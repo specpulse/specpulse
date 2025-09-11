@@ -44,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Various bug fixes and improvements
 
-## [1.0.2] - 2025-09-09
+## [1.0.2] - 2025-09-10
 
 ### Added
 - Basic test coverage
@@ -53,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Minor bug fixes
 
-## [1.0.1] - 2025-09-08
+## [1.0.1] - 2025-09-10
 
 ### Added
 - Initial beta release

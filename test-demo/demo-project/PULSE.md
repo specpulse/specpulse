@@ -5,11 +5,10 @@ This project uses SpecPulse for specification-driven development.
 
 ## Quick Start
 1. Open in your AI assistant (Claude or Gemini)
-2. Use `/pulse init <feature>` to start a new feature
-3. Use `/spec create` to generate specifications
-4. Use `/plan generate` to create implementation plans
-5. Use `/task breakdown` to create task lists
-6. Use `/validate all` before implementation
+2. Use `/pulse <feature-name>` to start a new feature
+3. Use `/spec [description]` to generate specifications
+4. Use `/plan` to create implementation plans
+5. Use `/task` to create task lists
 
 ## Project Structure
 - `specs/` - Feature specifications
@@ -20,10 +19,14 @@ This project uses SpecPulse for specification-driven development.
 - `templates/` - Document templates
 
 ## Commands
-- `/pulse init <feature>` - Initialize new feature
-- `/spec create <description>` - Create specification
-- `/plan generate` - Generate implementation plan
-- `/task breakdown` - Create task list
-- `/validate [component]` - Validate project
+- `/pulse <feature-name>` - Initialize new feature
+- `/spec [action] [description]` - Create/update/validate specifications
+- `/plan [action]` - Generate/validate implementation plans
+- `/task [action]` - Generate/manage task breakdowns
 
-Generated with SpecPulse v1.0.0
+## Command Actions
+- **spec**: `create`, `update`, `validate` (default: create)
+- **plan**: `generate`, `validate` (default: generate)
+- **task**: `breakdown`, `update`, `status` (default: breakdown)
+
+Generated with SpecPulse v1.0.4

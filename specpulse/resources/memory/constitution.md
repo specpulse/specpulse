@@ -124,7 +124,7 @@ complexity_exceptions:
     violation: "Using 4 projects instead of 3"
     justification: "Authentication requires separate service for security isolation"
     approved_by: "Team Lead"
-    date: "2024-01-15"
+    date: "2025-09-11"
 ```
 
 ### Amendment Process
@@ -233,5 +233,5 @@ While principles are immutable, their application can evolve:
 ## Living Constitution
 This constitution is a living document that learns from experience while maintaining core principles. Each project iteration strengthens these principles through practical application and refinement.
 
-*Last Updated: 2024-12-27*
+*Last Updated: 2025-09-11*
 *Version: 2.0 - Full SDD Methodology Implementation*
