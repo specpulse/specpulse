@@ -6,6 +6,7 @@ import sys
 import time
 import random
 from typing import Optional, List, Dict, Any
+from .. import __version__
 from rich.console import Console as RichConsole
 from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeRemainingColumn
@@ -42,9 +43,9 @@ class Console:
 +=====================================================================+
 """
 
-    MINI_BANNER = """
+    MINI_BANNER_TEMPLATE = """
 +---------------------------------------+
-|  SPECPULSE v1.0.0                    |
+|  SPECPULSE v{version:<23} |
 |  Specification-Driven Development     |
 |  Framework Ready                      |
 +---------------------------------------+
@@ -62,7 +63,10 @@ class Console:
     
     def show_banner(self, mini: bool = False):
         """Display ASCII art banner"""
-        banner = self.MINI_BANNER if mini else self.BANNER
+        if mini:
+            banner = self.MINI_BANNER_TEMPLATE.format(version=__version__)
+        else:
+            banner = self.BANNER
         gradient_colors = ["bright_blue", "bright_cyan", "bright_white"]
         
         lines = banner.strip().split('\n')

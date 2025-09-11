@@ -12,6 +12,7 @@ import shutil
 from datetime import datetime
 from typing import Optional
 
+from .. import __version__
 from ..core.specpulse import SpecPulse
 from ..core.validator import Validator
 from ..utils.console import Console
@@ -77,7 +78,7 @@ class SpecPulseCLI:
         
         # Create config file
         config = {
-            "version": "1.0.0",
+            "version": __version__,
             "project": {
                 "name": project_name,
                 "type": template,
@@ -599,7 +600,7 @@ def main():
     doctor_parser = subparsers.add_parser("doctor", help="System check and diagnostics")
     
     # Version
-    parser.add_argument("--version", action="version", version="SpecPulse 1.0.0")
+    parser.add_argument("--version", action="version", version=f"SpecPulse {__version__}")
     parser.add_argument("--no-color", action="store_true", help="Disable colored output")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     
