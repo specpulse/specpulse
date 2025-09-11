@@ -1,0 +1,32 @@
+[command]
+name = "pulse"
+description = "Initialize a new feature with SpecPulse framework"
+version = "1.0.0"
+
+[command.args]
+action = { required = true, description = "Action to perform (init)" }
+feature_name = { required = true, description = "Name of the feature" }
+
+[command.examples]
+basic = "pulse init 'user authentication'"
+kebab = "pulse init user-authentication"
+
+[command.implementation]
+script = "scripts/pulse-init.sh"
+output = "json"
+
+[command.help]
+text = """
+Initialize a new feature with proper structure:
+- Creates feature branch
+- Sets up specification directory
+- Creates plan and task directories
+- Updates project context
+
+Usage: pulse init <feature-name>
+
+The feature name will be cleaned and formatted:
+- Spaces replaced with hyphens
+- Converted to lowercase
+- Prefixed with feature ID (001, 002, etc.)
+"""

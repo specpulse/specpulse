@@ -1,0 +1,47 @@
+[command]
+name = "plan"
+description = "Generate implementation plan from specification"
+version = "1.0.0"
+
+[command.args]
+action = { required = true, description = "Action to perform (generate)" }
+
+[command.examples]
+basic = "plan generate"
+
+[command.implementation]
+script = "scripts/pulse-plan.sh"
+output = "json"
+template = "templates/plan.md"
+
+[command.phases]
+phase0 = "Setup and Prerequisites"
+phase1 = "Data Layer"
+phase2 = "Business Logic"
+phase3 = "API/Interface Layer"
+phase4 = "Testing and Optimization"
+
+[command.outputs]
+architecture = "System architecture diagram"
+technology = "Technology stack decisions"
+api_contracts = "API endpoint definitions"
+data_models = "Database schema"
+testing = "Test strategy and coverage"
+
+[command.help]
+text = """
+Create implementation plan from current specification.
+
+Usage: plan generate
+
+The plan includes:
+- Architecture design
+- Technology selection
+- Phased implementation approach
+- API contracts
+- Data models
+- Testing strategy
+- Risk assessment
+
+Reads specification and outputs detailed plan.
+"""

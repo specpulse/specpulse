@@ -1,0 +1,47 @@
+[command]
+name = "spec"
+description = "Create a detailed specification from requirements"
+version = "1.0.0"
+
+[command.args]
+action = { required = true, description = "Action to perform (create)" }
+description = { required = true, description = "Feature requirements description" }
+
+[command.examples]
+basic = "spec create 'Build a real-time chat system'"
+detailed = "spec create 'User authentication with OAuth2'"
+
+[command.implementation]
+script = "scripts/pulse-spec.sh"
+output = "json"
+template = "templates/spec.md"
+
+[command.sections]
+required = [
+    "Executive Summary",
+    "Problem Statement",
+    "Functional Requirements",
+    "Non-Functional Requirements",
+    "User Stories"
+]
+optional = [
+    "Technical Constraints",
+    "Dependencies",
+    "Risks and Mitigations"
+]
+
+[command.help]
+text = """
+Generate a comprehensive specification from requirements.
+
+Usage: spec create <description>
+
+The specification includes:
+- Problem analysis
+- Solution design
+- Detailed requirements
+- User stories with acceptance criteria
+- Risk assessment
+
+All unclear items are marked with [NEEDS CLARIFICATION]
+"""

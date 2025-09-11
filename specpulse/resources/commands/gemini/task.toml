@@ -1,0 +1,49 @@
+[command]
+name = "task"
+description = "Create task breakdown from implementation plan"
+version = "1.0.0"
+
+[command.args]
+action = { required = true, description = "Action to perform (breakdown)" }
+
+[command.examples]
+basic = "task breakdown"
+
+[command.implementation]
+script = "scripts/pulse-task.sh"
+output = "json"
+template = "templates/task.md"
+
+[command.task_types]
+setup = "Environment and configuration"
+development = "Feature implementation"
+testing = "Test creation and execution"
+documentation = "Documentation and guides"
+
+[command.priorities]
+high = "Critical path tasks"
+medium = "Important but not blocking"
+low = "Nice to have"
+
+[command.features]
+parallel = "Tasks marked with [P] can run simultaneously"
+dependencies = "Task dependencies tracked"
+critical_path = "Longest dependency chain identified"
+estimates = "Time estimates for each task"
+
+[command.help]
+text = """
+Generate task list from implementation plan.
+
+Usage: task breakdown
+
+Creates detailed task list with:
+- Task IDs and descriptions
+- Dependencies and ordering
+- Parallel execution groups [P]
+- Time estimates
+- Critical path analysis
+- Execution schedule
+
+Tasks are organized for efficient execution.
+"""
