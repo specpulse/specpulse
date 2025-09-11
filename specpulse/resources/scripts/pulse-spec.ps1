@@ -16,7 +16,7 @@ $ScriptName = $MyInvocation.MyCommand.Name
 $ProjectRoot = $PSScriptRoot | Split-Path -Parent | Split-Path -Parent
 $MemoryDir = Join-Path $ProjectRoot "memory"
 $ContextFile = Join-Path $MemoryDir "context.md"
-$TemplatesDir = Join-Path $ProjectRoot "resources" "templates"
+$TemplatesDir = Join-Path $ProjectRoot "templates"
 
 function Write-Log {
     param([string]$Message)

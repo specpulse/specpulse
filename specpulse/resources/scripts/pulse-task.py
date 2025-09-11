@@ -13,10 +13,10 @@ import datetime
 class SpecPulseTask:
     def __init__(self):
         self.script_name = Path(__file__).name
-        self.project_root = Path(__file__).parent.parent.parent
+        self.project_root = Path(__file__).parent.parent
         self.memory_dir = self.project_root / "memory"
         self.context_file = self.memory_dir / "context.md"
-        self.templates_dir = self.project_root / "resources" / "templates"
+        self.templates_dir = self.project_root / "templates"
         
     def log(self, message):
         """Log messages with timestamp"""
