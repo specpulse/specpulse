@@ -11,7 +11,7 @@ long_description = (this_directory / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="specpulse",
-    version="1.0.5",
+    version="1.0.6",
     author="SpecPulse",
     author_email="",
     description="Next-Generation Specification-Driven Development Framework",

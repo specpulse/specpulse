@@ -21,12 +21,12 @@
 
 SpecPulse revolutionizes AI-assisted development by enforcing a **specification-first approach**. Instead of jumping straight into code, SpecPulse ensures every feature starts with clear specifications, validated plans, and tracked tasks - guaranteeing quality from day one.
 
-> **Latest Update (v1.0.5)**: 
-> - ✅ **Complete Cross-Platform Support**: Works seamlessly on Windows, Linux, and macOS
-> - ✅ **100% Test Success Rate**: Comprehensive test suite with 37+ tests across all platforms
-> - ✅ **Python & PowerShell Scripts**: Full script compatibility beyond bash
-> - ✅ **Automatic Platform Detection**: AI commands choose the right script automatically
-> - ✅ **Unicode Support**: Full international character support (≤, ≥, →, ←)
+> **Latest Update (v1.0.6)**: 
+> - 🐛 **Critical Bug Fix**: Fixed cross-platform template initialization bug
+> - ✅ **Proper Resource Management**: All cross-platform scripts now correctly copied from @specpulse/resources
+> - ✅ **Complete Script Availability**: All 12 scripts (4 types × 3 platforms) properly installed
+> - ✅ **Enhanced Package Configuration**: Fixed package data inclusion for Python and PowerShell scripts
+> - ✅ **Improved Error Handling**: Better resource path resolution and script copying operations
 
 ### Why SpecPulse?
 
@@ -394,20 +394,11 @@ pytest tests/
 
 - **[PyPI Package](https://pypi.org/project/specpulse/)** - Official package page
 - **[GitHub Repository](https://github.com/specpulse/specpulse)** - Source code and issues
-- **[Examples](https://github.com/specpulse/specpulse/tree/main/examples)** - Real-world usage
 - **Command Reference** - See AI Integration section above for full command list
 
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-Built with inspiration from:
-- Test-Driven Development principles
-- Domain-Driven Design
-- Clean Architecture
-- Specification by Example
 
 ## 🚦 Project Status
 
