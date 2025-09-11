@@ -153,3 +153,7 @@ ehthumbs.db
 *.tmp
 *.bak
 *~
+
+tests/
+test-project/
+
