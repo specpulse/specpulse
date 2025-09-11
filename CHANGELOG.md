@@ -5,6 +5,19 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2025-09-11
+
+### Fixed
+- **Critical cross-platform template bug**: Fixed `specpulse init` command to use proper cross-platform scripts from `@specpulse/resources` instead of embedded templates
+- **Package data configuration**: Added missing `.py` and `.ps1` script files to package manifest in `pyproject.toml`
+- **CLI script creation**: Updated `_create_scripts` method to copy all cross-platform scripts from resources directory
+- **Resource path resolution**: Enhanced resource path detection using `pkg_resources.resource_filename()`
+
+### Added
+- Complete cross-platform script availability: All 12 scripts (4 types × 3 platforms) now properly installed
+- Better error handling for script copying operations
+- Improved script count reporting during initialization
+
 ## [1.0.5] - 2025-09-11
 
 ### Added
