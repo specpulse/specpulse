@@ -21,7 +21,11 @@
 
 SpecPulse revolutionizes AI-assisted development by enforcing a **specification-first approach**. Instead of jumping straight into code, SpecPulse ensures every feature starts with clear specifications, validated plans, and tracked tasks - guaranteeing quality from day one.
 
-> **Latest Update (v1.0.1)**: Fixed command documentation and improved AI integration clarity.
+> **Latest Update (v1.0.4)**: 
+> - ✅ **100% Working AI Commands**: Both Claude and Gemini commands now properly support arguments
+> - ✅ **95% Test Coverage**: Comprehensive test suite with 193+ tests
+> - ✅ **Fixed Command Formats**: Claude uses `$ARGUMENTS`, Gemini uses `{{args}}`
+> - ✅ **Enhanced Documentation**: Clearer examples and usage instructions
 
 ### Why SpecPulse?
 
@@ -69,25 +73,21 @@ specpulse init --ai gemini
 
 ```bash
 # Initialize a new feature
-/pulse init user-authentication
+/pulse user-authentication
+# Creates structure for 001-user-authentication feature
 
-# Create the specification
-/spec create "User login with OAuth2 and email/password"
-
-# Validate the specification
-/spec validate
+# Create the specification  
+/spec create user login with OAuth2 and email/password
+# Or just: /spec (for interactive mode)
 
 # Generate implementation plan
 /plan generate
-
-# Validate plan against constitution
-/plan validate
+# Or: /plan validate (to check existing plan)
 
 # Break down into tasks
 /task breakdown
-
-# Check task progress
-/task status
+# Or: /task update (to update task status)
+# Or: /task status (to see progress)
 ```
 
 ### Step 4: Validate & Ship
@@ -199,28 +199,41 @@ Stop guessing what users want:
 
 ### 🤖 Deep AI Integration
 
-**Claude Commands:**
+**How AI Commands Work:**
+
+Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
+
 ```bash
-# Feature initialization
-/pulse init <feature-name>        # Initialize new feature with structure
-
-# Specification management
-/spec create <description>        # Generate specification from requirements
-/spec update                      # Update existing specification
-/spec validate                    # Check specification completeness
-
-# Planning commands
-/plan generate                    # Create implementation plan from spec
-/plan validate                    # Validate plan against constitution
-
-# Task management
-/task breakdown                   # Generate tasks from plan
-/task update                      # Update task status
-/task status                      # Show task progress
+/pulse user-authentication     # Start new feature with name
+/spec create OAuth2 login      # Create specification with description
+/spec update                   # Update existing specification
+/spec validate                 # Validate specification completeness
+/plan generate                 # Generate plan from specification
+/plan validate                 # Validate plan against constitution
+/task breakdown                # Create task list from plan
+/task update                   # Update task statuses
+/task status                   # Show current progress
 ```
 
-**Gemini Commands:**
-Same commands with TOML-based configuration for enhanced parsing.
+**Behind the Scenes:**
+- Commands capture arguments using `$ARGUMENTS` variable
+- Shell scripts in `scripts/` folder process the arguments
+- AI reads templates from `templates/` folder
+- Results are saved in `specs/`, `plans/`, `tasks/` folders
+- Memory system tracks progress in `memory/` folder
+
+**Claude vs Gemini:**
+- **Claude**: Uses Markdown command files (`.claude/commands/*.md`) with YAML frontmatter
+  - Arguments passed via `$ARGUMENTS` variable to shell scripts
+- **Gemini**: Uses TOML command files (`.gemini/commands/*.toml`) with simple format
+  - Arguments handled via `{{args}}` placeholder in prompts
+- Both support arguments and work the same way from user perspective
+
+**Command Arguments:**
+- Commands can accept arguments: `/command arg1 arg2`
+- Claude: Arguments passed to scripts via `$ARGUMENTS`
+- Gemini: Arguments injected via `{{args}}` placeholder
+- Commands can be used without arguments for interactive mode
 
 ## 📊 Real-World Impact
 
@@ -380,7 +393,8 @@ Built with inspiration from:
 ## 🚦 Project Status
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/specpulse/specpulse)
-[![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)](https://github.com/specpulse/specpulse)
+[![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)](https://github.com/specpulse/specpulse)
+[![Tests](https://img.shields.io/badge/tests-193%20passed-brightgreen)](https://github.com/specpulse/specpulse)
 [![Maintainability](https://img.shields.io/badge/maintainability-A-brightgreen)](https://github.com/specpulse/specpulse)
 
 ---

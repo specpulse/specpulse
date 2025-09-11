@@ -1,45 +1,24 @@
-[command]
-name = "pulse"
-description = "Initialize SpecPulse features"
+description = "Initialize a new feature with SpecPulse framework"
+prompt = """
+Initialize a new SpecPulse feature with the name: {{args}}
 
-[command.subcommands.init]
-description = "Initialize a new feature with proper structure"
-usage = "/pulse init <feature-name>"
+Please follow these steps:
 
-[[command.subcommands.init.steps]]
-action = "run_script"
-script = "scripts/pulse-init.sh"
-args = ["{{feature_name}}"]
+1. Extract the feature name from the provided arguments
+2. Run the initialization script: !{bash scripts/pulse-init.sh "{{args}}"}
+3. Create the feature structure:
+   - Generate feature ID (001, 002, etc.)
+   - Create directories: specs/XXX-feature/, plans/XXX-feature/, tasks/XXX-feature/
+   - Copy templates to feature directories
+   - Update memory/context.md with current feature
+   - Create git branch if in git repository
 
-[[command.subcommands.init.steps]]
-action = "create_files"
-files = [
-    "specs/{{branch_name}}/spec.md",
-    "plans/{{branch_name}}/plan.md",
-    "tasks/{{branch_name}}/tasks.md"
-]
+4. Report the results showing:
+   - Created structure paths
+   - Feature ID and branch name
+   - Next steps for the user
 
-[[command.subcommands.init.steps]]
-action = "update_context"
-file = "memory/context.md"
-content = """
-## Active Feature: {{feature_name}}
-- Feature ID: {{feature_id}}
-- Branch: {{branch_name}}
-- Started: {{timestamp}}
-"""
+If no feature name is provided, ask the user for the feature name first.
 
-[[command.subcommands.init.steps]]
-action = "git_branch"
-branch = "{{branch_name}}"
-
-[command.response]
-template = """
-✅ Feature initialized: {{feature_name}}
-- Branch: {{branch_name}}
-- Spec: specs/{{branch_name}}/spec.md
-- Plan: plans/{{branch_name}}/plan.md
-- Tasks: tasks/{{branch_name}}/tasks.md
-
-Next: Use /spec create to define requirements
+Example usage: /pulse user-authentication
 """

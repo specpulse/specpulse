@@ -1,47 +1,69 @@
-# /task
+---
+name: task
+description: Generate and manage task breakdowns
+allowed_tools:
+  - Read
+  - Write  
+  - Edit
+  - Bash
+---
 
-Generate task breakdowns using SpecPulse structure.
+# /task Command
+
+Generate task breakdowns from implementation plans using SpecPulse structure.
 
 ## Usage
 ```
-/task breakdown
-/task update
-/task status
+/task [action]
 ```
 
-## Commands
+Actions: `breakdown`, `update`, `status` (defaults to `breakdown`)
 
-### breakdown
-Generate tasks from plan:
-1. Create task categories:
+## Implementation
+
+When called with `/task $ARGUMENTS`, I will:
+
+1. **Parse arguments** to determine action:
+   - If `$ARGUMENTS` is `update`: Update task status
+   - If `$ARGUMENTS` is `status`: Show progress
+   - Otherwise: Generate task breakdown
+
+2. **For `/task breakdown` or `/task`:**
+   
+   a. **Read implementation plan** from `plans/XXX-feature/plan.md`
+   
+   b. **Generate tasks from plan**:
+      - Create task categories:
    - Critical Path (Phase 0)
    - Phase 1: Foundation
    - Phase 2: Core Features
    - Phase 3: Polish
    - Phase 4: Testing
 
-2. For each task:
+      - For each task:
    - Use T[XXX] format (T001, T002)
    - Include clear description
    - Mark dependencies
    - Estimate complexity (S/M/L/XL)
    - Assign priority
 
-3. Write to tasks/[feature]/tasks.md
+   c. **Write tasks** to `tasks/XXX-feature/tasks.md`
 
-### update
-Update task status:
-1. Mark tasks as completed
-2. Add new discovered tasks
-3. Update dependencies
-4. Track blockers
+3. **For `/task update`:**
+   - Read current tasks from `tasks/XXX-feature/tasks.md`
+   - Ask which tasks to update
+   - Mark tasks as completed/in-progress
+   - Add newly discovered tasks
+   - Update dependencies and blockers
+   - Save updated task list
 
-### status
-Show task progress:
-1. Count completed vs total
-2. Show current phase
-3. List blockers
-4. Estimate remaining work
+4. **For `/task status`:**
+   - Read current tasks
+   - Count completed vs total
+   - Show current phase progress
+   - List any blockers
+   - Estimate remaining work
+   - Display progress summary
 
 ## Task Format
 ```markdown

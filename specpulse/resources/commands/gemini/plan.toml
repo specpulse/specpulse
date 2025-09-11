@@ -1,48 +1,51 @@
-[command]
-name = "plan"
-description = "Generate implementation plans"
+description = "Generate or validate implementation plans"
+prompt = """
+Handle the /plan command with arguments: {{args}}
 
-[command.subcommands.generate]
-description = "Create plan from specification"
-usage = "/plan generate"
+Parse arguments to determine action:
+- If "validate": Check plan against constitution
+- Otherwise: Generate new plan
 
-[[command.subcommands.generate.phase_gates]]
-name = "Constitutional Compliance"
-checks = [
-    "simplicity_check",
-    "test_first_check",
-    "framework_usage_check"
-]
+## For /plan generate or /plan:
+1. Read current specification from @{specs/*/spec.md}
 
-[[command.subcommands.generate.phase_gates]]
-name = "Complexity Check"
-max_modules = 3
-requires_justification = true
+2. Run Phase Gates checks:
+   - Constitutional compliance
+   - Simplicity check (≤3 modules)
+   - Test-first strategy defined
+   - Framework selection complete
+   - Research completed
 
-[[command.subcommands.generate.actions]]
-step = "read_spec"
-file = "specs/{{feature}}/spec.md"
+3. Generate plan sections:
+   - Technology stack
+   - Architecture overview
+   - Implementation phases
+   - API contracts
+   - Data models
+   - Testing strategy
 
-[[command.subcommands.generate.actions]]
-step = "generate_plan"
-template = "templates/plan.md"
-sections = [
-    "technology_stack",
-    "architecture",
-    "phases",
-    "api_contracts",
-    "data_models",
-    "test_strategy"
-]
+4. Track complexity:
+   - If >3 modules, document justification
+   - Create simplification roadmap
 
-[[command.subcommands.generate.actions]]
-step = "write_file"
-path = "plans/{{feature}}/plan.md"
+5. Write plan to plans/XXX-feature/plan.md
 
-[command.subcommands.validate]
-description = "Validate plan against constitution"
-checks = [
-    "phase_gates_passed",
-    "complexity_tracked",
-    "test_first_defined"
-]
+## For /plan validate:
+1. Read existing plan from @{plans/*/plan.md}
+2. Verify Phase Gates compliance
+3. Check complexity tracking
+4. Ensure test-first approach
+5. Validate framework choices
+6. Report validation results
+
+Phase Gates (Phase -1) must pass before implementation:
+- ✅ Using ≤3 projects/modules
+- ✅ Tests defined before code
+- ✅ Using framework features directly
+- ✅ No premature abstractions
+- ✅ Research completed
+
+Examples:
+- /plan generate
+- /plan validate
+"""
