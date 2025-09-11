@@ -1,0 +1,48 @@
+[command]
+name = "plan"
+description = "Generate implementation plans"
+
+[command.subcommands.generate]
+description = "Create plan from specification"
+usage = "/plan generate"
+
+[[command.subcommands.generate.phase_gates]]
+name = "Constitutional Compliance"
+checks = [
+    "simplicity_check",
+    "test_first_check",
+    "framework_usage_check"
+]
+
+[[command.subcommands.generate.phase_gates]]
+name = "Complexity Check"
+max_modules = 3
+requires_justification = true
+
+[[command.subcommands.generate.actions]]
+step = "read_spec"
+file = "specs/{{feature}}/spec.md"
+
+[[command.subcommands.generate.actions]]
+step = "generate_plan"
+template = "templates/plan.md"
+sections = [
+    "technology_stack",
+    "architecture",
+    "phases",
+    "api_contracts",
+    "data_models",
+    "test_strategy"
+]
+
+[[command.subcommands.generate.actions]]
+step = "write_file"
+path = "plans/{{feature}}/plan.md"
+
+[command.subcommands.validate]
+description = "Validate plan against constitution"
+checks = [
+    "phase_gates_passed",
+    "complexity_tracked",
+    "test_first_defined"
+]

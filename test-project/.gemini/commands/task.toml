@@ -1,0 +1,51 @@
+[command]
+name = "task"
+description = "Manage task breakdowns"
+
+[command.subcommands.breakdown]
+description = "Generate tasks from plan"
+usage = "/task breakdown"
+
+[[command.subcommands.breakdown.categories]]
+name = "Critical Path"
+phase = 0
+prefix = "T0"
+
+[[command.subcommands.breakdown.categories]]
+name = "Foundation"
+phase = 1
+prefix = "T1"
+
+[[command.subcommands.breakdown.categories]]
+name = "Core Features"
+phase = 2
+prefix = "T2"
+
+[[command.subcommands.breakdown.categories]]
+name = "Polish"
+phase = 3
+prefix = "T3"
+
+[[command.subcommands.breakdown.categories]]
+name = "Testing"
+phase = 4
+prefix = "T4"
+
+[command.subcommands.breakdown.format]
+pattern = "T{id:03d}"
+complexity = ["S", "M", "L", "XL"]
+template = "- [ ] {id}: [{complexity}] {description}"
+
+[command.subcommands.update]
+description = "Update task status"
+actions = ["complete", "add", "block", "unblock"]
+
+[command.subcommands.status]
+description = "Show task progress"
+shows = [
+    "completed_count",
+    "total_count",
+    "current_phase",
+    "blockers",
+    "estimate"
+]

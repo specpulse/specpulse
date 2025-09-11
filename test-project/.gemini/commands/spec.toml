@@ -1,0 +1,33 @@
+[command]
+name = "spec"
+description = "Manage feature specifications"
+
+[command.subcommands.create]
+description = "Create specification from requirements"
+usage = "/spec create <description>"
+
+[[command.subcommands.create.actions]]
+step = "analyze_requirements"
+input = "{{description}}"
+
+[[command.subcommands.create.actions]]
+step = "generate_spec"
+template = "templates/spec.md"
+markers = ["[NEEDS CLARIFICATION]"]
+
+[[command.subcommands.create.actions]]
+step = "write_file"
+path = "specs/{{feature}}/spec.md"
+
+[command.subcommands.validate]
+description = "Validate specification completeness"
+checks = [
+    "all_sections_filled",
+    "no_clarification_markers",
+    "testable_criteria",
+    "technical_specs_defined"
+]
+
+[command.subcommands.update]
+description = "Update existing specification"
+usage = "/spec update"

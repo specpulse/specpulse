@@ -21,6 +21,8 @@
 
 SpecPulse revolutionizes AI-assisted development by enforcing a **specification-first approach**. Instead of jumping straight into code, SpecPulse ensures every feature starts with clear specifications, validated plans, and tracked tasks - guaranteeing quality from day one.
 
+> **Latest Update (v1.0.1)**: Fixed command documentation and improved AI integration clarity.
+
 ### Why SpecPulse?
 
 - **🔍 Clarity First**: No more ambiguous requirements or scope creep
@@ -32,7 +34,7 @@ SpecPulse revolutionizes AI-assisted development by enforcing a **specification-
 ## 📦 Installation
 
 ```bash
-pip install specpulse
+pip install specpulse --upgrade
 ```
 
 **Requirements:**
@@ -72,11 +74,20 @@ specpulse init --ai gemini
 # Create the specification
 /spec create "User login with OAuth2 and email/password"
 
+# Validate the specification
+/spec validate
+
 # Generate implementation plan
 /plan generate
 
+# Validate plan against constitution
+/plan validate
+
 # Break down into tasks
 /task breakdown
+
+# Check task progress
+/task status
 ```
 
 ### Step 4: Validate & Ship
@@ -190,11 +201,22 @@ Stop guessing what users want:
 
 **Claude Commands:**
 ```bash
-/pulse init <feature>      # Start new feature
-/spec create <description> # Generate specification
-/plan generate            # Create implementation plan
-/task breakdown           # Generate task list
-/validate all            # Run all validations
+# Feature initialization
+/pulse init <feature-name>        # Initialize new feature with structure
+
+# Specification management
+/spec create <description>        # Generate specification from requirements
+/spec update                      # Update existing specification
+/spec validate                    # Check specification completeness
+
+# Planning commands
+/plan generate                    # Create implementation plan from spec
+/plan validate                    # Validate plan against constitution
+
+# Task management
+/task breakdown                   # Generate tasks from plan
+/task update                      # Update task status
+/task status                      # Show task progress
 ```
 
 **Gemini Commands:**
@@ -216,14 +238,14 @@ Same commands with TOML-based configuration for enhanced parsing.
 my-project/
 ├── .specpulse/          # Configuration and cache
 │   └── config.yaml      # Project settings
-├── .claude/             # Claude AI commands
-│   └── commands/        # Custom command definitions
-├── .gemini/             # Gemini AI commands
-│   └── commands/        # TOML command configs
+├── .claude/             # Claude AI integration
+│   └── commands/        # Claude command definitions (.md)
+├── .gemini/             # Gemini AI integration
+│   └── commands/        # Gemini command definitions (.toml)
 ├── memory/              # Project intelligence
 │   ├── constitution.md  # Immutable principles
 │   ├── context.md      # Current state
-│   └── decisions.md    # ADRs
+│   └── decisions.md    # Architecture Decision Records
 ├── specs/               # Feature specifications
 │   └── 001-feature/
 │       └── spec.md
@@ -234,7 +256,12 @@ my-project/
 │   └── 001-feature/
 │       └── tasks.md
 ├── templates/           # Customizable templates
-└── scripts/             # Automation scripts
+├── scripts/             # Shell scripts for AI execution
+│   ├── pulse-init.sh    # Feature initialization
+│   ├── pulse-spec.sh    # Specification creation
+│   ├── pulse-plan.sh    # Plan generation
+│   └── pulse-task.sh    # Task breakdown
+└── PULSE.md            # Project manifest
 ```
 
 ## 🛠️ Advanced Usage
@@ -316,7 +343,7 @@ specpulse validate --component constitution
 
 ## 🤝 Contributing
 
-We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! The project is actively maintained and looking for contributors.
 
 ```bash
 # Fork and clone
@@ -333,10 +360,10 @@ pytest tests/
 
 ## 📚 Documentation
 
-- **[Full Documentation](https://github.com/specpulse/specpulse/wiki)** - Comprehensive guides
-- **[API Reference](https://github.com/specpulse/specpulse/wiki/API)** - Detailed API docs
+- **[PyPI Package](https://pypi.org/project/specpulse/)** - Official package page
+- **[GitHub Repository](https://github.com/specpulse/specpulse)** - Source code and issues
 - **[Examples](https://github.com/specpulse/specpulse/tree/main/examples)** - Real-world usage
-- **[FAQ](https://github.com/specpulse/specpulse/wiki/FAQ)** - Frequently asked questions
+- **Command Reference** - See AI Integration section above for full command list
 
 ## 📄 License
 
