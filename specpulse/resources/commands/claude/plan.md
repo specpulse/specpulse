@@ -1,47 +1,54 @@
 # /plan
 
-Generate implementation plan from specification.
+Generate implementation plans using SpecPulse methodology.
 
 ## Usage
 ```
 /plan generate
+/plan validate
 ```
 
-## Description
-Creates a detailed implementation plan based on the current feature specification.
+## Commands
 
-## Process
-1. Reads the current specification
-2. Analyzes requirements
-3. Designs architecture
-4. Selects technology stack
-5. Creates phased implementation approach
-6. Generates API contracts
-7. Defines data models
-8. Plans testing strategy
+### generate
+Create implementation plan from specification:
+1. Run Phase Gates checks:
+   - Constitutional compliance
+   - Simplicity check (≤3 modules)
+   - Test-first strategy defined
+   - Framework selection complete
+   - Research completed
 
-## Plan Sections
-- Architecture Overview (with diagram)
-- Technology Stack
-- Implementation Phases
-- File Structure
-- API Contracts
-- Data Models
-- Testing Strategy
-- Risk Assessment
-- Success Criteria
+2. Generate plan sections:
+   - Technology stack
+   - Architecture overview
+   - Implementation phases
+   - API contracts
+   - Data models
+   - Testing strategy
 
-## Phases
-1. **Phase 0**: Setup and Prerequisites
-2. **Phase 1**: Data Layer
-3. **Phase 2**: Business Logic
-4. **Phase 3**: API/Interface Layer
-5. **Phase 4**: Testing and Optimization
+3. Track complexity:
+   - If >3 modules, document justification
+   - Create simplification roadmap
+
+4. Write to plans/[feature]/plan.md
+
+### validate
+Check plan against constitution:
+1. Verify Phase Gates passed
+2. Check complexity tracking
+3. Ensure test-first approach
+4. Validate framework choices
+
+## Phase Gates (Phase -1)
+Must pass before implementation:
+- ✅ Using ≤3 projects/modules
+- ✅ Tests defined before code
+- ✅ Using framework features directly
+- ✅ No premature abstractions
+- ✅ Research completed
 
 ## Example
 ```
 /plan generate
 ```
-
-Reads: `specs/001-user-auth/specification.md`
-Creates: `plans/001-user-auth/implementation.md`

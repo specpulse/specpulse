@@ -7,34 +7,30 @@ Initialize a new feature with SpecPulse framework.
 /pulse init <feature-name>
 ```
 
-## Description
-Creates a structured feature development environment with:
-- Feature branch (git)
-- Specification directory
-- Plan directory
-- Task directory
-- Context updates
+## What This Does
+1. Runs `scripts/pulse-init.sh <feature-name>` to:
+   - Create feature ID (001, 002, etc.)
+   - Create branch name (001-feature-name)
+   - Create directories: specs/, plans/, tasks/
+   - Copy templates to feature directories
+   - Update memory/context.md
+   - Create git branch if in git repo
 
-## Process
-1. Creates feature ID (e.g., 001, 002)
-2. Creates branch name (e.g., 001-user-auth)
-3. Sets up directory structure
-4. Switches to feature branch
-5. Updates project context
-
-## Output
-Returns JSON with:
-- branch_name: Created git branch
-- feature_id: Numeric feature ID
-- spec_dir: Specification directory path
-- plan_dir: Plan directory path
-- task_dir: Task directory path
+2. Reports the created structure back to user
 
 ## Example
 ```
-/pulse init "user authentication"
+/pulse init user-authentication
 ```
 
 Creates:
 - Branch: 001-user-authentication
-- Directories: specs/001-user-authentication/, etc.
+- specs/001-user-authentication/spec.md
+- plans/001-user-authentication/plan.md
+- tasks/001-user-authentication/tasks.md
+
+## Next Steps
+After initialization, use:
+- `/spec create` to write the specification
+- `/plan generate` to create implementation plan
+- `/task breakdown` to generate tasks

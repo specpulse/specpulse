@@ -1,45 +1,37 @@
 #!/bin/bash
-# SpecPulse Feature Initialization Script
+# Initialize a new feature with SpecPulse
 
-set -e
+FEATURE_NAME="${1:-feature}"
 
-# Get feature name from argument
-FEATURE_NAME="$1"
-if [ -z "$FEATURE_NAME" ]; then
-    echo "Error: Feature name required"
-    exit 1
-fi
+# Get next feature ID
+FEATURE_ID=$(printf "%03d" $(ls -d specs/[0-9]* 2>/dev/null | wc -l | xargs expr 1 +))
 
-# Clean feature name (replace spaces with hyphens, lowercase)
-CLEAN_NAME=$(echo "$FEATURE_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr '_' '-')
-
-# Get next feature number
-if [ -d "specs" ]; then
-    FEATURE_NUM=$(find specs -maxdepth 1 -type d -name "[0-9][0-9][0-9]-*" | wc -l)
-    FEATURE_NUM=$((FEATURE_NUM + 1))
-else
-    FEATURE_NUM=1
-fi
-
-# Format with leading zeros
-FEATURE_ID=$(printf "%03d" $FEATURE_NUM)
-BRANCH_NAME="${FEATURE_ID}-${CLEAN_NAME}"
+# Create branch name
+BRANCH_NAME="${FEATURE_ID}-${FEATURE_NAME}"
 
 # Create directories
 mkdir -p "specs/${BRANCH_NAME}"
 mkdir -p "plans/${BRANCH_NAME}"
 mkdir -p "tasks/${BRANCH_NAME}"
 
-# Create feature branch if git is available
-if command -v git &> /dev/null && [ -d ".git" ]; then
-    git checkout -b "$BRANCH_NAME" 2>/dev/null || git checkout "$BRANCH_NAME"
+# Create initial files from templates
+cp templates/spec.md "specs/${BRANCH_NAME}/spec.md"
+cp templates/plan.md "plans/${BRANCH_NAME}/plan.md"
+cp templates/task.md "tasks/${BRANCH_NAME}/tasks.md"
+
+# Update context
+echo "" >> memory/context.md
+echo "## Active Feature: ${FEATURE_NAME}" >> memory/context.md
+echo "- Feature ID: ${FEATURE_ID}" >> memory/context.md
+echo "- Branch: ${BRANCH_NAME}" >> memory/context.md
+echo "- Started: $(date -Iseconds)" >> memory/context.md
+
+# Create git branch if in git repo
+if [ -d .git ]; then
+    git checkout -b "${BRANCH_NAME}" 2>/dev/null || git checkout "${BRANCH_NAME}"
 fi
 
-# Output JSON result
-echo "{"
-echo "  \"branch_name\": \"$BRANCH_NAME\","
-echo "  \"feature_id\": \"$FEATURE_ID\","
-echo "  \"spec_dir\": \"specs/$BRANCH_NAME\","
-echo "  \"plan_dir\": \"plans/$BRANCH_NAME\","
-echo "  \"task_dir\": \"tasks/$BRANCH_NAME\""
-echo "}"
+echo "BRANCH_NAME=${BRANCH_NAME}"
+echo "SPEC_DIR=specs/${BRANCH_NAME}"
+echo "FEATURE_ID=${FEATURE_ID}"
+echo "STATUS=initialized"

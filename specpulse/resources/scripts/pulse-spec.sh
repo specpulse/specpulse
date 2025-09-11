@@ -1,40 +1,29 @@
 #!/bin/bash
-# SpecPulse Specification Generator Script
+# Generate or update specification
 
-set -e
+FEATURE_DIR="${1}"
+SPEC_CONTENT="${2}"
 
-# Get description from argument
-DESCRIPTION="$1"
-if [ -z "$DESCRIPTION" ]; then
-    echo "Error: Description required"
-    exit 1
+if [ -z "$FEATURE_DIR" ]; then
+    # Find current feature from context
+    FEATURE_DIR=$(grep -A1 "Active Feature" memory/context.md | tail -1 | cut -d: -f2 | xargs)
 fi
 
-# Find current feature branch
-BRANCH=$(git branch --show-current 2>/dev/null || echo "main")
-FEATURE_DIR=""
+SPEC_FILE="specs/${FEATURE_DIR}/spec.md"
 
-# Look for feature directory
-if [[ "$BRANCH" =~ ^[0-9]{3}- ]]; then
-    FEATURE_DIR="specs/$BRANCH"
-    if [ ! -d "$FEATURE_DIR" ]; then
-        echo "Error: Feature directory not found: $FEATURE_DIR"
-        exit 1
-    fi
+if [ -n "$SPEC_CONTENT" ]; then
+    # Update specification with content
+    echo "$SPEC_CONTENT" > "$SPEC_FILE"
 else
-    echo "Error: Not on a feature branch"
-    exit 1
+    # Ensure template exists
+    if [ ! -f "$SPEC_FILE" ]; then
+        cp templates/spec.md "$SPEC_FILE"
+    fi
 fi
 
-# Create specification file
-SPEC_FILE="$FEATURE_DIR/specification.md"
-TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
+# Validate specification
+echo "Validating specification..."
+grep -q "NEEDS CLARIFICATION" "$SPEC_FILE" && echo "WARNING: Specification has clarifications needed"
 
-# Output for AI processing
-echo "{"
-echo "  \"action\": \"create_specification\","
-echo "  \"description\": \"$DESCRIPTION\","
-echo "  \"spec_file\": \"$SPEC_FILE\","
-echo "  \"template\": \"templates/spec.md\","
-echo "  \"timestamp\": \"$TIMESTAMP\""
-echo "}"
+echo "SPEC_FILE=$SPEC_FILE"
+echo "STATUS=updated"

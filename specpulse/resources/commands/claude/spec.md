@@ -1,42 +1,47 @@
 # /spec
 
-Create a detailed specification from requirements.
+Create or update feature specifications using SpecPulse.
 
 ## Usage
 ```
 /spec create <description>
+/spec update
+/spec validate
 ```
 
-## Description
-Generates a comprehensive specification document from user requirements using the SpecPulse template.
+## Commands
 
-## Process
-1. Reads the specification template
-2. Analyzes user requirements
-3. Fills in all specification sections
-4. Marks uncertainties with [NEEDS CLARIFICATION]
-5. Saves to feature specification file
+### create
+Generate a specification from user requirements:
+1. Parse the user's description
+2. Identify functional requirements
+3. Create user stories
+4. Mark uncertainties with [NEEDS CLARIFICATION]
+5. Write to specs/[feature]/spec.md
 
-## Template Sections
-- Executive Summary
-- Problem Statement
-- Proposed Solution
-- Functional Requirements (numbered)
-- Non-Functional Requirements
-- User Stories
-- Technical Constraints
-- Dependencies
-- Risks and Mitigations
-- Open Questions
+### update
+Update existing specification:
+1. Read current spec.md
+2. Apply changes based on clarifications
+3. Remove resolved [NEEDS CLARIFICATION] markers
+4. Update acceptance criteria
 
-## Best Practices
-- Be specific and testable
-- Include acceptance criteria
-- Prioritize requirements (MUST/SHOULD/COULD)
-- Document all assumptions
-- Flag unclear requirements
+### validate
+Check specification completeness:
+1. Ensure all sections are filled
+2. Check for remaining [NEEDS CLARIFICATION] markers
+3. Verify acceptance criteria are testable
+4. Confirm technical specs are defined
+
+## Template Structure
+- Project Overview
+- Functional Requirements (Must/Should/Could)
+- User Stories with Acceptance Criteria
+- Technical Specifications
+- Clarifications Needed
+- Validation Checklist
 
 ## Example
 ```
-/spec create "Build a real-time chat system with user authentication, message history, and file sharing capabilities"
+/spec create "Build a user authentication system with email/password and OAuth2"
 ```

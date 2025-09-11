@@ -9,7 +9,6 @@ import yaml
 import json
 import os
 
-from .commands import AICommands
 
 
 class SpecPulse:
@@ -18,7 +17,6 @@ class SpecPulse:
     def __init__(self, project_path: Optional[Path] = None):
         self.project_path = project_path or Path.cwd()
         self.config = self._load_config()
-        self.commands = AICommands()
         # Get resource directory path
         self.resources_dir = Path(__file__).parent.parent / "resources"
     
@@ -911,36 +909,68 @@ Always use templates from `templates/` directory:
     # Claude command getters
     def get_claude_pulse_command(self) -> str:
         """Get Claude pulse command"""
-        return self.commands.get_claude_pulse_command()
+        command_path = self.resources_dir / "commands" / "claude" / "pulse.md"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# /pulse command not found"
     
     def get_claude_spec_command(self) -> str:
         """Get Claude spec command"""
-        return self.commands.get_claude_spec_command()
+        command_path = self.resources_dir / "commands" / "claude" / "spec.md"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# /spec command not found"
     
     def get_claude_plan_command(self) -> str:
         """Get Claude plan command"""
-        return self.commands.get_claude_plan_command()
+        command_path = self.resources_dir / "commands" / "claude" / "plan.md"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# /plan command not found"
     
     def get_claude_task_command(self) -> str:
         """Get Claude task command"""
-        return self.commands.get_claude_task_command()
+        command_path = self.resources_dir / "commands" / "claude" / "task.md"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# /task command not found"
     
     # Gemini command getters
     def get_gemini_pulse_command(self) -> str:
         """Get Gemini pulse command"""
-        return self.commands.get_gemini_pulse_command()
+        command_path = self.resources_dir / "commands" / "gemini" / "pulse.toml"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# Gemini pulse command not found"
     
     def get_gemini_spec_command(self) -> str:
         """Get Gemini spec command"""
-        return self.commands.get_gemini_spec_command()
+        command_path = self.resources_dir / "commands" / "gemini" / "spec.toml"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# Gemini spec command not found"
     
     def get_gemini_plan_command(self) -> str:
         """Get Gemini plan command"""
-        return self.commands.get_gemini_plan_command()
+        command_path = self.resources_dir / "commands" / "gemini" / "plan.toml"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# Gemini plan command not found"
     
     def get_gemini_task_command(self) -> str:
         """Get Gemini task command"""
-        return self.commands.get_gemini_task_command()
+        command_path = self.resources_dir / "commands" / "gemini" / "task.toml"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# Gemini task command not found"
     
     def get_gemini_instructions(self) -> str:
         """Get Gemini instructions"""

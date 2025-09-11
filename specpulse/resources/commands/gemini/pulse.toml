@@ -1,32 +1,45 @@
 [command]
 name = "pulse"
-description = "Initialize a new feature with SpecPulse framework"
-version = "1.0.0"
+description = "Initialize SpecPulse features"
 
-[command.args]
-action = { required = true, description = "Action to perform (init)" }
-feature_name = { required = true, description = "Name of the feature" }
+[command.subcommands.init]
+description = "Initialize a new feature with proper structure"
+usage = "/pulse init <feature-name>"
 
-[command.examples]
-basic = "pulse init 'user authentication'"
-kebab = "pulse init user-authentication"
-
-[command.implementation]
+[[command.subcommands.init.steps]]
+action = "run_script"
 script = "scripts/pulse-init.sh"
-output = "json"
+args = ["{{feature_name}}"]
 
-[command.help]
-text = """
-Initialize a new feature with proper structure:
-- Creates feature branch
-- Sets up specification directory
-- Creates plan and task directories
-- Updates project context
+[[command.subcommands.init.steps]]
+action = "create_files"
+files = [
+    "specs/{{branch_name}}/spec.md",
+    "plans/{{branch_name}}/plan.md",
+    "tasks/{{branch_name}}/tasks.md"
+]
 
-Usage: pulse init <feature-name>
+[[command.subcommands.init.steps]]
+action = "update_context"
+file = "memory/context.md"
+content = """
+## Active Feature: {{feature_name}}
+- Feature ID: {{feature_id}}
+- Branch: {{branch_name}}
+- Started: {{timestamp}}
+"""
 
-The feature name will be cleaned and formatted:
-- Spaces replaced with hyphens
-- Converted to lowercase
-- Prefixed with feature ID (001, 002, etc.)
+[[command.subcommands.init.steps]]
+action = "git_branch"
+branch = "{{branch_name}}"
+
+[command.response]
+template = """
+✅ Feature initialized: {{feature_name}}
+- Branch: {{branch_name}}
+- Spec: specs/{{branch_name}}/spec.md
+- Plan: plans/{{branch_name}}/plan.md
+- Tasks: tasks/{{branch_name}}/tasks.md
+
+Next: Use /spec create to define requirements
 """

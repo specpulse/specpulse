@@ -1,47 +1,48 @@
 [command]
 name = "plan"
-description = "Generate implementation plan from specification"
-version = "1.0.0"
+description = "Generate implementation plans"
 
-[command.args]
-action = { required = true, description = "Action to perform (generate)" }
+[command.subcommands.generate]
+description = "Create plan from specification"
+usage = "/plan generate"
 
-[command.examples]
-basic = "plan generate"
+[[command.subcommands.generate.phase_gates]]
+name = "Constitutional Compliance"
+checks = [
+    "simplicity_check",
+    "test_first_check",
+    "framework_usage_check"
+]
 
-[command.implementation]
-script = "scripts/pulse-plan.sh"
-output = "json"
+[[command.subcommands.generate.phase_gates]]
+name = "Complexity Check"
+max_modules = 3
+requires_justification = true
+
+[[command.subcommands.generate.actions]]
+step = "read_spec"
+file = "specs/{{feature}}/spec.md"
+
+[[command.subcommands.generate.actions]]
+step = "generate_plan"
 template = "templates/plan.md"
+sections = [
+    "technology_stack",
+    "architecture",
+    "phases",
+    "api_contracts",
+    "data_models",
+    "test_strategy"
+]
 
-[command.phases]
-phase0 = "Setup and Prerequisites"
-phase1 = "Data Layer"
-phase2 = "Business Logic"
-phase3 = "API/Interface Layer"
-phase4 = "Testing and Optimization"
+[[command.subcommands.generate.actions]]
+step = "write_file"
+path = "plans/{{feature}}/plan.md"
 
-[command.outputs]
-architecture = "System architecture diagram"
-technology = "Technology stack decisions"
-api_contracts = "API endpoint definitions"
-data_models = "Database schema"
-testing = "Test strategy and coverage"
-
-[command.help]
-text = """
-Create implementation plan from current specification.
-
-Usage: plan generate
-
-The plan includes:
-- Architecture design
-- Technology selection
-- Phased implementation approach
-- API contracts
-- Data models
-- Testing strategy
-- Risk assessment
-
-Reads specification and outputs detailed plan.
-"""
+[command.subcommands.validate]
+description = "Validate plan against constitution"
+checks = [
+    "phase_gates_passed",
+    "complexity_tracked",
+    "test_first_defined"
+]

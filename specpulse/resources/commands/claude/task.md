@@ -1,45 +1,56 @@
 # /task
 
-Create task breakdown from implementation plan.
+Generate task breakdowns using SpecPulse structure.
 
 ## Usage
 ```
 /task breakdown
+/task update
+/task status
 ```
 
-## Description
-Generates a detailed task list from the implementation plan with dependencies and time estimates.
+## Commands
 
-## Process
-1. Reads the implementation plan
-2. Breaks down each phase into tasks
-3. Identifies dependencies
-4. Marks parallel tasks with [P]
-5. Estimates time for each task
-6. Creates critical path
-7. Generates execution schedule
+### breakdown
+Generate tasks from plan:
+1. Create task categories:
+   - Critical Path (Phase 0)
+   - Phase 1: Foundation
+   - Phase 2: Core Features
+   - Phase 3: Polish
+   - Phase 4: Testing
 
-## Task Structure
-Each task includes:
-- ID (T001, T002, etc.)
-- Type (setup/development/testing/documentation)
-- Priority (HIGH/MEDIUM/LOW)
-- Estimate (hours)
-- Dependencies
-- Description
-- Acceptance criteria
-- Files affected
-- Assignable role
+2. For each task:
+   - Use T[XXX] format (T001, T002)
+   - Include clear description
+   - Mark dependencies
+   - Estimate complexity (S/M/L/XL)
+   - Assign priority
 
-## Organization
-- **Parallel Groups**: Tasks that can run simultaneously
-- **Sequential Tasks**: Tasks with dependencies
-- **Critical Path**: Longest dependency chain
+3. Write to tasks/[feature]/tasks.md
+
+### update
+Update task status:
+1. Mark tasks as completed
+2. Add new discovered tasks
+3. Update dependencies
+4. Track blockers
+
+### status
+Show task progress:
+1. Count completed vs total
+2. Show current phase
+3. List blockers
+4. Estimate remaining work
+
+## Task Format
+```markdown
+- [ ] T001: [S] Set up project structure
+- [ ] T002: [M] Create database schema
+- [x] T003: [L] Implement authentication
+```
 
 ## Example
 ```
 /task breakdown
 ```
-
-Reads: `plans/001-user-auth/implementation.md`
-Creates: `tasks/001-user-auth/tasks.md`

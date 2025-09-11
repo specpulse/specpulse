@@ -1,47 +1,33 @@
 [command]
 name = "spec"
-description = "Create a detailed specification from requirements"
-version = "1.0.0"
+description = "Manage feature specifications"
 
-[command.args]
-action = { required = true, description = "Action to perform (create)" }
-description = { required = true, description = "Feature requirements description" }
+[command.subcommands.create]
+description = "Create specification from requirements"
+usage = "/spec create <description>"
 
-[command.examples]
-basic = "spec create 'Build a real-time chat system'"
-detailed = "spec create 'User authentication with OAuth2'"
+[[command.subcommands.create.actions]]
+step = "analyze_requirements"
+input = "{{description}}"
 
-[command.implementation]
-script = "scripts/pulse-spec.sh"
-output = "json"
+[[command.subcommands.create.actions]]
+step = "generate_spec"
 template = "templates/spec.md"
+markers = ["[NEEDS CLARIFICATION]"]
 
-[command.sections]
-required = [
-    "Executive Summary",
-    "Problem Statement",
-    "Functional Requirements",
-    "Non-Functional Requirements",
-    "User Stories"
+[[command.subcommands.create.actions]]
+step = "write_file"
+path = "specs/{{feature}}/spec.md"
+
+[command.subcommands.validate]
+description = "Validate specification completeness"
+checks = [
+    "all_sections_filled",
+    "no_clarification_markers",
+    "testable_criteria",
+    "technical_specs_defined"
 ]
-optional = [
-    "Technical Constraints",
-    "Dependencies",
-    "Risks and Mitigations"
-]
 
-[command.help]
-text = """
-Generate a comprehensive specification from requirements.
-
-Usage: spec create <description>
-
-The specification includes:
-- Problem analysis
-- Solution design
-- Detailed requirements
-- User stories with acceptance criteria
-- Risk assessment
-
-All unclear items are marked with [NEEDS CLARIFICATION]
-"""
+[command.subcommands.update]
+description = "Update existing specification"
+usage = "/spec update"
