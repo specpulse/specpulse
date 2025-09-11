@@ -1,0 +1,24 @@
+description = "Initialize a new feature with SpecPulse framework"
+prompt = """
+Initialize a new SpecPulse feature with the name: {{args}}
+
+Please follow these steps:
+
+1. Extract the feature name from the provided arguments
+2. Run the initialization script: !{bash scripts/pulse-init.sh "{{args}}"}
+3. Create the feature structure:
+   - Generate feature ID (001, 002, etc.)
+   - Create directories: specs/XXX-feature/, plans/XXX-feature/, tasks/XXX-feature/
+   - Copy templates to feature directories
+   - Update memory/context.md with current feature
+   - Create git branch if in git repository
+
+4. Report the results showing:
+   - Created structure paths
+   - Feature ID and branch name
+   - Next steps for the user
+
+If no feature name is provided, ask the user for the feature name first.
+
+Example usage: /pulse user-authentication
+"""

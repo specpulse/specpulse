@@ -1,0 +1,57 @@
+description = "Generate and manage task breakdowns"
+prompt = """
+Handle the /task command with arguments: {{args}}
+
+Parse arguments to determine action:
+- If "update": Update task status
+- If "status": Show progress
+- Otherwise: Generate task breakdown
+
+## For /task breakdown or /task:
+1. Read implementation plan from @{plans/*/plan.md}
+
+2. Generate tasks from plan:
+   - Create task categories:
+     • Critical Path (Phase 0)
+     • Phase 1: Foundation
+     • Phase 2: Core Features
+     • Phase 3: Polish
+     • Phase 4: Testing
+
+   - For each task:
+     • Use T[XXX] format (T001, T002)
+     • Include clear description
+     • Mark dependencies
+     • Estimate complexity (S/M/L/XL)
+     • Assign priority
+
+3. Write tasks to tasks/XXX-feature/tasks.md
+
+## For /task update:
+1. Read current tasks from @{tasks/*/tasks.md}
+2. Ask which tasks to update
+3. Mark tasks as completed/in-progress
+4. Add newly discovered tasks
+5. Update dependencies and blockers
+6. Save updated task list
+
+## For /task status:
+1. Read current tasks
+2. Count completed vs total
+3. Show current phase progress
+4. List any blockers
+5. Estimate remaining work
+6. Display progress summary
+
+Task Format:
+```markdown
+- [ ] T001: [S] Set up project structure
+- [ ] T002: [M] Create database schema
+- [x] T003: [L] Implement authentication
+```
+
+Examples:
+- /task breakdown
+- /task update
+- /task status
+"""

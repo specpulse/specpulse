@@ -1,0 +1,37 @@
+description = "Create or manage feature specifications"
+prompt = """
+Handle the /spec command with arguments: {{args}}
+
+Parse the arguments to determine the action:
+- If starts with "create": Generate new specification
+- If starts with "update": Modify existing specification  
+- If starts with "validate": Check specification completeness
+- If no action specified: Default to "create" with full arguments as description
+
+## For /spec create [description] or /spec [description]:
+1. Read template from @{templates/spec.md}
+2. Parse the description to identify:
+   - Functional requirements (Must/Should/Could have)
+   - User stories and acceptance criteria
+   - Technical requirements
+3. Mark any uncertainties with [NEEDS CLARIFICATION: detail]
+4. Find current feature directory (latest in specs/)
+5. Write specification to specs/XXX-feature/spec.md
+
+## For /spec update:
+1. Read existing specification from @{specs/*/spec.md}
+2. Ask user for clarifications or changes
+3. Update content while preserving structure
+4. Remove resolved [NEEDS CLARIFICATION] markers
+
+## For /spec validate:
+1. Check all required sections are filled
+2. Count [NEEDS CLARIFICATION] markers
+3. Verify acceptance criteria are testable
+4. Report validation results
+
+Examples:
+- /spec user authentication with OAuth2 and email/password
+- /spec update
+- /spec validate
+"""

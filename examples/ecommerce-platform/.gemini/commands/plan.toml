@@ -1,0 +1,51 @@
+description = "Generate or validate implementation plans"
+prompt = """
+Handle the /plan command with arguments: {{args}}
+
+Parse arguments to determine action:
+- If "validate": Check plan against constitution
+- Otherwise: Generate new plan
+
+## For /plan generate or /plan:
+1. Read current specification from @{specs/*/spec.md}
+
+2. Run Phase Gates checks:
+   - Constitutional compliance
+   - Simplicity check (≤3 modules)
+   - Test-first strategy defined
+   - Framework selection complete
+   - Research completed
+
+3. Generate plan sections:
+   - Technology stack
+   - Architecture overview
+   - Implementation phases
+   - API contracts
+   - Data models
+   - Testing strategy
+
+4. Track complexity:
+   - If >3 modules, document justification
+   - Create simplification roadmap
+
+5. Write plan to plans/XXX-feature/plan.md
+
+## For /plan validate:
+1. Read existing plan from @{plans/*/plan.md}
+2. Verify Phase Gates compliance
+3. Check complexity tracking
+4. Ensure test-first approach
+5. Validate framework choices
+6. Report validation results
+
+Phase Gates (Phase -1) must pass before implementation:
+- ✅ Using ≤3 projects/modules
+- ✅ Tests defined before code
+- ✅ Using framework features directly
+- ✅ No premature abstractions
+- ✅ Research completed
+
+Examples:
+- /plan generate
+- /plan validate
+"""
