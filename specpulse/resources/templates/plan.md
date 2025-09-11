@@ -1,13 +1,13 @@
-<!-- SpecPulse Implementation Plan Template v3.0 -->
-<!-- AI Instructions: Generate plan from specification following SDD methodology -->
+<!-- SpecPulse Implementation Plan Template v4.0 - AI-Optimized -->
+<!-- AI Instructions: Generate plan from specification following constitutional gates -->
 
-# Implementation Plan: [FEATURE_NAME]
+# Implementation Plan: {{ feature_name }}
 
 ## Specification Reference
-- **Spec ID**: SPEC-[XXX]
-- **Branch**: [feature-branch-name]
-- **Generated**: [DATE]
-- **Optimization Focus**: [PERFORMANCE|SECURITY|SIMPLICITY|COST]
+- **Spec ID**: SPEC-{{ feature_id }}
+- **Branch**: {{ branch_name }}
+- **Generated**: {{ date }}
+- **Optimization Focus**: {{ optimization_focus | default("SIMPLICITY") }}
 
 ## Phase -1: Pre-Implementation Gates
 
@@ -19,8 +19,6 @@
 - [ ] No future-proofing without documented need?
 - [ ] Direct framework usage (no unnecessary wrappers)?
 - [ ] Single model representation per concept?
-
-**If any checkbox is unchecked, document in Complexity Tracking below**
 
 #### Anti-Abstraction Gate (Article VII)
 - [ ] Using framework features directly?
@@ -44,308 +42,165 @@
 - [ ] Library options researched?
 - [ ] Performance implications documented?
 - [ ] Security considerations analyzed?
-- [ ] Trade-offs documented in research.md?
+- [ ] Trade-offs documented?
 
-**Gate Status**: [ ] PASSED / [ ] BLOCKED (See Complexity Tracking)
+**Gate Status**: {{ gate_status | default("[ ] PENDING") }}
 
 ## Complexity Tracking
-
-### Justified Exceptions
-```yaml
-complexity_exceptions:
-  # Example:
-  # - article: VII
-  #   violation: "Using 4 modules instead of 3"
-  #   justification: "Authentication requires separate service for security isolation"
-  #   approved_by: "[Approver]"
-  #   date: "[DATE]"
-```
-
-### Simplification Opportunities
-- [ ] Areas identified for future simplification
-- [ ] Technical debt documented
-- [ ] Refactoring planned for Phase X
-
-## Research Summary
-**[Link to detailed research.md]**
-
-### Library Selection
-| Purpose | Options Evaluated | Selected | Rationale |
-|---------|------------------|----------|-----------|
-| [Need] | [Option1, Option2] | [Choice] | [Why] |
-
-### Performance Analysis
-- Expected load: [metrics]
-- Bottlenecks identified: [list]
-- Optimization strategy: [approach]
-
-### Security Considerations
-- Attack vectors considered: [list]
-- Mitigations planned: [list]
-- Compliance requirements: [list]
-
-## Architecture Overview
-
-### Library-First Design (Article I)
-```
-[feature-name]-lib/
-├── cli/              # CLI interface (Article II)
-│   └── main.py       # Text in/out, JSON support
-├── core/             # Core library logic
-│   ├── __init__.py   # Public API
-│   └── [modules]/    # Internal modules
-├── tests/            # Test-First (Article III)
-│   ├── contracts/    # Contract tests first
-│   ├── integration/  # Integration tests second
-│   ├── e2e/         # End-to-end tests third
-│   └── unit/        # Unit tests last
-└── docs/            # Executable documentation (Article IX)
-```
-
-### System Architecture
-```mermaid
-graph TB
-    subgraph "Library Architecture"
-        CLI[CLI Interface] --> Core[Core Library]
-        Core --> Data[Data Layer]
-        Core --> Services[Service Layer]
-    end
-    
-    subgraph "Testing Strategy"
-        CT[Contract Tests] --> IT[Integration Tests]
-        IT --> E2E[E2E Tests]
-        E2E --> UT[Unit Tests]
-    end
-```
+{% if complexity_exceptions %}
+{% for exception in complexity_exceptions %}
+### Exception {{ loop.index }}
+- **Article**: {{ exception.article }}
+- **Violation**: {{ exception.violation }}
+- **Justification**: {{ exception.justification }}
+- **Mitigation**: {{ exception.mitigation }}
+{% endfor %}
+{% else %}
+No complexity exceptions documented.
+{% endif %}
 
 ## Technology Stack
 
-### Core Technologies (Justified per Article VI)
-- **Language**: [Choice] - [Research-backed rationale]
-- **Framework**: [Choice] - [Why not alternatives]
-- **Database**: [Choice] - [Performance/scale rationale]
-- **Testing**: [Choice] - [Integration capability rationale]
+### Core Technologies
+{% for tech in core_technologies %}
+- **{{ tech.name }}**: {{ tech.version }} - {{ tech.purpose }}
+{% endfor %}
 
-### Complexity Budget (Article VII)
-- Module 1: [Purpose]
-- Module 2: [Purpose]
-- Module 3: [Purpose] (if needed)
-- **Total Modules**: [2-3] ✓
+### Dependencies
+{% for dep in dependencies %}
+- **{{ dep.name }}**: {{ dep.reason }}
+{% endfor %}
+
+## Architecture Overview
+
+### System Components
+{% for component in components %}
+#### {{ component.name }}
+- **Purpose**: {{ component.purpose }}
+- **Key Features**: {{ component.features }}
+- **Dependencies**: {{ component.dependencies | join(", ") }}
+{% endfor %}
+
+### Data Models
+{% for model in data_models %}
+#### {{ model.name }}
+- **Fields**: {{ model.fields | join(", ") }}
+- **Relationships**: {{ model.relationships }}
+- **Validation**: {{ model.validation }}
+{% endfor %}
 
 ## Implementation Phases
 
-### Phase 0: Test Infrastructure Setup
-**Duration**: [Estimate]
-**Gate**: Must pass all Article III requirements
+### Phase 0: Critical Path (Week {{ phase_0.weeks | default(1) }})
+{% for task in phase_0.tasks %}
+- [ ] {{ task.description }}
+{% endfor %}
 
-1. **Setup Test Environment**
-   - [ ] Real database instance (not mocks)
-   - [ ] Service dependencies running
-   - [ ] Production-like configuration
+### Phase 1: Foundation (Week {{ phase_1.weeks | default(2) }})
+{% for task in phase_1.tasks %}
+- [ ] {{ task.description }}
+{% endfor %}
 
-2. **Write Contract Tests** (Article VIII priority)
-   ```python
-   # contracts/test_api_contract.py
-   def test_api_contract_failing():
-       """This test MUST fail initially per Article III"""
-       assert False  # Red phase
-   ```
+### Phase 2: Core Features (Week {{ phase_2.weeks | default(3) }})
+{% for task in phase_2.tasks %}
+- [ ] {{ task.description }}
+{% endfor %}
 
-3. **Write Integration Tests**
-   ```python
-   # integration/test_service_integration.py
-   def test_service_integration_failing():
-       """Test service with real dependencies"""
-       assert False  # Red phase
-   ```
+### Phase 3: Polish (Week {{ phase_3.weeks | default(1) }})
+{% for task in phase_3.tasks %}
+- [ ] {{ task.description }}
+{% endfor %}
 
-### Phase 1: Library Core Implementation
-**Duration**: [Estimate]
-**Gate**: All tests from Phase 0 must be failing
+## API Contracts
 
-1. **CLI Interface** (Article II)
-   ```python
-   # cli/main.py structure
-   def main():
-       """Accept text input, produce text output"""
-       pass
-   ```
+### Endpoints
+{% for endpoint in endpoints %}
+#### {{ endpoint.method }} {{ endpoint.path }}
+- **Description**: {{ endpoint.description }}
+- **Request**: {{ endpoint.request }}
+- **Response**: {{ endpoint.response }}
+- **Authentication**: {{ endpoint.auth | default("Required") }}
+{% endfor %}
 
-2. **Core Library** (Article I)
-   - [ ] Minimal implementation to pass first test
-   - [ ] No premature optimization
-   - [ ] Direct framework usage
-
-3. **Make Tests Pass** (Green phase)
-   - [ ] Contract tests passing
-   - [ ] Integration tests passing
-   - [ ] Refactor while green
-
-### Phase 2: Feature Completion
-**Duration**: [Estimate]
-**Gate**: Core tests passing, ready for features
-
-1. **User Story Implementation**
-   - [ ] Story 1: [Title] - Tests first, then code
-   - [ ] Story 2: [Title] - Tests first, then code
-   - [ ] Story 3: [Title] - Tests first, then code
-
-2. **End-to-End Testing**
-   - [ ] Critical path tests with real services
-   - [ ] Performance benchmarks
-   - [ ] Security scenarios
-
-### Phase 3: Production Readiness
-**Duration**: [Estimate]
-**Gate**: All acceptance criteria met
-
-1. **Documentation** (Article IX - Executable)
-   ```markdown
-   # Quick Start (executable)
-   $ pip install feature-lib
-   $ feature-cli --help
-   $ echo "input" | feature-cli process
-   ```
-
-2. **Observability**
-   - [ ] Logging with structure
-   - [ ] Metrics exposed
-   - [ ] Health checks
-
-3. **Deployment**
-   - [ ] CI/CD pipeline
-   - [ ] Rollback capability
-   - [ ] Feature flags
-
-## Test-First Development Plan
-
-### Test Execution Order (Article III & VIII)
-1. **Contract Tests** → Define boundaries
-2. **Integration Tests** → Verify interactions
-3. **E2E Tests** → Validate workflows
-4. **Unit Tests** → Isolate logic
-
-### Test Coverage Requirements
-- Contract Tests: 100% of API surface
-- Integration Tests: 100% of service interactions
-- E2E Tests: 100% of critical paths
-- Unit Tests: 80% of business logic
-
-### Example Test Structure
-```python
-# Step 1: Write failing test (Red)
-def test_feature_behavior():
-    result = feature.process("input")
-    assert result == "expected"  # Fails
-
-# Step 2: Implement minimum to pass (Green)
-def process(input):
-    return "expected"  # Passes
-
-# Step 3: Refactor (Refactor)
-def process(input):
-    # Clean, maintainable implementation
-    return transform(validate(input))
+### Data Schemas
+{% for schema in schemas %}
+#### {{ schema.name }}
+```json
+{{ schema.json | indent(4) }}
 ```
+{% endfor %}
 
-## API Contracts (Article VIII - Contract First)
+## Testing Strategy
 
-### Contract: [Feature API]
-```yaml
-# contracts/feature-api.yaml
-openapi: 3.0.0
-paths:
-  /process:
-    post:
-      request:
-        required: true
-        content:
-          text/plain:
-            schema:
-              type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: object
-```
+### Test Categories
+- **Unit Tests**: {{ testing.unit.target | default("80% coverage") }}
+- **Integration Tests**: {{ testing.integration.target | default("Critical paths") }}
+- **E2E Tests**: {{ testing.e2e.target | default("Key user workflows") }}
+- **Performance Tests**: {{ testing.performance.target | default("Load testing") }}
 
-### Contract Test
-```python
-# contracts/test_feature_contract.py
-def test_process_contract():
-    """Verify API contract compliance"""
-    response = client.post("/process", data="input")
-    assert response.status_code == 200
-    assert "result" in response.json()
-```
+### Test Environment
+- **Database**: {{ testing.environment.database | default("PostgreSQL") }}
+- **Services**: {{ testing.environment.services | join(", ") }}
+- **Test Data**: {{ testing.environment.data_strategy | default("Seed with realistic data") }}
 
-## Data Models (Simple per Article VII)
+## Security Considerations
 
-### Primary Entity
-```python
-# Single, simple model - no premature abstraction
-@dataclass
-class Feature:
-    id: str
-    data: str
-    created_at: datetime
-    
-    def process(self) -> str:
-        """Direct, simple processing"""
-        return self.data.upper()  # No unnecessary layers
-```
+### Authentication & Authorization
+- **Method**: {{ security.auth_method | default("JWT tokens") }}
+- **Roles**: {{ security.roles | join(", ") }}
+- **Permissions**: {{ security.permissions_model | default("Role-based access control") }}
 
-## Risk Mitigation
+### Data Protection
+- **Encryption**: {{ security.encryption.transit | default("TLS 1.3") }} in transit, {{ security.encryption.at_rest | default("AES-256") }} at rest
+- **Compliance**: {{ security.compliance | join(", ") }}
 
-### Complexity Risks (Article VII)
-| Risk | Mitigation |
-|------|------------|
-| Over-engineering | Phase gates enforce simplicity |
-| Premature optimization | Start simple, measure first |
-| Abstraction creep | Direct framework usage required |
+## Deployment Strategy
 
-### Testing Risks (Article III)
-| Risk | Mitigation |
-|------|------------|
-| Skipping TDD | Gates require failing tests first |
-| Mock overuse | Real services required |
-| Low coverage | Coverage gates enforced |
+### Environments
+{% for env in environments %}
+#### {{ env.name }}
+- **URL**: {{ env.url }}
+- **Auto-deploy**: {{ env.auto_deploy | default("Manual") }}
+- **Health Checks**: {{ env.health_checks | default("Basic monitoring") }}
+{% endfor %}
+
+### Rollback Plan
+- **Strategy**: {{ rollback.strategy | default("Blue-green deployment") }}
+- **Triggers**: {{ rollback.triggers | join(", ") }}
+- **Recovery Time**: {{ rollback.recovery_time | default("< 5 minutes") }}
 
 ## Success Criteria
 
-### Constitutional Compliance
-- [ ] All Phase Gates passed
-- [ ] Complexity exceptions documented
-- [ ] Test-First cycle followed
-- [ ] Library-First architecture
+### Must-Have Metrics
+{% for metric in success_criteria.must %}
+- {{ metric.name }}: {{ metric.target }} ({{ metric.measurement }})
+{% endfor %}
 
-### Functional Completion
-- [ ] All user stories implemented
-- [ ] Acceptance criteria met
-- [ ] Contract tests passing
-- [ ] E2E scenarios validated
+### Should-Have Metrics
+{% for metric in success_criteria.should %}
+- {{ metric.name }}: {{ metric.target }} ({{ metric.measurement }})
+{% endfor %}
 
-### Quality Metrics
-- [ ] Test coverage > 80%
-- [ ] Performance targets met
-- [ ] Security audit passed
-- [ ] Documentation executable
+## Risk Assessment
 
-## Continuous Refinement (Article V)
+| Risk | Probability | Impact | Mitigation | Owner |
+|------|------------|--------|------------|-------|
+{% for risk in risks %}
+| {{ risk.description }} | {{ risk.probability }} | {{ risk.impact }} | {{ risk.mitigation }} | {{ risk.owner }} |
+{% endfor %}
 
-### Specification Feedback Loop
-- [ ] Implementation discoveries documented
-- [ ] Specification updated with learnings
-- [ ] [NEEDS CLARIFICATION] items resolved
-- [ ] Future improvements noted
+## Monitoring & Observability
 
-### Post-Implementation Review
-- [ ] Complexity assessment
-- [ ] Simplification opportunities
-- [ ] Architecture decisions validated
-- [ ] Constitution compliance verified
+### Key Metrics
+{% for metric in monitoring.metrics %}
+- **{{ metric.name }}**: {{ metric.target }} ({{ metric.unit }})
+{% endfor %}
+
+### Alerting
+- **Critical Alerts**: {{ monitoring.alerts.critical | join(", ") }}
+- **Warning Alerts**: {{ monitoring.alerts.warnings | join(", ") }}
 
 ---
-**Note**: This plan is a living document. Update it as implementation progresses and learnings emerge.
+**Generated by**: {{ ai_assistant }} on {{ date }}
+**Constitutional Gates**: {{ gate_status | default("PENDING") }}
+**Next Steps**: Use `/task` to break down into executable tasks

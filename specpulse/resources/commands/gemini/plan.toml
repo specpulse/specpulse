@@ -29,14 +29,22 @@ Parse arguments to determine action:
    - Create simplification roadmap
 
 5. Write plan to plans/XXX-feature/plan.md
+6. Run cross-platform validation:
+   - Windows: !{powershell scripts/pulse-plan.ps1 "XXX-feature"}
+   - Linux/macOS: !{bash scripts/pulse-plan.sh "XXX-feature"}
+   - Fallback: !{python scripts/pulse-plan.py "XXX-feature"}
 
 ## For /plan validate:
 1. Read existing plan from @{plans/*/plan.md}
-2. Verify Phase Gates compliance
-3. Check complexity tracking
-4. Ensure test-first approach
-5. Validate framework choices
-6. Report validation results
+2. Run cross-platform validation:
+   - Windows: !{powershell scripts/pulse-plan.ps1 "XXX-feature"}
+   - Linux/macOS: !{bash scripts/pulse-plan.sh "XXX-feature"}
+   - Fallback: !{python scripts/pulse-plan.py "XXX-feature"}
+3. Verify Phase Gates compliance
+4. Check complexity tracking
+5. Ensure test-first approach
+6. Validate framework choices
+7. Report validation results
 
 Phase Gates (Phase -1) must pass before implementation:
 - ✅ Using ≤3 projects/modules

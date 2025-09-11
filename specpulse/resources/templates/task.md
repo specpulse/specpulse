@@ -1,143 +1,164 @@
-<!-- SpecPulse Task List Template v2.0 -->
-<!-- AI Instructions: Generate from implementation plan -->
+<!-- SpecPulse Task List Template v3.0 - AI-Optimized -->
+<!-- AI Instructions: Generate from implementation plan using constitutional gates -->
 
-# Task List: [FEATURE_NAME]
+# Task List: {{ feature_name }}
 
 ## Metadata
-- **Plan Reference**: [PLAN_ID]
-- **Total Tasks**: [COUNT]
-- **Estimated Duration**: [TOTAL_HOURS]
-- **Parallel Groups**: [COUNT]
+- **Plan Reference**: SPEC-{{ feature_id }}
+- **Total Tasks**: {{ task_count }}
+- **Estimated Duration**: {{ total_duration }}
+- **Parallel Groups**: {{ parallel_groups }}
 
 ## Task Organization
 
-### Parallel Group A
+{% for group in parallel_groups %}
+### Parallel Group {{ loop.index }}
 *These tasks can be executed simultaneously*
 
-#### T001: [Task Name]
-- **Type**: [setup|development|testing|documentation]
-- **Priority**: [HIGH|MEDIUM|LOW]
-- **Estimate**: [hours]
-- **Dependencies**: None
-- **Description**: [What needs to be done]
-- **Acceptance**: [How to verify completion]
-- **Files**: [List of files to be created/modified]
-- **Assignable**: [role/skill required]
-
-#### T002: [Task Name]
-[Same structure as above]
+{% for task in group.tasks %}
+#### {{ task.id }}: {{ task.name }}
+- **Type**: {{ task.type }}
+- **Priority**: {{ task.priority }}
+- **Estimate**: {{ task.estimate }}
+- **Dependencies**: {{ task.dependencies | join(", ") | default("None") }}
+- **Description**: {{ task.description }}
+- **Acceptance**: {{ task.acceptance }}
+- **Files**: {{ task.files | join(", ") }}
+- **Assignable**: {{ task.assignable }}
+{% endfor %}
+{% endfor %}
 
 ### Sequential Tasks
 *These tasks must be completed in order*
 
-#### T003: [Task Name]
-- **Dependencies**: T001
-[Rest of structure]
+{% for task in sequential_tasks %}
+#### {{ task.id }}: {{ task.name }}
+- **Dependencies**: {{ task.dependencies | join(", ") }}
+- **Type**: {{ task.type }}
+- **Priority**: {{ task.priority }}
+- **Estimate**: {{ task.estimate }}
+- **Description**: {{ task.description }}
+- **Acceptance**: {{ task.acceptance }}
+{% endfor %}
 
 ### Critical Path
 *Tasks that directly impact timeline*
 
-1. T001 → T003 → T007
-2. Estimated critical path duration: [hours]
+{% for path in critical_path %}
+{{ loop.index }}. {{ path.tasks | join(" → ") }}
+{% endfor %}
+- Estimated critical path duration: {{ critical_path_duration }}
 
-## Task Details
+## Constitutional Gates Compliance
 
-### Setup Tasks (T001-T009)
-- [ ] T001: Initialize project structure
-- [ ] T002: Install dependencies
-- [ ] T003: Configure development environment
-- [ ] T004: Setup database
-- [ ] T005: Configure CI/CD
+### Pre-Implementation Validation
+{% for gate in constitutional_gates %}
+#### {{ gate.name }}
+- [ ] {{ gate.check_1 }}
+- [ ] {{ gate.check_2 }}
+- [ ] {{ gate.check_3 }}
+- [ ] {{ gate.check_4 }}
+**Status**: {{ gate.status | default("PENDING") }}
+{% endfor %}
 
-### Test Tasks [P] (T010-T019)
-- [ ] T010: Write unit tests for [component]
-- [ ] T011: Write integration tests for [feature]
-- [ ] T012: Write E2E tests for user flow
-- [ ] T013: Performance test setup
+## Task Details by Category
 
-### Development Tasks (T020-T049)
-- [ ] T020: Implement [component]
-- [ ] T021: Create [feature]
-- [ ] T022: Integrate [service]
-
-### Integration Tasks (T050-T059)
-- [ ] T050: Connect to database
-- [ ] T051: Integrate external APIs
-- [ ] T052: Setup middleware
-
-### Polish Tasks [P] (T060-T069)
-- [ ] T060: Documentation
-- [ ] T061: Performance optimization
-- [ ] T062: Security hardening
-- [ ] T063: Deployment preparation
+{% for category in task_categories %}
+### {{ category.name }} Tasks {% if category.parallel %}[P]{% endif %}
+{% for task in category.tasks %}
+- [ ] {{ task.id }}: {{ task.name }}
+{% endfor %}
+{% endfor %}
 
 ## Execution Schedule
 
-### Day 1-2
-- Morning: T001, T002, T003 (parallel)
-- Afternoon: T004, T005
-
-### Day 3-4
-- Morning: T010-T013 (parallel, TDD)
-- Afternoon: T020, T021
-
-### Day 5-6
-- Full days: T022-T049 (development sprint)
-
-### Day 7
-- Morning: T050-T052 (integration)
-- Afternoon: T060-T063 (polish, parallel)
+{% for phase in execution_schedule %}
+### {{ phase.name }}
+{% for time_block in phase.time_blocks %}
+- {{ time_block.timing }}: {{ time_block.tasks | join(", ") }}{% if time_block.parallel %} (parallel){% endif %}
+{% endfor %}
+{% endfor %}
 
 ## Progress Tracking
 ```yaml
 status:
-  total: [count]
+  total: {{ task_count }}
   completed: 0
   in_progress: 0
   blocked: 0
   
 metrics:
-  velocity: [tasks/day]
-  estimated_completion: [date]
+  velocity: {{ velocity | default("2-3 tasks/day") }}
+  estimated_completion: {{ estimated_completion }}
   blockers: []
   
 parallel_groups:
-  - name: "Setup"
-    tasks: [T001, T002, T003]
-    can_start: immediately
-  - name: "Tests"
-    tasks: [T010, T011, T012, T013]
-    can_start: after_setup
-  - name: "Polish"
-    tasks: [T060, T061, T062, T063]
-    can_start: after_development
+{% for group in parallel_groups %}
+  - name: "{{ group.name }}"
+    tasks: [{{ group.tasks | map(attribute='id') | join(", ") }}]
+    can_start: {{ group.can_start }}
+{% endfor %}
+
+sequential_tasks:
+{% for task in sequential_tasks %}
+  - name: "{{ task.name }}"
+    id: {{ task.id }}
+    dependencies: [{{ task.dependencies | join(", ") }}]
+{% endfor %}
 ```
 
 ## Task Execution Commands
 
 ### For parallel tasks:
 ```bash
-# Execute multiple [P] tasks simultaneously
-parallel_tasks="T001 T002 T003"
+# Execute parallel tasks using SpecPulse scripts
+{% for group in parallel_groups %}
+# {{ group.name }} tasks
+parallel_tasks="{{ group.tasks | map(attribute='id') | join(" ") }}"
 for task in $parallel_tasks; do
     echo "Starting $task in parallel..."
-    # Execute task
+    ./scripts/execute-task.sh "$task" &
 done
+wait  # Wait for all parallel tasks to complete
+{% endfor %}
 ```
 
 ### For sequential tasks:
 ```bash
-# Execute tasks in order
-sequential_tasks="T004 T005 T020"
-for task in $sequential_tasks; do
-    echo "Executing $task..."
-    # Execute task
-    # Wait for completion before next
-done
+# Execute tasks in dependency order
+{% for task in sequential_tasks %}
+# {{ task.name }} ({{ task.id }})
+echo "Executing {{ task.id }}..."
+./scripts/execute-task.sh "{{ task.id }}"
+# Check success before proceeding
+if [ $? -eq 0 ]; then
+    echo "{{ task.id }} completed successfully"
+else
+    echo "{{ task.id }} failed - halting execution"
+    exit 1
+fi
+{% endfor %}
 ```
 
-## Notes
-- Tasks marked with [P] can be executed in parallel
-- Update progress tracking after each task completion
-- If blocked, document reason and mitigation
-- Adjust estimates based on actual velocity
+## AI Integration Notes
+
+### Constitutional Gates
+- All tasks MUST pass constitutional compliance before implementation
+- Use `/validate` command to check compliance status
+- Mark gates as completed only after actual validation
+
+### Progress Tracking
+- Update task status in real-time using `/status` command
+- Document blockers immediately when identified
+- Use velocity metrics to refine future estimates
+
+### Quality Assurance
+- Each task requires specific acceptance criteria
+- Test-first development mandated by Article III
+- Integration tests required before deployment
+
+---
+**Generated by**: {{ ai_assistant }} on {{ date }}
+**Feature**: {{ feature_name }}
+**Constitutional Gates**: {{ constitutional_status | default("PENDING VALIDATION") }}
+**Next Steps**: Execute tasks following constitutional order

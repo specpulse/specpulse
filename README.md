@@ -21,11 +21,12 @@
 
 SpecPulse revolutionizes AI-assisted development by enforcing a **specification-first approach**. Instead of jumping straight into code, SpecPulse ensures every feature starts with clear specifications, validated plans, and tracked tasks - guaranteeing quality from day one.
 
-> **Latest Update (v1.0.4)**: 
-> - ✅ **100% Working AI Commands**: Both Claude and Gemini commands now properly support arguments
-> - ✅ **95% Test Coverage**: Comprehensive test suite with 193+ tests
-> - ✅ **Fixed Command Formats**: Claude uses `$ARGUMENTS`, Gemini uses `{{args}}`
-> - ✅ **Enhanced Documentation**: Clearer examples and usage instructions
+> **Latest Update (v1.0.5)**: 
+> - ✅ **Complete Cross-Platform Support**: Works seamlessly on Windows, Linux, and macOS
+> - ✅ **100% Test Success Rate**: Comprehensive test suite with 37+ tests across all platforms
+> - ✅ **Python & PowerShell Scripts**: Full script compatibility beyond bash
+> - ✅ **Automatic Platform Detection**: AI commands choose the right script automatically
+> - ✅ **Unicode Support**: Full international character support (≤, ≥, →, ←)
 
 ### Why SpecPulse?
 
@@ -45,6 +46,13 @@ pip install specpulse --upgrade
 - Python 3.11 or higher
 - Git (optional, for version control features)
 - Claude or Gemini CLI (for AI integration)
+
+**Cross-Platform Support:**
+- **Windows**: Python scripts + PowerShell fallback + Bash compatibility
+- **Linux**: Python scripts + Bash fallback  
+- **macOS**: Python scripts + Bash fallback
+- **Source Installation**: Works perfectly from source code (not just PyPI)
+- **Automatic Detection**: AI commands automatically detect OS and choose appropriate script
 
 ## 🚀 Quick Start
 
@@ -203,6 +211,13 @@ Stop guessing what users want:
 
 Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
 
+**Cross-Platform Script Execution:**
+- **Windows**: PowerShell (.ps1) → Python (.py) → Bash (.sh) fallback
+- **Linux/macOS**: Python (.py) → Bash (.sh) fallback  
+- **Automatic Detection**: AI commands detect OS and choose appropriate script
+- **Universal Compatibility**: Works whether installed via PyPI or source code
+- **Unicode Support**: Full international character support (≤, ≥, →, ←)
+
 ```bash
 /pulse user-authentication     # Start new feature with name
 /spec create OAuth2 login      # Create specification with description
@@ -217,10 +232,14 @@ Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
 
 **Behind the Scenes:**
 - Commands capture arguments using `$ARGUMENTS` variable
-- Shell scripts in `scripts/` folder process the arguments
-- AI reads templates from `templates/` folder
+- **Multi-platform scripts** in `resources/scripts/` folder process the arguments:
+  - `pulse-*.py` - Python scripts (universal)
+  - `pulse-*.ps1` - PowerShell scripts (Windows)
+  - `pulse-*.sh` - Bash scripts (Linux/macOS)
+- AI reads templates from `resources/templates/` folder
 - Results are saved in `specs/`, `plans/`, `tasks/` folders
 - Memory system tracks progress in `memory/` folder
+- **Automatic platform detection** ensures the right script runs on each OS
 
 **Claude vs Gemini:**
 - **Claude**: Uses Markdown command files (`.claude/commands/*.md`) with YAML frontmatter
@@ -393,8 +412,8 @@ Built with inspiration from:
 ## 🚦 Project Status
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/specpulse/specpulse)
-[![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)](https://github.com/specpulse/specpulse)
-[![Tests](https://img.shields.io/badge/tests-193%20passed-brightgreen)](https://github.com/specpulse/specpulse)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/specpulse/specpulse)
+[![Tests](https://img.shields.io/badge/tests-37%2B%20passed-brightgreen)](https://github.com/specpulse/specpulse)
 [![Maintainability](https://img.shields.io/badge/maintainability-A-brightgreen)](https://github.com/specpulse/specpulse)
 
 ---

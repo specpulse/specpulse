@@ -17,6 +17,10 @@ Parse the arguments to determine the action:
 3. Mark any uncertainties with [NEEDS CLARIFICATION: detail]
 4. Find current feature directory (latest in specs/)
 5. Write specification to specs/XXX-feature/spec.md
+6. Run cross-platform validation:
+   - Windows: !{powershell scripts/pulse-spec.ps1 "XXX-feature"}
+   - Linux/macOS: !{bash scripts/pulse-spec.sh "XXX-feature"}
+   - Fallback: !{python scripts/pulse-spec.py "XXX-feature"}
 
 ## For /spec update:
 1. Read existing specification from @{specs/*/spec.md}
@@ -25,10 +29,14 @@ Parse the arguments to determine the action:
 4. Remove resolved [NEEDS CLARIFICATION] markers
 
 ## For /spec validate:
-1. Check all required sections are filled
-2. Count [NEEDS CLARIFICATION] markers
-3. Verify acceptance criteria are testable
-4. Report validation results
+1. Run cross-platform validation:
+   - Windows: !{powershell scripts/pulse-spec.ps1 "XXX-feature"}
+   - Linux/macOS: !{bash scripts/pulse-spec.sh "XXX-feature"}
+   - Fallback: !{python scripts/pulse-spec.py "XXX-feature"}
+2. Check all required sections are filled
+3. Count [NEEDS CLARIFICATION] markers
+4. Verify acceptance criteria are testable
+5. Report validation results
 
 Examples:
 - /spec user authentication with OAuth2 and email/password
