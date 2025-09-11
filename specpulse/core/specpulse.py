@@ -18,13 +18,18 @@ class SpecPulse:
         self.project_path = project_path or Path.cwd()
         self.config = self._load_config()
         # Get resource directory path using package data
-        import pkg_resources
         try:
-            # Get the actual path to the resources directory in the installed package
-            self.resources_dir = Path(pkg_resources.resource_filename('specpulse', 'resources'))
+            # Use modern importlib.resources (Python 3.9+)
+            from importlib import resources
+            self.resources_dir = Path(resources.files('specpulse').joinpath('resources'))
         except:
-            # Fallback to development path
-            self.resources_dir = Path(__file__).parent.parent / "resources"
+            try:
+                # Fallback to pkg_resources for older Python versions
+                import pkg_resources
+                self.resources_dir = Path(pkg_resources.resource_filename('specpulse', 'resources'))
+            except:
+                # Final fallback to development path
+                self.resources_dir = Path(__file__).parent.parent / "resources"
     
     def _load_config(self) -> Dict:
         """Load project configuration"""
