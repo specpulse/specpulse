@@ -41,7 +41,7 @@ class SpecPulse:
     
     def get_spec_template(self) -> str:
         """Get specification template from file"""
-        template_path = self.resources_dir / "templates" / "spec.md"
+        template_path = self.resources_dir / "templates" / "spec-001.md"
         if template_path.exists():
             with open(template_path, 'r', encoding='utf-8') as f:
                 return f.read()
@@ -125,7 +125,7 @@ FR-001: [Requirement]
     
     def get_plan_template(self) -> str:
         """Get implementation plan template from file"""
-        template_path = self.resources_dir / "templates" / "plan.md"
+        template_path = self.resources_dir / "templates" / "plan-001.md"
         if template_path.exists():
             with open(template_path, 'r', encoding='utf-8') as f:
                 return f.read()
@@ -636,7 +636,7 @@ if [ "$1" == "--current" ]; then
             if [ -d "$FEATURE_DIR" ]; then
                 echo "{"
                 echo "  \\"branch\\": \\"$BRANCH\\","
-                echo "  \\"spec_file\\": \\"$FEATURE_DIR/spec.md\\","
+                echo "  \\"spec_file\\": \\"$FEATURE_DIR/spec-001.md\\","
                 echo "  \\"spec_dir\\": \\"$FEATURE_DIR\\""
                 echo "}"
                 exit 0
@@ -649,7 +649,7 @@ if [ "$1" == "--current" ]; then
     if [ -n "$LATEST" ]; then
         echo "{"
         echo "  \\"branch\\": \\"$(basename $LATEST)\\","
-        echo "  \\"spec_file\\": \\"$LATEST/spec.md\\","
+        echo "  \\"spec_file\\": \\"$LATEST/spec-001.md\\","
         echo "  \\"spec_dir\\": \\"$LATEST\\""
         echo "}"
     else
@@ -680,8 +680,8 @@ if [ "$1" == "--current" ]; then
             if [ -d "$SPEC_DIR" ]; then
                 echo "{"
                 echo "  \\"branch\\": \\"$BRANCH\\","
-                echo "  \\"spec_file\\": \\"$SPEC_DIR/spec.md\\","
-                echo "  \\"plan_file\\": \\"$PLAN_DIR/plan.md\\","
+                echo "  \\"spec_file\\": \\"$SPEC_DIR/spec-001.md\\","
+                echo "  \\"plan_file\\": \\"$PLAN_DIR/plan-001.md\\","
                 echo "  \\"plan_dir\\": \\"$PLAN_DIR\\""
                 echo "}"
                 exit 0
@@ -695,8 +695,8 @@ if [ "$1" == "--current" ]; then
         BRANCH=$(basename "$LATEST")
         echo "{"
         echo "  \\"branch\\": \\"$BRANCH\\","
-        echo "  \\"spec_file\\": \\"specs/$BRANCH/spec.md\\","
-        echo "  \\"plan_file\\": \\"plans/$BRANCH/plan.md\\","
+        echo "  \\"spec_file\\": \\"specs/$BRANCH/spec-001.md\\","
+        echo "  \\"plan_file\\": \\"plans/$BRANCH/plan-001.md\\","
         echo "  \\"plan_dir\\": \\"plans/$BRANCH\\""
         echo "}"
     else
@@ -728,9 +728,9 @@ if [ "$1" == "--current" ]; then
             if [ -d "$SPEC_DIR" ]; then
                 echo "{"
                 echo "  \\"branch\\": \\"$BRANCH\\","
-                echo "  \\"spec_file\\": \\"$SPEC_DIR/spec.md\\","
-                echo "  \\"plan_file\\": \\"$PLAN_DIR/plan.md\\","
-                echo "  \\"task_file\\": \\"$TASK_DIR/tasks.md\\","
+                echo "  \\"spec_file\\": \\"$SPEC_DIR/spec-001.md\\","
+                echo "  \\"plan_file\\": \\"$PLAN_DIR/plan-001.md\\","
+                echo "  \\"task_file\\": \\"$TASK_DIR/task-001.md\\","
                 echo "  \\"task_dir\\": \\"$TASK_DIR\\""
                 echo "}"
                 exit 0
@@ -744,9 +744,9 @@ if [ "$1" == "--current" ]; then
         BRANCH=$(basename "$LATEST")
         echo "{"
         echo "  \\"branch\\": \\"$BRANCH\\","
-        echo "  \\"spec_file\\": \\"specs/$BRANCH/spec.md\\","
-        echo "  \\"plan_file\\": \\"plans/$BRANCH/plan.md\\","
-        echo "  \\"task_file\\": \\"tasks/$BRANCH/tasks.md\\","
+        echo "  \\"spec_file\\": \\"specs/$BRANCH/spec-001.md\\","
+        echo "  \\"plan_file\\": \\"plans/$BRANCH/plan-001.md\\","
+        echo "  \\"task_file\\": \\"tasks/$BRANCH/task-001.md\\","
         echo "  \\"task_dir\\": \\"tasks/$BRANCH\\""
         echo "}"
     else
@@ -801,7 +801,7 @@ validate_spec() {
 if [ "$1" == "spec" ]; then
     validate_spec $2
 elif [ "$1" == "all" ]; then
-    for spec in specs/*/spec.md; do
+    for spec in specs/*/spec-001.md; do
         validate_spec $spec
     done
 fi
@@ -827,9 +827,9 @@ generate_from_template() {
 
 # Main
 if [ "$1" == "spec" ]; then
-    generate_from_template templates/spec.md $2 $3
+    generate_from_template templates/spec-001.md $2 $3
 elif [ "$1" == "plan" ]; then
-    generate_from_template templates/plan.md $2 $3
+    generate_from_template templates/plan-001.md $2 $3
 elif [ "$1" == "task" ]; then
     generate_from_template templates/task.md $2 $3
 fi
@@ -843,28 +843,28 @@ You have access to SpecPulse commands for specification-driven development.
 
 ## Available Commands
 
-### /pulse init <feature-name>
+### /sp-pulse <feature-name>
 Initializes a new feature with proper structure.
 - Creates feature branch
 - Sets up specification directory
 - Loads templates
 - Updates context
 
-### /spec create <description>
+### /sp-spec create <description>
 Creates a detailed specification from description.
-- Use the template in templates/spec.md
+- Use the template in templates/spec-001.md
 - Mark uncertainties with [NEEDS CLARIFICATION]
 - Ensure all sections are complete
 - Validate against constitution
 
-### /plan generate
+### /sp-plan generate
 Generates implementation plan from current specification.
 - Read the active specification
 - Create detailed phases
 - Include technology decisions
 - Add time estimates
 
-### /task breakdown
+### /sp-task breakdown
 Creates task list from implementation plan.
 - Identify dependencies
 - Mark parallel tasks with [P]
@@ -879,10 +879,10 @@ Validates specifications, plans, or project.
 
 ## Workflow
 
-1. User requests feature → Use `/pulse init`
-2. User describes requirements → Use `/spec create`
-3. Specification complete → Use `/plan generate`
-4. Plan approved → Use `/task breakdown`
+1. User requests feature → Use `/sp-pulse`
+2. User describes requirements → Use `/sp-spec create`
+3. Specification complete → Use `/sp-plan generate`
+4. Plan approved → Use `/sp-task breakdown`
 5. Before implementation → Use `/validate all`
 
 ## Constitution Rules
@@ -904,8 +904,8 @@ Always enforce these principles:
 ## Templates
 
 Always use templates from `templates/` directory:
-- `spec.md` for specifications
-- `plan.md` for implementation plans
+- `spec-001.md` for specifications
+- `plan-001.md` for implementation plans
 - `task.md` for task lists
 
 ## Best Practices
@@ -924,23 +924,23 @@ Always use templates from `templates/` directory:
         if command_path.exists():
             with open(command_path, 'r', encoding='utf-8') as f:
                 return f.read()
-        return "# /pulse command not found"
+        return "# /sp-pulse command not found"
     
     def get_claude_spec_command(self) -> str:
         """Get Claude spec command"""
-        command_path = self.resources_dir / "commands" / "claude" / "spec.md"
+        command_path = self.resources_dir / "commands" / "claude" / "spec-001.md"
         if command_path.exists():
             with open(command_path, 'r', encoding='utf-8') as f:
                 return f.read()
-        return "# /spec command not found"
+        return "# /sp-spec command not found"
     
     def get_claude_plan_command(self) -> str:
         """Get Claude plan command"""
-        command_path = self.resources_dir / "commands" / "claude" / "plan.md"
+        command_path = self.resources_dir / "commands" / "claude" / "plan-001.md"
         if command_path.exists():
             with open(command_path, 'r', encoding='utf-8') as f:
                 return f.read()
-        return "# /plan command not found"
+        return "# /sp-plan command not found"
     
     def get_claude_task_command(self) -> str:
         """Get Claude task command"""
@@ -948,7 +948,7 @@ Always use templates from `templates/` directory:
         if command_path.exists():
             with open(command_path, 'r', encoding='utf-8') as f:
                 return f.read()
-        return "# /task command not found"
+        return "# /sp-task command not found"
     
     # Gemini command getters
     def get_gemini_pulse_command(self) -> str:
@@ -993,13 +993,13 @@ This project uses SpecPulse for specification-driven development.
 
 ### Initialization
 ```
-/pulse init <feature-name>
+/sp-pulse <feature-name>
 ```
 Creates new feature structure and branch.
 
 ### Specification Creation
 ```
-/spec create <description>
+/sp-spec create <description>
 ```
 Generates detailed specification from natural language.
 
@@ -1012,7 +1012,7 @@ Required sections:
 
 ### Plan Generation
 ```
-/plan generate [--optimize <focus>]
+/sp-plan generate [--optimize <focus>]
 ```
 Creates implementation plan from specification.
 
@@ -1024,7 +1024,7 @@ Optimization options:
 
 ### Task Breakdown
 ```
-/task breakdown [--parallel]
+/sp-task breakdown [--parallel]
 ```
 Generates actionable task list.
 
@@ -1043,8 +1043,8 @@ Validates project components.
 ## Templates Location
 
 Use templates from `templates/` directory:
-- Specification: templates/spec.md
-- Implementation: templates/plan.md
+- Specification: templates/spec-001.md
+- Implementation: templates/plan-001.md
 - Tasks: templates/task.md
 
 ## Memory System
@@ -1057,21 +1057,21 @@ Project memory in `memory/` directory:
 ## Workflow Process
 
 1. **Initialize Feature**
-   - Run: `/pulse init feature-name`
+   - Run: `/sp-pulse feature-name`
    - Creates branch and structure
 
 2. **Create Specification**
-   - Run: `/spec create "description"`
+   - Run: `/sp-spec create "description"`
    - Fill template completely
    - Mark unclear items: [NEEDS CLARIFICATION]
 
 3. **Generate Plan**
-   - Run: `/plan generate`
+   - Run: `/sp-plan generate`
    - Choose optimization focus
    - Review technology choices
 
 4. **Create Tasks**
-   - Run: `/task breakdown`
+   - Run: `/sp-task breakdown`
    - Review dependencies
    - Check time estimates
 

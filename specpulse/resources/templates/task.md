@@ -45,7 +45,7 @@
 *Tasks that directly impact timeline*
 
 {% for path in critical_path %}
-{{ loop.index }}. {{ path.tasks | join(" → ") }}
+{{ loop.index }}. {{ path.tasks | join(" -> ") }}
 {% endfor %}
 - Estimated critical path duration: {{ critical_path_duration }}
 
@@ -107,50 +107,51 @@ sequential_tasks:
 {% endfor %}
 ```
 
-## Task Execution Commands
+## Task Execution Guidelines
 
-### For parallel tasks:
-```bash
-# Execute parallel tasks using SpecPulse scripts
-{% for group in parallel_groups %}
-# {{ group.name }} tasks
-parallel_tasks="{{ group.tasks | map(attribute='id') | join(" ") }}"
-for task in $parallel_tasks; do
-    echo "Starting $task in parallel..."
-    ./scripts/execute-task.sh "$task" &
-done
-wait  # Wait for all parallel tasks to complete
-{% endfor %}
-```
+### AI-Assisted Development Process
+All task execution should be handled by AI assistants (Claude or Gemini) following the SpecPulse methodology:
 
-### For sequential tasks:
-```bash
-# Execute tasks in dependency order
-{% for task in sequential_tasks %}
-# {{ task.name }} ({{ task.id }})
-echo "Executing {{ task.id }}..."
-./scripts/execute-task.sh "{{ task.id }}"
-# Check success before proceeding
-if [ $? -eq 0 ]; then
-    echo "{{ task.id }} completed successfully"
-else
-    echo "{{ task.id }} failed - halting execution"
-    exit 1
-fi
-{% endfor %}
-```
+1. **Task Selection**: AI assistants should select tasks based on:
+   - Dependency order (sequential tasks first)
+   - Parallel execution opportunities
+   - Current context and feature priorities
+   - Resource availability
+
+2. **Implementation Process**: For each task:
+   ```markdown
+   ## Task: {{ task.id }} - {{ task.name }}
+   
+   **Status**: [ ] Pending / [x] Completed / [-] In Progress / [!] Blocked
+   **Dependencies**: {{ task.dependencies | join(", ") | default("None") }}
+   **Acceptance**: {{ task.acceptance }}
+   ```
+
+3. **Parallel Execution Strategy**: When tasks can be executed in parallel:
+   - AI assistants should work on multiple tasks simultaneously
+   - Coordinate task completion status
+   - Handle cross-task dependencies
+   - Maintain code consistency
+
+### Task Dependencies Management
+
+- **Sequential Dependencies**: Tasks must be completed in specific order
+- **Parallel Opportunities**: Independent tasks can be worked on simultaneously
+- **Dependency Resolution**: AI should resolve conflicts and blocking issues
+- **Progress Coordination**: Multiple AI assistants should coordinate task completion
 
 ## AI Integration Notes
 
 ### Constitutional Gates
 - All tasks MUST pass constitutional compliance before implementation
-- Use `/validate` command to check compliance status
+- Use `/sp-validate` command to check compliance status
 - Mark gates as completed only after actual validation
 
 ### Progress Tracking
-- Update task status in real-time using `/status` command
-- Document blockers immediately when identified
+- Update task status in real-time using markdown checkboxes: `[ ]` → `[-]` → `[x]`
+- Document blockers immediately with `[!]` status and resolution notes
 - Use velocity metrics to refine future estimates
+- Coordinate with other AI assistants for parallel task execution
 
 ### Quality Assurance
 - Each task requires specific acceptance criteria

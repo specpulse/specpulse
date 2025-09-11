@@ -1,0 +1,54 @@
+description = "Create or manage feature specifications with versioning"
+prompt = """
+Handle the /sp-spec command with arguments: {{args}}
+
+First, detect current feature context:
+- Read memory/context.md for current feature metadata
+- Use git branch name if available (e.g., 001-user-authentication)
+- Fall back to most recently created feature directory
+- If no context found, ask user to specify feature or run /sp-pulse first
+
+Parse the arguments to determine the action:
+- If starts with "create": Generate new specification
+- If starts with "update": Modify existing specification  
+- If starts with "validate": Check specification completeness
+- If no action specified: Default to "create" with full arguments as description
+
+## For /sp-spec create [description] or /sp-spec [description]:
+1. Read template from @{templates/spec.md}
+2. Parse the description to identify:
+   - Functional requirements (Must/Should/Could have)
+   - User stories and acceptance criteria
+   - Technical requirements
+3. Mark any uncertainties with [NEEDS CLARIFICATION: detail]
+4. Find current feature directory from detected context
+5. Check existing spec files and create next version (spec-001.md, spec-002.md, etc.)
+6. Write specification to specs/XXX-feature/spec-XXX.md
+7. Run cross-platform validation:
+   - Linux/macOS: !{bash scripts/sp-pulse-spec.sh "XXX-feature"}
+   - Fallback: !{python scripts/sp-pulse-spec.py "XXX-feature"}
+
+## For /sp-spec update:
+1. Show list of existing spec files in current feature directory
+2. Ask user which spec file to update
+3. Read selected specification file
+4. Ask user for clarifications or changes
+5. Update content while preserving structure
+6. Remove resolved [NEEDS CLARIFICATION] markers
+
+## For /sp-spec validate:
+1. Show list of existing spec files in current feature directory
+2. Ask user which spec file to validate
+3. Run cross-platform validation:
+   - Linux/macOS: !{bash scripts/sp-pulse-spec.sh "XXX-feature"}
+   - Fallback: !{python scripts/sp-pulse-spec.py "XXX-feature"}
+4. Check all required sections are filled
+5. Count [NEEDS CLARIFICATION] markers
+6. Verify acceptance criteria are testable
+7. Report validation results
+
+Examples:
+- /sp-spec user authentication with OAuth2 and email/password
+- /sp-spec update
+- /sp-spec validate
+"""

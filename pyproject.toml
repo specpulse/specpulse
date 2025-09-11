@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "specpulse"
-version = "1.0.6"
+version = "1.1.0"
 description = "Specification-Driven Development Framework"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -89,7 +89,6 @@ specpulse = [
     "resources/memory/*.md",
     "resources/scripts/*.sh",
     "resources/scripts/*.py",
-    "resources/scripts/*.ps1",
     "resources/commands/claude/*.md",
     "resources/commands/gemini/*.toml",
 ]

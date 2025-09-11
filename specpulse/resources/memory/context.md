@@ -25,3 +25,14 @@
 
 ## Team Notes
 <!-- Important reminders or observations -->
+
+## Active Feature: test-feature
+- Feature ID: 001
+- Branch: 001-test-feature
+- Started: 2025-09-12T00:06:47.683447
+
+
+## Active Feature: test-feature-2
+- Feature ID: 001
+- Branch: 001-test-feature-2
+- Started: 2025-09-12T00:09:08.283919

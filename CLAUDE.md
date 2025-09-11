@@ -141,9 +141,9 @@ Templates are generated dynamically and can be customized:
 
 ### Shell Script Integration
 AI commands execute shell scripts in the project's `scripts/` directory:
-- `pulse-init.sh` - Feature initialization
-- `pulse-spec.sh` - Specification creation
-- `pulse-plan.sh` - Plan generation
-- `pulse-task.sh` - Task breakdown
+- `sp-pulse-init.sh` - Feature initialization
+- `sp-pulse-spec.sh` - Specification creation
+- `sp-pulse-plan.sh` - Plan generation
+- `sp-pulse-task.sh` - Task breakdown
 
 Scripts receive arguments via `$ARGUMENTS` (Claude) or `{{args}}` (Gemini).

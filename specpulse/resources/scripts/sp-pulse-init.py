@@ -77,9 +77,9 @@ class SpecPulseInit:
     def copy_templates(self, branch_name):
         """Copy templates to feature directories"""
         templates = {
-            "spec.md": self.project_root / "specs" / branch_name / "spec.md",
-            "plan.md": self.project_root / "plans" / branch_name / "plan.md",
-            "task.md": self.project_root / "tasks" / branch_name / "tasks.md"
+            "spec.md": self.project_root / "specs" / branch_name / "spec-001.md",
+            "plan.md": self.project_root / "plans" / branch_name / "plan-001.md",
+            "task.md": self.project_root / "tasks" / branch_name / "task-001.md"
         }
         
         for template_name, target_path in templates.items():
@@ -140,7 +140,7 @@ class SpecPulseInit:
     def main(self, args):
         """Main execution function"""
         if len(args) < 1:
-            self.error_exit("Usage: python pulse-init.py <feature-name> [feature-id]")
+            self.error_exit("Usage: python sp-pulse-init.py <feature-name> [feature-id]")
             
         feature_name = args[0]
         custom_id = args[1] if len(args) > 1 else None

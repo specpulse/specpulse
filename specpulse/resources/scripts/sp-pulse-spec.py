@@ -101,7 +101,7 @@ class SpecPulseSpec:
     def main(self, args):
         """Main execution function"""
         if len(args) < 1:
-            self.error_exit("Usage: python pulse-spec.py <feature-dir> [spec-content]")
+            self.error_exit("Usage: python sp-pulse-spec.py <feature-dir> [spec-content]")
             
         feature_dir = args[0]
         spec_content = args[1] if len(args) > 1 else None
@@ -112,8 +112,24 @@ class SpecPulseSpec:
         sanitized_dir = self.get_current_feature_dir(feature_dir)
         
         # Set file paths
-        spec_file = self.project_root / "specs" / sanitized_dir / "spec.md"
-        template_file = self.templates_dir / "spec.md"
+        specs_dir = self.project_root / "specs" / sanitized_dir
+        spec_file = specs_dir / "spec-001.md"
+        
+        # Find next available spec number
+        if specs_dir.exists():
+            existing_specs = list(specs_dir.glob("spec-*.md"))
+            if existing_specs:
+                spec_numbers = [int(f.stem.split('-')[1]) for f in existing_specs if f.stem.split('-')[1].isdigit()]
+                next_number = max(spec_numbers) + 1 if spec_numbers else 1
+            else:
+                next_number = 1
+        else:
+            next_number = 1
+            specs_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Update spec_file to use versioned naming
+        spec_file = specs_dir / f"spec-{next_number:03d}.md"
+        template_file = self.templates_dir / "spec-001.md"
         
         # Ensure specs directory exists
         spec_file.parent.mkdir(parents=True, exist_ok=True)
@@ -133,7 +149,11 @@ class SpecPulseSpec:
                     
                 self.log(f"Creating specification from template: {spec_file}")
                 try:
-                    spec_file.write_text(template_file.read_text(encoding='utf-8'))
+                    template_content = template_file.read_text(encoding='utf-8')
+                    # Update template content to use sp- prefixed commands
+                    template_content = template_content.replace("/plan ", "/sp-plan ")
+                    template_content = template_content.replace("/task ", "/sp-task ")
+                    spec_file.write_text(template_content)
                 except Exception as e:
                     self.error_exit(f"Failed to copy specification template: {e}")
             else:

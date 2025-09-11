@@ -110,7 +110,7 @@ This includes:
 Every implementation plan MUST pass through constitutional gates:
 
 #### Phase -1: Pre-Implementation Gates
-- [ ] Simplicity Gate (Article VII): Using ≤3 projects? No future-proofing?
+- [ ] Simplicity Gate (Article VII): Using <=3 projects? No future-proofing?
 - [ ] Anti-Abstraction Gate (Article VII): Using framework directly? Single model?
 - [ ] Test-First Gate (Article III): Tests written? Tests reviewed? Tests failing?
 - [ ] Integration-First Gate (Article VIII): Contracts defined? Contract tests written?
@@ -188,11 +188,11 @@ While principles are immutable, their application can evolve:
 
 ### SpecPulse Development Process
 1. `specpulse init` - Initialize feature with proper structure
-2. Create specification following template guidelines
-3. Generate implementation plan with Phase Gates
-4. Break down into executable tasks
+2. `/sp-spec` - Create specification following template guidelines
+3. `/sp-plan` - Generate implementation plan with Phase Gates
+4. `/sp-task` - Break down into executable tasks
 5. Execute with Test-First Development
-6. Validate against constitution and specification
+6. `/sp-validate` - Validate against constitution and specification
 7. Update specifications based on learnings
 
 ### Version Control

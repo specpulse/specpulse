@@ -86,10 +86,10 @@ Creates complete project structure with templates, memory system, and AI integra
 
 ### 2. Feature Development (in AI)
 ```bash
-/pulse init feature-name
-/spec create "requirements"
-/plan generate
-/task breakdown
+/sp-pulse feature-name
+/sp-spec create "requirements"
+/sp-plan generate
+/sp-task breakdown
 ```
 
 ### 3. Implementation
@@ -183,19 +183,19 @@ Ensures all components meet quality standards.
 ### Web Application
 ```bash
 specpulse init my-web-app --template web
-# In AI: /pulse init user-dashboard
+# In AI: /sp-pulse user-dashboard
 ```
 
 ### API Service
 ```bash
 specpulse init my-api --template api
-# In AI: /pulse init rest-endpoints
+# In AI: /sp-pulse rest-endpoints
 ```
 
 ### CLI Tool
 ```bash
 specpulse init my-cli --template cli
-# In AI: /pulse init command-parser
+# In AI: /sp-pulse command-parser
 ```
 
 ## Troubleshooting

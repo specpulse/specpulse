@@ -6,9 +6,8 @@ Please follow these steps:
 
 1. Extract the feature name from the provided arguments
 2. Run the initialization script with cross-platform detection:
-   - Windows: !{powershell scripts/pulse-init.ps1 "{{args}}"}
-   - Linux/macOS: !{bash scripts/pulse-init.sh "{{args}}"}  
-   - Fallback: !{python scripts/pulse-init.py "{{args}"}
+   - Linux/macOS: !{bash scripts/sp-pulse-init.sh "{{args}}"}  
+   - Fallback: !{python scripts/sp-pulse-init.py "{{args}}"}
 3. Create the feature structure:
    - Generate feature ID (001, 002, etc.)
    - Create directories: specs/XXX-feature/, plans/XXX-feature/, tasks/XXX-feature/
@@ -16,12 +15,19 @@ Please follow these steps:
    - Update memory/context.md with current feature
    - Create git branch if in git repository
 
-4. Report the results showing:
+4. Suggest specification options:
+   - Generate 2-3 different specification suggestions based on the feature name
+   - Present options to user as numbered choices
+   - Ask user to choose one or provide their own specification description
+   - Guide user to use /sp-spec command after making selection
+
+5. Report the results showing:
    - Created structure paths
    - Feature ID and branch name
-   - Next steps for the user
+   - Specification suggestions for user to choose from
+   - Next steps guidance
 
 If no feature name is provided, ask the user for the feature name first.
 
-Example usage: /pulse user-authentication
+Example usage: /sp-pulse user-authentication
 """

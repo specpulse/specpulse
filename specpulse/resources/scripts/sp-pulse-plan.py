@@ -126,7 +126,7 @@ class SpecPulsePlan:
     def main(self, args):
         """Main execution function"""
         if len(args) < 1:
-            self.error_exit("Usage: python pulse-plan.py <feature-dir>")
+            self.error_exit("Usage: python sp-pulse-plan.py <feature-dir>")
             
         feature_dir = args[0]
         
@@ -136,9 +136,34 @@ class SpecPulsePlan:
         sanitized_dir = self.get_current_feature_dir(feature_dir)
         
         # Set file paths
-        plan_file = self.project_root / "plans" / sanitized_dir / "plan.md"
-        template_file = self.templates_dir / "plan.md"
-        spec_file = self.project_root / "specs" / sanitized_dir / "spec.md"
+        specs_dir = self.project_root / "specs" / sanitized_dir
+        plans_dir = self.project_root / "plans" / sanitized_dir
+        
+        # Find latest spec file
+        if specs_dir.exists():
+            spec_files = list(specs_dir.glob("spec-*.md"))
+            if spec_files:
+                latest_spec = max(spec_files, key=lambda f: f.stat().st_mtime)
+            else:
+                self.error_exit(f"No specification files found in {specs_dir}")
+        else:
+            self.error_exit(f"Specifications directory not found: {specs_dir}")
+        
+        # Find next available plan number
+        if plans_dir.exists():
+            existing_plans = list(plans_dir.glob("plan-*.md"))
+            if existing_plans:
+                plan_numbers = [int(f.stem.split('-')[1]) for f in existing_plans if f.stem.split('-')[1].isdigit()]
+                next_number = max(plan_numbers) + 1 if plan_numbers else 1
+            else:
+                next_number = 1
+        else:
+            next_number = 1
+            plans_dir.mkdir(parents=True, exist_ok=True)
+        
+        plan_file = plans_dir / f"plan-{next_number:03d}.md"
+        template_file = self.templates_dir / "plan-001.md"
+        spec_file = latest_spec
         
         # Ensure plans directory exists
         plan_file.parent.mkdir(parents=True, exist_ok=True)
@@ -155,7 +180,7 @@ class SpecPulsePlan:
         if not plan_file.exists():
             self.log(f"Creating implementation plan from template: {plan_file}")
             try:
-                plan_file.write_text(template_file.read_text(encoding='utf-8'))
+                plan_file.write_text(template_file.read_text(encoding='utf-8'), encoding='utf-8')
             except Exception as e:
                 self.error_exit(f"Failed to copy plan template: {e}")
         else:

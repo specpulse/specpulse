@@ -88,8 +88,8 @@ class SpecPulseCLI:
                 "primary": ai
             },
             "templates": {
-                "spec": "templates/spec.md",
-                "plan": "templates/plan.md",
+                "spec": "templates/spec-001.md",
+                "plan": "templates/plan-001.md",
                 "task": "templates/task.md"
             },
             "conventions": {
@@ -179,12 +179,12 @@ class SpecPulseCLI:
         
         # Create spec template
         spec_template = self.specpulse.get_spec_template()
-        with open(templates_dir / "spec.md", 'w', encoding='utf-8') as f:
+        with open(templates_dir / "spec-001.md", 'w', encoding='utf-8') as f:
             f.write(spec_template)
         
         # Create plan template  
         plan_template = self.specpulse.get_plan_template()
-        with open(templates_dir / "plan.md", 'w', encoding='utf-8') as f:
+        with open(templates_dir / "plan-001.md", 'w', encoding='utf-8') as f:
             f.write(plan_template)
         
         # Create task template
@@ -221,7 +221,7 @@ class SpecPulseCLI:
         resources_scripts_dir = self.specpulse.resources_dir / "scripts"
         
         # Copy all script files from resources
-        script_extensions = [".sh", ".py", ".ps1"]
+        script_extensions = [".sh", ".py"]
         scripts_copied = 0
         
         for script_file in resources_scripts_dir.iterdir():
@@ -246,53 +246,34 @@ class SpecPulseCLI:
     def _create_ai_commands(self, project_path: Path):
         """Create AI command files for Claude and Gemini CLI integration"""
         
-        # Claude commands (.md format)
+        # Copy all command files from resources
+        resources_commands_dir = self.specpulse.resources_dir / "commands"
+        commands_copied = 0
+        
+        # Copy Claude commands (.md format)
         claude_commands_dir = project_path / ".claude" / "commands"
+        claude_resources_dir = resources_commands_dir / "claude"
         
-        # /pulse command - Initialize feature
-        pulse_command = self.specpulse.get_claude_pulse_command()
-        with open(claude_commands_dir / "pulse.md", 'w', encoding='utf-8') as f:
-            f.write(pulse_command)
+        if claude_resources_dir.exists():
+            for command_file in claude_resources_dir.glob("*.md"):
+                dest_path = claude_commands_dir / command_file.name
+                shutil.copy2(command_file, dest_path)
+                commands_copied += 1
         
-        # /spec command - Create specification
-        spec_command = self.specpulse.get_claude_spec_command()
-        with open(claude_commands_dir / "spec.md", 'w', encoding='utf-8') as f:
-            f.write(spec_command)
-        
-        # /plan command - Generate plan
-        plan_command = self.specpulse.get_claude_plan_command()
-        with open(claude_commands_dir / "plan.md", 'w', encoding='utf-8') as f:
-            f.write(plan_command)
-        
-        # /task command - Create task breakdown
-        task_command = self.specpulse.get_claude_task_command()
-        with open(claude_commands_dir / "task.md", 'w', encoding='utf-8') as f:
-            f.write(task_command)
-        
-        # Gemini commands (.toml format)
+        # Copy Gemini commands (.toml format)
         gemini_commands_dir = project_path / ".gemini" / "commands"
+        gemini_resources_dir = resources_commands_dir / "gemini"
         
-        # pulse command
-        pulse_toml = self.specpulse.get_gemini_pulse_command()
-        with open(gemini_commands_dir / "pulse.toml", 'w', encoding='utf-8') as f:
-            f.write(pulse_toml)
+        if gemini_resources_dir.exists():
+            for command_file in gemini_resources_dir.glob("*.toml"):
+                dest_path = gemini_commands_dir / command_file.name
+                shutil.copy2(command_file, dest_path)
+                commands_copied += 1
         
-        # spec command
-        spec_toml = self.specpulse.get_gemini_spec_command()
-        with open(gemini_commands_dir / "spec.toml", 'w', encoding='utf-8') as f:
-            f.write(spec_toml)
-        
-        # plan command
-        plan_toml = self.specpulse.get_gemini_plan_command()
-        with open(gemini_commands_dir / "plan.toml", 'w', encoding='utf-8') as f:
-            f.write(plan_toml)
-        
-        # task command
-        task_toml = self.specpulse.get_gemini_task_command()
-        with open(gemini_commands_dir / "task.toml", 'w', encoding='utf-8') as f:
-            f.write(task_toml)
-        
-        self.console.animated_success("AI command files created")
+        if commands_copied == 0:
+            self.console.warning("No AI command files found in resources directory")
+        else:
+            self.console.animated_success(f"AI command files created ({commands_copied} files)")
     
     # def _create_ai_files(self, project_path: Path, ai: str):
     #     """Create AI instruction files (deprecated - AI tools create these themselves)"""
@@ -308,10 +289,10 @@ This project uses SpecPulse for specification-driven development.
 
 ## Quick Start
 1. Open in your AI assistant (Claude or Gemini)
-2. Use `/pulse init <feature>` to start a new feature
-3. Use `/spec create` to generate specifications
-4. Use `/plan generate` to create implementation plans
-5. Use `/task breakdown` to create task lists
+2. Use `/sp-pulse <feature>` to start a new feature
+3. Use `/sp-spec create` to generate specifications
+4. Use `/sp-plan generate` to create implementation plans
+5. Use `/sp-task breakdown` to create task lists
 6. Use `/validate all` before implementation
 
 ## Project Structure
@@ -323,10 +304,10 @@ This project uses SpecPulse for specification-driven development.
 - `templates/` - Document templates
 
 ## Commands
-- `/pulse init <feature>` - Initialize new feature
-- `/spec create <description>` - Create specification
-- `/plan generate` - Generate implementation plan
-- `/task breakdown` - Create task list
+- `/sp-pulse <feature>` - Initialize new feature
+- `/sp-spec create <description>` - Create specification
+- `/sp-plan generate` - Generate implementation plan
+- `/sp-task breakdown` - Create task list
 - `/validate [component]` - Validate project
 
 Generated with SpecPulse v1.0.0
@@ -451,7 +432,7 @@ Generated with SpecPulse v1.0.0
         # Consolidate specs
         specs_dir = project_path / "specs"
         if specs_dir.exists():
-            spec_count = len(list(specs_dir.glob("*/spec.md")))
+            spec_count = len(list(specs_dir.glob("*/spec-*.md")))
             sync_items.append(("Specifications", f"{spec_count} found"))
         
         # Check git status

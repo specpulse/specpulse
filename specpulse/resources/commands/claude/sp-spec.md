@@ -1,5 +1,5 @@
 ---
-name: spec
+name: sp-spec
 description: Create or manage feature specifications using AI-optimized templates
 allowed_tools:
   - Read
@@ -9,29 +9,35 @@ allowed_tools:
   - TodoWrite
 ---
 
-# /spec Command
+# /sp-spec Command
 
 Create, update, or validate feature specifications using SpecPulse methodology with AI-optimized templates.
 
 ## Usage
 ```
-/spec [action] [description|feature-name]
+/sp-spec [action] [description|feature-name]
 ```
 
 Actions: `create`, `update`, `validate`, `clarify` (defaults to `create`)
 
 ## Implementation
 
-When called with `/spec $ARGUMENTS`, I will:
+When called with `/sp-spec $ARGUMENTS`, I will:
 
-1. **Parse arguments** to determine action:
+1. **Detect current feature context**:
+   - Read `memory/context.md` for current feature metadata
+   - Use git branch name if available (e.g., `001-user-authentication`)
+   - Fall back to most recently created feature directory
+   - If no context found, ask user to specify feature or run `/sp-pulse` first
+
+2. **Parse arguments** to determine action:
    - If starts with `create`: Generate new specification
    - If starts with `update`: Modify existing specification
    - If starts with `validate`: Check specification completeness
    - If starts with `clarify`: Address [NEEDS CLARIFICATION] markers
    - If no action specified: Default to `create` with full arguments as description
 
-2. **For `/spec create [description]` or `/spec [description]`:**
+3. **For `/sp-spec create [description]` or `/sp-spec [description]`:**
    - Read AI-optimized template from `templates/spec.md`
    - Parse the description to identify:
      - Functional requirements (Must/Should/Could/Won't have)
@@ -43,32 +49,37 @@ When called with `/spec $ARGUMENTS`, I will:
      # Specification: {{ feature_name }}
      ## Metadata
      - **ID**: SPEC-{{ feature_id }}
+     - **Version**: {{ version }}
      - **Created**: {{ date }}
      ```
    - Mark any uncertainties with `[NEEDS CLARIFICATION: specific question]`
-   - Find current feature directory from context or create new
-   - Write specification to `specs/ID-feature-name/spec.md`
+   - Use detected feature context to determine target directory
+   - **Version management**: Check existing spec files and create next version (spec-001.md, spec-002.md, etc.)
+   - Write specification to `specs/ID-feature-name/spec-XXX.md`
    - Run enhanced validation with cross-platform detection:
-     - **Windows**: `powershell scripts/pulse-spec.ps1 "$FEATURE_DIR"`
-     - **Linux/macOS**: `bash scripts/pulse-spec.sh "$FEATURE_DIR"`
-     - **Python Fallback**: `python scripts/pulse-spec.py "$FEATURE_DIR"`
+     - **Linux/macOS**: `bash scripts/sp-pulse-spec.sh "$FEATURE_DIR"`
+     - **Python Fallback**: `python scripts/sp-pulse-spec.py "$FEATURE_DIR"`
 
-3. **For `/spec update`:**
-   - Read existing specification from current context
+4. **For `/sp-spec update`:**
+   - **Show existing spec files**: List all spec-XXX.md files in current feature directory
+   - **Ask user to select**: Which spec file to update
+   - Read selected specification file
    - Parse update requests and identify sections to modify
    - Update content while preserving AI-friendly template structure
    - Remove resolved `[NEEDS CLARIFICATION]` markers
    - Run validation to ensure completeness
 
-4. **For `/spec validate`:**
-   - Read current specification
+5. **For `/sp-spec validate`:**
+   - **Show existing spec files**: List all spec-XXX.md files in current feature directory
+   - **Ask user to select**: Which spec file to validate
+   - Read selected specification file from detected context
    - Check all required sections using enhanced validation:
      ```bash
      # Cross-platform detection
      if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-         powershell scripts/pulse-spec.ps1 "$FEATURE_DIR"
+         python scripts/sp-pulse-spec.py "$FEATURE_DIR"
      else
-         bash scripts/pulse-spec.sh "$FEATURE_DIR" || python scripts/pulse-spec.py "$FEATURE_DIR"
+         bash scripts/sp-pulse-spec.sh "$FEATURE_DIR" || python scripts/sp-pulse-spec.py "$FEATURE_DIR"
      fi
      ```
    - Count `[NEEDS CLARIFICATION]` markers
@@ -76,7 +87,9 @@ When called with `/spec $ARGUMENTS`, I will:
    - Check constitutional compliance indicators
    - Report detailed validation results
 
-5. **For `/spec clarify`:**
+6. **For `/sp-spec clarify`:**
+   - **Show existing spec files**: List all spec-XXX.md files in current feature directory
+   - **Ask user to select**: Which spec file to clarify
    - Find all `[NEEDS CLARIFICATION]` markers
    - Address each uncertainty with user input
    - Update specification with resolved information
@@ -87,7 +100,7 @@ When called with `/spec $ARGUMENTS`, I will:
 
 ### Creating a new specification
 ```
-User: /spec create user authentication system with OAuth2 and JWT tokens
+User: /sp-spec create user authentication system with OAuth2 and JWT tokens
 ```
 I will create a comprehensive specification using AI-optimized templates with:
 - Jinja2-style variables for AI processing
@@ -97,13 +110,13 @@ I will create a comprehensive specification using AI-optimized templates with:
 
 ### Updating existing specification
 ```
-User: /spec update add password complexity requirements
+User: /sp-spec update add password complexity requirements
 ```
 I will read the current spec, update password requirements, and validate changes.
 
 ### Validating specification
 ```
-User: /spec validate
+User: /sp-spec validate
 ```
 I will run enhanced validation with detailed reporting:
 ```
@@ -115,7 +128,7 @@ STATUS=validation_complete
 
 ### Addressing clarifications
 ```
-User: /spec clarify
+User: /sp-spec clarify
 ```
 I will systematically address all [NEEDS CLARIFICATION] markers.
 
@@ -152,7 +165,7 @@ The AI-optimized specification template includes:
 ## Integration Features
 
 - **Cross-platform script execution** with automatic detection
-- **Enhanced script integration** with Bash, PowerShell, and Python support
+- **Enhanced script integration** with Bash and Python support
 - **Template variable processing** for AI optimization
 - **Automated validation** with detailed reporting
 - **Context-aware operation** using memory/context.md

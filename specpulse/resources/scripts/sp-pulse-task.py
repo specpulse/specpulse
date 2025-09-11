@@ -155,7 +155,7 @@ class SpecPulseTask:
     def main(self, args):
         """Main execution function"""
         if len(args) < 1:
-            self.error_exit("Usage: python pulse-task.py <feature-dir>")
+            self.error_exit("Usage: python sp-pulse-task.py <feature-dir>")
             
         feature_dir = args[0]
         
@@ -165,10 +165,46 @@ class SpecPulseTask:
         sanitized_dir = self.get_current_feature_dir(feature_dir)
         
         # Set file paths
-        task_file = self.project_root / "tasks" / sanitized_dir / "tasks.md"
+        plans_dir = self.project_root / "plans" / sanitized_dir
+        tasks_dir = self.project_root / "tasks" / sanitized_dir
+        
+        # Find latest spec and plan files
+        specs_dir = self.project_root / "specs" / sanitized_dir
+        
+        if specs_dir.exists():
+            spec_files = list(specs_dir.glob("spec-*.md"))
+            if spec_files:
+                latest_spec = max(spec_files, key=lambda f: f.stat().st_mtime)
+            else:
+                self.error_exit(f"No spec files found in {specs_dir}")
+        else:
+            self.error_exit(f"Specs directory not found: {specs_dir}")
+            
+        if plans_dir.exists():
+            plan_files = list(plans_dir.glob("plan-*.md"))
+            if plan_files:
+                latest_plan = max(plan_files, key=lambda f: f.stat().st_mtime)
+            else:
+                self.error_exit(f"No plan files found in {plans_dir}")
+        else:
+            self.error_exit(f"Plans directory not found: {plans_dir}")
+        
+        # Find next available task number
+        if tasks_dir.exists():
+            existing_tasks = list(tasks_dir.glob("task-*.md"))
+            if existing_tasks:
+                task_numbers = [int(f.stem.split('-')[1]) for f in existing_tasks if f.stem.split('-')[1].isdigit()]
+                next_number = max(task_numbers) + 1 if task_numbers else 1
+            else:
+                next_number = 1
+        else:
+            next_number = 1
+            tasks_dir.mkdir(parents=True, exist_ok=True)
+        
+        task_file = tasks_dir / f"task-{next_number:03d}.md"
         template_file = self.templates_dir / "task.md"
-        plan_file = self.project_root / "plans" / sanitized_dir / "plan.md"
-        spec_file = self.project_root / "specs" / sanitized_dir / "spec.md"
+        plan_file = latest_plan
+        spec_file = latest_spec
         
         # Ensure tasks directory exists
         task_file.parent.mkdir(parents=True, exist_ok=True)

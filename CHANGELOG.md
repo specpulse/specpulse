@@ -5,6 +5,29 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-09-12
+
+### Added
+- **Command prefix system**: All commands now use `sp-` prefix to avoid reserved name conflicts
+- **Multi-spec workflow**: Support for multiple specifications, plans, and tasks within the same feature
+- **Versioned file system**: Automatic naming with spec-001.md, plan-001.md, task-001.md format
+- **Context detection**: Automatic feature detection using memory/context.md and git branch names
+- **Manual workflow control**: `/sp-pulse` only creates directories, manual control over `/spec`, `/plan`, `/task`
+- **Enhanced AI integration**: Improved workflow coordination between Claude and Gemini assistants
+
+### Fixed
+- **Comprehensive codebase review**: Fixed all old command references throughout the project
+- **Template system cleanup**: Removed nonsensical shell script execution commands from templates
+- **File path consistency**: Updated all hardcoded file paths to use versioned naming system
+- **Script naming**: All scripts now consistently use `sp-` prefix (sp-pulse-*.py, sp-pulse-*.sh)
+- **Documentation updates**: Updated all README references and examples to use new command structure
+
+### Changed
+- **Breaking change**: All command names changed from `/pulse`, `/spec`, `/plan`, `/task` to `/sp-pulse`, `/sp-spec`, `/sp-plan`, `/sp-task`
+- **Removed PowerShell scripts**: Now only supporting .sh and .py scripts for cross-platform compatibility
+- **Improved project structure**: Better organization of scripts and templates with consistent naming
+- **Enhanced error handling**: Better validation and error messages throughout the system
+
 ## [1.0.6] - 2025-09-11
 
 ### Fixed

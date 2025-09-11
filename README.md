@@ -21,11 +21,12 @@
 
 SpecPulse revolutionizes AI-assisted development by enforcing a **specification-first approach**. Instead of jumping straight into code, SpecPulse ensures every feature starts with clear specifications, validated plans, and tracked tasks - guaranteeing quality from day one.
 
-> **Latest Update (v1.0.6)**: 
-> - 🐛 **Critical Bug Fix**: Fixed cross-platform template initialization bug
-> - ✅ **Proper Resource Management**: All cross-platform scripts now correctly copied from @specpulse/resources
-> - ✅ **Complete Script Availability**: All 12 scripts (4 types × 3 platforms) properly installed
-> - ✅ **Enhanced Package Configuration**: Fixed package data inclusion for Python and PowerShell scripts
+> **Latest Update (v1.1.0)**: 
+> - 🔧 **Command Prefix System**: All commands now use `sp-` prefix to avoid conflicts
+> - 📋 **Multi-Spec Workflow**: Support for multiple specs/plans/tasks per feature
+> - 🗂️ **Versioned File System**: Automatic spec-001.md, plan-001.md, task-001.md naming
+> - 🎯 **Context Detection**: Automatic feature detection using git branches
+> - 🤖 **Enhanced AI Integration**: Improved manual workflow control
 > - ✅ **Improved Error Handling**: Better resource path resolution and script copying operations
 
 ### Why SpecPulse?
@@ -81,21 +82,21 @@ specpulse init --ai gemini
 
 ```bash
 # Initialize a new feature
-/pulse user-authentication
+/sp-pulse user-authentication
 # Creates structure for 001-user-authentication feature
 
 # Create the specification  
-/spec create user login with OAuth2 and email/password
-# Or just: /spec (for interactive mode)
+/sp-spec create user login with OAuth2 and email/password
+# Or just: /sp-spec (for interactive mode)
 
 # Generate implementation plan
-/plan generate
-# Or: /plan validate (to check existing plan)
+/sp-plan generate
+# Or: /sp-plan validate (to check existing plan)
 
 # Break down into tasks
-/task breakdown
-# Or: /task update (to update task status)
-# Or: /task status (to see progress)
+/sp-task breakdown
+# Or: /sp-task update (to update task status)
+# Or: /sp-task status (to see progress)
 ```
 
 ### Step 4: Validate & Ship
@@ -219,23 +220,22 @@ Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
 - **Unicode Support**: Full international character support (≤, ≥, →, ←)
 
 ```bash
-/pulse user-authentication     # Start new feature with name
-/spec create OAuth2 login      # Create specification with description
-/spec update                   # Update existing specification
-/spec validate                 # Validate specification completeness
-/plan generate                 # Generate plan from specification
-/plan validate                 # Validate plan against constitution
-/task breakdown                # Create task list from plan
-/task update                   # Update task statuses
-/task status                   # Show current progress
+/sp-pulse user-authentication     # Start new feature with name
+/sp-spec create OAuth2 login      # Create specification with description
+/sp-spec update                   # Update existing specification
+/sp-spec validate                 # Validate specification completeness
+/sp-plan generate                 # Generate plan from specification
+/sp-plan validate                 # Validate plan against constitution
+/sp-task breakdown                # Create task list from plan
+/sp-task update                   # Update task statuses
+/sp-task status                   # Show current progress
 ```
 
 **Behind the Scenes:**
 - Commands capture arguments using `$ARGUMENTS` variable
 - **Multi-platform scripts** in `resources/scripts/` folder process the arguments:
-  - `pulse-*.py` - Python scripts (universal)
-  - `pulse-*.ps1` - PowerShell scripts (Windows)
-  - `pulse-*.sh` - Bash scripts (Linux/macOS)
+  - `sp-pulse-*.py` - Python scripts (universal)
+  - `sp-pulse-*.sh` - Bash scripts (Linux/macOS)
 - AI reads templates from `resources/templates/` folder
 - Results are saved in `specs/`, `plans/`, `tasks/` folders
 - Memory system tracks progress in `memory/` folder
@@ -280,19 +280,19 @@ my-project/
 │   └── decisions.md    # Architecture Decision Records
 ├── specs/               # Feature specifications
 │   └── 001-feature/
-│       └── spec.md
+│       └── spec-001.md
 ├── plans/               # Implementation plans
 │   └── 001-feature/
-│       └── plan.md
+│       └── plan-001.md
 ├── tasks/               # Task breakdowns
 │   └── 001-feature/
-│       └── tasks.md
+│       └── task-001.md
 ├── templates/           # Customizable templates
 ├── scripts/             # Shell scripts for AI execution
-│   ├── pulse-init.sh    # Feature initialization
-│   ├── pulse-spec.sh    # Specification creation
-│   ├── pulse-plan.sh    # Plan generation
-│   └── pulse-task.sh    # Task breakdown
+│   ├── sp-pulse-init.sh    # Feature initialization
+│   ├── sp-pulse-spec.sh    # Specification creation
+│   ├── sp-pulse-plan.sh    # Plan generation
+│   └── sp-pulse-task.sh    # Task breakdown
 └── PULSE.md            # Project manifest
 ```
 
@@ -304,7 +304,7 @@ Create project-specific templates:
 
 ```bash
 # Copy and modify templates
-cp templates/spec.md templates/custom-spec.md
+cp templates/spec-001.md templates/custom-spec.md
 # Edit to match your needs
 ```
 
@@ -368,7 +368,7 @@ specpulse validate --component constitution
 **Solution**: Check template path in config.yaml
 
 ### AI Commands Not Working
-**Problem**: `/pulse` commands not recognized
+**Problem**: `/sp-pulse` commands not recognized
 **Solution**: Ensure you ran `specpulse init --ai claude` or `--ai gemini`
 
 </details>

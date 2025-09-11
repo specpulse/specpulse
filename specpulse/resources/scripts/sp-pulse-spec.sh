@@ -47,26 +47,49 @@ if [ -z "$FEATURE_DIR" ]; then
     fi
 fi
 
-SPEC_FILE="$PROJECT_ROOT/specs/${FEATURE_DIR}/spec.md"
-TEMPLATE_FILE="$PROJECT_ROOT/templates/spec.md"
+SPEC_DIR="$PROJECT_ROOT/specs/${FEATURE_DIR}"
+TEMPLATE_FILE="$PROJECT_ROOT/templates/spec-001.md"
 
 # Ensure specs directory exists
-mkdir -p "$(dirname "$SPEC_FILE")"
+mkdir -p "$SPEC_DIR"
 
+# Find latest spec file or create new one
 if [ -n "$SPEC_CONTENT" ]; then
+    # Find next available spec number
+    if [ -d "$SPEC_DIR" ]; then
+        existing_specs=$(find "$SPEC_DIR" -name "spec-*.md" | wc -l)
+        spec_number=$((existing_specs + 1))
+    else
+        spec_number=1
+    fi
+    SPEC_FILE="$SPEC_DIR/spec-$(printf "%03d" $spec_number).md"
+    
     # Update specification with provided content
-    log "Updating specification: $SPEC_FILE"
+    log "Creating specification: $SPEC_FILE"
     echo "$SPEC_CONTENT" > "$SPEC_FILE" || error_exit "Failed to write specification content"
 else
-    # Ensure specification exists from template
-    if [ ! -f "$SPEC_FILE" ]; then
+    # Find latest spec file
+    if [ -d "$SPEC_DIR" ]; then
+        SPEC_FILE=$(find "$SPEC_DIR" -name "spec-*.md" -printf "%T@ %p\n" | sort -n | tail -1 | cut -d' ' -f2-)
+        if [ -z "$SPEC_FILE" ]; then
+            # No spec files found, create first one
+            SPEC_FILE="$SPEC_DIR/spec-001.md"
+            if [ ! -f "$TEMPLATE_FILE" ]; then
+                error_exit "Template not found: $TEMPLATE_FILE"
+            fi
+            log "Creating specification from template: $SPEC_FILE"
+            cp "$TEMPLATE_FILE" "$SPEC_FILE" || error_exit "Failed to copy specification template"
+        else
+            log "Using latest specification: $SPEC_FILE"
+        fi
+    else
+        # Create directory and first spec
+        SPEC_FILE="$SPEC_DIR/spec-001.md"
         if [ ! -f "$TEMPLATE_FILE" ]; then
             error_exit "Template not found: $TEMPLATE_FILE"
         fi
         log "Creating specification from template: $SPEC_FILE"
         cp "$TEMPLATE_FILE" "$SPEC_FILE" || error_exit "Failed to copy specification template"
-    else
-        log "Specification already exists: $SPEC_FILE"
     fi
 fi
 

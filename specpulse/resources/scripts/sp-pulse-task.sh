@@ -46,35 +46,51 @@ if [ -z "$FEATURE_DIR" ]; then
     fi
 fi
 
-TASK_FILE="$PROJECT_ROOT/tasks/${FEATURE_DIR}/tasks.md"
+TASK_DIR="$PROJECT_ROOT/tasks/${FEATURE_DIR}"
+PLAN_DIR="$PROJECT_ROOT/plans/${FEATURE_DIR}"
+SPEC_DIR="$PROJECT_ROOT/specs/${FEATURE_DIR}"
 TEMPLATE_FILE="$PROJECT_ROOT/templates/task.md"
-PLAN_FILE="$PROJECT_ROOT/plans/${FEATURE_DIR}/plan.md"
-SPEC_FILE="$PROJECT_ROOT/specs/${FEATURE_DIR}/spec.md"
 
 # Ensure tasks directory exists
-mkdir -p "$(dirname "$TASK_FILE")"
+mkdir -p "$TASK_DIR"
 
-# Check if specification and plan exist first
-if [ ! -f "$SPEC_FILE" ]; then
-    error_exit "Specification file not found: $SPEC_FILE. Please create specification first."
+# Find latest spec file
+if [ -d "$SPEC_DIR" ]; then
+    SPEC_FILE=$(find "$SPEC_DIR" -name "spec-*.md" -printf "%T@ %p\n" | sort -n | tail -1 | cut -d' ' -f2-)
+    if [ -z "$SPEC_FILE" ]; then
+        error_exit "No specification files found in $SPEC_DIR. Please create specification first."
+    fi
+else
+    error_exit "Specifications directory not found: $SPEC_DIR. Please create specification first."
 fi
 
-if [ ! -f "$PLAN_FILE" ]; then
-    error_exit "Implementation plan not found: $PLAN_FILE. Please create plan first."
+# Find latest plan file
+if [ -d "$PLAN_DIR" ]; then
+    PLAN_FILE=$(find "$PLAN_DIR" -name "plan-*.md" -printf "%T@ %p\n" | sort -n | tail -1 | cut -d' ' -f2-)
+    if [ -z "$PLAN_FILE" ]; then
+        error_exit "No plan files found in $PLAN_DIR. Please create plan first."
+    fi
+else
+    error_exit "Plans directory not found: $PLAN_DIR. Please create plan first."
 fi
+
+# Find next available task number or create new one
+if [ -d "$TASK_DIR" ]; then
+    existing_tasks=$(find "$TASK_DIR" -name "task-*.md" | wc -l)
+    task_number=$((existing_tasks + 1))
+else
+    task_number=1
+fi
+TASK_FILE="$TASK_DIR/task-$(printf "%03d" $task_number).md"
 
 # Ensure task template exists
 if [ ! -f "$TEMPLATE_FILE" ]; then
     error_exit "Template not found: $TEMPLATE_FILE"
 fi
 
-# Create task file if it doesn't exist
-if [ ! -f "$TASK_FILE" ]; then
-    log "Creating task breakdown from template: $TASK_FILE"
-    cp "$TEMPLATE_FILE" "$TASK_FILE" || error_exit "Failed to copy task template"
-else
-    log "Task breakdown already exists: $TASK_FILE"
-fi
+# Create task file
+log "Creating task breakdown from template: $TASK_FILE"
+cp "$TEMPLATE_FILE" "$TASK_FILE" || error_exit "Failed to copy task template"
 
 # Validate task structure
 log "Validating task breakdown..."
