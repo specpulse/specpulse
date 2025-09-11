@@ -17,8 +17,14 @@ class SpecPulse:
     def __init__(self, project_path: Optional[Path] = None):
         self.project_path = project_path or Path.cwd()
         self.config = self._load_config()
-        # Get resource directory path
-        self.resources_dir = Path(__file__).parent.parent / "resources"
+        # Get resource directory path using package data
+        import pkg_resources
+        try:
+            # Get the actual path to the resources directory in the installed package
+            self.resources_dir = Path(pkg_resources.resource_filename('specpulse', 'resources'))
+        except:
+            # Fallback to development path
+            self.resources_dir = Path(__file__).parent.parent / "resources"
     
     def _load_config(self) -> Dict:
         """Load project configuration"""

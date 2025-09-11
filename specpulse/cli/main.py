@@ -216,46 +216,32 @@ class SpecPulseCLI:
         self.console.animated_success("Memory files created")
     
     def _create_scripts(self, project_path: Path):
-        """Create automation scripts"""
+        """Create automation scripts - copy all cross-platform scripts from resources"""
         scripts_dir = project_path / "scripts"
+        resources_scripts_dir = self.specpulse.resources_dir / "scripts"
         
-        # Pulse init script
-        init_script = self.specpulse.get_setup_script()
-        with open(scripts_dir / "pulse-init.sh", 'w', encoding='utf-8') as f:
-            f.write(init_script)
-        try:
-            os.chmod(scripts_dir / "pulse-init.sh", 0o755)
-        except:
-            pass  # Windows may not support chmod
+        # Copy all script files from resources
+        script_extensions = [".sh", ".py", ".ps1"]
+        scripts_copied = 0
         
-        # Pulse spec script
-        spec_script = self.specpulse.get_spec_script()
-        with open(scripts_dir / "pulse-spec.sh", 'w', encoding='utf-8') as f:
-            f.write(spec_script)
-        try:
-            os.chmod(scripts_dir / "pulse-spec.sh", 0o755)
-        except:
-            pass
+        for script_file in resources_scripts_dir.iterdir():
+            if script_file.suffix in script_extensions:
+                dest_path = scripts_dir / script_file.name
+                shutil.copy2(script_file, dest_path)
+                
+                # Make shell scripts executable
+                if script_file.suffix == ".sh":
+                    try:
+                        os.chmod(dest_path, 0o755)
+                    except:
+                        pass  # Windows may not support chmod
+                
+                scripts_copied += 1
         
-        # Pulse plan script
-        plan_script = self.specpulse.get_plan_script()
-        with open(scripts_dir / "pulse-plan.sh", 'w', encoding='utf-8') as f:
-            f.write(plan_script)
-        try:
-            os.chmod(scripts_dir / "pulse-plan.sh", 0o755)
-        except:
-            pass
-        
-        # Pulse task script
-        task_script = self.specpulse.get_task_script()
-        with open(scripts_dir / "pulse-task.sh", 'w', encoding='utf-8') as f:
-            f.write(task_script)
-        try:
-            os.chmod(scripts_dir / "pulse-task.sh", 0o755)
-        except:
-            pass
-        
-        self.console.animated_success("Scripts created")
+        if scripts_copied == 0:
+            self.console.warning("No scripts found in resources directory")
+        else:
+            self.console.animated_success(f"Scripts created ({scripts_copied} files)")
     
     def _create_ai_commands(self, project_path: Path):
         """Create AI command files for Claude and Gemini CLI integration"""

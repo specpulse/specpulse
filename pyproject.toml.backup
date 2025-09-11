@@ -88,8 +88,6 @@ specpulse = [
     "resources/templates/*.md",
     "resources/memory/*.md",
     "resources/scripts/*.sh",
-    "resources/scripts/*.py",
-    "resources/scripts/*.ps1",
     "resources/commands/claude/*.md",
     "resources/commands/gemini/*.toml",
 ]
