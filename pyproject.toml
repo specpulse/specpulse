@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "specpulse"
-version = "1.0.1"
+version = "1.0.2"
 description = "Specification-Driven Development Framework"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -69,14 +69,27 @@ Documentation = "https://github.com/specpulse/specpulse/wiki"
 Changelog = "https://github.com/specpulse/specpulse/releases"
 
 [tool.setuptools]
-packages = ["specpulse"]
+packages = [
+    "specpulse",
+    "specpulse.cli",
+    "specpulse.core", 
+    "specpulse.utils",
+    "specpulse.resources",
+    "specpulse.resources.commands",
+    "specpulse.resources.commands.claude",
+    "specpulse.resources.commands.gemini",
+    "specpulse.resources.memory",
+    "specpulse.resources.scripts",
+    "specpulse.resources.templates",
+]
 
 [tool.setuptools.package-data]
 specpulse = [
-    "templates/*.md",
-    "scripts/*.sh",
-    "scripts/*.py",
-    "config/*.yaml",
+    "resources/templates/*.md",
+    "resources/memory/*.md",
+    "resources/scripts/*.sh",
+    "resources/commands/claude/*.md",
+    "resources/commands/gemini/*.toml",
 ]
 
 [tool.black]
