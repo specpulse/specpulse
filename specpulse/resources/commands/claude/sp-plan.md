@@ -47,14 +47,9 @@ When called with `/sp-plan $ARGUMENTS`, I will:
       - Generate single monolithic plan
    d. **Find and validate specification** from selected spec file
    
-   d. **Enhanced validation** using cross-platform script:
+   d. **Validation** using script:
       ```bash
-      # Cross-platform detection
-      if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-          python scripts/sp-pulse-plan.py "$FEATURE_DIR"
-      else
-          bash scripts/sp-pulse-plan.sh "$FEATURE_DIR" || python scripts/sp-pulse-plan.py "$FEATURE_DIR"
-      fi
+      bash scripts/sp-pulse-plan.sh "$FEATURE_DIR"
       ```
 
    e. **Run Constitutional Phase Gates** (Article VII):
@@ -102,14 +97,9 @@ When called with `/sp-plan $ARGUMENTS`, I will:
 4. **For `/sp-plan validate`:**
    a. **Show existing plan files**: List all plan-XXX.md files in current feature directory
    b. **Ask user to select**: Which plan file to validate
-   c. **Enhanced validation** using cross-platform script:
+   c. **Validation** using script:
      ```bash
-     # Cross-platform detection
-     if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-         python scripts/sp-pulse-plan.py "$FEATURE_DIR"
-     else
-         bash scripts/sp-pulse-plan.sh "$FEATURE_DIR" || python scripts/sp-pulse-plan.py "$FEATURE_DIR"
-     fi
+     bash scripts/sp-pulse-plan.sh "$FEATURE_DIR"
      ```
    d. Verify all constitutional gates are addressed
    e. Check complexity exceptions have proper justifications
@@ -202,14 +192,13 @@ I will analyze and recommend complexity reductions.
 ## Enhanced Features
 
 - **AI-optimized templates** with Jinja2-style variables
-- **Cross-platform script execution** with automatic detection
-- **Enhanced script integration** for Bash and Python
+- **Script execution** with Bash
 - **Constitutional compliance tracking** with gate status
 - **Complexity exception management** with justifications
 - **Performance and security considerations** integrated
 - **Integration-first approach** with real service usage
 - **Detailed validation reporting** with specific recommendations
-- **Platform-agnostic operation** for any development environment
+- **Cross-platform operation** with Bash
 
 ## Error Handling
 

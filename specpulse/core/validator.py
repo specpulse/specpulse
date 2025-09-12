@@ -11,8 +11,13 @@ import re
 class Validator:
     """Validates SpecPulse project components"""
     
-    def __init__(self):
+    def __init__(self, project_root: Optional[Path] = None):
         self.results = []
+        self.constitution = None
+        self.phase_gates = []
+        
+        if project_root:
+            self._load_constitution(project_root)
     
     def validate_all(self, project_path: Path, fix: bool = False, verbose: bool = False) -> List[Dict]:
         """Validate entire project"""
@@ -330,3 +335,171 @@ class Validator:
                     "status": "warning",
                     "message": "Constitution enforcement disabled"
                 })
+    
+    def _load_constitution(self, project_root: Path):
+        """Load constitution from project"""
+        constitution_path = project_root / "memory" / "constitution.md"
+        if constitution_path.exists():
+            self.constitution = constitution_path.read_text()
+            # Extract phase gates from constitution
+            self._extract_phase_gates()
+    
+    def _extract_phase_gates(self):
+        """Extract phase gates from constitution"""
+        if not self.constitution:
+            return
+        
+        # Simple extraction of phase gates from constitution text
+        gates = []
+        lines = self.constitution.split('\n')
+        for line in lines:
+            if 'Phase Gate' in line or 'phase gate' in line:
+                gates.append(line.strip())
+        self.phase_gates = gates
+    
+    def load_constitution(self, project_root: Path) -> bool:
+        """Load constitution from a project"""
+        self._load_constitution(project_root)
+        return self.constitution is not None
+    
+    def validate_spec(self, spec_path: Path, verbose: bool = False) -> Dict:
+        """Validate a single specification file"""
+        if not spec_path.exists():
+            return {"status": "error", "message": f"Spec file not found: {spec_path}"}
+        
+        content = spec_path.read_text()
+        result = {"status": "valid", "issues": []}
+        
+        # Check required sections
+        required_sections = ["## Requirements", "## User Stories", "## Acceptance Criteria"]
+        for section in required_sections:
+            if section not in content:
+                result["issues"].append(f"Missing section: {section}")
+        
+        if result["issues"]:
+            result["status"] = "invalid"
+        
+        return result
+    
+    def validate_plan(self, plan_path: Path, verbose: bool = False) -> Dict:
+        """Validate a single plan file"""
+        if not plan_path.exists():
+            return {"status": "error", "message": f"Plan file not found: {plan_path}"}
+        
+        content = plan_path.read_text()
+        result = {"status": "valid", "issues": []}
+        
+        # Check required sections
+        required_sections = ["## Architecture", "## Phases", "## Technology Stack"]
+        for section in required_sections:
+            if section not in content:
+                result["issues"].append(f"Missing section: {section}")
+        
+        if result["issues"]:
+            result["status"] = "invalid"
+        
+        return result
+    
+    def validate_task(self, task_path: Path, verbose: bool = False) -> Dict:
+        """Validate a single task file"""
+        if not task_path.exists():
+            return {"status": "error", "message": f"Task file not found: {task_path}"}
+        
+        content = task_path.read_text()
+        result = {"status": "valid", "issues": []}
+        
+        # Check for task format
+        if not re.search(r'T\d{3}', content):
+            result["issues"].append("No task IDs found (T001 format)")
+        
+        if result["issues"]:
+            result["status"] = "invalid"
+        
+        return result
+    
+    def validate_constitution_compliance(self, spec_content: str, verbose: bool = False) -> Dict:
+        """Validate that content complies with constitution"""
+        result = {"status": "compliant", "violations": []}
+        
+        if not self.constitution:
+            return result
+        
+        # Check for simplicity principle
+        if 'complexity' in spec_content.lower() and 'simple' not in spec_content.lower():
+            result["violations"].append("Simplicity principle: Complex solution without justification")
+        
+        if result["violations"]:
+            result["status"] = "non-compliant"
+        
+        return result
+    
+    def check_phase_gate(self, gate_name: str, context: Dict) -> bool:
+        """Check if a phase gate passes"""
+        # Simple gate checking logic
+        if gate_name == "simplicity":
+            return context.get("module_count", 0) <= 3
+        elif gate_name == "test-first":
+            return context.get("tests_written", False)
+        return True
+    
+    def validate_all_project(self, project_root: Path, verbose: bool = False) -> Dict:
+        """Validate entire project"""
+        results = {
+            "specs": [],
+            "plans": [],
+            "tasks": [],
+            "constitution_compliance": True
+        }
+        
+        # Validate specs
+        specs_dir = project_root / "specs"
+        if specs_dir.exists():
+            for spec_file in specs_dir.glob("*/spec*.md"):
+                results["specs"].append(self.validate_spec(spec_file, verbose))
+        
+        # Validate plans
+        plans_dir = project_root / "plans"
+        if plans_dir.exists():
+            for plan_file in plans_dir.glob("*/plan*.md"):
+                results["plans"].append(self.validate_plan(plan_file, verbose))
+        
+        # Validate tasks
+        tasks_dir = project_root / "tasks"
+        if tasks_dir.exists():
+            for task_file in tasks_dir.glob("*/task*.md"):
+                results["tasks"].append(self.validate_task(task_file, verbose))
+        
+        return results
+    
+    def format_validation_report(self, results: Dict) -> str:
+        """Format validation results as a report"""
+        report = "# Validation Report\n\n"
+        
+        # Specs section
+        report += "## Specifications\n"
+        for spec in results.get("specs", []):
+            status = spec.get("status", "unknown")
+            report += f"- Status: {status}\n"
+            if spec.get("issues"):
+                for issue in spec["issues"]:
+                    report += f"  - Issue: {issue}\n"
+        
+        # Plans section
+        report += "\n## Plans\n"
+        for plan in results.get("plans", []):
+            status = plan.get("status", "unknown")
+            report += f"- Status: {status}\n"
+            if plan.get("issues"):
+                for issue in plan["issues"]:
+                    report += f"  - Issue: {issue}\n"
+        
+        # Tasks section
+        report += "\n## Tasks\n"
+        for task in results.get("tasks", []):
+            status = task.get("status", "unknown")
+            report += f"- Status: {status}\n"
+            if task.get("issues"):
+                for issue in task["issues"]:
+                    report += f"  - Issue: {issue}\n"
+        
+        return report

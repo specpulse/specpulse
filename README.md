@@ -49,11 +49,10 @@ pip install specpulse --upgrade
 - Claude or Gemini CLI (for AI integration)
 
 **Cross-Platform Support:**
-- **Windows**: Python scripts + PowerShell fallback + Bash compatibility
-- **Linux**: Python scripts + Bash fallback  
-- **macOS**: Python scripts + Bash fallback
+- **Windows**: Requires Git Bash or WSL
+- **Linux**: Native Bash support  
+- **macOS**: Native Bash support
 - **Source Installation**: Works perfectly from source code (not just PyPI)
-- **Automatic Detection**: AI commands automatically detect OS and choose appropriate script
 
 ## 🚀 Quick Start
 
@@ -224,10 +223,9 @@ Stop guessing what users want:
 
 Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
 
-**Cross-Platform Script Execution:**
-- **Windows**: PowerShell (.ps1) → Python (.py) → Bash (.sh) fallback
-- **Linux/macOS**: Python (.py) → Bash (.sh) fallback  
-- **Automatic Detection**: AI commands detect OS and choose appropriate script
+**Script Execution:**
+- **All Platforms**: Bash (.sh) scripts only
+- **Requirements**: Bash shell required (Git Bash on Windows, native on Linux/macOS)
 - **Universal Compatibility**: Works whether installed via PyPI or source code
 - **Unicode Support**: Full international character support (≤, ≥, →, ←)
 
@@ -247,13 +245,11 @@ Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
 
 **Behind the Scenes:**
 - Commands capture arguments using `$ARGUMENTS` variable
-- **Multi-platform scripts** in `resources/scripts/` folder process the arguments:
-  - `sp-pulse-*.py` - Python scripts (universal)
-  - `sp-pulse-*.sh` - Bash scripts (Linux/macOS)
+- **Shell scripts** in `resources/scripts/` folder process the arguments:
+  - `sp-pulse-*.sh` - Bash scripts (all platforms)
 - AI reads templates from `resources/templates/` folder
 - Results are saved in `specs/`, `plans/`, `tasks/` folders
 - Memory system tracks progress in `memory/` folder
-- **Automatic platform detection** ensures the right script runs on each OS
 
 **Claude vs Gemini:**
 - **Claude**: Uses Markdown command files (`.claude/commands/*.md`) with YAML frontmatter

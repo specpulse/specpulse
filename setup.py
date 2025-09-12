@@ -11,7 +11,7 @@ long_description = (this_directory / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="specpulse",
-    version="1.2.1",
+    version="1.2.3",
     author="SpecPulse",
     author_email="",
     description="Next-Generation Specification-Driven Development Framework",
@@ -64,7 +64,6 @@ setup(
             "resources/templates/decomposition/*.ts",
             "resources/memory/*.md",
             "resources/scripts/*.sh",
-            "resources/scripts/*.py",
             "resources/commands/claude/*.md",
             "resources/commands/gemini/*.toml",
         ],

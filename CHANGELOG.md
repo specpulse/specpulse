@@ -5,6 +5,24 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.3] - 2025-09-12
+
+### Changed
+- **Simplified script execution**: Removed Python script fallback, now using only Bash scripts across all platforms
+- **Streamlined packaging**: Removed Python scripts from package distribution
+- **Updated documentation**: Clarified Bash requirement for all platforms (Git Bash on Windows)
+
+### Removed
+- All Python scripts (.py) from resources/scripts directory
+- Python fallback references from all Claude and Gemini command files
+- Python script references from package data in pyproject.toml and setup.py
+
+## [1.2.2] - 2025-09-12
+
+### Fixed
+- **Version display**: Fixed `__version__` in `__init__.py` to show correct version
+- Now `specpulse --version` displays the correct version number
+
 ## [1.2.1] - 2025-09-12
 
 ### Fixed

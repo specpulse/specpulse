@@ -23,9 +23,8 @@ Initialize a new feature following SpecPulse methodology with constitutional com
 When called with `/sp-pulse $ARGUMENTS`, I will:
 
 1. **Validate arguments** and extract feature name + optional ID
-2. **Run initialization script** with cross-platform detection:
-   - **Linux/macOS**: `bash scripts/sp-pulse-init.sh "$FEATURE_NAME" "$OPTIONAL_ID"`
-   - **Python Fallback**: `python scripts/sp-pulse-init.py "$FEATURE_NAME" "$OPTIONAL_ID"`
+2. **Run initialization script**:
+   - `bash scripts/sp-pulse-init.sh "$FEATURE_NAME" "$OPTIONAL_ID"`
 3. **Create complete feature structure**:
    - Generate feature ID (001, 002, etc.) or use provided ID
    - Create sanitized branch name: `ID-feature-name`
@@ -105,8 +104,7 @@ The system automatically detects which feature you're working on:
 - **Git integration** with branch management
 - **Template validation** before copying
 - **Todo list creation** for progress tracking
-- **Cross-platform script execution** with automatic detection
-- **Multiple language support**: Bash, PowerShell, Python
+- **Cross-platform script execution** with Bash
 - **Platform-agnostic operation** for any development environment
 
 ## Feature Progress Tracking

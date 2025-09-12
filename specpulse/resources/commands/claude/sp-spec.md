@@ -56,9 +56,8 @@ When called with `/sp-spec $ARGUMENTS`, I will:
    - Use detected feature context to determine target directory
    - **Version management**: Check existing spec files and create next version (spec-001.md, spec-002.md, etc.)
    - Write specification to `specs/ID-feature-name/spec-XXX.md`
-   - Run enhanced validation with cross-platform detection:
-     - **Linux/macOS**: `bash scripts/sp-pulse-spec.sh "$FEATURE_DIR"`
-     - **Python Fallback**: `python scripts/sp-pulse-spec.py "$FEATURE_DIR"`
+   - Run validation:
+     - `bash scripts/sp-pulse-spec.sh "$FEATURE_DIR"`
 
 4. **For `/sp-spec update`:**
    - **Show existing spec files**: List all spec-XXX.md files in current feature directory
@@ -75,12 +74,7 @@ When called with `/sp-spec $ARGUMENTS`, I will:
    - Read selected specification file from detected context
    - Check all required sections using enhanced validation:
      ```bash
-     # Cross-platform detection
-     if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-         python scripts/sp-pulse-spec.py "$FEATURE_DIR"
-     else
-         bash scripts/sp-pulse-spec.sh "$FEATURE_DIR" || python scripts/sp-pulse-spec.py "$FEATURE_DIR"
-     fi
+     bash scripts/sp-pulse-spec.sh "$FEATURE_DIR"
      ```
    - Count `[NEEDS CLARIFICATION]` markers
    - Verify acceptance criteria follow Given-When-Then format
@@ -164,10 +158,9 @@ The AI-optimized specification template includes:
 
 ## Integration Features
 
-- **Cross-platform script execution** with automatic detection
-- **Enhanced script integration** with Bash and Python support
+- **Script execution** with Bash support
 - **Template variable processing** for AI optimization
 - **Automated validation** with detailed reporting
 - **Context-aware operation** using memory/context.md
 - **Progress tracking** with todo list integration
-- **Platform-agnostic operation** for Windows, Linux, and macOS
+- **Cross-platform operation** with Bash

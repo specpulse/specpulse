@@ -48,14 +48,9 @@ When called with `/sp-task $ARGUMENTS`, I will:
    c. **If not decomposed**:
       - Show existing plan files and ask user to select
       - Generate single task file with standard IDs (T001, T002)
-   c. **Enhanced validation** using cross-platform script:
+   c. **Validation** using script:
       ```bash
-      # Cross-platform detection
-      if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-          python scripts/sp-pulse-task.py "$FEATURE_DIR"
-      else
-          bash scripts/sp-pulse-task.sh "$FEATURE_DIR" || python scripts/sp-pulse-task.py "$FEATURE_DIR"
-      fi
+      bash scripts/sp-pulse-task.sh "$FEATURE_DIR"
       ```
    
    d. **Read implementation plan** from selected plan file
@@ -112,14 +107,9 @@ When called with `/sp-task $ARGUMENTS`, I will:
 4. **For `/sp-task update`:**
    a. **Show existing task files**: List all task-XXX.md files in current feature directory
    b. **Ask user to select**: Which task file to update
-   c. **Enhanced analysis** using cross-platform script:
+   c. **Analysis** using script:
      ```bash
-     # Cross-platform detection
-     if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-         python scripts/sp-pulse-task.py "$FEATURE_DIR"
-     else
-         bash scripts/sp-pulse-task.sh "$FEATURE_DIR" || python scripts/sp-pulse-task.py "$FEATURE_DIR"
-     fi
+     bash scripts/sp-pulse-task.sh "$FEATURE_DIR"
      ```
    d. **Parse current tasks** from selected file with comprehensive status:
      - Total tasks, completed, pending, blocked
@@ -253,12 +243,7 @@ User: /sp-task execute AUTH-T001
 I will:
 - Run: Cross-platform detection and execution
   ```bash
-  # Cross-platform detection
-  if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-      python scripts/sp-pulse-task.py "$FEATURE_DIR"
-  else
-      bash scripts/sp-pulse-task.sh "$FEATURE_DIR" || python scripts/sp-pulse-task.py "$FEATURE_DIR"
-  fi
+  bash scripts/sp-pulse-task.sh "$FEATURE_DIR"
   ```
 - Create: AI-optimized task structure with template variables
 - Output: `TOTAL_TASKS=25, PARALLEL_TASKS=8, STATUS=generated`
@@ -283,27 +268,22 @@ I will:
 - Validate: Constitutional gates compliance and task readiness
 - Execute: Cross-platform task execution
   ```bash
-  # Cross-platform task execution
-  if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-      python scripts/sp-pulse-task.py "$FEATURE_DIR" "execute:$TASK_ID"
-  else
-      bash scripts/sp-pulse-task.sh "$FEATURE_DIR" "execute:$TASK_ID" || python scripts/sp-pulse-task.py "$FEATURE_DIR" "execute:$TASK_ID"
-  fi
+  bash scripts/sp-pulse-task.sh "$FEATURE_DIR" "execute:$TASK_ID"
   ```
 - Track: Results and update progress automatically
 
 ## Enhanced Features
 
-- **Cross-platform script execution** with automatic detection (Bash/Python)
+- **Script execution** with Bash
 - **AI-optimized templates** with Jinja2-style variables
-- **Enhanced script integration** for validation and execution
+- **Script integration** for validation and execution
 - **Constitutional gates compliance** tracking
 - **Parallel task identification** and execution
 - **Comprehensive progress tracking** with YAML configuration
 - **Automatic percentage calculation** and velocity metrics
 - **Task dependency management** with conflict detection
 - **Execution command generation** with script integration
-- **Platform-agnostic operation** for Windows, Linux, and macOS
+- **Cross-platform operation** with Bash
 
 ## Error Handling
 

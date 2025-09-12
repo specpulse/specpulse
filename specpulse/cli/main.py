@@ -31,6 +31,13 @@ class SpecPulseCLI:
              template: str = "web"):
         """Initialize SpecPulse in an existing or new project"""
         
+        # Validate project name for invalid characters
+        import re
+        if project_name and not here:
+            if not re.match(r'^[a-zA-Z0-9_-]+$', project_name):
+                self.console.error(f"Project name contains invalid characters: {project_name}")
+                return False
+        
         if here:
             project_path = Path.cwd()
             project_name = project_path.name
@@ -620,6 +627,13 @@ graph LR
         project_path = Path.cwd()
         sync_items = []
         
+        # Create missing directories if they don't exist
+        for dir_name in ["specs", "plans", "tasks", "memory", "templates", "scripts"]:
+            dir_path = project_path / dir_name
+            if not dir_path.exists():
+                dir_path.mkdir(parents=True, exist_ok=True)
+                sync_items.append((dir_name, "Created"))
+        
         self.console.spinner("Synchronizing project state")
         import time
         
@@ -656,6 +670,29 @@ graph LR
         self.console.animated_success("Project synchronized successfully!")
         
         return True
+    
+    def list_specs(self):
+        """List all specifications in the project"""
+        specs_dir = Path("specs")
+        if not specs_dir.exists():
+            self.console.warning("No specs directory found")
+            return []
+        
+        spec_files = []
+        for feature_dir in specs_dir.iterdir():
+            if feature_dir.is_dir():
+                for spec_file in feature_dir.glob("spec-*.md"):
+                    spec_files.append(spec_file)
+        
+        if not spec_files:
+            self.console.warning("No specifications found")
+            return []
+        
+        self.console.info(f"Found {len(spec_files)} specifications")
+        for spec_file in spec_files:
+            self.console.info(f"  - {spec_file.relative_to(specs_dir)}")
+        
+        return spec_files
     
     def doctor(self):
         """System check and diagnostics"""

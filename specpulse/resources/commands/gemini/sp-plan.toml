@@ -38,17 +38,15 @@ Parse arguments to determine action:
 
 7. Check existing plan files and create next version (plan-001.md, plan-002.md, etc.)
 8. Write plan to plans/XXX-feature/plan-XXX.md
-9. Run cross-platform validation:
-   - Linux/macOS: !{bash scripts/sp-pulse-plan.sh "XXX-feature"}
-   - Fallback: !{python scripts/sp-pulse-plan.py "XXX-feature"}
+9. Run validation:
+   - !{bash scripts/sp-pulse-plan.sh "XXX-feature"}
 
 ## For /sp-plan validate:
 1. Show list of existing plan files in current feature directory
 2. Ask user which plan file to validate
 3. Read selected plan from @{plans/*/plan-XXX.md}
-4. Run cross-platform validation:
-   - Linux/macOS: !{bash scripts/sp-pulse-plan.sh "XXX-feature"}
-   - Fallback: !{python scripts/sp-pulse-plan.py "XXX-feature"}
+4. Run validation:
+   - !{bash scripts/sp-pulse-plan.sh "XXX-feature"}
 5. Verify Phase Gates compliance
 6. Check complexity tracking
 7. Ensure test-first approach

@@ -24,9 +24,8 @@ Parse the arguments to determine the action:
 4. Find current feature directory from detected context
 5. Check existing spec files and create next version (spec-001.md, spec-002.md, etc.)
 6. Write specification to specs/XXX-feature/spec-XXX.md
-7. Run cross-platform validation:
-   - Linux/macOS: !{bash scripts/sp-pulse-spec.sh "XXX-feature"}
-   - Fallback: !{python scripts/sp-pulse-spec.py "XXX-feature"}
+7. Run validation:
+   - !{bash scripts/sp-pulse-spec.sh "XXX-feature"}
 
 ## For /sp-spec update:
 1. Show list of existing spec files in current feature directory
@@ -39,9 +38,8 @@ Parse the arguments to determine the action:
 ## For /sp-spec validate:
 1. Show list of existing spec files in current feature directory
 2. Ask user which spec file to validate
-3. Run cross-platform validation:
-   - Linux/macOS: !{bash scripts/sp-pulse-spec.sh "XXX-feature"}
-   - Fallback: !{python scripts/sp-pulse-spec.py "XXX-feature"}
+3. Run validation:
+   - !{bash scripts/sp-pulse-spec.sh "XXX-feature"}
 4. Check all required sections are filled
 5. Count [NEEDS CLARIFICATION] markers
 6. Verify acceptance criteria are testable
