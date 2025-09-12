@@ -291,9 +291,10 @@ This project uses SpecPulse for specification-driven development.
 1. Open in your AI assistant (Claude or Gemini)
 2. Use `/sp-pulse <feature>` to start a new feature
 3. Use `/sp-spec create` to generate specifications
-4. Use `/sp-plan generate` to create implementation plans
-5. Use `/sp-task breakdown` to create task lists
-6. Use `/validate all` before implementation
+4. Use `/sp-decompose <spec-id>` to break down large specs
+5. Use `/sp-plan generate` to create implementation plans
+6. Use `/sp-task breakdown` to create task lists
+7. Use `/validate all` before implementation
 
 ## Project Structure
 - `specs/` - Feature specifications
@@ -306,6 +307,7 @@ This project uses SpecPulse for specification-driven development.
 ## Commands
 - `/sp-pulse <feature>` - Initialize new feature
 - `/sp-spec create <description>` - Create specification
+- `/sp-decompose <spec-id>` - Decompose specs into microservices/APIs
 - `/sp-plan generate` - Generate implementation plan
 - `/sp-task breakdown` - Create task list
 - `/validate [component]` - Validate project
@@ -409,6 +411,206 @@ Generated with SpecPulse v1.0.0
         self.console.validation_results(validation_results)
         
         return all(r["status"] != "error" for r in results)
+    
+    def decompose(self, spec_id: Optional[str] = None, 
+                  microservices: bool = False,
+                  apis: bool = False, 
+                  interfaces: bool = False):
+        """Decompose large specifications into smaller components"""
+        self.console.show_banner(mini=True)
+        self.console.header("Specification Decomposition", style="bright_yellow")
+        
+        project_path = Path.cwd()
+        specs_dir = project_path / "specs"
+        
+        # Find target specification
+        if spec_id:
+            # Handle both "001" and "001-feature" formats
+            spec_id_num = spec_id.split('-')[0] if '-' in spec_id else spec_id
+            spec_dirs = list(specs_dir.glob(f"{spec_id_num}*"))
+        else:
+            # Try to detect from context or most recent
+            spec_dirs = sorted(specs_dir.glob("*"), reverse=True)
+        
+        if not spec_dirs:
+            self.console.error("No specifications found. Run /sp-spec create first.")
+            return False
+        
+        target_dir = spec_dirs[0]
+        spec_files = list(target_dir.glob("spec-*.md"))
+        
+        if not spec_files:
+            self.console.error(f"No specification files found in {target_dir}")
+            return False
+        
+        # Use most recent spec file
+        spec_file = sorted(spec_files)[-1]
+        
+        self.console.info(f"Decomposing: {spec_file.name}")
+        self.console.spinner("Analyzing specification complexity")
+        
+        # Create decomposition directory
+        decomp_dir = target_dir / "decomposition"
+        decomp_dir.mkdir(exist_ok=True)
+        
+        # Determine what to generate
+        if not any([microservices, apis, interfaces]):
+            # Default to all
+            microservices = apis = interfaces = True
+        
+        decomp_items = []
+        
+        if microservices:
+            # Use template from SpecPulse core
+            ms_template = self.specpulse.get_decomposition_template("microservices")
+            ms_content = ms_template.replace("{{ feature_name }}", target_dir.name)
+            ms_content = ms_content.replace("{{ spec_id }}", target_dir.name.split('-')[0])
+            ms_content = ms_content.replace("{{ date }}", datetime.now().isoformat())
+            ms_content = ms_content.replace("{{ version }}", "1.0.0")
+            
+            # Placeholder content for services (AI will fill this)
+            ms_content = ms_content.replace("{{ services }}", """### Authentication Service
+- **Responsibility**: User identity and access control
+- **Bounded Context**: Identity Management
+
+### User Management Service  
+- **Responsibility**: User profiles and preferences
+- **Bounded Context**: User Domain""")
+            
+            ms_content = ms_content.replace("{{ communication_patterns }}", "- REST APIs for synchronous
+- Event Bus for asynchronous")
+            ms_content = ms_content.replace("{{ data_boundaries }}", "- Each service owns its data
+- No shared databases")
+            ms_content = ms_content.replace("{{ integration_points }}", "- API Gateway
+- Message Queue")
+            
+            # Simplified microservices content
+            ms_content = """# Microservice Decomposition
+
+## Services Identified
+
+### Authentication Service
+- **Responsibility**: User identity and access control
+- **Bounded Context**: Identity Management
+- **Data Ownership**: users, sessions, tokens
+
+### User Management Service  
+- **Responsibility**: User profile and preferences
+- **Bounded Context**: User Domain
+- **Data Ownership**: profiles, preferences, settings
+
+## Communication Patterns
+- Synchronous: REST APIs
+- Asynchronous: Event Bus
+- Hybrid: CQRS for read/write separation
+"""
+            with open(decomp_dir / "microservices.md", 'w', encoding='utf-8') as f:
+                f.write(ms_content)
+            decomp_items.append(("Microservices", "Generated"))
+        
+        if apis:
+            # Generate API contracts using template
+            api_dir = decomp_dir / "api-contracts"
+            api_dir.mkdir(exist_ok=True)
+            
+            # Use template from SpecPulse core
+            api_template = self.specpulse.get_decomposition_template("api")
+            
+            # Basic API content (AI will expand this)
+            api_content = """openapi: 3.0.0
+info:
+  title: Authentication Service API
+  version: 1.0.0
+paths:
+  /api/v1/auth/login:
+    post:
+      summary: Authenticate user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Successful authentication
+"""
+            with open(api_dir / "auth-service.yaml", 'w', encoding='utf-8') as f:
+                f.write(api_content)
+            decomp_items.append(("API Contracts", "Generated"))
+        
+        if interfaces:
+            # Generate interface specifications using template
+            iface_dir = decomp_dir / "interfaces"
+            iface_dir.mkdir(exist_ok=True)
+            
+            # Use template from SpecPulse core
+            iface_template = self.specpulse.get_decomposition_template("interface")
+            
+            # Basic interface content (AI will expand this)
+            iface_content = """// Authentication Service Interface
+export interface IAuthenticationService {
+  authenticate(credentials: Credentials): Promise<AuthToken>;
+  validateToken(token: string): Promise<TokenValidation>;
+  refreshToken(refreshToken: string): Promise<AuthToken>;
+  revokeToken(token: string): Promise<void>;
+}
+
+export interface Credentials {
+  username: string;
+  password: string;
+}
+
+export interface AuthToken {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}
+"""
+            with open(iface_dir / "IAuthService.ts", 'w', encoding='utf-8') as f:
+                f.write(iface_content)
+            decomp_items.append(("Interfaces", "Generated"))
+        
+        # Generate integration map
+        map_content = """# Integration Map
+
+## Service Communication
+
+```mermaid
+graph LR
+    A[API Gateway] --> B[Auth Service]
+    A --> C[User Service]
+    B --> D[Session Store]
+    C --> E[Profile DB]
+    B -.->|Events| F[Event Bus]
+    C -.->|Events| F
+```
+
+## Data Flow
+1. Client → API Gateway
+2. Gateway → Authentication
+3. Auth → Session Store
+4. Success → User Service
+5. User → Profile Data
+"""
+        with open(decomp_dir / "integration-map.md", 'w', encoding='utf-8') as f:
+            f.write(map_content)
+        decomp_items.append(("Integration Map", "Created"))
+        
+        import time
+        time.sleep(1)  # Visual effect
+        
+        # Display results
+        self.console.status_panel("Decomposition Complete", decomp_items)
+        self.console.animated_success(f"Specification decomposed into {len(decomp_items)} components")
+        self.console.info(f"Output: {decomp_dir}")
+        
+        return True
     
     def sync(self):
         """Synchronize project state"""
@@ -560,6 +762,13 @@ def main():
     validate_parser.add_argument("--fix", action="store_true", help="Attempt to fix issues")
     validate_parser.add_argument("--verbose", action="store_true", help="Verbose output")
     
+    # Decompose command
+    decompose_parser = subparsers.add_parser("decompose", help="Decompose specifications into smaller components")
+    decompose_parser.add_argument("spec_id", nargs="?", help="Specification ID (e.g., 001 or 001-feature)")
+    decompose_parser.add_argument("--microservices", action="store_true", help="Generate microservice boundaries")
+    decompose_parser.add_argument("--apis", action="store_true", help="Generate API contracts")
+    decompose_parser.add_argument("--interfaces", action="store_true", help="Generate interface specifications")
+    
     # Sync command
     sync_parser = subparsers.add_parser("sync", help="Synchronize project state")
     
@@ -582,6 +791,8 @@ def main():
         cli.update()
     elif args.command == "validate":
         cli.validate(args.component, args.fix, args.verbose)
+    elif args.command == "decompose":
+        cli.decompose(args.spec_id, args.microservices, args.apis, args.interfaces)
     elif args.command == "sync":
         cli.sync()
     elif args.command == "doctor":

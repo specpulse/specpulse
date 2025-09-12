@@ -38,8 +38,16 @@ When called with `/sp-task $ARGUMENTS`, I will:
 
 3. **For `/sp-task breakdown` or `/sp-task`:**
    
-   a. **Show existing plan files**: List all plan-XXX.md files in current feature directory
-   b. **Ask user to select**: Which plan file to base tasks on
+   a. **Check for decomposition**: Look for `specs/XXX-feature/decomposition/` directory
+   b. **If decomposed**:
+      - Read service definitions from decomposition
+      - Show service-specific plan files (auth-service-plan.md, user-service-plan.md, etc.)
+      - Generate tasks per service with service prefix (AUTH-T001, USER-T001)
+      - Create integration tasks (INT-T001) for cross-service work
+      - Structure: `tasks/XXX-feature/auth-service-tasks.md`, `integration-tasks.md`
+   c. **If not decomposed**:
+      - Show existing plan files and ask user to select
+      - Generate single task file with standard IDs (T001, T002)
    c. **Enhanced validation** using cross-platform script:
       ```bash
       # Cross-platform detection
@@ -62,13 +70,20 @@ When called with `/sp-task $ARGUMENTS`, I will:
       - **Task Version**: {{ task_version }}
       ```
 
-   f. **Generate structured task categories**:
-      - **Constitutional Gates Compliance**: Pre-implementation validation
-      - **Critical Path (Phase 0)**: Tasks that impact timeline
-      - **Parallel Groups**: Tasks that can execute simultaneously
-      - **Sequential Tasks**: Tasks with dependencies
-      - **Execution Schedule**: Time-based task organization
-      - **Progress Tracking**: YAML configuration for monitoring
+   f. **Generate structured task categories based on architecture**:
+      - **For decomposed services**:
+        * Service-specific tasks with bounded context
+        * Inter-service integration tasks
+        * Service deployment order tasks
+        * Contract testing tasks between services
+      - **For monolithic architecture**:
+        * Layer-based tasks (data, business, API)
+        * Module-specific tasks
+      - **Common categories**:
+        * Constitutional Gates Compliance
+        * Critical Path identification
+        * Parallel vs Sequential grouping
+        * Progress Tracking configuration
 
    g. **For each task**, generate comprehensive metadata:
       - **ID**: T[XXX] format (T001, T002)
@@ -151,6 +166,32 @@ When called with `/sp-task $ARGUMENTS`, I will:
    g. **Update progress tracking** automatically
 
 ## Enhanced Task Format
+
+### For Decomposed Services
+```markdown
+### Auth Service Tasks
+#### AUTH-T001: Initialize auth service structure
+- **Service**: Authentication
+- **Type**: setup
+- **Priority**: HIGH
+- **Dependencies**: None
+
+### User Service Tasks  
+#### USER-T001: Initialize user service structure
+- **Service**: User Management
+- **Type**: setup
+- **Priority**: HIGH
+- **Dependencies**: None
+
+### Integration Tasks
+#### INT-T001: Set up service communication
+- **Services**: Auth ↔ User
+- **Type**: integration
+- **Priority**: HIGH
+- **Dependencies**: AUTH-T001, USER-T001
+```
+
+### For Monolithic Architecture
 ```markdown
 ### Parallel Group A
 #### T001: Initialize project structure
@@ -188,9 +229,26 @@ Each task breakdown includes constitutional compliance validation:
 
 ## Examples
 
-### Generate task breakdown
+### Generate tasks for decomposed spec
 ```
 User: /sp-task breakdown
+```
+Detecting decomposition in `specs/001-authentication/decomposition/`...
+I will create:
+- `tasks/001-authentication/auth-service-tasks.md`
+- `tasks/001-authentication/user-service-tasks.md`
+- `tasks/001-authentication/integration-tasks.md`
+
+### Generate tasks for monolithic spec
+```
+User: /sp-task breakdown
+```
+No decomposition found. Creating single task file:
+- `tasks/001-authentication/task-001.md`
+
+### Execute service-specific task
+```
+User: /sp-task execute AUTH-T001
 ```
 I will:
 - Run: Cross-platform detection and execution

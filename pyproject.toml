@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "specpulse"
-version = "1.1.0"
+version = "1.2.0"
 description = "Specification-Driven Development Framework"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -81,11 +81,15 @@ packages = [
     "specpulse.resources.memory",
     "specpulse.resources.scripts",
     "specpulse.resources.templates",
+    "specpulse.resources.templates.decomposition",
 ]
 
 [tool.setuptools.package-data]
 specpulse = [
     "resources/templates/*.md",
+    "resources/templates/decomposition/*.md",
+    "resources/templates/decomposition/*.yaml",
+    "resources/templates/decomposition/*.ts",
     "resources/memory/*.md",
     "resources/scripts/*.sh",
     "resources/scripts/*.py",

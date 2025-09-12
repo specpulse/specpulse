@@ -21,13 +21,13 @@
 
 SpecPulse revolutionizes AI-assisted development by enforcing a **specification-first approach**. Instead of jumping straight into code, SpecPulse ensures every feature starts with clear specifications, validated plans, and tracked tasks - guaranteeing quality from day one.
 
-> **Latest Update (v1.1.0)**: 
-> - 🔧 **Command Prefix System**: All commands now use `sp-` prefix to avoid conflicts
-> - 📋 **Multi-Spec Workflow**: Support for multiple specs/plans/tasks per feature
-> - 🗂️ **Versioned File System**: Automatic spec-001.md, plan-001.md, task-001.md naming
-> - 🎯 **Context Detection**: Automatic feature detection using git branches
-> - 🤖 **Enhanced AI Integration**: Improved manual workflow control
-> - ✅ **Improved Error Handling**: Better resource path resolution and script copying operations
+> **Latest Update (v1.2.0)**: 
+> - 🔀 **Microservice Decomposition**: New `/sp-decompose` command to break large specs into services
+> - 🏗️ **Service-Based Planning**: Automatic service-specific plans and integration plans
+> - 📊 **Service Task Management**: Task prefixes per service (AUTH-T001, USER-T001, INT-T001)
+> - 🎯 **Smart Workflow Detection**: Automatic monolithic vs decomposed architecture handling
+> - 📝 **Rich Templates**: New templates for services, APIs, interfaces, and integration
+> - 🔧 **Previous (v1.1.0)**: Command prefix system, multi-spec workflow, versioned files
 
 ### Why SpecPulse?
 
@@ -89,14 +89,19 @@ specpulse init --ai gemini
 /sp-spec create user login with OAuth2 and email/password
 # Or just: /sp-spec (for interactive mode)
 
+# [NEW] Decompose large specs into microservices (optional)
+/sp-decompose 001
+# Creates service boundaries, API contracts, and interfaces
+
 # Generate implementation plan
 /sp-plan generate
-# Or: /sp-plan validate (to check existing plan)
+# For decomposed: Creates service-specific plans + integration plan
+# For monolithic: Creates single comprehensive plan
 
 # Break down into tasks
 /sp-task breakdown
-# Or: /sp-task update (to update task status)
-# Or: /sp-task status (to see progress)
+# For decomposed: Creates AUTH-T001, USER-T001, INT-T001 tasks
+# For monolithic: Creates T001, T002, T003 tasks
 ```
 
 ### Step 4: Validate & Ship
@@ -104,6 +109,13 @@ specpulse init --ai gemini
 ```bash
 # Validate everything
 specpulse validate
+
+# [NEW] Decompose specifications
+specpulse decompose 001
+# Or with options:
+specpulse decompose --microservices
+specpulse decompose --apis
+specpulse decompose --interfaces
 
 # Run diagnostics
 specpulse doctor
@@ -224,11 +236,13 @@ Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
 /sp-spec create OAuth2 login      # Create specification with description
 /sp-spec update                   # Update existing specification
 /sp-spec validate                 # Validate specification completeness
-/sp-plan generate                 # Generate plan from specification
+/sp-decompose 001                 # [NEW] Decompose spec into microservices
+/sp-plan generate                 # Generate plan(s) - detects decomposition
 /sp-plan validate                 # Validate plan against constitution
-/sp-task breakdown                # Create task list from plan
+/sp-task breakdown                # Create task list(s) - per service if decomposed
 /sp-task update                   # Update task statuses
 /sp-task status                   # Show current progress
+/sp-task execute AUTH-T001        # [NEW] Execute service-specific task
 ```
 
 **Behind the Scenes:**
@@ -264,6 +278,39 @@ Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
 | **Technical Debt** | Accumulates | **Tracked & Managed** |
 | **Documentation** | Often outdated | **Always current** |
 
+## 🎯 Microservice Decomposition (NEW)
+
+For large, complex specifications, SpecPulse can automatically decompose them into microservices:
+
+```bash
+# Decompose a specification
+/sp-decompose 001
+```
+
+This creates:
+- **Service Boundaries**: Using Domain-Driven Design principles
+- **API Contracts**: OpenAPI 3.0 specifications for each service
+- **Interface Definitions**: TypeScript/Java/Go interfaces
+- **Integration Map**: Service communication architecture
+- **Migration Plan**: Strategy for breaking down monoliths
+
+### Workflow Adaptation
+
+SpecPulse automatically adapts based on architecture:
+
+**Monolithic Flow:**
+```
+spec-001.md → plan-001.md → task-001.md (T001, T002...)
+```
+
+**Decomposed Flow:**
+```
+spec-001.md → decomposition/ → service plans → service tasks
+                ├── microservices.md      ├── auth-service-plan.md    ├── AUTH-T001
+                ├── api-contracts/        ├── user-service-plan.md    ├── USER-T001
+                └── interfaces/           └── integration-plan.md     └── INT-T001
+```
+
 ## 🏗️ Project Structure
 
 ```
@@ -280,13 +327,25 @@ my-project/
 │   └── decisions.md    # Architecture Decision Records
 ├── specs/               # Feature specifications
 │   └── 001-feature/
-│       └── spec-001.md
+│       ├── spec-001.md
+│       └── decomposition/    # [NEW] Microservice decomposition
+│           ├── microservices.md
+│           ├── api-contracts/
+│           └── interfaces/
 ├── plans/               # Implementation plans
 │   └── 001-feature/
-│       └── plan-001.md
+│       ├── plan-001.md      # Monolithic plan
+│       # OR for decomposed:
+│       ├── auth-service-plan.md
+│       ├── user-service-plan.md
+│       └── integration-plan.md
 ├── tasks/               # Task breakdowns
 │   └── 001-feature/
-│       └── task-001.md
+│       ├── task-001.md      # Monolithic tasks
+│       # OR for decomposed:
+│       ├── auth-service-tasks.md
+│       ├── user-service-tasks.md
+│       └── integration-tasks.md
 ├── templates/           # Customizable templates
 ├── scripts/             # Shell scripts for AI execution
 │   ├── sp-pulse-init.sh    # Feature initialization

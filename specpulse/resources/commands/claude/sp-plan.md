@@ -36,9 +36,16 @@ When called with `/sp-plan $ARGUMENTS`, I will:
    - Otherwise: Generate new plan
 
 3. **For `/sp-plan generate` or `/sp-plan`:**
-   a. **Show existing spec files**: List all spec-XXX.md files in current feature directory
-   b. **Ask user to select**: Which spec file to base plan on
-   c. **Find and validate specification** from selected spec file
+   a. **Check for decomposition**: Look for `specs/XXX-feature/decomposition/` directory
+   b. **If decomposed**:
+      - Read decomposition artifacts (microservices.md, api-contracts/, interfaces/)
+      - Generate separate plans for each service
+      - Create integration plan for service coordination
+      - Structure: `plans/XXX-feature/service-A-plan.md`, `integration-plan.md`
+   c. **If not decomposed**:
+      - Show existing spec files and ask user to select
+      - Generate single monolithic plan
+   d. **Find and validate specification** from selected spec file
    
    d. **Enhanced validation** using cross-platform script:
       ```bash
@@ -67,15 +74,22 @@ When called with `/sp-plan $ARGUMENTS`, I will:
       - **Generated**: {{ date }}
       ```
 
-   g. **Generate comprehensive sections**:
-      - Technology stack with performance implications
-      - Architecture overview with component relationships
-      - Implementation phases with timeline estimates
-      - API contracts with authentication requirements
-      - Data models with validation rules
-      - Testing strategy with coverage targets
-      - Security considerations with compliance requirements
-      - Deployment strategy with rollback plans
+   g. **Generate comprehensive sections based on architecture**:
+      - **For decomposed specs**:
+        * Service-specific plans with bounded contexts
+        * Inter-service communication plans
+        * Data consistency strategies
+        * Service deployment order
+        * Integration testing approach
+      - **For monolithic specs**:
+        * Traditional layered architecture
+        * Module boundaries
+        * Single deployment strategy
+      - Common sections:
+        * Technology stack with performance implications
+        * Testing strategy with coverage targets
+        * Security considerations
+        * Deployment strategy with rollback plans
 
    h. **Complexity tracking** (Article VII):
       - Document all complexity exceptions with justifications
@@ -150,15 +164,22 @@ When called with `/sp-plan $ARGUMENTS`, I will:
 
 ## Examples
 
-### Generate plan with validation
+### Generate plan for decomposed spec
 ```
 User: /sp-plan generate
 ```
-I will:
-- Run: `bash scripts/sp-pulse-plan.sh "$FEATURE_DIR"`
-- Validate: Constitutional gates compliance
-- Create: AI-optimized plan with template variables
-- Output: `CONSTITUTIONAL_GATES_STATUS=PENDING`
+Detecting decomposition in `specs/001-authentication/decomposition/`...
+I will create:
+- `plans/001-authentication/auth-service-plan.md`
+- `plans/001-authentication/user-service-plan.md`
+- `plans/001-authentication/integration-plan.md`
+
+### Generate plan for monolithic spec
+```
+User: /sp-plan generate
+```
+No decomposition found. Creating single plan:
+- `plans/001-authentication/plan-001.md`
 
 ### Validate existing plan
 ```

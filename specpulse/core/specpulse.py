@@ -537,6 +537,36 @@ Last Updated: [AI updates this automatically]
 - **[Term]**: [Definition]
 """
     
+    def get_decomposition_template(self, template_type: str = "microservices") -> str:
+        """Get decomposition template"""
+        template_map = {
+            "microservices": "microservices.md",
+            "api": "api-contract.yaml",
+            "interface": "interface.ts"
+        }
+        
+        template_file = template_map.get(template_type, "microservices.md")
+        template_path = self.resources_dir / "templates" / "decomposition" / template_file
+        
+        if template_path.exists():
+            with open(template_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        
+        # Fallback for microservices template
+        if template_type == "microservices":
+            return """# Microservice Decomposition: {{ feature_name }}
+
+## Service Boundaries
+{{ services }}
+
+## Communication Patterns
+{{ communication }}
+
+## Data Ownership
+{{ data_boundaries }}
+"""
+        return ""
+    
     def get_decisions_template(self) -> str:
         """Get architectural decisions template from file"""
         template_path = self.resources_dir / "memory" / "decisions.md"

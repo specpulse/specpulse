@@ -1,0 +1,54 @@
+[command]
+name = "sp-decompose"
+description = "Decompose large specifications into microservices, APIs, and smaller components"
+type = "spec-decomposition"
+
+[prompt]
+template = """
+Decompose the specification {{args}} into smaller, manageable components.
+
+Analysis required:
+1. Identify microservice boundaries using DDD principles
+2. Define API contracts with OpenAPI specifications
+3. Create interface specifications for each component
+4. Map data ownership and consistency boundaries
+5. Design communication patterns between services
+
+Generate:
+- Service definitions with clear responsibilities
+- API contracts in OpenAPI 3.0 format
+- Interface specifications in appropriate languages
+- Data models and schemas
+- Integration mapping diagram
+- Migration plan from monolith
+
+Apply these principles:
+- Domain-Driven Design for boundaries
+- SOLID principles for design
+- Single responsibility per service
+- Clear data ownership
+- Minimal coupling between services
+
+Output structure:
+specs/XXX-feature/decomposition/
+├── microservices.md
+├── api-contracts/
+├── interfaces/
+├── data-models/
+├── integration-map.md
+└── migration-plan.md
+"""
+
+[validation]
+required_outputs = [
+    "microservices.md",
+    "api-contracts",
+    "interfaces",
+    "integration-map.md"
+]
+
+[options]
+microservices = "Focus on service boundary identification"
+apis = "Generate detailed API contracts"
+interfaces = "Create interface specifications"
+all = "Complete decomposition analysis"

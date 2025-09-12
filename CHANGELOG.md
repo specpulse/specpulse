@@ -5,6 +5,27 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-09-12
+
+### Added
+- **Microservice Decomposition**: New `/sp-decompose` command to break down large specifications into microservices
+- **Service-Based Planning**: Automatic detection of decomposed specs and creation of service-specific plans
+- **Integration Planning**: New integration plan template for coordinating between services
+- **Service Task Management**: Task IDs with service prefixes (AUTH-T001, USER-T001, INT-T001)
+- **Smart Workflow Detection**: Plans and tasks automatically adapt to monolithic vs decomposed architecture
+- **New Templates**: Added templates for microservices, API contracts, interfaces, and integration plans
+- **Decomposition CLI Command**: `specpulse decompose [spec-id] [--microservices] [--apis] [--interfaces]`
+- **Enhanced Context Tracking**: `memory/context.md` now tracks decomposition status and service architecture
+
+### Changed
+- **Workflow Adaptation**: `/sp-plan` and `/sp-task` commands now detect decomposition and generate appropriate artifacts
+- **Template Structure**: Added `templates/decomposition/` directory with specialized templates
+- **Script Updates**: Added `sp-pulse-decompose.sh` and `sp-pulse-decompose.py` for decomposition orchestration
+
+### Fixed
+- **Template Loading**: Proper handling of decomposition templates in SpecPulse core
+- **CLI Integration**: Decompose command properly integrated with existing workflow
+
 ## [1.1.0] - 2025-09-12
 
 ### Added

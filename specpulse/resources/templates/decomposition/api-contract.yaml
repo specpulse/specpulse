@@ -1,0 +1,22 @@
+openapi: 3.0.0
+info:
+  title: {{ service_name }} API
+  version: {{ version }}
+  description: {{ service_description }}
+  
+servers:
+  - url: {{ base_url }}
+    description: {{ environment }}
+
+paths:
+  {{ paths }}
+
+components:
+  schemas:
+    {{ schemas }}
+  
+  securitySchemes:
+    {{ security_schemes }}
+
+tags:
+  {{ tags }}
