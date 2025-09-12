@@ -477,12 +477,12 @@ Generated with SpecPulse v1.0.0
 - **Responsibility**: User profiles and preferences
 - **Bounded Context**: User Domain""")
             
-            ms_content = ms_content.replace("{{ communication_patterns }}", "- REST APIs for synchronous
-- Event Bus for asynchronous")
-            ms_content = ms_content.replace("{{ data_boundaries }}", "- Each service owns its data
-- No shared databases")
-            ms_content = ms_content.replace("{{ integration_points }}", "- API Gateway
-- Message Queue")
+            ms_content = ms_content.replace("{{ communication_patterns }}", """- REST APIs for synchronous
+- Event Bus for asynchronous""")
+            ms_content = ms_content.replace("{{ data_boundaries }}", """- Each service owns its data
+- No shared databases""")
+            ms_content = ms_content.replace("{{ integration_points }}", """- API Gateway
+- Message Queue""")
             
             # Simplified microservices content
             ms_content = """# Microservice Decomposition
