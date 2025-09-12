@@ -56,12 +56,12 @@ mkdir -p "$TASKS_DIR" || error_exit "Failed to create tasks directory: $TASKS_DI
 # Create initial files from templates
 TEMPLATE_DIR="$PROJECT_ROOT/templates"
 
-if [ ! -f "$TEMPLATE_DIR/spec-001.md" ]; then
-    error_exit "Template not found: $TEMPLATE_DIR/spec-001.md"
+if [ ! -f "$TEMPLATE_DIR/spec.md" ]; then
+    error_exit "Template not found: $TEMPLATE_DIR/spec.md"
 fi
 
-cp "$TEMPLATE_DIR/spec-001.md" "$SPECS_DIR/spec-001.md" || error_exit "Failed to copy spec template"
-cp "$TEMPLATE_DIR/plan-001.md" "$PLANS_DIR/plan-001.md" || error_exit "Failed to copy plan template"
+cp "$TEMPLATE_DIR/spec.md" "$SPECS_DIR/spec-001.md" || error_exit "Failed to copy spec template"
+cp "$TEMPLATE_DIR/plan.md" "$PLANS_DIR/plan-001.md" || error_exit "Failed to copy plan template"
 cp "$TEMPLATE_DIR/task.md" "$TASKS_DIR/task-001.md" || error_exit "Failed to copy task template"
 
 # Update context

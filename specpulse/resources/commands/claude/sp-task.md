@@ -3,7 +3,7 @@ name: sp-task
 description: Generate and manage task breakdowns using AI-optimized templates
 allowed_tools:
   - Read
-  - Write  
+  - Write
   - Edit
   - Bash
   - TodoWrite
@@ -12,6 +12,11 @@ allowed_tools:
 # /sp-task Command
 
 Generate task breakdowns from implementation plans using SpecPulse methodology with AI-optimized templates and enhanced validation.
+
+## CRITICAL: File Edit Restrictions
+- **NEVER EDIT**: templates/, scripts/, commands/, .claude/, .gemini/
+- **ONLY EDIT**: specs/, plans/, tasks/, memory/
+- Templates are COPIED to tasks/ folder, then edited there
 
 ## Usage
 ```
@@ -55,7 +60,8 @@ When called with `/sp-task $ARGUMENTS`, I will:
    
    d. **Read implementation plan** from selected plan file
    
-   e. **Generate AI-optimized tasks** using template variables:
+   e. **Generate AI-optimized tasks** by COPYING template from templates/task.md to tasks/XXX-feature/:
+      - **IMPORTANT**: Can EDIT files in tasks/ folder, but NEVER modify templates/, scripts/, or commands/ folders
       ```markdown
       # Task List: {{ feature_name }}
       ## Metadata

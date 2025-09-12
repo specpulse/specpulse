@@ -13,6 +13,11 @@ allowed_tools:
 
 Create, update, or validate feature specifications using SpecPulse methodology with AI-optimized templates.
 
+## CRITICAL: File Edit Restrictions
+- **NEVER EDIT**: templates/, scripts/, commands/, .claude/, .gemini/
+- **ONLY EDIT**: specs/, plans/, tasks/, memory/
+- Templates are COPIED to specs/ folder, then edited there
+
 ## Usage
 ```
 /sp-spec [action] [description|feature-name]
@@ -38,7 +43,8 @@ When called with `/sp-spec $ARGUMENTS`, I will:
    - If no action specified: Default to `create` with full arguments as description
 
 3. **For `/sp-spec create [description]` or `/sp-spec [description]`:**
-   - Read AI-optimized template from `templates/spec.md`
+   - COPY template from `templates/spec.md` to create NEW file in `specs/XXX-feature/`
+   - IMPORTANT: Only edit files in specs/, plans/, tasks/ folders. NEVER edit templates/, scripts/, or commands/
    - Parse the description to identify:
      - Functional requirements (Must/Should/Could/Won't have)
      - User stories with testable acceptance criteria
@@ -55,7 +61,8 @@ When called with `/sp-spec $ARGUMENTS`, I will:
    - Mark any uncertainties with `[NEEDS CLARIFICATION: specific question]`
    - Use detected feature context to determine target directory
    - **Version management**: Check existing spec files and create next version (spec-001.md, spec-002.md, etc.)
-   - Write specification to `specs/ID-feature-name/spec-XXX.md`
+   - Write NEW specification to `specs/ID-feature-name/spec-XXX.md`
+   - Can EDIT files in specs/ folder, but NEVER modify templates/, scripts/, or commands/ folders
    - Run validation:
      - `bash scripts/sp-pulse-spec.sh "$FEATURE_DIR"`
 

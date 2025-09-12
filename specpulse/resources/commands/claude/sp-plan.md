@@ -13,6 +13,11 @@ allowed_tools:
 
 Generate implementation plans from specifications following SpecPulse methodology with constitutional compliance and AI-optimized templates.
 
+## CRITICAL: File Edit Restrictions
+- **NEVER EDIT**: templates/, scripts/, commands/, .claude/, .gemini/
+- **ONLY EDIT**: specs/, plans/, tasks/, memory/
+- Templates are COPIED to plans/ folder, then edited there
+
 ## Usage
 ```
 /sp-plan [action] [feature-directory]
@@ -59,7 +64,7 @@ When called with `/sp-plan $ARGUMENTS`, I will:
       - Integration-First Gate: Real services over mocks
       - Research Gate: Technology choices documented
 
-   f. **Generate AI-optimized plan** using template variables:
+   f. **Generate AI-optimized plan** by COPYING template from templates/plan.md to plans/XXX-feature/:
       ```markdown
       # Implementation Plan: {{ feature_name }}
       ## Specification Reference
@@ -92,7 +97,8 @@ When called with `/sp-plan $ARGUMENTS`, I will:
       - Track optimization opportunities
 
    i. **Version management**: Check existing plan files and create next version (plan-001.md, plan-002.md, etc.)
-   j. **Write optimized plan** to `plans/XXX-feature/plan-XXX.md`
+   j. **Write NEW plan file** to `plans/XXX-feature/plan-XXX.md`
+   k. **IMPORTANT**: Can EDIT files in plans/ folder, but NEVER modify templates/, scripts/, or commands/ folders
 
 4. **For `/sp-plan validate`:**
    a. **Show existing plan files**: List all plan-XXX.md files in current feature directory

@@ -48,7 +48,7 @@ if [ -z "$FEATURE_DIR" ]; then
 fi
 
 SPEC_DIR="$PROJECT_ROOT/specs/${FEATURE_DIR}"
-TEMPLATE_FILE="$PROJECT_ROOT/templates/spec-001.md"
+TEMPLATE_FILE="$PROJECT_ROOT/templates/spec.md"
 
 # Ensure specs directory exists
 mkdir -p "$SPEC_DIR"

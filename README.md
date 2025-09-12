@@ -251,6 +251,19 @@ Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
 - Results are saved in `specs/`, `plans/`, `tasks/` folders
 - Memory system tracks progress in `memory/` folder
 
+**🔒 Important Security Rules:**
+- **Protected Directories** (Read-Only after init):
+  - `templates/` - Original template files
+  - `scripts/` - Shell scripts
+  - `commands/` - AI command definitions
+  - `.claude/` and `.gemini/` - AI configurations
+- **Editable Directories**:
+  - `specs/` - Feature specifications (AI creates/edits here)
+  - `plans/` - Implementation plans (AI creates/edits here)
+  - `tasks/` - Task breakdowns (AI creates/edits here)
+  - `memory/` - Project context and decisions
+- **Workflow**: Templates are COPIED to working directories, never modified directly
+
 **Claude vs Gemini:**
 - **Claude**: Uses Markdown command files (`.claude/commands/*.md`) with YAML frontmatter
   - Arguments passed via `$ARGUMENTS` variable to shell scripts

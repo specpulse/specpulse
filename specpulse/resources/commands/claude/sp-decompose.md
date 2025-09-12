@@ -13,6 +13,11 @@ allowed_tools:
 
 Decompose large specifications into smaller, manageable components with microservice boundaries, API contracts, and interface specifications.
 
+## CRITICAL: File Edit Restrictions
+- **NEVER EDIT**: templates/, scripts/, commands/, .claude/, .gemini/
+- **ONLY EDIT**: specs/, plans/, tasks/, memory/
+- Decomposition templates are COPIED to specs/XXX-feature/decomposition/, then edited there
+
 ## Usage
 ```
 /sp-decompose [spec-id] [options]
@@ -89,8 +94,9 @@ When called with `/sp-decompose $ARGUMENTS`, I will:
    - Create adapter patterns for external integrations
 
 6. **Generate decomposition artifacts using templates**:
-   - Read templates from `templates/decomposition/`
-   - Use template variables for AI processing
+   - COPY templates from `templates/decomposition/` to `specs/XXX-feature/decomposition/`
+   - Use template variables for AI processing in the COPIED files
+   - **IMPORTANT**: Can EDIT files in specs/decomposition/ folder, but NEVER modify templates/, scripts/, or commands/ folders
    - Create structured output in `specs/XXX-feature/decomposition/`:
      - **`microservices.md`**: From template with service boundaries
      - **`api-contracts/`**: From OpenAPI template

@@ -5,6 +5,37 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.6] - 2025-09-12
+
+### Changed
+- **Updated README.md**: Added Important Security Rules section explaining protected vs editable directories
+- **Documentation**: Clarified that templates are copied to working directories, never modified directly
+
+## [1.2.5] - 2025-09-12
+
+### Fixed
+- **Clarified File Edit Permissions**: Edit tool restored to Claude commands with clear restrictions
+- **Added Security Notes**: All commands now explicitly state which directories are protected
+- **Directory Protection**: templates/, scripts/, commands/ folders are read-only after init
+
+### Changed
+- Claude commands can use Edit tool but ONLY in specs/, plans/, tasks/, memory/ folders
+- Added CRITICAL security notes to all command files
+- Clarified that templates are COPIED to working directories, then edited there
+
+## [1.2.4] - 2025-09-12
+
+### Fixed
+- **Critical Security Fix**: Prevented modification of template files
+- **Script Improvements**: Fixed template file paths in all shell scripts
+- **AI Command Security**: Removed Edit tool from Claude commands to prevent template modification
+- **Template Protection**: Ensured all scripts only COPY templates, never modify originals
+
+### Changed
+- All scripts now use correct template names (spec.md, plan.md, task.md)
+- Claude commands explicitly state templates must be COPIED, not edited
+- Enhanced security by preventing any modification of resources/templates files
+
 ## [1.2.3] - 2025-09-12
 
 ### Changed

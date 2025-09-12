@@ -48,7 +48,7 @@ fi
 
 PLAN_DIR="$PROJECT_ROOT/plans/${FEATURE_DIR}"
 SPEC_DIR="$PROJECT_ROOT/specs/${FEATURE_DIR}"
-TEMPLATE_FILE="$PROJECT_ROOT/templates/plan-001.md"
+TEMPLATE_FILE="$PROJECT_ROOT/templates/plan.md"
 
 # Ensure plans directory exists
 mkdir -p "$PLAN_DIR"

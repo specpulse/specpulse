@@ -13,6 +13,19 @@ allowed_tools:
 
 Initialize a new feature following SpecPulse methodology with constitutional compliance.
 
+## CRITICAL SECURITY NOTE
+**NEVER edit files in these protected directories:**
+- `templates/` - Template files (spec.md, plan.md, task.md)
+- `scripts/` - Shell scripts (sp-pulse-*.sh)
+- `commands/` - AI command definitions
+- `.claude/` and `.gemini/` - AI configuration files
+
+**ONLY create and edit files in:**
+- `specs/` - Feature specifications
+- `plans/` - Implementation plans
+- `tasks/` - Task breakdowns
+- `memory/` - Project context (context.md, decisions.md)
+
 ## Usage
 ```
 /sp-pulse <feature-name> [feature-id]
