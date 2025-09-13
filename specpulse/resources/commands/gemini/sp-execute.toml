@@ -1,0 +1,69 @@
+[command]
+name = "sp-execute"
+description = "Execute tasks continuously without stopping - complete all pending work"
+
+[command.prompt]
+text = """
+Execute tasks continuously from the task list without stopping between tasks.
+
+Arguments: {{args}}
+
+CRITICAL: This is NON-STOP EXECUTION mode. You must:
+1. Execute the current/next task
+2. Mark it as completed
+3. Immediately move to the next task
+4. Continue until ALL tasks are done or blocked
+
+NO STOPPING between tasks unless:
+- All tasks are completed
+- Remaining tasks are blocked
+- An error occurs requiring user intervention
+- User explicitly stops you
+
+## Steps:
+
+1. Run: scripts/sp-pulse-execute.sh {{args}}
+
+2. Analyze the output to identify:
+   - Next task to execute (T001 or AUTH-T001 format)
+   - Total pending tasks
+   - Current progress percentage
+
+3. For each task:
+   - Read task description from task file
+   - Implement the solution
+   - Test if applicable
+   - Mark as completed: [ ] → [x]
+   - Move to next task WITHOUT PAUSING
+
+4. Continue executing until:
+   - All tasks completed
+   - Hit a blocker
+   - Critical error
+   - User says "stop"
+
+## Execution Modes:
+
+- No arguments or "next": Execute next pending task and continue
+- "all": Execute ALL pending tasks non-stop
+- Specific task (T001, AUTH-T001): Start from that task
+
+## Rules:
+
+- NO EXPLANATIONS between tasks
+- NO WAITING for confirmation
+- NO SUMMARIES after each task
+- Just execute and continue
+
+## Final Report:
+
+Only after ALL tasks done:
+```
+Execution Complete
+Progress: 100% (25/25 tasks)
+✓ 25 tasks completed
+Ready for validation
+```
+
+Execute efficiently and continuously!
+"""

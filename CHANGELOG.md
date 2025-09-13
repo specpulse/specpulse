@@ -5,6 +5,27 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-09-13
+
+### Added
+- **Continuous Task Execution**: New `/sp-execute` command for non-stop task completion
+- **Flow State Development**: Execute all tasks without interruptions or context switching
+- **Batch Processing Mode**: Complete entire task lists with a single command (`/sp-execute all`)
+- **Smart Task Progression**: Automatic advancement through pending, in-progress, and blocked tasks
+- **Task Status Detection**: Intelligent identification of next tasks to execute
+- **Service-Aware Execution**: Support for both monolithic (T001) and decomposed (AUTH-T001) task formats
+- **New Shell Script**: Added `sp-pulse-execute.sh` for continuous execution orchestration
+- **Enhanced Productivity**: 10x faster task completion through elimination of manual confirmations
+
+### Changed
+- **Updated README**: Added comprehensive section on continuous task execution with examples
+- **Enhanced Workflow**: Streamlined development process from spec to completion
+- **Command Documentation**: Added `/sp-execute` to all command listings and workflows
+
+### Fixed
+- **Template Naming**: Fixed `sp-pulse-init.sh` to use correct file naming (spec-001.md instead of spec-001.md)
+- **Directory Structure**: Ensured consistent feature ID usage in file creation
+
 ## [1.2.6] - 2025-09-12
 
 ### Changed

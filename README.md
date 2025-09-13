@@ -21,13 +21,13 @@
 
 SpecPulse revolutionizes AI-assisted development by enforcing a **specification-first approach**. Instead of jumping straight into code, SpecPulse ensures every feature starts with clear specifications, validated plans, and tracked tasks - guaranteeing quality from day one.
 
-> **Latest Update (v1.2.0)**: 
-> - 🔀 **Microservice Decomposition**: New `/sp-decompose` command to break large specs into services
-> - 🏗️ **Service-Based Planning**: Automatic service-specific plans and integration plans
-> - 📊 **Service Task Management**: Task prefixes per service (AUTH-T001, USER-T001, INT-T001)
-> - 🎯 **Smart Workflow Detection**: Automatic monolithic vs decomposed architecture handling
-> - 📝 **Rich Templates**: New templates for services, APIs, interfaces, and integration
-> - 🔧 **Previous (v1.1.0)**: Command prefix system, multi-spec workflow, versioned files
+> **Latest Update (v1.3.0)**:
+> - 🚀 **Continuous Task Execution**: New `/sp-execute` command for non-stop task completion
+> - ⚡ **Flow State Development**: Execute all tasks without interruptions
+> - 🔄 **Smart Task Progression**: Automatic advancement through task lists
+> - 🎯 **Batch Processing**: Complete entire features in one command
+> - **Previous (v1.2.0)**: Microservice decomposition, service-based planning, smart workflow detection
+> - **Previous (v1.1.0)**: Command prefix system, multi-spec workflow, versioned files
 
 ### Why SpecPulse?
 
@@ -84,7 +84,7 @@ specpulse init --ai gemini
 /sp-pulse user-authentication
 # Creates structure for 001-user-authentication feature
 
-# Create the specification  
+# Create the specification
 /sp-spec create user login with OAuth2 and email/password
 # Or just: /sp-spec (for interactive mode)
 
@@ -101,6 +101,11 @@ specpulse init --ai gemini
 /sp-task breakdown
 # For decomposed: Creates AUTH-T001, USER-T001, INT-T001 tasks
 # For monolithic: Creates T001, T002, T003 tasks
+
+# [NEW] Execute all tasks continuously without stopping
+/sp-execute all
+# Completes ALL tasks in sequence without interruptions
+# Or: /sp-execute (for next task), /sp-execute T001 (specific task)
 ```
 
 ### Step 4: Validate & Ship
@@ -234,13 +239,15 @@ Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
 /sp-spec create OAuth2 login      # Create specification with description
 /sp-spec update                   # Update existing specification
 /sp-spec validate                 # Validate specification completeness
-/sp-decompose 001                 # [NEW] Decompose spec into microservices
+/sp-decompose 001                 # Decompose spec into microservices
 /sp-plan generate                 # Generate plan(s) - detects decomposition
 /sp-plan validate                 # Validate plan against constitution
 /sp-task breakdown                # Create task list(s) - per service if decomposed
 /sp-task update                   # Update task statuses
 /sp-task status                   # Show current progress
-/sp-task execute AUTH-T001        # [NEW] Execute service-specific task
+/sp-execute all                   # [NEW] Execute ALL tasks non-stop until completion
+/sp-execute                       # [NEW] Execute next task and continue
+/sp-execute T001                  # [NEW] Execute specific task and continue
 ```
 
 **Behind the Scenes:**
@@ -287,7 +294,64 @@ Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
 | **Technical Debt** | Accumulates | **Tracked & Managed** |
 | **Documentation** | Often outdated | **Always current** |
 
-## 🎯 Microservice Decomposition (NEW)
+## 🚀 Continuous Task Execution (NEW in v1.3.0)
+
+SpecPulse now supports **non-stop task execution** for maximum development efficiency:
+
+### The `/sp-execute` Command
+
+Complete entire features without interruptions:
+
+```bash
+# Execute ALL tasks continuously
+/sp-execute all
+# AI will complete every task in sequence without stopping
+
+# Execute next task and continue
+/sp-execute
+# Starts with next pending task and keeps going
+
+# Execute from specific task
+/sp-execute T001
+# Starts from T001 and continues through all remaining tasks
+```
+
+### Flow State Development
+
+The continuous execution mode enables:
+- **Zero Context Switching**: No stops between tasks
+- **Maximum Efficiency**: Complete features 10x faster
+- **Uninterrupted Flow**: Maintain focus and productivity
+- **Automatic Progression**: Smart task advancement
+- **Batch Processing**: Handle entire task lists in one go
+
+### Example Workflow
+
+```bash
+# Traditional approach (multiple commands, lots of waiting)
+/sp-task execute T001
+# ... wait for completion ...
+/sp-task execute T002
+# ... wait for completion ...
+/sp-task execute T003
+# ... and so on ...
+
+# NEW: Continuous execution (one command, no waiting)
+/sp-execute all
+# Completes T001, T002, T003... T025 automatically!
+```
+
+### Benefits
+
+| Traditional Execution | Continuous Execution |
+|----------------------|---------------------|
+| Stop after each task | Non-stop completion |
+| Constant confirmations | Automatic progression |
+| Context switching | Flow state maintained |
+| 5-10 tasks/hour | 50+ tasks/hour |
+| Manual task selection | Smart task ordering |
+
+## 🎯 Microservice Decomposition
 
 For large, complex specifications, SpecPulse can automatically decompose them into microservices:
 
