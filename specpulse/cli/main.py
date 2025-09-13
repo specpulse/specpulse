@@ -17,6 +17,7 @@ from ..core.specpulse import SpecPulse
 from ..core.validator import Validator
 from ..utils.console import Console
 from ..utils.git_utils import GitUtils
+from ..utils.version_check import check_pypi_version, compare_versions, get_update_message, should_check_version
 
 
 class SpecPulseCLI:
@@ -24,7 +25,32 @@ class SpecPulseCLI:
         self.console = Console(no_color=no_color, verbose=verbose)
         self.specpulse = SpecPulse()
         self.validator = Validator()
-        
+
+        # Check for updates (non-blocking)
+        self._check_for_updates()
+
+    def _check_for_updates(self):
+        """Check for available updates on PyPI"""
+        try:
+            if not should_check_version():
+                return
+
+            latest = check_pypi_version(timeout=1)
+            if latest:
+                current = __version__
+                is_outdated, is_major = compare_versions(current, latest)
+
+                if is_outdated:
+                    message, color = get_update_message(current, latest, is_major)
+                    # Only show for init command or when verbose
+                    # Don't spam on every command
+                    import sys
+                    if len(sys.argv) > 1 and sys.argv[1] in ['init', '--version']:
+                        self.console.info(message, style=color)
+        except:
+            # Never fail due to version check
+            pass
+
     def init(self, project_name: Optional[str] = None, 
              here: bool = False, 
              ai: str = "claude",
@@ -239,20 +265,20 @@ class SpecPulseCLI:
         resources_scripts_dir = self.specpulse.resources_dir / "scripts"
         
         # Copy all script files from resources
-        script_extensions = [".sh", ".py"]
+        script_extensions = [".sh", ".ps1", ".py"]
         scripts_copied = 0
-        
+
         for script_file in resources_scripts_dir.iterdir():
             if script_file.suffix in script_extensions:
                 dest_path = scripts_dir / script_file.name
                 shutil.copy2(script_file, dest_path)
-                
+
                 # Make shell scripts executable
-                if script_file.suffix == ".sh":
+                if script_file.suffix in [".sh", ".ps1"]:
                     try:
                         os.chmod(dest_path, 0o755)
                     except:
-                        pass  # Windows may not support chmod
+                        pass  # Windows may not support chmod for .sh files
                 
                 scripts_copied += 1
         

@@ -41,7 +41,7 @@ class SpecPulse:
     
     def get_spec_template(self) -> str:
         """Get specification template from file"""
-        template_path = self.resources_dir / "templates" / "spec-001.md"
+        template_path = self.resources_dir / "templates" / "spec.md"
         if template_path.exists():
             with open(template_path, 'r', encoding='utf-8') as f:
                 return f.read()
@@ -125,7 +125,7 @@ FR-001: [Requirement]
     
     def get_plan_template(self) -> str:
         """Get implementation plan template from file"""
-        template_path = self.resources_dir / "templates" / "plan-001.md"
+        template_path = self.resources_dir / "templates" / "plan.md"
         if template_path.exists():
             with open(template_path, 'r', encoding='utf-8') as f:
                 return f.read()

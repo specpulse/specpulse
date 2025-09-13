@@ -21,13 +21,14 @@
 
 SpecPulse revolutionizes AI-assisted development by enforcing a **specification-first approach**. Instead of jumping straight into code, SpecPulse ensures every feature starts with clear specifications, validated plans, and tracked tasks - guaranteeing quality from day one.
 
-> **Latest Update (v1.3.0)**:
-> - 🚀 **Continuous Task Execution**: New `/sp-execute` command for non-stop task completion
-> - ⚡ **Flow State Development**: Execute all tasks without interruptions
-> - 🔄 **Smart Task Progression**: Automatic advancement through task lists
-> - 🎯 **Batch Processing**: Complete entire features in one command
-> - **Previous (v1.2.0)**: Microservice decomposition, service-based planning, smart workflow detection
-> - **Previous (v1.1.0)**: Command prefix system, multi-spec workflow, versioned files
+> **Latest Update (v1.3.4)**:
+> - 🧪 **89% Test Coverage**: Comprehensive test suite with 450+ tests
+> - 🔍 **Version Update Checking**: Automatic PyPI version checking with 24-hour caching
+> - 💪 **PowerShell Support**: Full Windows PowerShell script support alongside Bash
+> - 🛠️ **Enhanced Stability**: Critical path fixes and improved error handling
+> - **Previous (v1.3.0)**: Continuous task execution with `/sp-execute` command
+> - **Previous (v1.2.0)**: Microservice decomposition, service-based planning
+> - **Previous (v1.1.0)**: Command prefix system, multi-spec workflow
 
 ### Why SpecPulse?
 

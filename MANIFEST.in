@@ -2,7 +2,7 @@ include README.md
 include LICENSE
 include pyproject.toml
 include requirements.txt
-recursive-include specpulse/resources *.md *.sh *.toml *.yaml
+recursive-include specpulse/resources *.md *.sh *.ps1 *.toml *.yaml
 recursive-include specpulse/resources/templates *
 recursive-include specpulse/resources/memory *
 recursive-include specpulse/resources/scripts *
