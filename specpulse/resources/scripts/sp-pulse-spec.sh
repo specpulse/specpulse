@@ -28,25 +28,14 @@ fi
 FEATURE_DIR="$1"
 SPEC_CONTENT="${2:-}"
 
+# Extract feature ID from directory name (e.g., "001-feature-name" -> "001")
+FEATURE_ID=$(echo "$FEATURE_DIR" | grep -o '^[0-9]\{3\}' || echo "001")
+
 # Sanitize feature directory
 SANITIZED_DIR=$(echo "$FEATURE_DIR" | sed 's/[^a-zA-Z0-9_-]//g')
 
 if [ -z "$SANITIZED_DIR" ]; then
     error_exit "Invalid feature directory: '$FEATURE_DIR'"
-fi
-
-# Find feature directory if not provided
-if [ -z "$FEATURE_DIR" ]; then
-    CONTEXT_FILE="$PROJECT_ROOT/memory/context.md"
-    if [ -f "$CONTEXT_FILE" ]; then
-        FEATURE_DIR=$(grep -A1 "Active Feature" "$CONTEXT_FILE" | tail -1 | cut -d: -f2 | xargs)
-        if [ -z "$FEATURE_DIR" ]; then
-            error_exit "No active feature found in context file"
-        fi
-        log "Using active feature from context: $FEATURE_DIR"
-    else
-        error_exit "No feature directory provided and no context file found"
-    fi
 fi
 
 SPEC_DIR="$PROJECT_ROOT/specs/${FEATURE_DIR}"

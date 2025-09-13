@@ -67,10 +67,11 @@ class SpecPulseCLI:
             ".gemini/commands",
             "memory",
             "specs",
-            "plans", 
+            "plans",
             "tasks",
             "scripts",
-            "templates"
+            "templates",
+            "templates/decomposition"
         ]
         
         # Create directories with progress bar
@@ -198,7 +199,17 @@ class SpecPulseCLI:
         task_template = self.specpulse.get_task_template()
         with open(templates_dir / "task.md", 'w', encoding='utf-8') as f:
             f.write(task_template)
-        
+
+        # Copy decomposition templates
+        decomp_dir = templates_dir / "decomposition"
+        decomp_dir.mkdir(parents=True, exist_ok=True)
+
+        resources_decomp_dir = self.specpulse.resources_dir / "templates" / "decomposition"
+        if resources_decomp_dir.exists():
+            for template_file in resources_decomp_dir.iterdir():
+                if template_file.is_file():
+                    shutil.copy2(template_file, decomp_dir / template_file.name)
+
         self.console.success("Created templates")
     
     def _create_memory_files(self, project_path: Path):

@@ -27,25 +27,14 @@ fi
 
 FEATURE_DIR="$1"
 
+# Extract feature ID from directory name (e.g., "001-feature-name" -> "001")
+FEATURE_ID=$(echo "$FEATURE_DIR" | grep -o '^[0-9]\{3\}' || echo "001")
+
 # Sanitize feature directory
 SANITIZED_DIR=$(echo "$FEATURE_DIR" | sed 's/[^a-zA-Z0-9_-]//g')
 
 if [ -z "$SANITIZED_DIR" ]; then
     error_exit "Invalid feature directory: '$FEATURE_DIR'"
-fi
-
-# Find feature directory if not provided
-if [ -z "$FEATURE_DIR" ]; then
-    CONTEXT_FILE="$PROJECT_ROOT/memory/context.md"
-    if [ -f "$CONTEXT_FILE" ]; then
-        FEATURE_DIR=$(grep -A1 "Active Feature" "$CONTEXT_FILE" | tail -1 | cut -d: -f2 | xargs)
-        if [ -z "$FEATURE_DIR" ]; then
-            error_exit "No active feature found in context file"
-        fi
-        log "Using active feature from context: $FEATURE_DIR"
-    else
-        error_exit "No feature directory provided and no context file found"
-    fi
 fi
 
 TASK_DIR="$PROJECT_ROOT/tasks/${FEATURE_DIR}"
@@ -132,10 +121,9 @@ if [ "$PLAN_GATE_STATUS" != "COMPLETED" ]; then
 fi
 
 # Calculate completion percentage
-if [ "$TOTAL_TASKS" -gt 0 ]; then
-    COMPLETION_PERCENTAGE=$((COMPLETED_TASKS * 100 / TOTAL_TASKS))
-else
-    COMPLETION_PERCENTAGE=0
+COMPLETION_PERCENTAGE=0
+if [ "${TOTAL_TASKS:-0}" -gt 0 ] && [ "${COMPLETED_TASKS:-0}" -ge 0 ]; then
+    COMPLETION_PERCENTAGE=$(( (COMPLETED_TASKS * 100) / TOTAL_TASKS ))
 fi
 
 log "Task analysis completed - Total: $TOTAL_TASKS, Completed: $COMPLETED_TASKS ($COMPLETION_PERCENTAGE%), Parallel: $PARALLEL_TASKS"
