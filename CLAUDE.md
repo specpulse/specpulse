@@ -271,7 +271,7 @@ tasks/001-user-authentication/
 ## Important Notes
 
 ### Version Management
-- Current version: 1.3.0 (in `pyproject.toml`)
+- Current version: 1.3.1 (in `pyproject.toml`)
 - Version must sync between `pyproject.toml` and `setup.py`
 - Use semantic versioning for releases
 

@@ -5,6 +5,14 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2025-09-13
+
+### Fixed
+- **Critical Template Bug**: Fixed template files being created with wrong names (spec-001.md instead of spec.md)
+- **Script Path Bug**: Fixed shell scripts looking in wrong directory (../../templates instead of ../templates)
+- **Init Command**: Now correctly creates spec.md, plan.md, and task.md templates
+- **Project Root Detection**: Scripts now properly detect project root directory
+
 ## [1.3.0] - 2025-09-13
 
 ### Added

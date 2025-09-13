@@ -95,8 +95,8 @@ class SpecPulseCLI:
                 "primary": ai
             },
             "templates": {
-                "spec": "templates/spec-001.md",
-                "plan": "templates/plan-001.md",
+                "spec": "templates/spec.md",
+                "plan": "templates/plan.md",
                 "task": "templates/task.md"
             },
             "conventions": {
@@ -183,17 +183,17 @@ class SpecPulseCLI:
     def _create_templates(self, project_path: Path):
         """Create template files"""
         templates_dir = project_path / "templates"
-        
+
         # Create spec template
         spec_template = self.specpulse.get_spec_template()
-        with open(templates_dir / "spec-001.md", 'w', encoding='utf-8') as f:
+        with open(templates_dir / "spec.md", 'w', encoding='utf-8') as f:
             f.write(spec_template)
-        
-        # Create plan template  
+
+        # Create plan template
         plan_template = self.specpulse.get_plan_template()
-        with open(templates_dir / "plan-001.md", 'w', encoding='utf-8') as f:
+        with open(templates_dir / "plan.md", 'w', encoding='utf-8') as f:
             f.write(plan_template)
-        
+
         # Create task template
         task_template = self.specpulse.get_task_template()
         with open(templates_dir / "task.md", 'w', encoding='utf-8') as f:

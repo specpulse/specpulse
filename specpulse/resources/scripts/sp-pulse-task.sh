@@ -5,7 +5,9 @@ set -euo pipefail  # Exit on error, unset vars, pipe failures
 
 # Configuration
 SCRIPT_NAME="$(basename "$0")"
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/.."
+# Remove double slashes and normalize path
+PROJECT_ROOT="$(cd "$PROJECT_ROOT" && pwd)"
 
 # Function to log messages
 log() {
