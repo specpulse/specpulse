@@ -3,7 +3,7 @@ SpecPulse: Specification-Driven Development Framework
 Built for the AI era
 """
 
-__version__ = "1.3.2"
+__version__ = "1.3.3"
 __author__ = "SpecPulse"
 __url__ = "https://github.com/specpulse"
 
