@@ -5,6 +5,17 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2025-09-13
+
+### Fixed
+- **Script Path Detection**: Simplified and fixed project root detection in all shell scripts
+- **Clear Directory Structure**: Scripts now consistently use `$SCRIPT_DIR/..` for project root
+- **Documentation**: Added comprehensive directory structure explanation in CLAUDE.md
+
+### Changed
+- All shell scripts now use consistent path detection logic
+- Improved clarity in script comments about directory structure
+
 ## [1.3.1] - 2025-09-13
 
 ### Fixed

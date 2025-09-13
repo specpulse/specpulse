@@ -190,6 +190,47 @@ The `/sp-execute` command enables non-stop task completion:
 
 This enables maximum efficiency by eliminating context switching and maintaining flow state.
 
+## Directory Structure and Script Execution
+
+### How Scripts Work
+When AI executes commands like `/sp-pulse`, `/sp-spec`, etc., the following happens:
+
+1. **Script Location**: Scripts are copied to `project-root/scripts/`
+2. **Script Execution**: `bash scripts/sp-pulse-init.sh [arguments]`
+3. **Project Root Detection**: Scripts automatically detect project root as parent of scripts/ directory
+
+### Directory Layout
+```
+project-root/                    # User's project directory
+├── scripts/                     # Shell scripts (copied from SpecPulse)
+│   ├── sp-pulse-init.sh
+│   ├── sp-pulse-spec.sh
+│   ├── sp-pulse-plan.sh
+│   └── sp-pulse-task.sh
+├── templates/                   # Template files (MUST have these exact names)
+│   ├── spec.md                 # NOT spec-001.md
+│   ├── plan.md                 # NOT plan-001.md
+│   └── task.md                 # Correct name
+├── specs/
+│   └── 001-feature-name/       # Feature directory
+│       ├── spec-001.md         # First specification
+│       └── spec-002.md         # Updated specification
+├── plans/
+│   └── 001-feature-name/       # Same feature directory name
+│       └── plan-001.md         # Implementation plan
+└── tasks/
+    └── 001-feature-name/       # Same feature directory name
+        └── task-001.md         # Task breakdown
+```
+
+### Script Arguments
+- `/sp-pulse user-auth` → `bash scripts/sp-pulse-init.sh "user-auth"`
+- `/sp-spec` → `bash scripts/sp-pulse-spec.sh "001-user-auth"`
+- `/sp-plan` → `bash scripts/sp-pulse-plan.sh "001-user-auth"`
+- `/sp-task` → `bash scripts/sp-pulse-task.sh "001-user-auth"`
+
+The feature directory name (e.g., "001-user-auth") is passed to spec, plan, and task scripts.
+
 ## CRITICAL WORKFLOW RULES
 
 ### ⚠️ NEVER MODIFY TEMPLATE FILES
@@ -271,7 +312,7 @@ tasks/001-user-authentication/
 ## Important Notes
 
 ### Version Management
-- Current version: 1.3.1 (in `pyproject.toml`)
+- Current version: 1.3.2 (in `pyproject.toml`)
 - Version must sync between `pyproject.toml` and `setup.py`
 - Use semantic versioning for releases
 
