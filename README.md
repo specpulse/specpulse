@@ -11,7 +11,7 @@
 
 *Build better software faster by putting specifications first and letting AI handle the implementation details.*
 
-[Installation](#-installation) • [Quick Start](#-quick-start) • [Features](#-features) • [Documentation](#-documentation) • [Contributing](#-contributing)
+[Installation](#-installation) • [Quick Start](#-quick-start) • [Usage Guide](#-usage-guide) • [Features](#-features) • [Documentation](#-documentation) • [Contributing](#-contributing)
 
 </div>
 
@@ -528,6 +528,45 @@ pytest tests/
 - **[PyPI Package](https://pypi.org/project/specpulse/)** - Official package page
 - **[GitHub Repository](https://github.com/specpulse/specpulse)** - Source code and issues
 - **Command Reference** - See AI Integration section above for full command list
+
+## 📚 Usage Guide
+
+### How to Break Your Project into Features (Pulses)
+
+A complete guide is available in **[SPECPULSE_USAGE_GUIDE.md](SPECPULSE_USAGE_GUIDE.md)** which covers:
+- Feature decomposition strategies
+- Sizing guidelines (3-15 tasks per pulse)
+- Naming conventions (001-feature-name format)
+- Real-world examples for different project types
+- Best practices for feature boundaries
+
+#### Quick Examples
+
+**E-Commerce Platform:**
+```
+001-user-authentication    # Registration, login, sessions
+002-product-catalog        # Products, categories, search
+003-shopping-cart          # Cart management, calculations
+004-payment-processing     # Gateway, transactions, receipts
+005-order-management       # History, tracking, refunds
+```
+
+**SaaS Application:**
+```
+001-tenant-management      # Multi-tenancy, workspaces
+002-subscription-billing   # Plans, payments, invoices
+003-api-management        # Keys, rate limiting, docs
+004-admin-dashboard       # Analytics, reports, settings
+005-webhook-system        # Events, notifications, logs
+```
+
+**Key Principles:**
+- Each pulse should be **independent** and **testable**
+- Keep pulses between **3-15 tasks**
+- Use **sequential numbering** (001, 002, 003...)
+- Follow the **9 constitutional principles**
+
+See the full guide for detailed breakdowns and strategies.
 
 ## 📄 License
 
