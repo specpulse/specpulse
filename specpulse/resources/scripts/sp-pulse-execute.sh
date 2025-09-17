@@ -67,23 +67,23 @@ if grep -qE "AUTH-T[0-9]|USER-T[0-9]|INT-T[0-9]" "$TASK_FILE" 2>/dev/null; then
     log "Detected decomposed architecture with service-specific tasks"
 fi
 
-# Count task status
-TOTAL_TASKS=$(grep -cE "^- \[.\] (T[0-9]{3}|[A-Z]+-T[0-9]{3})" "$TASK_FILE" 2>/dev/null || echo "0")
-COMPLETED_TASKS=$(grep -cE "^- \[x\] (T[0-9]{3}|[A-Z]+-T[0-9]{3})" "$TASK_FILE" 2>/dev/null || echo "0")
-PENDING_TASKS=$(grep -cE "^- \[ \] (T[0-9]{3}|[A-Z]+-T[0-9]{3})" "$TASK_FILE" 2>/dev/null || echo "0")
-IN_PROGRESS_TASKS=$(grep -cE "^- \[>\] (T[0-9]{3}|[A-Z]+-T[0-9]{3})" "$TASK_FILE" 2>/dev/null || echo "0")
-BLOCKED_TASKS=$(grep -cE "^- \[!\] (T[0-9]{3}|[A-Z]+-T[0-9]{3})" "$TASK_FILE" 2>/dev/null || echo "0")
+# Count task status - handle the actual format used in task files
+TOTAL_TASKS=$(grep -cE "^### T[0-9]{3}:" "$TASK_FILE" 2>/dev/null || echo "0")
+COMPLETED_TASKS=$(awk '/^### T[0-9]{3}:/{task=$0; found=0; for(i=0; i<5; i++) {getline; if(/^\*\*Status\*\*: \[x\]/) {found=1; break} if(/^###/) break} if(found) count++} END{print count+0}' "$TASK_FILE" 2>/dev/null || echo "0")
+PENDING_TASKS=$(awk '/^### T[0-9]{3}:/{task=$0; found=0; for(i=0; i<5; i++) {getline; if(/^\*\*Status\*\*: \[ \]/) {found=1; break} if(/^###/) break} if(found) count++} END{print count+0}' "$TASK_FILE" 2>/dev/null || echo "0")
+IN_PROGRESS_TASKS=$(awk '/^### T[0-9]{3}:/{task=$0; found=0; for(i=0; i<5; i++) {getline; if(/^\*\*Status\*\*: \[>\]/) {found=1; break} if(/^###/) break} if(found) count++} END{print count+0}' "$TASK_FILE" 2>/dev/null || echo "0")
+BLOCKED_TASKS=$(awk '/^### T[0-9]{3}:/{task=$0; found=0; for(i=0; i<5; i++) {getline; if(/^\*\*Status\*\*: \[!\]/) {found=1; break} if(/^###/) break} if(found) count++} END{print count+0}' "$TASK_FILE" 2>/dev/null || echo "0")
 
 # Find next task to execute
 case "$COMMAND" in
     "next"|"continue")
         # Find first in-progress task
         if [ "$IN_PROGRESS_TASKS" -gt 0 ]; then
-            NEXT_TASK=$(grep -E "^- \[>\] (T[0-9]{3}|[A-Z]+-T[0-9]{3})" "$TASK_FILE" | head -1 | sed -E 's/.*\[(T[0-9]{3}|[A-Z]+-T[0-9]{3})\].*/\1/')
+            NEXT_TASK=$(grep "^\*\*Status\*\*: \[>\]" "$TASK_FILE" -B1 | grep -E "^### T[0-9]{3}:" | head -1 | sed -E 's/^### (T[0-9]{3}):.*/\1/')
             log "Resuming in-progress task: $NEXT_TASK"
         # Otherwise find first pending task
         elif [ "$PENDING_TASKS" -gt 0 ]; then
-            NEXT_TASK=$(grep -E "^- \[ \] (T[0-9]{3}|[A-Z]+-T[0-9]{3})" "$TASK_FILE" | head -1 | sed -E 's/.*\[(T[0-9]{3}|[A-Z]+-T[0-9]{3})\].*/\1/')
+            NEXT_TASK=$(grep "^\*\*Status\*\*: \[ \]" "$TASK_FILE" -B1 | grep -E "^### T[0-9]{3}:" | head -1 | sed -E 's/^### (T[0-9]{3}):.*/\1/')
             log "Starting next pending task: $NEXT_TASK"
         else
             if [ "$BLOCKED_TASKS" -gt 0 ]; then
@@ -147,7 +147,7 @@ fi
 if [ "$PENDING_TASKS" -gt 0 ]; then
     echo ""
     echo "NEXT_TASKS_PREVIEW:"
-    grep -E "^- \[ \] (T[0-9]{3}|[A-Z]+-T[0-9]{3})" "$TASK_FILE" | head -5 | while read -r line; do
+    awk '/^### T[0-9]{3}:/{task=$0; found=0; for(i=0; i<5; i++) {getline; if(/^\*\*Status\*\*: \[ \]/) {found=1; break} if(/^###/) break} if(found) {print task; count++; if(count>=5) exit}}' "$TASK_FILE" | while read -r line; do
         echo "  $line"
     done
 fi

@@ -73,19 +73,22 @@ echo "# Task Breakdown for $FEATURE_NAME" > "$TASKS_DIR/task-001.md"
 
 # Add markers indicating these files need AI processing
 echo "" >> "$SPECS_DIR/spec-001.md"
-echo "<!-- TO BE GENERATED FROM TEMPLATE: $TEMPLATE_DIR/spec.md -->" >> "$SPECS_DIR/spec-001.md"
-echo "<!-- FEATURE: $FEATURE_NAME -->" >> "$SPECS_DIR/spec-001.md"
-echo "<!-- ID: $FEATURE_ID -->" >> "$SPECS_DIR/spec-001.md"
+echo "<!-- INSTRUCTION: Generate specification content using template: $TEMPLATE_DIR/spec.md -->" >> "$SPECS_DIR/spec-001.md"
+echo "<!-- FEATURE_DIR: $BRANCH_NAME -->" >> "$SPECS_DIR/spec-001.md"
+echo "<!-- FEATURE_ID: $FEATURE_ID -->" >> "$SPECS_DIR/spec-001.md"
 
 echo "" >> "$PLANS_DIR/plan-001.md"
-echo "<!-- TO BE GENERATED FROM TEMPLATE: $TEMPLATE_DIR/plan.md -->" >> "$PLANS_DIR/plan-001.md"
-echo "<!-- FEATURE: $FEATURE_NAME -->" >> "$PLANS_DIR/plan-001.md"
-echo "<!-- ID: $FEATURE_ID -->" >> "$PLANS_DIR/plan-001.md"
+echo "<!-- INSTRUCTION: Generate plan using template: $TEMPLATE_DIR/plan.md -->" >> "$PLANS_DIR/plan-001.md"
+echo "<!-- SPEC_FILE: $SPECS_DIR/spec-001.md -->" >> "$PLANS_DIR/plan-001.md"
+echo "<!-- FEATURE_DIR: $BRANCH_NAME -->" >> "$PLANS_DIR/plan-001.md"
+echo "<!-- FEATURE_ID: $FEATURE_ID -->" >> "$PLANS_DIR/plan-001.md"
 
 echo "" >> "$TASKS_DIR/task-001.md"
-echo "<!-- TO BE GENERATED FROM TEMPLATE: $TEMPLATE_DIR/task.md -->" >> "$TASKS_DIR/task-001.md"
-echo "<!-- FEATURE: $FEATURE_NAME -->" >> "$TASKS_DIR/task-001.md"
-echo "<!-- ID: $FEATURE_ID -->" >> "$TASKS_DIR/task-001.md"
+echo "<!-- INSTRUCTION: Generate tasks using template: $TEMPLATE_DIR/task.md -->" >> "$TASKS_DIR/task-001.md"
+echo "<!-- SPEC_FILE: $SPECS_DIR/spec-001.md -->" >> "$TASKS_DIR/task-001.md"
+echo "<!-- PLAN_FILE: $PLANS_DIR/plan-001.md -->" >> "$TASKS_DIR/task-001.md"
+echo "<!-- FEATURE_DIR: $BRANCH_NAME -->" >> "$TASKS_DIR/task-001.md"
+echo "<!-- FEATURE_ID: $FEATURE_ID -->" >> "$TASKS_DIR/task-001.md"
 
 # Update context
 CONTEXT_FILE="$PROJECT_ROOT/memory/context.md"

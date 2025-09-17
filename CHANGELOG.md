@@ -5,6 +5,34 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.4] - 2025-09-17
+
+### 🐛 Critical Bug Fixes
+- **Fixed Script Numbering Logic**: Resolved issue where `/sp-pulse` created placeholder files but subsequent commands created new numbered files (spec-002.md instead of filling spec-001.md)
+- **Fixed Task Format Detection**: Updated `sp-pulse-execute.sh` and `.ps1` to detect correct task format (`### T001: Name` with `**Status**: [ ] Pending`)
+- **Fixed Placeholder Consistency**: All scripts now use consistent `<!-- INSTRUCTION: Generate -->` format for AI instruction markers
+- **Fixed Validation Logic**: Scripts properly detect placeholder files awaiting AI generation vs completed files
+- **Fixed PowerShell/Bash Parity**: All PowerShell scripts now match their Bash counterparts in behavior
+
+### 🔧 Technical Improvements
+- Unified placeholder creation across `sp-pulse-init`, `sp-pulse-spec`, `sp-pulse-plan`, and `sp-pulse-task` scripts
+- Improved PROJECT_ROOT detection for cross-platform compatibility
+- Enhanced task counting logic using AWK for bash and regex for PowerShell
+- Better handling of files in "awaiting generation" state
+
+## [1.4.3] - 2025-09-17
+
+### 🐛 Bug Fixes
+- Added missing PowerShell script files (.ps1) to package data
+- Fixed resource packaging to include all required script files
+- Ensured cross-platform compatibility with both bash and PowerShell scripts
+
+## [1.4.2] - 2025-09-17
+
+### 🐛 Bug Fixes
+- Fixed missing `packaging` dependency in pyproject.toml
+- Added packaging>=21.0 to dependencies list for proper version handling
+
 ## [1.4.1] - 2025-09-17
 
 ### 🐛 Bug Fixes

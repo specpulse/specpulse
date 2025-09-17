@@ -82,15 +82,34 @@ if ($taskContent -match "AUTH-T[0-9]|USER-T[0-9]|INT-T[0-9]") {
     Log-Message "Detected decomposed architecture with service-specific tasks"
 }
 
-# Count task status using regex
-$taskPattern = '^- \[.\] (T[0-9]{3}|[A-Z]+-T[0-9]{3})'
-$allTasks = [regex]::Matches($taskContent, $taskPattern, [System.Text.RegularExpressions.RegexOptions]::Multiline)
-$TotalTasks = $allTasks.Count
+# Count task status using the actual format used in task files
+# Format is: ### T001: Task Name
+#           **Status**: [x] Completed
+$TotalTasks = ([regex]::Matches($taskContent, '^### T[0-9]{3}:', [System.Text.RegularExpressions.RegexOptions]::Multiline)).Count
 
-$CompletedTasks = ([regex]::Matches($taskContent, '^- \[x\] (T[0-9]{3}|[A-Z]+-T[0-9]{3})', [System.Text.RegularExpressions.RegexOptions]::Multiline)).Count
-$PendingTasks = ([regex]::Matches($taskContent, '^- \[ \] (T[0-9]{3}|[A-Z]+-T[0-9]{3})', [System.Text.RegularExpressions.RegexOptions]::Multiline)).Count
-$InProgressTasks = ([regex]::Matches($taskContent, '^- \[>\] (T[0-9]{3}|[A-Z]+-T[0-9]{3})', [System.Text.RegularExpressions.RegexOptions]::Multiline)).Count
-$BlockedTasks = ([regex]::Matches($taskContent, '^- \[!\] (T[0-9]{3}|[A-Z]+-T[0-9]{3})', [System.Text.RegularExpressions.RegexOptions]::Multiline)).Count
+# Count completed tasks by finding task headers followed by status within next few lines
+$CompletedTasks = 0
+$PendingTasks = 0
+$InProgressTasks = 0
+$BlockedTasks = 0
+
+$taskHeaders = [regex]::Matches($taskContent, '^### (T[0-9]{3}):', [System.Text.RegularExpressions.RegexOptions]::Multiline)
+foreach ($header in $taskHeaders) {
+    $taskId = $header.Groups[1].Value
+    $startIndex = $header.Index
+    $endIndex = if ($header.Index + 500 -lt $taskContent.Length) { $header.Index + 500 } else { $taskContent.Length }
+    $taskSection = $taskContent.Substring($startIndex, $endIndex - $startIndex)
+
+    if ($taskSection -match '\*\*Status\*\*:\s*\[x\]') {
+        $CompletedTasks++
+    } elseif ($taskSection -match '\*\*Status\*\*:\s*\[ \]') {
+        $PendingTasks++
+    } elseif ($taskSection -match '\*\*Status\*\*:\s*\[>\]') {
+        $InProgressTasks++
+    } elseif ($taskSection -match '\*\*Status\*\*:\s*\[!\]') {
+        $BlockedTasks++
+    }
+}
 
 # Find next task to execute
 $NextTask = ""
@@ -98,17 +117,34 @@ $TaskDetails = ""
 
 switch ($Command) {
     { $_ -in "next", "continue" } {
-        # Find first in-progress task
-        $inProgressMatch = [regex]::Match($taskContent, '^- \[>\] ((T[0-9]{3}|[A-Z]+-T[0-9]{3}): .+)$', [System.Text.RegularExpressions.RegexOptions]::Multiline)
-        if ($inProgressMatch.Success) {
-            $NextTask = $inProgressMatch.Groups[1].Value
-            $TaskDetails = "RESUMING IN-PROGRESS TASK"
-        } else {
-            # Find first pending task
-            $pendingMatch = [regex]::Match($taskContent, '^- \[ \] ((T[0-9]{3}|[A-Z]+-T[0-9]{3}): .+)$', [System.Text.RegularExpressions.RegexOptions]::Multiline)
-            if ($pendingMatch.Success) {
-                $NextTask = $pendingMatch.Groups[1].Value
-                $TaskDetails = "STARTING NEW TASK"
+        # Find first in-progress or pending task
+        foreach ($header in $taskHeaders) {
+            $taskId = $header.Groups[1].Value
+            $startIndex = $header.Index
+            $endIndex = if ($header.Index + 500 -lt $taskContent.Length) { $header.Index + 500 } else { $taskContent.Length }
+            $taskSection = $taskContent.Substring($startIndex, $endIndex - $startIndex)
+
+            # Check for in-progress task first
+            if ($taskSection -match '\*\*Status\*\*:\s*\[>\]') {
+                $NextTask = $taskId
+                $TaskDetails = "RESUMING IN-PROGRESS TASK"
+                break
+            }
+        }
+
+        # If no in-progress task found, find first pending
+        if (-not $NextTask) {
+            foreach ($header in $taskHeaders) {
+                $taskId = $header.Groups[1].Value
+                $startIndex = $header.Index
+                $endIndex = if ($header.Index + 500 -lt $taskContent.Length) { $header.Index + 500 } else { $taskContent.Length }
+                $taskSection = $taskContent.Substring($startIndex, $endIndex - $startIndex)
+
+                if ($taskSection -match '\*\*Status\*\*:\s*\[ \]') {
+                    $NextTask = $taskId
+                    $TaskDetails = "STARTING NEW TASK"
+                    break
+                }
             }
         }
     }
@@ -120,9 +156,8 @@ switch ($Command) {
     }
     default {
         # Specific task requested
-        $specificMatch = [regex]::Match($taskContent, "^- \[.\] (($Command): .+)$", [System.Text.RegularExpressions.RegexOptions]::Multiline)
-        if ($specificMatch.Success) {
-            $NextTask = $specificMatch.Groups[1].Value
+        if ($taskContent -match "^### ($Command):" ) {
+            $NextTask = $Command
             $TaskDetails = "EXECUTE SPECIFIC TASK"
         }
     }

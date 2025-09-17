@@ -78,27 +78,30 @@ try {
     $specContent = @"
 # Specification for $FeatureName
 
-<!-- TO BE GENERATED FROM TEMPLATE: $TemplateDir\spec.md -->
-<!-- FEATURE: $FeatureName -->
-<!-- ID: $FeatureId -->
+<!-- INSTRUCTION: Generate specification content using template: $TemplateDir\spec.md -->
+<!-- FEATURE_DIR: $BranchName -->
+<!-- FEATURE_ID: $FeatureId -->
 "@
     Set-Content -Path "$SpecsDir\spec-001.md" -Value $specContent
 
     $planContent = @"
 # Implementation Plan for $FeatureName
 
-<!-- TO BE GENERATED FROM TEMPLATE: $TemplateDir\plan.md -->
-<!-- FEATURE: $FeatureName -->
-<!-- ID: $FeatureId -->
+<!-- INSTRUCTION: Generate plan using template: $TemplateDir\plan.md -->
+<!-- SPEC_FILE: $SpecsDir\spec-001.md -->
+<!-- FEATURE_DIR: $BranchName -->
+<!-- FEATURE_ID: $FeatureId -->
 "@
     Set-Content -Path "$PlansDir\plan-001.md" -Value $planContent
 
     $taskContent = @"
 # Task Breakdown for $FeatureName
 
-<!-- TO BE GENERATED FROM TEMPLATE: $TemplateDir\task.md -->
-<!-- FEATURE: $FeatureName -->
-<!-- ID: $FeatureId -->
+<!-- INSTRUCTION: Generate tasks using template: $TemplateDir\task.md -->
+<!-- SPEC_FILE: $SpecsDir\spec-001.md -->
+<!-- PLAN_FILE: $PlansDir\plan-001.md -->
+<!-- FEATURE_DIR: $BranchName -->
+<!-- FEATURE_ID: $FeatureId -->
 "@
     Set-Content -Path "$TasksDir\task-001.md" -Value $taskContent
 } catch {
