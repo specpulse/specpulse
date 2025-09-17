@@ -294,14 +294,14 @@ indexes:
 - Performance Benchmarks
 - Security Scenarios
 
-## Constitution Compliance
+## SDD Compliance
 
 ### Principle Validation
-- [ ] Single Responsibility: Each component has one purpose
-- [ ] Test-First: Tests written before implementation
-- [ ] Documentation: All code is documented
-- [ ] Security: Security considered by design
-- [ ] Performance: Meets performance targets
+- [ ] Specification First: Requirements clearly defined
+- [ ] Incremental Planning: Phased approach planned
+- [ ] Task Decomposition: Broken into executable tasks
+- [ ] Quality Assurance: Appropriate testing strategy
+- [ ] Architecture Documentation: Decisions recorded
 
 ## Risk Assessment
 
@@ -317,7 +317,7 @@ indexes:
 
 ## Success Criteria
 - [ ] All functional requirements implemented
-- [ ] Test coverage > 80%
+- [ ] Appropriate test coverage for project type
 - [ ] Performance targets met
 - [ ] Security audit passed
 - [ ] Documentation complete
@@ -419,79 +419,9 @@ metrics:
         if template_path.exists():
             with open(template_path, 'r', encoding='utf-8') as f:
                 return f.read()
-        # Fallback to embedded template if file not found
-        return """# Project Constitution
-
-## Immutable Principles
-
-### Principle 1: Simplicity First
-Every solution must start with the simplest approach that could work.
-Complexity is added only when proven necessary.
-
-### Principle 2: Test-Driven Development
-No production code without tests.
-Tests are written first, implementation follows.
-
-### Principle 3: Single Responsibility
-Each module, function, and component does one thing well.
-If you need "and" to describe it, split it.
-
-### Principle 4: Documentation as Code
-Documentation lives with code.
-If it's not documented, it doesn't exist.
-
-### Principle 5: Security by Design
-Security is not an afterthought.
-Every feature considers security implications from the start.
-
-## Technical Standards
-
-### Code Style
-- Python: PEP 8 with type hints
-- JavaScript: StandardJS
-- Go: Official Go formatting
-
-### Testing Requirements
-- Minimum 80% code coverage
-- All API endpoints must have contract tests
-- Critical paths require E2E tests
-
-### Performance Targets
-- API response time: < 200ms (p95)
-- Page load time: < 2 seconds
-- Database queries: < 50ms
-
-### Security Requirements
-- All data encrypted in transit (TLS 1.3+)
-- Sensitive data encrypted at rest
-- Authentication: OAuth 2.0 / JWT
-- Authorization: RBAC with least privilege
-
-## Architecture Rules
-
-### Service Boundaries
-- Services communicate only through defined APIs
-- No shared databases between services
-- Each service owns its data
-
-### Data Management
-- Single source of truth for each data type
-- Event sourcing for audit requirements
-- CQRS where read/write patterns differ
-
-### Error Handling
-- All errors are handled explicitly
-- User-facing errors are helpful and actionable
-- System errors are logged with context
-
-## Amendment Process
-
-Changes to this constitution require:
-1. Documented rationale
-2. Team consensus
-3. Gradual migration plan
-4. Update to all affected documentation
-"""
+        # Fallback - return empty if template not found
+        # Templates should always be loaded from resources/memory/constitution.md
+        return ""
     
     def get_context_template(self) -> str:
         """Get context template from file"""
@@ -915,20 +845,24 @@ Validates specifications, plans, or project.
 4. Plan approved → Use `/sp-task breakdown`
 5. Before implementation → Use `/validate all`
 
-## Constitution Rules
+## SDD Principles
 
-Always enforce these principles:
-1. Simplicity first
-2. Test-driven development
-3. Single responsibility
-4. Documentation as code
-5. Security by design
+Follow these universal principles:
+1. Specification First
+2. Incremental Planning
+3. Task Decomposition
+4. Traceable Implementation
+5. Continuous Validation
+6. Quality Assurance
+7. Architecture Documentation
+8. Iterative Refinement
+9. Stakeholder Alignment
 
 ## Context Management
 
 - Read `memory/context.md` for project state
 - Update context after major decisions
-- Check `memory/constitution.md` for principles
+- Check `memory/constitution.md` for SDD principles
 - Reference previous specs for consistency
 
 ## Templates

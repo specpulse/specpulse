@@ -11,7 +11,7 @@ allowed_tools:
 
 # /sp-pulse Command
 
-Initialize a new feature following SpecPulse methodology with constitutional compliance.
+Initialize a new feature following SpecPulse methodology with SDD compliance.
 
 ## CRITICAL SECURITY NOTE
 **NEVER edit files in these protected directories:**
@@ -53,17 +53,17 @@ When called with `/sp-pulse $ARGUMENTS`, I will:
 
 5. **Validate structure** and report comprehensive status
 
-## Constitutional Compliance
+## SDD Compliance
 
-**Article I: Simplicity**
+**Principle 1: Specification First**
 - [ ] Feature name is clear and specific
-- [ ] No unnecessary abstractions in initial structure
-- [ ] Single responsibility per feature
+- [ ] Ready for requirements documentation
+- [ ] Structure supports specifications
 
-**Article II: Anti-Abstraction**  
-- [ ] Direct template usage (no wrapper layers)
-- [ ] Minimal initial structure
-- [ ] Framework-ready files
+**Principle 2: Incremental Planning**
+- [ ] Initial structure supports phased development
+- [ ] Templates ready for iterative work
+- [ ] Supports any project type
 
 ## Example
 ```
@@ -100,7 +100,7 @@ The `/sp-pulse` command creates the feature structure and then guides you throug
 1. **Phase -1**: **MANUAL** - Use `/sp-spec` to create specification with AI assistance
 2. **Phase 0**: **MANUAL** - Use `/sp-plan` to generate implementation plan  
 3. **Phase 1**: **MANUAL** - Use `/sp-task` to create task breakdown
-4. **Implementation**: Begin development following constitutional principles
+4. **Implementation**: Begin development following SDD principles
 
 ## Context Detection
 

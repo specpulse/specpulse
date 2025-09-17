@@ -108,8 +108,8 @@ When called with `/sp-decompose $ARGUMENTS`, I will:
    - Check for circular dependencies
    - Verify data consistency boundaries
    - Ensure single responsibility principle
-   - Validate against constitutional principles:
-     - Simplicity (≤3 modules per service)
+   - Validate against SDD principles:
+     - Clear service boundaries
      - Clear boundaries
      - Testability
 
@@ -180,28 +180,28 @@ specs/001-authentication/decomposition/
 └── migration-plan.md         # Decomposition strategy
 ```
 
-## Constitutional Compliance
+## SDD Compliance
 
-**Article I: Simplicity**
-- Each service limited to 3 core modules
-- Clear, focused responsibilities
-- Minimal inter-service dependencies
+**Principle 1: Specification First**
+- Each service has clear specifications
+- Service boundaries well-defined
+- Requirements traced to services
 
-**Article V: Single Responsibility**
-- Services own their data
-- Clear aggregate boundaries
-- Independent deployment capability
+**Principle 3: Task Decomposition**
+- Services broken into manageable tasks
+- Clear service-specific work items
+- Integration tasks identified
 
-**Article VIII: Framework Selection**
-- Choose appropriate tech stack per service
-- Leverage existing libraries
-- Standardize communication protocols
+**Principle 7: Architecture Documentation**
+- Service boundaries documented
+- Technology choices recorded
+- Integration patterns defined
 
 ## Integration with SpecPulse Workflow
 
 1. **After `/sp-spec create`**: 
    - AI analyzes spec complexity
-   - Suggests decomposition if >3 modules detected
+   - Suggests decomposition if complexity warrants it
    - User confirms with `/sp-decompose`
 
 2. **During decomposition**:
@@ -223,7 +223,7 @@ specs/001-authentication/decomposition/
 5. **With `/sp-validate`**: 
    - Validates service boundaries
    - Checks circular dependencies
-   - Ensures constitutional compliance
+   - Ensures SDD compliance
 
 ## Error Handling
 

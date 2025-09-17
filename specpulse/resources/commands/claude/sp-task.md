@@ -81,7 +81,7 @@ When called with `/sp-task $ARGUMENTS`, I will:
         * Layer-based tasks (data, business, API)
         * Module-specific tasks
       - **Common categories**:
-        * Constitutional Gates Compliance
+        * SDD Gates Compliance
         * Critical Path identification
         * Parallel vs Sequential grouping
         * Progress Tracking configuration
@@ -120,7 +120,7 @@ When called with `/sp-task $ARGUMENTS`, I will:
    d. **Parse current tasks** from selected file with comprehensive status:
      - Total tasks, completed, pending, blocked
      - Parallel tasks identification
-     - Constitutional gates status
+     - SDD gates status
      - Completion percentage calculation
    e. **Interactive task updates**:
      - Mark tasks as completed/in-progress/blocked
@@ -137,20 +137,20 @@ When called with `/sp-task $ARGUMENTS`, I will:
      TOTAL_TASKS=25
      COMPLETED_TASKS=10
      COMPLETION_PERCENTAGE=40%
-     CONSTITUTIONAL_GATES_PENDING=2
+     SDD_GATES_PENDING=2
      ```
    d. **Display comprehensive progress**:
      - Overall completion percentage
      - Phase-by-phase progress
      - Blocker identification and resolution
      - Velocity metrics and estimates
-     - Constitutional gates compliance status
+     - SDD gates compliance status
 
 6. **For `/sp-task execute`:**
    a. **Show existing task files**: List all task-XXX.md files in current feature directory
    b. **Ask user to select**: Which task file to execute from
    c. **Ask user to specify**: Which specific task ID to execute
-   d. **Validate task readiness** using constitutional gates
+   d. **Validate task readiness** using SDD gates
    e. **Execute task** using AI assistant capabilities:
      ```markdown
      ## Task Execution: {{ TASK_ID }}
@@ -215,13 +215,13 @@ metrics:
   completion_percentage: 40%
 ```
 
-## Constitutional Gates Integration
+## SDD Gates Integration
 
-Each task breakdown includes constitutional compliance validation:
-- **Simplicity Gate**: Tasks avoid unnecessary complexity
-- **Test-First Gate**: Test tasks before implementation tasks
-- **Integration-First Gate**: Real service integration preferred
-- **Research Gate**: Technology research tasks included
+Each task breakdown includes SDD compliance validation:
+- **Specification First**: Tasks trace to specifications
+- **Task Decomposition**: Concrete, actionable tasks
+- **Quality Assurance**: Appropriate testing tasks included
+- **Traceable Implementation**: Clear linkage to requirements
 
 ## Examples
 
@@ -264,14 +264,14 @@ I will update task status and recalculate progress metrics.
 ```
 User: /sp-task status
 ```
-I will display detailed progress with constitutional gates compliance.
+I will display detailed progress with SDD gates compliance.
 
 ### Execute specific task
 ```
 User: /sp-task execute T001
 ```
 I will:
-- Validate: Constitutional gates compliance and task readiness
+- Validate: SDD gates compliance and task readiness
 - Execute: Cross-platform task execution
   ```bash
   bash scripts/sp-pulse-task.sh "$FEATURE_DIR" "execute:$TASK_ID"
@@ -283,7 +283,7 @@ I will:
 - **Script execution** with Bash
 - **AI-optimized templates** with Jinja2-style variables
 - **Script integration** for validation and execution
-- **Constitutional gates compliance** tracking
+- **SDD gates compliance** tracking
 - **Parallel task identification** and execution
 - **Comprehensive progress tracking** with YAML configuration
 - **Automatic percentage calculation** and velocity metrics
@@ -294,7 +294,7 @@ I will:
 ## Error Handling
 
 - Plan existence validation before task generation
-- Constitutional gates compliance checking
+- SDD gates compliance checking
 - Template structure validation
 - Dependency conflict detection
 - Task execution error handling with rollback

@@ -85,7 +85,7 @@ When called with `/sp-spec $ARGUMENTS`, I will:
      ```
    - Count `[NEEDS CLARIFICATION]` markers
    - Verify acceptance criteria follow Given-When-Then format
-   - Check constitutional compliance indicators
+   - Check SDD compliance indicators
    - Report detailed validation results
 
 6. **For `/sp-spec clarify`:**
@@ -105,7 +105,7 @@ User: /sp-spec create user authentication system with OAuth2 and JWT tokens
 ```
 I will create a comprehensive specification using AI-optimized templates with:
 - Jinja2-style variables for AI processing
-- Constitutional compliance sections
+- SDD compliance sections
 - Testable acceptance criteria
 - Automated validation
 
@@ -137,23 +137,28 @@ I will systematically address all [NEEDS CLARIFICATION] markers.
 
 The AI-optimized specification template includes:
 - **Metadata**: Template variables for AI processing
-- **Constitutional Gates**: Pre-implementation validation
+- **SDD Gates**: Pre-implementation validation
 - **Functional Requirements**: Structured Must/Should/Could/Won't
 - **User Stories**: Given-When-Then acceptance criteria
 - **Validation Checklist**: Automated completeness checks
 - **Integration Points**: AI command workflow guidance
 
-## Constitutional Compliance
+## SDD Compliance
 
-**Article III: Test-First**
-- [ ] Acceptance criteria written before implementation
-- [ ] Test scenarios clearly defined
-- [ ] Integration points identified
+**Principle 1: Specification First**
+- [ ] Requirements clearly documented
+- [ ] Acceptance criteria defined
+- [ ] User stories included
 
-**Article VI: Research**
+**Principle 6: Quality Assurance**
+- [ ] Test scenarios defined
+- [ ] Acceptance criteria testable
+- [ ] Quality metrics specified
+
+**Principle 7: Architecture Documentation**
 - [ ] Technology choices documented
+- [ ] Integration points identified
 - [ ] Security considerations addressed
-- [ ] Performance requirements specified
 
 ## Enhanced Error Handling
 

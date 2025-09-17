@@ -19,22 +19,22 @@
 
 ## 🎯 What is SpecPulse?
 
-SpecPulse revolutionizes AI-assisted development by enforcing a **specification-first approach**. Instead of jumping straight into code, SpecPulse ensures every feature starts with clear specifications, validated plans, and tracked tasks - guaranteeing quality from day one.
+SpecPulse is a universal **Specification-Driven Development (SDD)** framework that works with ANY software project - web apps, mobile apps, desktop software, games, APIs, ML projects, and more. It ensures every feature starts with clear specifications, validated plans, and tracked tasks.
 
-> **Latest Update (v1.3.4)**:
-> - 🧪 **89% Test Coverage**: Comprehensive test suite with 450+ tests
-> - 🔍 **Version Update Checking**: Automatic PyPI version checking with 24-hour caching
-> - 💪 **PowerShell Support**: Full Windows PowerShell script support alongside Bash
-> - 🛠️ **Enhanced Stability**: Critical path fixes and improved error handling
-> - **Previous (v1.3.0)**: Continuous task execution with `/sp-execute` command
-> - **Previous (v1.2.0)**: Microservice decomposition, service-based planning
-> - **Previous (v1.1.0)**: Command prefix system, multi-spec workflow
+> **Latest Update (v1.4.0)** - Complete Framework Revolution:
+> - 🚀 **Universal SDD Framework**: Transformed from Constitutional to Specification-Driven Development
+> - 🎯 **No Technology Restrictions**: Support for ANY technology stack - web, mobile, desktop, games, ML
+> - 🧪 **86% Test Coverage**: Complete test suite rewrite with 98.3% success rate
+> - ✨ **9 Universal Principles**: Flexible principles replacing rigid articles
+> - 🔄 **Major API Updates**: All methods renamed from `constitution` to `sdd_compliance`
+> - 📝 **Enhanced Documentation**: Complete overhaul of docs and templates
 
 ### Why SpecPulse?
 
+- **🎯 Universal**: Works with ANY project type - web, mobile, desktop, games, APIs, ML
 - **🔍 Clarity First**: No more ambiguous requirements or scope creep
 - **🤖 AI-Optimized**: Designed specifically for Claude and Gemini workflows
-- **✅ Quality Gates**: Built-in checks prevent bad code from entering your codebase
+- **✅ Quality Gates**: Built-in checks ensure quality for your specific project type
 - **📊 Full Traceability**: Every decision, change, and requirement is tracked
 - **🚀 Faster Delivery**: Structured approach reduces rework and debugging time
 
@@ -131,21 +131,21 @@ specpulse sync
 
 ## ✨ Features
 
-### 🏛️ Constitutional Development
+### 🏛️ Universal SDD Principles
 
-Nine immutable principles guide every line of code:
+Nine principles that enable Specification-Driven Development for ANY project:
 
-| Article | Principle | Benefit |
-|---------|-----------|---------|
-| **I** | Library-First | Every feature is modular and reusable |
-| **II** | CLI Interface | Text-based interaction for automation |
-| **III** | Test-First | Tests before code, always |
-| **IV** | Staged Implementation | Incremental, validated progress |
-| **V** | Direct Framework Usage | No unnecessary abstractions |
-| **VI** | No Abstraction Layers | Keep it simple, keep it maintainable |
-| **VII** | Simplicity Enforcement | Maximum 3 modules per feature |
-| **VIII** | Complexity Tracking | Document and justify exceptions |
-| **IX** | Framework-First | Don't reinvent the wheel |
+| # | Principle | Purpose | Applies To |
+|---|-----------|---------|------------|
+| **1** | Specification First | Start with clear requirements | All projects |
+| **2** | Incremental Planning | Phased implementation | Web, mobile, desktop, games |
+| **3** | Task Decomposition | Concrete, executable tasks | Any technology stack |
+| **4** | Traceable Implementation | Link code to specs | All languages |
+| **5** | Continuous Validation | Ensure spec alignment | Any framework |
+| **6** | Quality Assurance | Appropriate testing | GUI, CLI, API, games |
+| **7** | Architecture Documentation | Record decisions | Any architecture |
+| **8** | Iterative Refinement | Evolve with learnings | All methodologies |
+| **9** | Stakeholder Alignment | Shared understanding | Any team size |
 
 ### 🚦 Phase Gates System
 
@@ -157,10 +157,10 @@ Before any code is written, features must pass:
 └────────┬────────┘
          ↓
 ┌─────────────────┐
-│ Phase Gates     │ → Constitutional compliance check
-└────────┬────────┘     Simplicity validation (≤3 modules)
-         ↓              Test strategy defined
-┌─────────────────┐     Framework selected
+│ Phase Gates     │ → SDD compliance check
+└────────┬────────┘     Quality assurance strategy defined
+         ↓              Architecture documented
+┌─────────────────┐     Stakeholder alignment confirmed
 │ Implementation  │     Research completed
 └────────┬────────┘
          ↓
@@ -209,7 +209,7 @@ memory/
 
 - **Persistent Context**: Never lose track of project state
 - **Decision History**: Understand why choices were made
-- **Constitutional Enforcement**: Principles that can't be violated
+- **SDD Enforcement**: Universal principles for any software project
 
 ### 🔍 [NEEDS CLARIFICATION] Markers
 
@@ -562,9 +562,9 @@ A complete guide is available in **[SPECPULSE_USAGE_GUIDE.md](SPECPULSE_USAGE_GU
 
 **Key Principles:**
 - Each pulse should be **independent** and **testable**
-- Keep pulses between **3-15 tasks**
+- Size appropriately for your project type
 - Use **sequential numbering** (001, 002, 003...)
-- Follow the **9 constitutional principles**
+- Follow the **9 universal SDD principles**
 
 See the full guide for detailed breakdowns and strategies.
 

@@ -123,16 +123,16 @@ $BlockedTasks = ([regex]::Matches($content, "^- \[!\]", [System.Text.RegularExpr
 # Check for parallel tasks
 $ParallelTasks = ([regex]::Matches($content, "\[P\]")).Count
 
-# Check constitutional gates compliance
+# Check SDD gates compliance
 $GatesCount = 0
-if ($content -match "Constitutional Gates Compliance") {
-    $gatesSection = $content.Substring($content.IndexOf("Constitutional Gates Compliance"))
+if ($content -match "SDD Gates Compliance") {
+    $gatesSection = $content.Substring($content.IndexOf("SDD Gates Compliance"))
     if ($gatesSection.Length -gt 0) {
         $GatesCount = ([regex]::Matches($gatesSection.Substring(0, [Math]::Min(1000, $gatesSection.Length)), "\[ \]")).Count
     }
 }
 
-# Check if plan has constitutional gates completed
+# Check if plan has SDD gates completed
 $planContent = Get-Content -Path $PlanFile -Raw
 $PlanGateStatus = "PENDING"
 if ($planContent -match "Gate Status:.*\[(.*?)\]") {
@@ -140,7 +140,7 @@ if ($planContent -match "Gate Status:.*\[(.*?)\]") {
 }
 
 if ($PlanGateStatus -ne "COMPLETED") {
-    Log-Message "WARNING: Implementation plan constitutional gates not completed. Task generation may be premature."
+    Log-Message "WARNING: Implementation plan SDD gates not completed. Task generation may be premature."
 }
 
 # Calculate completion percentage
@@ -160,7 +160,7 @@ Write-Output "COMPLETED_TASKS=$CompletedTasks"
 Write-Output "PENDING_TASKS=$PendingTasks"
 Write-Output "BLOCKED_TASKS=$BlockedTasks"
 Write-Output "PARALLEL_TASKS=$ParallelTasks"
-Write-Output "CONSTITUTIONAL_GATES_PENDING=$GatesCount"
+Write-Output "SDD_GATES_PENDING=$GatesCount"
 Write-Output "COMPLETION_PERCENTAGE=$CompletionPercentage"
 Write-Output "MISSING_SECTIONS=$($MissingSections.Count)"
 Write-Output "STATUS=generated"

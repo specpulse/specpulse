@@ -112,11 +112,12 @@ dependencies:
 ### Rollback Plan
 {{ rollback_plan }}
 
-## Constitutional Compliance
-- [ ] Each integration point ≤ 3 dependencies (Article I: Simplicity)
-- [ ] Contract tests defined (Article III: Test-First)
-- [ ] Real services over mocks (Article VIII: Framework Selection)
-- [ ] Security at integration points (Article V: Security by Design)
+## SDD Compliance
+- [ ] Specifications for each integration point (Principle 1: Specification First)
+- [ ] Phased integration approach (Principle 2: Incremental Planning)
+- [ ] Contract tests defined (Principle 6: Quality Assurance)
+- [ ] Architecture decisions documented (Principle 7: Architecture Documentation)
+- [ ] Stakeholder communication plan (Principle 9: Stakeholder Alignment)
 
 ## Risk Assessment
 

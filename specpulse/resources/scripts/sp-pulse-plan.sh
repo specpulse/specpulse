@@ -89,20 +89,24 @@ if [ ${#MISSING_SECTIONS[@]} -gt 0 ]; then
     log "WARNING: Missing required sections: ${MISSING_SECTIONS[*]}"
 fi
 
-# Check Constitutional Gates
-log "Checking Constitutional Gates..."
+# Check SDD Gates
+log "Checking SDD Gates..."
 
-CONSTITUTIONAL_GATES=(
-    "Simplicity Gate"
-    "Anti-Abstraction Gate"
-    "Test-First Gate"
-    "Integration-First Gate"
-    "Research Gate"
+SDD_GATES=(
+    "Specification First"
+    "Incremental Planning"
+    "Task Decomposition"
+    "Traceable Implementation"
+    "Continuous Validation"
+    "Quality Assurance"
+    "Architecture Documentation"
+    "Iterative Refinement"
+    "Stakeholder Alignment"
 )
 
-for gate in "${CONSTITUTIONAL_GATES[@]}"; do
+for gate in "${SDD_GATES[@]}"; do
     if ! grep -q "$gate" "$PLAN_FILE"; then
-        log "WARNING: Missing constitutional gate: $gate"
+        log "WARNING: Missing SDD gate: $gate"
     fi
 done
 
@@ -116,7 +120,7 @@ fi
 GATE_STATUS=$(grep -A5 "Gate Status:" "$PLAN_FILE" | tail -1 | sed 's/.*\[\(.*\)\].*/\1/' || echo "PENDING")
 
 if [ "$GATE_STATUS" != "COMPLETED" ]; then
-    log "WARNING: Constitutional gates not completed. Status: $GATE_STATUS"
+    log "WARNING: SDD gates not completed. Status: $GATE_STATUS"
 fi
 
 log "Implementation plan processing completed successfully"
@@ -124,5 +128,5 @@ log "Implementation plan processing completed successfully"
 echo "PLAN_FILE=$PLAN_FILE"
 echo "SPEC_FILE=$SPEC_FILE"
 echo "MISSING_SECTIONS=${#MISSING_SECTIONS[@]}"
-echo "CONSTITUTIONAL_GATES_STATUS=$GATE_STATUS"
+echo "SDD_GATES_STATUS=$GATE_STATUS"
 echo "STATUS=ready"

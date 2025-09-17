@@ -21,11 +21,12 @@
 
 {{ integration_points }}
 
-## Constitutional Compliance
-- [ ] Each service ≤ 3 core modules (Article I: Simplicity)
-- [ ] Single responsibility per service (Article V)
-- [ ] Clear test boundaries defined (Article III)
-- [ ] Framework selection documented (Article VIII)
+## SDD Compliance
+- [ ] Service specifications clear (Principle 1: Specification First)
+- [ ] Phased service rollout planned (Principle 2: Incremental Planning)
+- [ ] Service tasks decomposed (Principle 3: Task Decomposition)
+- [ ] Test strategy defined per service (Principle 6: Quality Assurance)
+- [ ] Architecture decisions documented (Principle 7: Architecture Documentation)
 
 ## Next Steps
 1. Review service boundaries with team

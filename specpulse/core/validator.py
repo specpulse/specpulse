@@ -32,8 +32,8 @@ class Validator:
         # Validate plans
         self._validate_plans(project_path, fix, verbose)
         
-        # Validate constitution compliance
-        self._validate_constitution_compliance(project_path, verbose)
+        # Validate SDD principles compliance
+        self._validate_sdd_compliance(project_path, verbose)
         
         return self.results
     
@@ -101,10 +101,10 @@ class Validator:
         
         return self.results
     
-    def validate_constitution(self, project_path: Path, verbose: bool = False) -> List[Dict]:
-        """Validate constitution compliance"""
+    def validate_sdd_compliance(self, project_path: Path, verbose: bool = False) -> List[Dict]:
+        """Validate SDD principles compliance"""
         self.results = []
-        self._validate_constitution_compliance(project_path, verbose)
+        self._validate_sdd_compliance(project_path, verbose)
         return self.results
     
     def _validate_structure(self, project_path: Path):
@@ -283,27 +283,31 @@ class Validator:
                     "message": "No implementation plans found"
                 })
     
-    def _validate_constitution_compliance(self, project_path: Path, verbose: bool):
-        """Validate compliance with constitution principles"""
+    def _validate_sdd_compliance(self, project_path: Path, verbose: bool):
+        """Validate compliance with SDD principles"""
         constitution_path = project_path / "memory" / "constitution.md"
         
         if not constitution_path.exists():
             self.results.append({
                 "status": "error",
-                "message": "Constitution file not found"
+                "message": "SDD principles file (constitution.md) not found"
             })
             return
         
         with open(constitution_path, 'r', encoding='utf-8') as f:
             constitution = f.read()
         
-        # Check for key principles
+        # Check for key SDD principles
         principles = [
-            "Simplicity First",
-            "Test-Driven Development",
-            "Single Responsibility",
-            "Documentation as Code",
-            "Security by Design"
+            "Specification First",
+            "Incremental Planning",
+            "Task Decomposition",
+            "Traceable Implementation",
+            "Continuous Validation",
+            "Quality Assurance",
+            "Architecture Documentation",
+            "Iterative Refinement",
+            "Stakeholder Alignment"
         ]
         
         for principle in principles:
@@ -311,12 +315,12 @@ class Validator:
                 if verbose:
                     self.results.append({
                         "status": "success",
-                        "message": f"Constitution includes: {principle}"
+                        "message": f"SDD principle found: {principle}"
                     })
             else:
                 self.results.append({
                     "status": "warning",
-                    "message": f"Constitution missing principle: {principle}"
+                    "message": f"Missing SDD principle: {principle}"
                 })
         
         # Check config for constitution enforcement
@@ -325,15 +329,15 @@ class Validator:
             with open(config_path, 'r', encoding='utf-8') as f:
                 config = yaml.safe_load(f)
             
-            if config.get("constitution", {}).get("enforce", False):
+            if config.get("sdd", {}).get("enforce", True):
                 self.results.append({
                     "status": "success",
-                    "message": "Constitution enforcement enabled"
+                    "message": "SDD principles enforcement enabled"
                 })
             else:
                 self.results.append({
                     "status": "warning",
-                    "message": "Constitution enforcement disabled"
+                    "message": "SDD principles enforcement disabled"
                 })
     
     def _load_constitution(self, project_root: Path):
@@ -362,7 +366,7 @@ class Validator:
         self._load_constitution(project_root)
         return self.constitution is not None
     
-    def validate_spec(self, spec_path: Path, verbose: bool = False) -> Dict:
+    def validate_spec_file(self, spec_path: Path, verbose: bool = False) -> Dict:
         """Validate a single specification file"""
         if not spec_path.exists():
             return {"status": "error", "message": f"Spec file not found: {spec_path}"}
@@ -381,7 +385,7 @@ class Validator:
         
         return result
     
-    def validate_plan(self, plan_path: Path, verbose: bool = False) -> Dict:
+    def validate_plan_file(self, plan_path: Path, verbose: bool = False) -> Dict:
         """Validate a single plan file"""
         if not plan_path.exists():
             return {"status": "error", "message": f"Plan file not found: {plan_path}"}
@@ -400,7 +404,7 @@ class Validator:
         
         return result
     
-    def validate_task(self, task_path: Path, verbose: bool = False) -> Dict:
+    def validate_task_file(self, task_path: Path, verbose: bool = False) -> Dict:
         """Validate a single task file"""
         if not task_path.exists():
             return {"status": "error", "message": f"Task file not found: {task_path}"}
@@ -417,16 +421,16 @@ class Validator:
         
         return result
     
-    def validate_constitution_compliance(self, spec_content: str, verbose: bool = False) -> Dict:
-        """Validate that content complies with constitution"""
+    def validate_sdd_principles(self, spec_content: str, verbose: bool = False) -> Dict:
+        """Validate that content complies with SDD principles"""
         result = {"status": "compliant", "violations": []}
         
         if not self.constitution:
             return result
         
-        # Check for simplicity principle
-        if 'complexity' in spec_content.lower() and 'simple' not in spec_content.lower():
-            result["violations"].append("Simplicity principle: Complex solution without justification")
+        # Check for specification clarity
+        if '[needs clarification]' in spec_content.lower():
+            result["violations"].append("Specification First: Contains unresolved clarifications")
         
         if result["violations"]:
             result["status"] = "non-compliant"
@@ -435,9 +439,9 @@ class Validator:
     
     def check_phase_gate(self, gate_name: str, context: Dict) -> bool:
         """Check if a phase gate passes"""
-        # Simple gate checking logic
-        if gate_name == "simplicity":
-            return context.get("module_count", 0) <= 3
+        # Gate checking logic
+        if gate_name == "specification":
+            return context.get("spec_complete", False)
         elif gate_name == "test-first":
             return context.get("tests_written", False)
         return True
@@ -448,26 +452,26 @@ class Validator:
             "specs": [],
             "plans": [],
             "tasks": [],
-            "constitution_compliance": True
+            "sdd_compliance": True
         }
         
         # Validate specs
         specs_dir = project_root / "specs"
         if specs_dir.exists():
             for spec_file in specs_dir.glob("*/spec*.md"):
-                results["specs"].append(self.validate_spec(spec_file, verbose))
+                results["specs"].append(self.validate_spec_file(spec_file, verbose))
         
         # Validate plans
         plans_dir = project_root / "plans"
         if plans_dir.exists():
             for plan_file in plans_dir.glob("*/plan*.md"):
-                results["plans"].append(self.validate_plan(plan_file, verbose))
+                results["plans"].append(self.validate_plan_file(plan_file, verbose))
         
         # Validate tasks
         tasks_dir = project_root / "tasks"
         if tasks_dir.exists():
             for task_file in tasks_dir.glob("*/task*.md"):
-                results["tasks"].append(self.validate_task(task_file, verbose))
+                results["tasks"].append(self.validate_task_file(task_file, verbose))
         
         return results
     

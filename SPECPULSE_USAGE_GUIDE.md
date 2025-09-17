@@ -2,7 +2,7 @@
 
 ## What is SpecPulse?
 
-SpecPulse is a specification-driven development framework that transforms how you build software with AI assistance. Instead of jumping straight into code, SpecPulse ensures every feature starts with clear specifications, validated plans, and tracked tasks.
+SpecPulse is a universal Specification-Driven Development (SDD) framework that works with ANY software project - web apps, mobile apps, games, desktop software, APIs, ML projects, and more. It ensures every feature starts with clear specifications, validated plans, and tracked tasks, regardless of your technology stack.
 
 ## Getting Started
 
@@ -226,19 +226,29 @@ Format: `XXX-feature-name`
 - Helps track progress
 - Enables easy reference
 
-## Constitutional Principles
+## Universal SDD Principles
 
-Every pulse must follow these 9 principles:
+Every project using SpecPulse follows these 9 principles:
 
-1. **Library-First**: Each pulse creates reusable modules
-2. **CLI-Only**: No GUI, text interface only
-3. **Test-First**: Write tests before code
-4. **Spec-Driven**: Specification before implementation
-5. **Direct Usage**: No unnecessary abstractions
-6. **No Layers**: Keep it simple
-7. **≤3 Modules**: Maximum per feature
-8. **Track Complexity**: Document exceptions
-9. **Use Existing**: Don't reinvent the wheel
+1. **Specification First**: Start with clear requirements and acceptance criteria
+2. **Incremental Planning**: Break work into valuable, deployable phases
+3. **Task Decomposition**: Create concrete tasks with clear outcomes
+4. **Traceable Implementation**: Link all code to specifications
+5. **Continuous Validation**: Verify spec-implementation alignment
+6. **Quality Assurance**: Apply appropriate testing for your project type
+7. **Architecture Documentation**: Record and justify technical decisions
+8. **Iterative Refinement**: Evolve based on feedback and learnings
+9. **Stakeholder Alignment**: Maintain shared understanding
+
+These principles work for ANY project:
+- ✅ Web applications (React, Vue, Angular)
+- ✅ Mobile apps (iOS, Android, Flutter, React Native)
+- ✅ Desktop software (Electron, Qt, WPF)
+- ✅ Games (Unity, Unreal, Godot)
+- ✅ APIs (REST, GraphQL, gRPC)
+- ✅ ML/AI projects
+- ✅ Embedded systems
+- ✅ Blockchain applications
 
 ## Advanced Features
 
@@ -284,7 +294,7 @@ Benefits:
 - ❌ Mix unrelated functionality
 - ❌ Skip specifications
 - ❌ Implement without plans
-- ❌ Violate constitutional principles
+- ❌ Violate SDD principles
 
 ## Command Reference
 
@@ -352,7 +362,7 @@ Track your progress with:
 - Average tasks per pulse
 - Time per pulse
 - Test coverage per pulse
-- Constitutional compliance score
+- SDD compliance score
 
 ## Conclusion
 

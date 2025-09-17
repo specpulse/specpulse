@@ -9,7 +9,7 @@ First, detect current feature context:
 - If no context found, ask user to specify feature or run /sp-pulse first
 
 Parse arguments to determine action:
-- If "validate": Check plan against constitution
+- If "validate": Check plan against SDD principles
 - Otherwise: Generate new plan
 
 ## For /sp-plan generate or /sp-plan:
@@ -18,11 +18,11 @@ Parse arguments to determine action:
 3. Read selected specification from @{specs/*/spec-XXX.md}
 
 4. Run Phase Gates checks:
-   - Constitutional compliance
-   - Simplicity check (≤3 modules)
-   - Test-first strategy defined
-   - Framework selection complete
-   - Research completed
+   - SDD compliance verification
+   - Architecture documentation check
+   - Quality assurance strategy defined
+   - Stakeholder alignment confirmed
+   - Incremental planning validated
 
 5. Generate plan sections:
    - Technology stack
@@ -32,9 +32,9 @@ Parse arguments to determine action:
    - Data models
    - Testing strategy
 
-6. Track complexity:
-   - If >3 modules, document justification
-   - Create simplification roadmap
+6. Track architectural decisions:
+   - Document all technology choices
+   - Record trade-offs and rationale
 
 7. Check existing plan files and create next version (plan-001.md, plan-002.md, etc.)
 8. Write plan to plans/XXX-feature/plan-XXX.md
@@ -48,17 +48,17 @@ Parse arguments to determine action:
 4. Run validation:
    - !{bash scripts/sp-pulse-plan.sh "XXX-feature"}
 5. Verify Phase Gates compliance
-6. Check complexity tracking
-7. Ensure test-first approach
+6. Check architecture documentation
+7. Ensure quality assurance strategy
 8. Validate framework choices
 9. Report validation results
 
-Phase Gates (Phase -1) must pass before implementation:
-- ✅ Using ≤3 projects/modules
-- ✅ Tests defined before code
-- ✅ Using framework features directly
-- ✅ No premature abstractions
-- ✅ Research completed
+SDD Compliance Gates must pass before implementation:
+- ✅ Specification clearly defined
+- ✅ Incremental phases planned
+- ✅ Tasks properly decomposed
+- ✅ Quality strategy appropriate
+- ✅ Architecture documented
 
 Examples:
 - /sp-plan generate

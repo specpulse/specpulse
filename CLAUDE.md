@@ -70,7 +70,7 @@ python -m specpulse.cli.main decompose 001
 
 ## Architecture Overview
 
-SpecPulse is a specification-driven development framework that enforces a structured approach to software development through AI integration and constitutional principles.
+SpecPulse is a universal Specification-Driven Development (SDD) framework that works with ANY software project type - web apps, mobile apps, desktop software, games, APIs, ML projects, and more.
 
 ### Core Components
 
@@ -84,8 +84,8 @@ SpecPulse is a specification-driven development framework that enforces a struct
    - Handles resource copying, command generation, and project structure
 
 3. **Validator** (`specpulse/core/validator.py`)
-   - `Validator` class: Validates specs, plans, and constitutional compliance
-   - Enforces 9 immutable development principles
+   - `Validator` class: Validates specs, plans, and SDD compliance
+   - Enforces 9 universal development principles (see below)
    - Phase gates system for quality control
 
 4. **Utilities** (`specpulse/utils/`)
@@ -114,7 +114,7 @@ project/
 ├── plans/           # Implementation plans (derived from specs)
 ├── tasks/           # Task breakdowns (T001, T002 or SERVICE-T001)
 ├── memory/          # Persistent state
-│   ├── constitution.md  # 9 immutable principles
+│   ├── constitution.md  # 9 universal SDD principles
 │   ├── context.md      # Current project state
 │   └── decisions.md    # Architecture Decision Records
 ├── templates/       # Customizable document templates
@@ -129,18 +129,18 @@ For complex specifications, the framework supports automatic decomposition:
 - Service-specific plans and tasks (AUTH-T001, USER-T001)
 - Integration plans for service communication
 
-### Constitutional Principles
+### Universal SDD Principles
 
-All development follows 9 immutable articles:
-1. **Library-First**: Every feature must be modular
-2. **CLI Interface**: Text-based interaction only
-3. **Test-First**: Tests before implementation
-4. **Specification as Source**: Specs drive all development
-5. **Direct Framework Usage**: No unnecessary abstractions
-6. **No Abstraction Layers**: Simplicity over complexity
-7. **Simplicity Enforcement**: ≤3 modules per feature
-8. **Complexity Tracking**: Document exceptions
-9. **Framework-First**: Use existing solutions
+All development follows 9 universal principles for Specification-Driven Development:
+1. **Specification First**: Every feature starts with clear requirements and acceptance criteria
+2. **Incremental Planning**: Break work into phased, valuable increments
+3. **Task Decomposition**: Create concrete, executable tasks with clear outcomes
+4. **Traceable Implementation**: Link every piece of code to specifications
+5. **Continuous Validation**: Regularly verify implementation matches specs
+6. **Quality Assurance**: Ensure quality through appropriate testing strategies
+7. **Architecture Documentation**: Record and justify technical decisions
+8. **Iterative Refinement**: Evolve specs and implementation based on learnings
+9. **Stakeholder Alignment**: Maintain shared understanding through clear specs
 
 ### Template System
 

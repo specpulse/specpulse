@@ -99,20 +99,24 @@ if ($MissingSections.Count -gt 0) {
     Log-Message "WARNING: Missing required sections: $($MissingSections -join ', ')"
 }
 
-# Check Constitutional Gates
-Log-Message "Checking Constitutional Gates..."
+# Check SDD Gates
+Log-Message "Checking SDD Gates..."
 
-$ConstitutionalGates = @(
-    "Simplicity Gate",
-    "Anti-Abstraction Gate",
-    "Test-First Gate",
-    "Integration-First Gate",
-    "Research Gate"
+$SDDGates = @(
+    "Specification First",
+    "Incremental Planning",
+    "Task Decomposition",
+    "Traceable Implementation",
+    "Continuous Validation",
+    "Quality Assurance",
+    "Architecture Documentation",
+    "Iterative Refinement",
+    "Stakeholder Alignment"
 )
 
-foreach ($gate in $ConstitutionalGates) {
+foreach ($gate in $SDDGates) {
     if ($content -notmatch [regex]::Escape($gate)) {
-        Log-Message "WARNING: Missing constitutional gate: $gate"
+        Log-Message "WARNING: Missing SDD gate: $gate"
     }
 }
 
@@ -130,7 +134,7 @@ if ($content -match "Gate Status:.*\[(.*?)\]") {
 }
 
 if ($GateStatus -ne "COMPLETED") {
-    Log-Message "WARNING: Constitutional gates not completed. Status: $GateStatus"
+    Log-Message "WARNING: SDD gates not completed. Status: $GateStatus"
 }
 
 Log-Message "Implementation plan processing completed successfully"
@@ -139,5 +143,5 @@ Log-Message "Implementation plan processing completed successfully"
 Write-Output "PLAN_FILE=$PlanFile"
 Write-Output "SPEC_FILE=$SpecFile"
 Write-Output "MISSING_SECTIONS=$($MissingSections.Count)"
-Write-Output "CONSTITUTIONAL_GATES_STATUS=$GateStatus"
+Write-Output "SDD_GATES_STATUS=$GateStatus"
 Write-Output "STATUS=ready"

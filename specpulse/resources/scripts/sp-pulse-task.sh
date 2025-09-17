@@ -109,15 +109,15 @@ BLOCKED_TASKS=$(grep -c "^- \[!\]" "$TASK_FILE" 2>/dev/null || echo "0")
 # Check for parallel tasks
 PARALLEL_TASKS=$(grep -c "\[P\]" "$TASK_FILE" 2>/dev/null || echo "0")
 
-# Check constitutional gates compliance
-CONSTITUTIONAL_SECTION=$(grep -A 20 "Constitutional Gates Compliance" "$TASK_FILE" 2>/dev/null || echo "")
-GATES_COUNT=$(echo "$CONSTITUTIONAL_SECTION" | grep -c "\[ \]" 2>/dev/null || echo "0")
+# Check SDD gates compliance
+SDD_SECTION=$(grep -A 20 "SDD Gates Compliance" "$TASK_FILE" 2>/dev/null || echo "")
+GATES_COUNT=$(echo "$SDD_SECTION" | grep -c "\[ \]" 2>/dev/null || echo "0")
 
-# Check if plan has constitutional gates completed
+# Check if plan has SDD gates completed
 PLAN_GATE_STATUS=$(grep -A5 "Gate Status:" "$PLAN_FILE" | tail -1 | sed 's/.*\[\(.*\)\].*/\1/' || echo "PENDING")
 
 if [ "$PLAN_GATE_STATUS" != "COMPLETED" ]; then
-    log "WARNING: Implementation plan constitutional gates not completed. Task generation may be premature."
+    log "WARNING: Implementation plan SDD gates not completed. Task generation may be premature."
 fi
 
 # Calculate completion percentage
@@ -137,7 +137,7 @@ echo "COMPLETED_TASKS=$COMPLETED_TASKS"
 echo "PENDING_TASKS=$PENDING_TASKS"
 echo "BLOCKED_TASKS=$BLOCKED_TASKS"
 echo "PARALLEL_TASKS=$PARALLEL_TASKS"
-echo "CONSTITUTIONAL_GATES_PENDING=$GATES_COUNT"
+echo "SDD_GATES_PENDING=$GATES_COUNT"
 echo "COMPLETION_PERCENTAGE=$COMPLETION_PERCENTAGE"
 echo "MISSING_SECTIONS=${#MISSING_SECTIONS[@]}"
 echo "STATUS=generated"

@@ -151,11 +151,12 @@
 ### Libraries
 {{ libraries }}
 
-## Constitutional Compliance
-- [ ] Service has single responsibility (Article V)
-- [ ] ≤ 3 core modules (Article I: Simplicity)
-- [ ] Tests before implementation (Article III)
-- [ ] Direct framework usage (Article VIII)
+## SDD Compliance
+- [ ] Service specifications clear (Principle 1: Specification First)
+- [ ] Phased implementation plan (Principle 2: Incremental Planning)
+- [ ] Tasks properly decomposed (Principle 3: Task Decomposition)
+- [ ] Test strategy defined (Principle 6: Quality Assurance)
+- [ ] Architecture documented (Principle 7: Architecture Documentation)
 
 ## Risk Assessment
 {{ risks }}

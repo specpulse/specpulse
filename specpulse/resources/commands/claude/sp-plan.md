@@ -11,7 +11,7 @@ allowed_tools:
 
 # /sp-plan Command
 
-Generate implementation plans from specifications following SpecPulse methodology with constitutional compliance and AI-optimized templates.
+Generate implementation plans from specifications following SpecPulse methodology with SDD compliance and AI-optimized templates.
 
 ## CRITICAL: File Edit Restrictions
 - **NEVER EDIT**: templates/, scripts/, commands/, .claude/, .gemini/
@@ -36,7 +36,7 @@ When called with `/sp-plan $ARGUMENTS`, I will:
    - If no context found, ask user to specify feature or run `/sp-pulse` first
 
 2. **Parse arguments** and determine action:
-   - If `validate`: Check plan against constitutional gates
+   - If `validate`: Check plan against SDD gates
    - If `optimize`: Improve existing plan complexity
    - Otherwise: Generate new plan
 
@@ -57,12 +57,12 @@ When called with `/sp-plan $ARGUMENTS`, I will:
       bash scripts/sp-pulse-plan.sh "$FEATURE_DIR"
       ```
 
-   e. **Run Constitutional Phase Gates** (Article VII):
-      - Simplicity Gate: ≤3 modules justification
-      - Anti-Abstraction Gate: Direct framework usage
-      - Test-First Gate: Tests before implementation
-      - Integration-First Gate: Real services over mocks
-      - Research Gate: Technology choices documented
+   e. **Run SDD Compliance Gates**:
+      - Specification First: Requirements clear and traced
+      - Incremental Planning: Phased approach defined
+      - Task Decomposition: Clear breakdown planned
+      - Quality Assurance: Testing strategy defined
+      - Architecture Documentation: Decisions recorded
 
    f. **Generate AI-optimized plan** by COPYING template from templates/plan.md to plans/XXX-feature/:
       ```markdown
@@ -91,10 +91,10 @@ When called with `/sp-plan $ARGUMENTS`, I will:
         * Security considerations
         * Deployment strategy with rollback plans
 
-   h. **Complexity tracking** (Article VII):
-      - Document all complexity exceptions with justifications
-      - Create mitigation strategies for each exception
-      - Track optimization opportunities
+   h. **Architecture documentation**:
+      - Document all architectural decisions with rationale
+      - Create improvement strategies for technical debt
+      - Track future enhancement opportunities
 
    i. **Version management**: Check existing plan files and create next version (plan-001.md, plan-002.md, etc.)
    j. **Write NEW plan file** to `plans/XXX-feature/plan-XXX.md`
@@ -107,8 +107,8 @@ When called with `/sp-plan $ARGUMENTS`, I will:
      ```bash
      bash scripts/sp-pulse-plan.sh "$FEATURE_DIR"
      ```
-   d. Verify all constitutional gates are addressed
-   e. Check complexity exceptions have proper justifications
+   d. Verify all SDD gates are addressed
+   e. Check architectural decisions have proper documentation
    f. Validate test-first approach is documented
    g. Ensure integration strategy uses real services
    h. Report detailed validation results
@@ -124,38 +124,38 @@ When called with `/sp-plan $ARGUMENTS`, I will:
    e. **Generate optimization recommendations**
    f. **Create new version**: Write optimized plan as next version (plan-XXX.md)
 
-## Constitutional Phase Gates (Phase -1)
+## SDD Compliance Gates (Phase -1)
 
 **Must pass before implementation:**
 
-### Article VII: Simplicity Gate
-- [ ] Using ≤3 projects/modules for initial implementation
-- [ ] No future-proofing without documented need
-- [ ] Direct framework usage (no unnecessary wrappers)
-- [ ] Single model representation per concept
+### Principle 1: Specification First
+- [ ] Clear requirements documented
+- [ ] User stories with acceptance criteria
+- [ ] [NEEDS CLARIFICATION] markers used
+- [ ] Functional and non-functional requirements
 
-### Article VII: Anti-Abstraction Gate  
-- [ ] Using framework features directly
-- [ ] No unnecessary abstraction layers
-- [ ] Clear, simple interfaces
-- [ ] Avoiding premature optimization
+### Principle 2: Incremental Planning
+- [ ] Work broken into valuable phases
+- [ ] Each phase delivers working software
+- [ ] Milestones and checkpoints defined
+- [ ] Features prioritized by business value
 
-### Article III: Test-First Gate
-- [ ] Test specifications written
-- [ ] Tests reviewed and approved
-- [ ] Tests confirmed to FAIL before implementation
-- [ ] TDD cycle planned (Red-Green-Refactor)
+### Principle 3: Task Decomposition
+- [ ] Tasks are specific and actionable
+- [ ] Effort estimates provided
+- [ ] Definition of Done clear
+- [ ] Dependencies identified
 
-### Article VIII: Integration-First Gate
-- [ ] Contract tests defined
-- [ ] Using real services over mocks
-- [ ] Production-like test environment planned
-- [ ] End-to-end test scenarios identified
+### Principle 6: Quality Assurance
+- [ ] Testing strategy appropriate for project
+- [ ] Acceptance criteria testable
+- [ ] Code review process defined
+- [ ] Quality metrics identified
 
-### Article VI: Research Gate
-- [ ] Library options researched
-- [ ] Performance implications documented
-- [ ] Security considerations analyzed
+### Principle 7: Architecture Documentation
+- [ ] Technology choices documented
+- [ ] Integration points identified
+- [ ] Technical debt tracked
 - [ ] Trade-offs documented
 
 ## Examples
@@ -184,7 +184,7 @@ User: /sp-plan validate
 I will run comprehensive validation:
 ```
 PLAN_FILE=plans/001-user-authentication/plan.md
-CONSTITUTIONAL_GATES_STATUS=COMPLETED
+SDD_GATES_STATUS=COMPLETED
 MISSING_SECTIONS=0
 STATUS=validation_complete
 ```
@@ -199,8 +199,8 @@ I will analyze and recommend complexity reductions.
 
 - **AI-optimized templates** with Jinja2-style variables
 - **Script execution** with Bash
-- **Constitutional compliance tracking** with gate status
-- **Complexity exception management** with justifications
+- **SDD compliance tracking** with gate status
+- **Architecture decision tracking** with rationale
 - **Performance and security considerations** integrated
 - **Integration-first approach** with real service usage
 - **Detailed validation reporting** with specific recommendations
@@ -209,7 +209,7 @@ I will analyze and recommend complexity reductions.
 ## Error Handling
 
 - Specification existence validation
-- Constitutional gate compliance checking
+- SDD gate compliance checking
 - Template structure validation
 - Directory structure verification
 - Feature context auto-discovery

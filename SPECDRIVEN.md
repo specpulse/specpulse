@@ -96,36 +96,36 @@ Output: Ordered task list:
 - T005: Add rate limiting
 ```
 
-## Constitutional Development
+## SDD Methodology
 
-Nine immutable articles ensure architectural discipline:
+Nine universal principles enable SDD for any project:
 
-### Article I: Library-First
-Every feature must be a reusable library before it's an implementation.
+### Principle 1: Specification First
+Every feature starts with clear requirements. Define what before how.
 
-### Article II: CLI Interface
-All functionality exposed through text. No feature exists unless it's callable from command line.
+### Principle 2: Incremental Planning
+Break work into valuable phases. Each phase delivers working software.
 
-### Article III: Test-First
-The test defines the feature. Implementation satisfies the test.
+### Principle 3: Task Decomposition
+Create concrete, executable tasks. Clear outcomes, effort estimates.
 
-### Article IV: Specification as Source
-If it's not in the specification, it doesn't exist. If it exists, it must be specified.
+### Principle 4: Traceable Implementation
+Every line of code traces to a spec. Maintain bidirectional traceability.
 
-### Article V: Direct Usage
-Use frameworks directly. No wrappers, no abstractions, no "simplifications."
+### Principle 5: Continuous Validation
+Regularly verify implementation matches specifications. Update as needed.
 
-### Article VI: No Abstraction Layers
-The framework is the abstraction. Don't abstract the abstraction.
+### Principle 6: Quality Assurance
+Apply appropriate testing for your project type. Ensure acceptance criteria are met.
 
-### Article VII: Simplicity Enforcement
-Maximum 3 modules per feature. More requires architectural review.
+### Principle 7: Architecture Documentation
+Record technology choices and rationale. Track decisions and trade-offs.
 
-### Article VIII: Complexity Tracking
-Every violation of simplicity must be documented with justification.
+### Principle 8: Iterative Refinement
+Specifications evolve based on learnings. Capture feedback, refine continuously.
 
-### Article IX: Framework-First
-Never build what a framework provides. Integration over implementation.
+### Principle 9: Stakeholder Alignment
+Keep everyone aligned through clear specifications. Shared understanding is key.
 
 ## The SDD Workflow
 
@@ -244,15 +244,15 @@ gemini
 /sp-execute
 ```
 
-### The Constitutional Gates
+### The SDD Compliance Gates
 
 Before any implementation, pass through the gates:
 
-1. **Simplicity Gate**: Is this the simplest solution?
-2. **Anti-Abstraction Gate**: Are we using frameworks directly?
-3. **Test-First Gate**: Do we have tests defined?
-4. **Integration Gate**: Can this integrate with existing systems?
-5. **Research Gate**: Have we researched existing solutions?
+1. **Specification Gate**: Are requirements clear and complete?
+2. **Planning Gate**: Is work broken into valuable phases?
+3. **Quality Gate**: Is our testing strategy appropriate?
+4. **Architecture Gate**: Are decisions documented?
+5. **Stakeholder Gate**: Is everyone aligned?
 
 ## Beyond Code Generation
 

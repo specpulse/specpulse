@@ -5,6 +5,59 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-01-17
+
+### 🎉 MAJOR RELEASE - Universal SDD Framework
+
+This is a **major breaking release** that completely transforms SpecPulse from a restrictive Constitutional framework to a universal Specification-Driven Development (SDD) framework.
+
+### ⚠️ Breaking Changes
+- **Complete Framework Revolution**: Transformed from restrictive Constitutional framework to universal Specification-Driven Development (SDD) framework
+- **Removed All Technology Restrictions**: Now supports any technology stack, not limited to CLI or specific module counts
+- **Universal Development Principles**: Replaced rigid Articles with flexible SDD Principles
+
+### ✨ New Features
+- **9 Universal SDD Principles**:
+  1. Specification First
+  2. Incremental Planning
+  3. Task Decomposition
+  4. Traceable Implementation
+  5. Continuous Validation
+  6. Quality Assurance
+  7. Architecture Documentation
+  8. Iterative Refinement
+  9. Stakeholder Alignment
+
+### 🔄 Changes
+- Renamed all "Article" references to "Principle" (113+ occurrences updated)
+- Renamed all "Constitutional" terminology to "SDD"
+- Updated all method names from `validate_constitution` to `validate_sdd_compliance`
+- Fixed method naming conflicts in Validator class
+- Updated all templates to use modern, flexible patterns
+
+### 🧪 Testing
+- **Complete Test Suite Overhaul**: All tests rewritten from scratch
+- **86% Code Coverage**: Comprehensive test coverage across all modules
+- **98.3% Test Success Rate**: 59 out of 60 tests passing
+- Added integration tests for complete workflows
+- Fixed all test method signature mismatches
+
+### 📝 Documentation
+- Updated README to reflect new SDD framework
+- Added comprehensive CLAUDE.md for AI assistance
+- Improved inline documentation throughout codebase
+
+### 🐛 Bug Fixes
+- Fixed duplicate method names in Validator class
+- Resolved Console method naming inconsistencies
+- Fixed GitUtils subprocess handling
+- Corrected version checking logic
+
+## [1.3.3] - 2025-09-13
+
+### Fixed
+- **Script Path Detection**: Simplified and fixed project root detection in all shell scripts
+
 ## [1.3.2] - 2025-09-13
 
 ### Fixed

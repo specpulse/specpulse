@@ -1,134 +1,242 @@
 # Project Constitution
-*Immutable principles that govern all development through Specification-Driven Development (SDD)*
+*Universal principles that enable Specification-Driven Development (SDD) for any software project*
 
-## The Nine Articles of Specification-Driven Development
+## The Nine Universal SDD Principles
 
-### Article I: Library-First Principle
-Every feature in this project MUST begin its existence as a standalone library. No feature shall be implemented directly within application code without first being abstracted into a reusable library component.
+### 1. SPECIFICATION FIRST
+**Rule:** Every feature starts with a clear specification.
 
-**Rationale**: This ensures modularity, reusability, and clear boundaries between features.
+**Requirements:**
+- Define what you're building before how
+- Include user stories and acceptance criteria
+- Use [NEEDS CLARIFICATION] markers for unknowns
+- Document functional and non-functional requirements
 
-### Article II: CLI Interface Mandate
-Every library MUST expose its core functionality through a command-line interface.
+**Validation:** Can someone else understand what to build from this spec?
 
-All CLI interfaces MUST:
-- Accept text as input (via stdin, arguments, or files)
-- Produce text as output (via stdout)
-- Support JSON format for structured data exchange
-- Provide --help documentation
-- Return appropriate exit codes (0 for success, non-zero for failure)
+**Example:**
+```markdown
+# ✅ GOOD: Clear specification
+## User Authentication
+- Users can register with email and password
+- [NEEDS CLARIFICATION]: OAuth2 provider list
+- Password reset via email required
 
-**Rationale**: This ensures observability, testability, and composability of all components.
+# ❌ BAD: Vague specification
+"Make a login system that works"
+```
 
-### Article III: Test-First Imperative
-This is NON-NEGOTIABLE: All implementation MUST follow strict Test-Driven Development.
+### 2. INCREMENTAL PLANNING
+**Rule:** Break specifications into manageable, phased plans.
 
-No implementation code shall be written before:
-1. Unit tests are written and documented
-2. Tests are validated and approved by the user
-3. Tests are confirmed to FAIL (Red phase)
-4. Implementation makes tests PASS (Green phase)
-5. Code is refactored while maintaining passing tests (Refactor phase)
+**Requirements:**
+- Create phase-based implementation plans
+- Define clear milestones and checkpoints
+- Prioritize features by business value
+- Each phase should deliver working software
 
-**Rationale**: This ensures correctness, prevents regression, and documents expected behavior.
+**Validation:** Is each phase independently valuable and deployable?
 
-### Article IV: Specification as Source of Truth
-Specifications don't serve code—code serves specifications. The specification is the primary artifact from which all implementation flows.
+**Example:**
+```markdown
+# ✅ GOOD: Phased delivery
+Phase 1: Core authentication (Week 1)
+Phase 2: User profiles (Week 2)
+Phase 3: Role management (Week 3)
 
-Every code change MUST:
-- Trace back to a specification requirement
-- Update specifications if behavior changes
+# ❌ BAD: Everything at once
+"Complete user management system in one sprint"
+```
+
+### 3. TASK DECOMPOSITION
+**Rule:** Break plans into concrete, executable tasks.
+
+**Requirements:**
+- Create specific, actionable tasks with clear outcomes
+- Estimate effort in hours or days
+- Define "Definition of Done" for each task
+- Include acceptance criteria
+
+**Validation:** Could a developer pick this up and start immediately?
+
+**Example:**
+```markdown
+# ✅ GOOD: Actionable task
+T001: Implement user registration endpoint
+- Effort: 4 hours
+- Done: POST /api/users accepts and validates data
+- Test: Registration creates user in database
+
+# ❌ BAD: Vague task
+"Do user stuff"
+```
+
+### 4. TRACEABLE IMPLEMENTATION
+**Rule:** Every piece of code should trace back to a specification.
+
+**Requirements:**
+- Reference spec requirements in code comments
+- Link commits to tasks and specs
+- Update specs when requirements change
 - Maintain bidirectional traceability
 
-**Rationale**: This eliminates the gap between intent and implementation.
+**Validation:** Can you trace this code to a specific requirement?
 
-### Article V: Continuous Refinement
-Consistency validation happens continuously, not as a one-time gate.
+**Example:**
+```markdown
+# ✅ GOOD: Traceable implementation
+- Commit message: "Implement user auth (SPEC-001, T003)"
+- Code comment: "// Implements REQ-SEC-03: Password validation"
+- PR description: Links to spec-001.md#security
+- Task reference: T003 from task-001.md
 
-All specifications MUST be:
-- Analyzed for ambiguity and contradictions
-- Marked with [NEEDS CLARIFICATION] for uncertainties
-- Validated against the constitution
-- Refined based on implementation feedback
+# ❌ BAD: No traceability
+- Commit: "Fixed stuff"
+- No spec references in code
+- No task linkage
+```
 
-**Rationale**: This ensures specifications remain precise, complete, and implementable.
+### 5. CONTINUOUS VALIDATION
+**Rule:** Validate implementation against specifications continuously.
 
-### Article VI: Research-Driven Context
-Every technical decision MUST be informed by research.
+**Requirements:**
+- Check implementation matches spec after each task
+- Run acceptance tests regularly
+- Update specs if reality differs from plan
+- Maintain spec-code synchronization
 
-Before implementation:
-- Research agents investigate library options
-- Performance implications are documented
-- Security considerations are analyzed
-- Organizational constraints are identified
+**Validation:** Does the current implementation match the specification?
 
-**Rationale**: This prevents uninformed decisions and technical debt.
+**Example:**
+```markdown
+# ✅ GOOD: Regular validation
+- After each task: Check against spec
+- Daily: Run acceptance tests
+- Weekly: Full spec review
 
-### Article VII: Simplicity and Anti-Abstraction
-Start simple, add complexity only when proven necessary.
+# ❌ BAD: No validation
+"We'll check at the end of the project"
+```
 
-Requirements:
-- Maximum 3 projects/modules for initial implementation
-- No future-proofing without documented need
-- Use framework features directly (no unnecessary wrappers)
-- Single model representation per concept
-- Additional complexity requires documented justification
+### 6. QUALITY ASSURANCE
+**Rule:** Ensure quality through appropriate testing and review.
 
-**Rationale**: This prevents over-engineering and maintains maintainability.
+**Requirements:**
+- Test based on acceptance criteria
+- Choose appropriate test types for your project
+- Automate testing where valuable
+- Conduct code reviews for critical features
 
-### Article VIII: Integration-First Testing
-Tests MUST use realistic environments over mocks.
+**Validation:** Are all acceptance criteria verifiable and tested?
 
-Testing priority:
-1. Contract tests (API boundaries)
-2. Integration tests (component interaction)
-3. End-to-end tests (user workflows)
-4. Unit tests (isolated logic)
+**Example:**
+```markdown
+# ✅ GOOD: Appropriate testing
+- Unit tests for business logic
+- Integration tests for APIs
+- E2E tests for critical user flows
 
-Use:
-- Real databases over mocks
-- Actual service instances over stubs
-- Production-like data volumes
-- Realistic network conditions
+# ❌ BAD: No testing strategy
+"We'll test manually"
+```
 
-**Rationale**: This ensures code works in practice, not just in theory.
+### 7. ARCHITECTURE DOCUMENTATION
+**Rule:** Document key architectural decisions and patterns.
 
-### Article IX: Executable Documentation
-All documentation MUST be executable or verifiable.
+**Requirements:**
+- Record technology choices and rationale
+- Document integration points and APIs
+- Track technical debt and trade-offs
+- Maintain architecture decision records (ADRs)
 
-This includes:
-- Code examples that can be run
-- API contracts that can be tested
-- Quickstart guides that can be validated
-- Architecture decisions with measurable outcomes
+**Validation:** Will someone understand these decisions in 6 months?
 
-**Rationale**: This prevents documentation drift and ensures accuracy.
+**Example:**
+```markdown
+# ✅ GOOD: Documented decisions
+ADR-001: Choose PostgreSQL over MongoDB
+- Date: 2025-01-15
+- Rationale: Need ACID transactions
+- Trade-offs: Less flexible schema
 
-## Constitutional Enforcement
+# ❌ BAD: No documentation
+"We just picked what we knew"
+```
+
+### 8. ITERATIVE REFINEMENT
+**Rule:** Specifications and implementations evolve based on learnings.
+
+**Requirements:**
+- Update specs based on user feedback
+- Refine based on implementation discoveries
+- Version specifications for traceability
+- Document lessons learned
+
+**Validation:** Do specs reflect current reality and learnings?
+
+**Example:**
+```markdown
+# ✅ GOOD: Learning from implementation
+Spec v1: "Users login with email"
+Spec v2: "Added: Support for username login (user feedback)"
+Spec v3: "Added: MFA option (security review)"
+
+# ❌ BAD: Never updating specs
+"Original spec from 6 months ago"
+```
+
+### 9. STAKEHOLDER ALIGNMENT
+**Rule:** Keep all stakeholders aligned through specifications.
+
+**Requirements:**
+- Share specs with team and clients
+- Get approval before major phases
+- Communicate changes clearly
+- Maintain shared understanding
+
+**Validation:** Does everyone understand what's being built and why?
+
+**Example:**
+```markdown
+# ✅ GOOD: Clear communication
+- Weekly spec reviews with team
+- Client approval before each phase
+- Documented change requests
+
+# ❌ BAD: Working in isolation
+"We'll show them when it's done"
+```
+
+## SDD Methodology Enforcement
 
 ### Phase Gates
-Every implementation plan MUST pass through constitutional gates:
+Every implementation plan MUST pass through SDD compliance gates:
 
 #### Phase -1: Pre-Implementation Gates
-- [ ] Simplicity Gate (Article VII): Using <=3 projects? No future-proofing?
-- [ ] Anti-Abstraction Gate (Article VII): Using framework directly? Single model?
-- [ ] Test-First Gate (Article III): Tests written? Tests reviewed? Tests failing?
-- [ ] Integration-First Gate (Article VIII): Contracts defined? Contract tests written?
-- [ ] Research Gate (Article VI): Options researched? Trade-offs documented?
+- [ ] Specification First: Requirements clear and documented?
+- [ ] Incremental Planning: Work broken into valuable phases?
+- [ ] Task Decomposition: Tasks concrete and actionable?
+- [ ] Traceable Implementation: Code-to-spec mapping planned?
+- [ ] Continuous Validation: Validation checkpoints defined?
+- [ ] Quality Assurance: Test strategy appropriate?
+- [ ] Architecture Documentation: Decision tracking planned?
+- [ ] Iterative Refinement: Feedback loops established?
+- [ ] Stakeholder Alignment: Communication plan in place?
 
-### Complexity Tracking
-Any violation of simplicity principles MUST be documented:
+### Decision Tracking
+All significant architectural decisions and trade-offs MUST be documented:
 ```yaml
-complexity_exceptions:
-  - article: VII
-    violation: "Using 4 projects instead of 3"
-    justification: "Authentication requires separate service for security isolation"
+architectural_decisions:
+  - decision: "Microservices for payment processing"
+    rationale: "PCI compliance requires isolation"
+    trade_offs: "Increased operational complexity"
     approved_by: "Team Lead"
     date: "2025-09-11"
+    review_date: "2025-Q2"
 ```
 
 ### Amendment Process
-While principles are immutable, their application can evolve:
+While principles guide development, their application can evolve:
 
 1. Proposed amendments require:
    - Explicit documentation of rationale
@@ -143,46 +251,47 @@ While principles are immutable, their application can evolve:
 ## Principles in Practice
 
 ### When Starting a New Feature
-1. Write specification first (Article IV)
-2. Research technical options (Article VI)
-3. Design as a library (Article I)
-4. Expose via CLI (Article II)
-5. Write tests first (Article III)
-6. Keep it simple (Article VII)
-7. Use real environments (Article VIII)
+1. Write specification first (Principle 1)
+2. Create phased plan (Principle 2)
+3. Break into tasks (Principle 3)
+4. Ensure traceability (Principle 4)
+5. Set up validation (Principle 5)
+6. Define quality strategy (Principle 6)
+7. Document architecture (Principle 7)
 
 ### When Reviewing Code
-- Does it trace to a specification? (Article IV)
-- Are tests written first? (Article III)
-- Is it the simplest solution? (Article VII)
-- Does it work with real services? (Article VIII)
-- Is documentation executable? (Article IX)
+- Does it trace to a specification? (Principle 4)
+- Is testing appropriate? (Principle 6)
+- Are decisions documented? (Principle 7)
+- Has it been validated? (Principle 5)
+- Are stakeholders aligned? (Principle 9)
 
-### When Facing Complexity
-1. Document why simplicity isn't sufficient
-2. Get explicit approval for complexity
-3. Track in complexity_exceptions
-4. Plan for future simplification
+### When Making Architectural Decisions
+1. Document the decision and rationale
+2. Get stakeholder approval for significant changes
+3. Track in architecture decision records
+4. Plan for future improvements
 
 ## Technical Standards
 
-### Code Style
-- Python: PEP 8 with type hints
-- JavaScript/TypeScript: ESLint + Prettier
-- Tests: Descriptive names, AAA pattern
-- Documentation: Clear, concise, with examples
+### Code Style Guidelines
+- Follow language-specific best practices
+- Use consistent formatting (Prettier, Black, etc.)
+- Write self-documenting code
+- Add meaningful comments where needed
 
 ### Testing Requirements
-- Minimum 80% code coverage
-- All APIs must have contract tests
-- Critical paths require E2E tests
-- TDD red-green-refactor cycle mandatory
+- Choose coverage appropriate for project risk
+- Test based on acceptance criteria
+- Critical features need comprehensive testing
+- Use testing approach suitable for project type
 
-### Performance Targets
-- API response time: < 200ms (p95)
-- Test execution: < 5 minutes for full suite
-- Build time: < 2 minutes
-- Specification generation: < 30 seconds
+### Project-Specific Standards
+- Define standards appropriate for your project type
+- Web apps: Response times, Core Web Vitals
+- Mobile apps: Battery usage, offline capability
+- Games: FPS targets, load times
+- APIs: Throughput, latency percentiles
 
 ## Development Workflow
 
@@ -191,8 +300,8 @@ While principles are immutable, their application can evolve:
 2. `/sp-spec` - Create specification following template guidelines
 3. `/sp-plan` - Generate implementation plan with Phase Gates
 4. `/sp-task` - Break down into executable tasks
-5. Execute with Test-First Development
-6. `/sp-validate` - Validate against constitution and specification
+5. Execute with Quality Assurance
+6. `/sp-validate` - Validate against SDD principles and specification
 7. Update specifications based on learnings
 
 ### Version Control
@@ -203,9 +312,9 @@ While principles are immutable, their application can evolve:
 
 ### Continuous Integration
 - Specification validation on every commit
-- Constitutional gate checks in CI
-- Test coverage enforcement
-- Complexity tracking reports
+- SDD compliance checks in CI
+- Appropriate test coverage for project type
+- Architecture decision tracking
 
 ## Specification Quality Standards
 
