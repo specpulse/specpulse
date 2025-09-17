@@ -21,7 +21,12 @@
 
 SpecPulse is a universal **Specification-Driven Development (SDD)** framework that works with ANY software project - web apps, mobile apps, desktop software, games, APIs, ML projects, and more. It ensures every feature starts with clear specifications, validated plans, and tracked tasks.
 
-> **Latest Update (v1.4.2)** - Template System Enhancement:
+> **Latest Update (v1.4.3)** - Script Numbering Fix:
+> - 🔢 **Fixed Numbering Logic**: Spec, plan, and task files now number correctly (001, 002, 003...)
+> - 📝 **No Empty First Files**: spec-001.md, plan-001.md, task-001.md always contain content
+> - 🎯 **Proper Interactive Mode**: Scripts create placeholder files for AI to fill
+>
+> **v1.4.2** - Template System Enhancement:
 > - 📁 **Physical Template Files**: Templates now exist as physical files for AI tools to read
 > - 🔧 **Complete PowerShell Support**: Added PowerShell scripts matching all Bash functionality
 > - 📝 **Enhanced Decomposition Templates**: Full microservice decomposition template support

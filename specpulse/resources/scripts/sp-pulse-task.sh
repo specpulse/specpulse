@@ -70,14 +70,14 @@ else
     error_exit "Plans directory not found: $PLAN_DIR. Please create plan first."
 fi
 
-# Find next available task number or create new one
-if [ -d "$TASK_DIR" ]; then
-    # Get the highest task number and increment it
+# Check if task-001.md exists
+if [ -f "$TASK_DIR/task-001.md" ]; then
+    # Find next available task number
     highest_task=$(find "$TASK_DIR" -name "task-*.md" -exec basename {} .md \; | sed 's/task-//' | sort -n | tail -1)
     if [ -n "$highest_task" ]; then
         task_number=$((highest_task + 1))
     else
-        task_number=1
+        task_number=2
     fi
 else
     task_number=1
@@ -89,20 +89,15 @@ if [ ! -f "$TEMPLATE_FILE" ]; then
     error_exit "Template not found: $TEMPLATE_FILE"
 fi
 
-# Create task file marker for AI generation
-log "Creating task breakdown marker: $TASK_FILE"
+# Create placeholder file for AI to generate tasks
+log "Creating task breakdown: $TASK_FILE"
 echo "# Task Breakdown - $FEATURE_DIR" > "$TASK_FILE"
 echo "" >> "$TASK_FILE"
-echo "<!-- AI: Please generate tasks using template: $TEMPLATE_FILE -->" >> "$TASK_FILE"
+echo "<!-- INSTRUCTION: Generate tasks using template: $TEMPLATE_FILE -->" >> "$TASK_FILE"
 echo "<!-- SPEC_FILE: $SPEC_FILE -->" >> "$TASK_FILE"
 echo "<!-- PLAN_FILE: $PLAN_FILE -->" >> "$TASK_FILE"
 echo "<!-- FEATURE_DIR: $FEATURE_DIR -->" >> "$TASK_FILE"
 echo "<!-- FEATURE_ID: $FEATURE_ID -->" >> "$TASK_FILE"
-echo "" >> "$TASK_FILE"
-echo "## Awaiting AI Generation" >> "$TASK_FILE"
-echo "Tasks need to be generated from the template based on:" >> "$TASK_FILE"
-echo "- Specification: $SPEC_FILE" >> "$TASK_FILE"
-echo "- Plan: $PLAN_FILE" >> "$TASK_FILE"
 
 # Validate task structure
 log "Validating task breakdown..."

@@ -64,41 +64,39 @@ if [ -n "$SPEC_CONTENT" ]; then
         spec_number=1
     fi
     SPEC_FILE="$SPEC_DIR/spec-$(printf "%03d" $spec_number).md"
-    
+
     # Update specification with provided content
     log "Creating specification: $SPEC_FILE"
     echo "$SPEC_CONTENT" > "$SPEC_FILE" || error_exit "Failed to write specification content"
 else
-    # Find latest spec file
-    if [ -d "$SPEC_DIR" ]; then
-        SPEC_FILE=$(find "$SPEC_DIR" -name "spec-*.md" -printf "%T@ %p\n" | sort -n | tail -1 | cut -d' ' -f2-)
-        if [ -z "$SPEC_FILE" ]; then
-            # No spec files found, create first one with marker for AI
-            SPEC_FILE="$SPEC_DIR/spec-001.md"
-            log "Creating first specification marker: $SPEC_FILE"
-            echo "# Specification - $FEATURE_DIR" > "$SPEC_FILE"
-            echo "" >> "$SPEC_FILE"
-            echo "<!-- AI: Please generate specification using template: $TEMPLATE_FILE -->" >> "$SPEC_FILE"
-            echo "<!-- FEATURE_DIR: $FEATURE_DIR -->" >> "$SPEC_FILE"
-            echo "<!-- FEATURE_ID: $FEATURE_ID -->" >> "$SPEC_FILE"
-            echo "" >> "$SPEC_FILE"
-            echo "## Awaiting AI Generation" >> "$SPEC_FILE"
-            echo "This specification needs to be generated from the template." >> "$SPEC_FILE"
+    # Interactive mode - AI should generate spec content
+    # Check if spec-001.md exists
+    if [ -f "$SPEC_DIR/spec-001.md" ]; then
+        # Find next available spec number
+        highest_spec=$(find "$SPEC_DIR" -name "spec-*.md" -exec basename {} .md \; | sed 's/spec-//' | sort -n | tail -1)
+        if [ -n "$highest_spec" ]; then
+            spec_number=$((highest_spec + 1))
         else
-            log "Using latest specification: $SPEC_FILE"
+            spec_number=2
         fi
-    else
-        # Create directory and first spec with marker for AI
-        SPEC_FILE="$SPEC_DIR/spec-001.md"
-        log "Creating first specification marker: $SPEC_FILE"
+        SPEC_FILE="$SPEC_DIR/spec-$(printf "%03d" $spec_number).md"
+        log "Creating specification file for AI generation: $SPEC_FILE"
+        # Create placeholder file for AI to fill
         echo "# Specification - $FEATURE_DIR" > "$SPEC_FILE"
         echo "" >> "$SPEC_FILE"
-        echo "<!-- AI: Please generate specification using template: $TEMPLATE_FILE -->" >> "$SPEC_FILE"
+        echo "<!-- INSTRUCTION: Generate specification content using template: $TEMPLATE_FILE -->" >> "$SPEC_FILE"
         echo "<!-- FEATURE_DIR: $FEATURE_DIR -->" >> "$SPEC_FILE"
         echo "<!-- FEATURE_ID: $FEATURE_ID -->" >> "$SPEC_FILE"
+    else
+        # Create first spec
+        SPEC_FILE="$SPEC_DIR/spec-001.md"
+        log "Creating first specification file for AI generation: $SPEC_FILE"
+        # Create placeholder file for AI to fill
+        echo "# Specification - $FEATURE_DIR" > "$SPEC_FILE"
         echo "" >> "$SPEC_FILE"
-        echo "## Awaiting AI Generation" >> "$SPEC_FILE"
-        echo "This specification needs to be generated from the template." >> "$SPEC_FILE"
+        echo "<!-- INSTRUCTION: Generate specification content using template: $TEMPLATE_FILE -->" >> "$SPEC_FILE"
+        echo "<!-- FEATURE_DIR: $FEATURE_DIR -->" >> "$SPEC_FILE"
+        echo "<!-- FEATURE_ID: $FEATURE_ID -->" >> "$SPEC_FILE"
     fi
 fi
 

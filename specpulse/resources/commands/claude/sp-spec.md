@@ -43,7 +43,12 @@ When called with `/sp-spec $ARGUMENTS`, I will:
    - If no action specified: Default to `create` with full arguments as description
 
 3. **For `/sp-spec create [description]` or `/sp-spec [description]`:**
-   - COPY template from `templates/spec.md` to create NEW file in `specs/XXX-feature/`
+   - **CRITICAL NUMBERING LOGIC**:
+     - Check if `specs/XXX-feature/spec-001.md` exists
+     - If spec-001.md does NOT exist: Create spec-001.md with full content from template
+     - If spec-001.md EXISTS: Create spec-002.md (or next number) with new content
+     - NEVER leave spec-001.md as placeholder if it's the first spec
+   - READ template from `templates/spec.md` and use it to generate content
    - IMPORTANT: Only edit files in specs/, plans/, tasks/ folders. NEVER edit templates/, scripts/, or commands/
    - Parse the description to identify:
      - Functional requirements (Must/Should/Could/Won't have)
@@ -60,11 +65,10 @@ When called with `/sp-spec $ARGUMENTS`, I will:
      ```
    - Mark any uncertainties with `[NEEDS CLARIFICATION: specific question]`
    - Use detected feature context to determine target directory
-   - **Version management**: Check existing spec files and create next version (spec-001.md, spec-002.md, etc.)
-   - Write NEW specification to `specs/ID-feature-name/spec-XXX.md`
+   - Write FULL specification content to `specs/ID-feature-name/spec-XXX.md`
    - Can EDIT files in specs/ folder, but NEVER modify templates/, scripts/, or commands/ folders
    - Run validation:
-     - `bash scripts/sp-pulse-spec.sh "$FEATURE_DIR"`
+     - `bash scripts/sp-pulse-spec.sh "$FEATURE_DIR" "$SPEC_CONTENT"`
 
 4. **For `/sp-spec update`:**
    - **Show existing spec files**: List all spec-XXX.md files in current feature directory

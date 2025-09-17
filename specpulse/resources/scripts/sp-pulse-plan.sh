@@ -59,14 +59,14 @@ else
     error_exit "Specifications directory not found: $SPEC_DIR. Please create specification first."
 fi
 
-# Find next available plan number or create new one
-if [ -d "$PLAN_DIR" ]; then
-    # Get the highest plan number and increment it
+# Check if plan-001.md exists
+if [ -f "$PLAN_DIR/plan-001.md" ]; then
+    # Find next available plan number
     highest_plan=$(find "$PLAN_DIR" -name "plan-*.md" -exec basename {} .md \; | sed 's/plan-//' | sort -n | tail -1)
     if [ -n "$highest_plan" ]; then
         plan_number=$((highest_plan + 1))
     else
-        plan_number=1
+        plan_number=2
     fi
 else
     plan_number=1
@@ -78,17 +78,14 @@ if [ ! -f "$TEMPLATE_FILE" ]; then
     error_exit "Template not found: $TEMPLATE_FILE"
 fi
 
-# Create plan marker for AI generation
-log "Creating implementation plan marker: $PLAN_FILE"
+# Create placeholder file for AI to generate plan
+log "Creating implementation plan: $PLAN_FILE"
 echo "# Implementation Plan - $FEATURE_DIR" > "$PLAN_FILE"
 echo "" >> "$PLAN_FILE"
-echo "<!-- AI: Please generate plan using template: $TEMPLATE_FILE -->" >> "$PLAN_FILE"
+echo "<!-- INSTRUCTION: Generate plan using template: $TEMPLATE_FILE -->" >> "$PLAN_FILE"
 echo "<!-- SPEC_FILE: $SPEC_FILE -->" >> "$PLAN_FILE"
 echo "<!-- FEATURE_DIR: $FEATURE_DIR -->" >> "$PLAN_FILE"
 echo "<!-- FEATURE_ID: $FEATURE_ID -->" >> "$PLAN_FILE"
-echo "" >> "$PLAN_FILE"
-echo "## Awaiting AI Generation" >> "$PLAN_FILE"
-echo "This plan needs to be generated from the template based on specification: $SPEC_FILE" >> "$PLAN_FILE"
 
 # Validate plan structure
 log "Validating implementation plan..."

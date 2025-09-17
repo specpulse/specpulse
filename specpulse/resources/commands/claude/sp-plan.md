@@ -96,8 +96,12 @@ When called with `/sp-plan $ARGUMENTS`, I will:
       - Create improvement strategies for technical debt
       - Track future enhancement opportunities
 
-   i. **Version management**: Check existing plan files and create next version (plan-001.md, plan-002.md, etc.)
-   j. **Write NEW plan file** to `plans/XXX-feature/plan-XXX.md`
+   i. **CRITICAL NUMBERING LOGIC**:
+      - Check if `plans/XXX-feature/plan-001.md` exists
+      - If plan-001.md does NOT exist: Create plan-001.md with full content from template
+      - If plan-001.md EXISTS: Create plan-002.md (or next number) with new content
+      - NEVER leave plan-001.md as placeholder if it's the first plan
+   j. **Write FULL plan content** to `plans/XXX-feature/plan-XXX.md`
    k. **IMPORTANT**: Can EDIT files in plans/ folder, but NEVER modify templates/, scripts/, or commands/ folders
 
 4. **For `/sp-plan validate`:**

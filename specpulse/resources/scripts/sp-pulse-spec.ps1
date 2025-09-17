@@ -48,8 +48,13 @@ if (-not (Test-Path $SpecDir)) {
 # Find latest spec file or create new one
 if ($SpecContent) {
     # Find next available spec number
-    $existingSpecs = Get-ChildItem -Path $SpecDir -Filter "spec-*.md" -ErrorAction SilentlyContinue
-    $specNumber = if ($existingSpecs) { $existingSpecs.Count + 1 } else { 1 }
+    $existingSpecs = Get-ChildItem -Path $SpecDir -Filter "spec-*.md" -ErrorAction SilentlyContinue | Sort-Object Name
+    if ($existingSpecs) {
+        $highestSpec = [int]($existingSpecs[-1].BaseName -replace 'spec-', '')
+        $specNumber = $highestSpec + 1
+    } else {
+        $specNumber = 1
+    }
     $SpecFile = Join-Path $SpecDir ("spec-{0:D3}.md" -f $specNumber)
 
     # Update specification with provided content
@@ -60,27 +65,24 @@ if ($SpecContent) {
         Exit-WithError "Failed to write specification content: $_"
     }
 } else {
-    # Find latest spec file
-    $latestSpec = Get-ChildItem -Path $SpecDir -Filter "spec-*.md" -ErrorAction SilentlyContinue |
-                  Sort-Object LastWriteTime -Descending |
-                  Select-Object -First 1
-
-    if ($latestSpec) {
-        $SpecFile = $latestSpec.FullName
-        Log-Message "Using latest specification: $SpecFile"
+    # Interactive mode - AI should generate spec content
+    # Check if spec-001.md exists
+    $FirstSpec = Join-Path $SpecDir "spec-001.md"
+    if (Test-Path $FirstSpec) {
+        # Find next available spec number
+        $existingSpecs = Get-ChildItem -Path $SpecDir -Filter "spec-*.md" -ErrorAction SilentlyContinue | Sort-Object Name
+        if ($existingSpecs) {
+            $highestSpec = [int]($existingSpecs[-1].BaseName -replace 'spec-', '')
+            $specNumber = $highestSpec + 1
+        } else {
+            $specNumber = 2
+        }
     } else {
-        # No spec files found, create first one
-        $SpecFile = Join-Path $SpecDir "spec-001.md"
-        if (-not (Test-Path $TemplateFile)) {
-            Exit-WithError "Template not found: $TemplateFile"
-        }
-        Log-Message "Creating specification from template: $SpecFile"
-        try {
-            Copy-Item -Path $TemplateFile -Destination $SpecFile -Force
-        } catch {
-            Exit-WithError "Failed to copy specification template: $_"
-        }
+        $specNumber = 1
     }
+    $SpecFile = Join-Path $SpecDir ("spec-{0:D3}.md" -f $specNumber)
+    Log-Message "Creating specification file for AI generation: $SpecFile"
+    "INSTRUCTION: Generate specification content using template at $TemplateFile" | Set-Content -Path "$SpecFile.instruction"
 }
 
 # Validate specification
