@@ -309,8 +309,9 @@ tasks/001-user-authentication/
 ## Important Notes
 
 ### Version Management
-- Current version: 1.4.1 (in `pyproject.toml`)
-- Version must sync between `pyproject.toml` and `setup.py`
+- Current version: 1.4.5 (in `specpulse/_version.py`)
+- Version is defined ONLY in `specpulse/_version.py`
+- All other files read from this single source of truth
 - Use semantic versioning for releases
 
 ### Resource Handling

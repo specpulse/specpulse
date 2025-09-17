@@ -21,7 +21,12 @@
 
 SpecPulse is a universal **Specification-Driven Development (SDD)** framework that works with ANY software project - web apps, mobile apps, desktop software, games, APIs, ML projects, and more. It ensures every feature starts with clear specifications, validated plans, and tracked tasks.
 
-> **Latest Update (v1.4.4)** - Critical Workflow Fixes:
+> **Latest Update (v1.4.5)** - Version Management:
+> - 🎯 **Single Source of Truth**: Version now managed only in `_version.py`
+> - 📦 **Module Support**: Can run with `python -m specpulse`
+> - 🔧 **Dynamic Version**: No more version sync issues
+>
+> **v1.4.4** - Critical Workflow Fixes:
 > - 🐛 **Fixed Script Numbering**: Resolved `/sp-pulse` creating empty placeholders while subsequent commands created new files
 > - 🎯 **Fixed Task Detection**: Execute scripts now properly detect task format (`### T001:` with `**Status**:`)
 > - 📝 **Unified Placeholders**: All scripts use consistent `<!-- INSTRUCTION: Generate -->` markers

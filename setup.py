@@ -4,14 +4,26 @@ SpecPulse Setup Configuration
 
 from setuptools import setup, find_packages
 from pathlib import Path
+import os
+import re
 
 # Read the README file
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text(encoding="utf-8")
 
+# Get version from _version.py
+def get_version():
+    version_file = os.path.join(this_directory, "specpulse", "_version.py")
+    with open(version_file, "r") as f:
+        content = f.read()
+        match = re.search(r'__version__\s*=\s*["\']([^"\']+)["\']', content)
+        if match:
+            return match.group(1)
+        raise RuntimeError("Unable to find version string.")
+
 setup(
     name="specpulse",
-    version="1.4.4",
+    version=get_version(),
     author="SpecPulse",
     author_email="",
     description="Next-Generation Specification-Driven Development Framework",
