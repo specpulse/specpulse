@@ -29,10 +29,24 @@ class GitUtils:
         except FileNotFoundError:
             return False, "Git is not installed or not in PATH"
     
-    def check_git_installed(self) -> bool:
+    @staticmethod
+    def check_git_installed() -> bool:
+        """Check if git is installed (static method)"""
+        try:
+            result = subprocess.run(
+                ["git", "--version"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            return True
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            return False
+
+    @staticmethod
+    def is_git_installed() -> bool:
         """Check if git is installed"""
-        success, _ = self._run_git_command("--version")
-        return success
+        return GitUtils.check_git_installed()
     
     def is_git_repo(self, path: Optional[Path] = None) -> bool:
         """Check if directory is a git repository"""
@@ -176,3 +190,32 @@ class GitUtils:
         if success:
             return output.split('\n') if output else []
         return []
+
+    # Additional methods for test compatibility
+    def is_repo(self) -> bool:
+        """Check if current directory is a git repository"""
+        return (self.repo_path / ".git").exists()
+
+    def add_all_files(self) -> bool:
+        """Add all files to staging area"""
+        return self.add_files()
+
+    def get_commits(self, limit: int = 10) -> List[str]:
+        """Get recent commits"""
+        return self.get_log(limit)
+
+    def stash(self) -> bool:
+        """Stash current changes"""
+        success, _ = self._run_git_command("stash")
+        return success
+
+    def stash_pop(self) -> bool:
+        """Pop stashed changes"""
+        success, _ = self._run_git_command("stash", "pop")
+        return success
+
+    def merge(self, branch: str) -> bool:
+        """Merge branch into current branch"""
+        success, _ = self._run_git_command("merge", branch)
+        return success
+

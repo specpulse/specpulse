@@ -1,125 +1,94 @@
-<!-- SpecPulse Specification Template v4.0 - AI-Optimized -->
-<!-- AI Instructions:
-    1. Replace all {{variable}} placeholders with actual values
-    2. Fill sections based on user input and requirements analysis
-    3. Mark ALL uncertainties with [NEEDS CLARIFICATION: specific question]
-    4. Keep requirements testable and unambiguous
-    5. Focus on WHAT and WHY, not HOW
--->
-
-# Specification: {{ feature_name }}
+# Specification: {{feature_name}}
 
 ## Metadata
-- **ID**: SPEC-{{ feature_id }}
-- **Branch**: {{ branch_name }}
-- **Created**: {{ date }}
-- **Author**: {{ author }}
-- **AI Assistant**: {{ ai_assistant }}
+- **ID**: SPEC-{{spec_id}}
+- **Created**: {{date}}
+- **Author**: {{author}}
+- **AI Assistant**: {{ai_assistant}}
 - **Version**: 1.0.0
-- **Status**: DRAFT
 
 ## Executive Summary
-{{ executive_summary | default("Brief description of what this feature does and why it's needed") }}
-
-## User Request
-```
-{{ user_input }}
-```
+[One paragraph description of what this feature does and why it's needed]
 
 ## Problem Statement
+[Detailed description of the problem being solved]
 
-### Current State
-{{ current_state | default("Describe the current situation and pain points") }}
+## Proposed Solution
+[High-level approach to solving the problem]
 
-### Desired State  
-{{ desired_state | default("Describe what should be achieved after implementation") }}
+## Detailed Requirements
 
-## Clarifications Needed
-<!-- List ALL ambiguities from user input -->
-{% if clarifications %}
-{% for clarification in clarifications %}
-- [NEEDS CLARIFICATION: {{ clarification }}]
-{% endfor %}
-{% else %}
-- [NEEDS CLARIFICATION: Add specific questions based on user input]
-{% endif %}
+### Functional Requirements
+<!-- AI: Generate numbered list of specific, testable requirements -->
+
+FR-001: [Requirement]
+  - Acceptance: [How to verify this requirement is met]
+  - Priority: [MUST|SHOULD|COULD]
+
+FR-002: [Requirement]
+  - Acceptance: [How to verify this requirement is met]
+  - Priority: [MUST|SHOULD|COULD]
+
+### Non-Functional Requirements
+
+#### Performance
+- Response Time: [Target]
+- Throughput: [Target]
+- Resource Usage: [Limits]
+
+#### Security
+- Authentication: [Method]
+- Authorization: [Model]
+- Data Protection: [Requirements]
+
+#### Scalability
+- User Load: [Target]
+- Data Volume: [Target]
+- Geographic Distribution: [Requirements]
 
 ## User Stories
 
-### Primary Stories
-{% for story in user_stories %}
-#### Story {{ loop.index }}: {{ story.title }}
-**As a** {{ story.user_type }}
-**I want to** {{ story.action }}
-**So that** {{ story.benefit }}
+<!-- AI: Generate user stories in standard format -->
+
+### Story 1: [Title]
+**As a** [user type]
+**I want** [action/feature]
+**So that** [benefit/value]
 
 **Acceptance Criteria:**
-{% for criteria in story.acceptance_criteria %}
-- Given {{ criteria.given }}, when {{ criteria.when }}, then {{ criteria.then }}
-{% endfor %}
-{% endfor %}
+- [ ] [Criterion 1]
+- [ ] [Criterion 2]
+- [ ] [Criterion 3]
 
-## Functional Requirements
+### Story 2: [Title]
+**As a** [user type]
+**I want** [action/feature]
+**So that** [benefit/value]
 
-### MUST Have Requirements
-{% for req in must_requirements %}
-**FR-{{ "%03d" | format(loop.index0 + 1) }}**: {{ req.statement }}
-- **Rationale**: {{ req.rationale }}
-- **Testable**: Yes
-{% endfor %}
+**Acceptance Criteria:**
+- [ ] [Criterion 1]
+- [ ] [Criterion 2]
+- [ ] [Criterion 3]
 
-### SHOULD Have Requirements
-{% for req in should_requirements %}
-**FR-{{ "%03d" | format(loop.index0 + len(must_requirements) + 1) }}**: {{ req.statement }}
-- **Rationale**: {{ req.rationale }}
-- **Testable**: Yes
-{% endfor %}
-
-## Non-Functional Requirements
-
-### Performance
-- Response time < {{ performance.response_time | default("200ms") }}
-- Support {{ performance.concurrent_users | default("1000") }} concurrent users
-
-### Security
-- All data encrypted in transit
-- {{ security.authentication | default("Authentication required for sensitive actions") }}
-
-## Acceptance Scenarios
-
-### Critical Path
-1. **Scenario**: {{ primary_scenario.name }}
-   - **When**: {{ primary_scenario.action }}
-   - **Then**: {{ primary_scenario.result }}
-
-### Error Cases
-1. **Scenario**: {{ error_scenario.name }}
-   - **When**: {{ error_scenario.action }}
-   - **Then**: {{ error_scenario.result }}
-
-## Success Metrics
-- Adoption rate: {{ metrics.adoption_rate | default("80% within 30 days") }}
-- Success rate: {{ metrics.success_rate | default("95% of attempts") }}
-- User satisfaction: {{ metrics.satisfaction | default("8/10 NPS") }}
-
-## Out of Scope
-<!-- Explicitly state what this feature will NOT do -->
-{% for item in out_of_scope %}
-- This feature will NOT {{ item }}
-{% endfor %}
+## Technical Constraints
+<!-- List any technical limitations or requirements -->
 
 ## Dependencies
-{% for dep in dependencies %}
-- {{ dep }}
-{% endfor %}
+<!-- External services, libraries, or other features required -->
 
-## Validation Checklist
-- [ ] All MUST requirements implemented
-- [ ] All acceptance criteria pass
-- [ ] No [NEEDS CLARIFICATION] markers remain
+## Risks and Mitigations
+<!-- Identify potential risks and how to address them -->
+
+## Success Criteria
+<!-- Define what success looks like for this feature -->
+- [ ] All functional requirements implemented
+- [ ] All user stories completed
 - [ ] Performance targets met
-- [ ] Security requirements validated
+- [ ] Security requirements satisfied
 
----
-**Generated by**: {{ ai_assistant }} on {{ date }}
-**Next Steps**: Use `/sp-plan generate` to create implementation plan
+## Open Questions
+<!-- Mark with [NEEDS CLARIFICATION] for items requiring user input -->
+- [NEEDS CLARIFICATION: Specific detail about requirement]
+
+## Appendix
+<!-- Additional diagrams, mockups, or references -->

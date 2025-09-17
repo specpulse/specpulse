@@ -1,230 +1,139 @@
-<!-- SpecPulse Implementation Plan Template v4.0 - AI-Optimized -->
-<!-- AI Instructions: Generate plan from specification following SDD gates -->
-
-# Implementation Plan: {{ feature_name }}
+# Implementation Plan: {{feature_name}}
 
 ## Specification Reference
-- **Spec ID**: SPEC-{{ feature_id }}
-- **Branch**: {{ branch_name }}
-- **Generated**: {{ date }}
-- **Optimization Focus**: {{ optimization_focus | default("SIMPLICITY") }}
-
-## Phase -1: Pre-Implementation Gates
-
-### SDD Compliance Check
-**ENSURE SPECIFICATION-DRIVEN DEVELOPMENT PRINCIPLES ARE FOLLOWED**
-
-#### Principle 1: Specification First
-- [ ] Clear specifications written?
-- [ ] User stories and acceptance criteria defined?
-- [ ] [NEEDS CLARIFICATION] markers for unknowns?
-- [ ] Functional and non-functional requirements documented?
-
-#### Principle 2: Incremental Planning
-- [ ] Work broken into phases?
-- [ ] Each phase delivers value?
-- [ ] Milestones and checkpoints defined?
-- [ ] Features prioritized by business value?
-
-#### Principle 3: Task Decomposition
-- [ ] Tasks are specific and actionable?
-- [ ] Effort estimates provided?
-- [ ] Definition of Done clear?
-- [ ] Tasks can be picked up immediately?
-
-#### Principle 4: Traceable Implementation
-- [ ] Code will reference spec requirements?
-- [ ] Commits will link to tasks?
-- [ ] Bidirectional traceability planned?
-- [ ] Spec updates process defined?
-
-#### Principle 5: Continuous Validation
-- [ ] Validation checkpoints identified?
-- [ ] Acceptance tests planned?
-- [ ] Spec-code sync process defined?
-- [ ] Regular validation scheduled?
-
-#### Principle 6: Quality Assurance
-- [ ] Test strategy appropriate for project type?
-- [ ] Acceptance criteria testable?
-- [ ] Code review process defined?
-- [ ] Quality metrics identified?
-
-#### Principle 7: Architecture Documentation
-- [ ] Technology choices documented?
-- [ ] Integration points identified?
-- [ ] Technical debt tracking planned?
-- [ ] ADR process established?
-
-#### Principle 8: Iterative Refinement
-- [ ] Feedback loops established?
-- [ ] Spec versioning process defined?
-- [ ] Learning capture process planned?
-- [ ] Refinement triggers identified?
-
-#### Principle 9: Stakeholder Alignment
-- [ ] Stakeholders identified?
-- [ ] Communication plan established?
-- [ ] Approval process defined?
-- [ ] Change management process clear?
-
-**Gate Status**: {{ gate_status | default("[ ] PENDING") }}
-
-## Architecture Decisions
-{% if architectural_decisions %}
-{% for decision in architectural_decisions %}
-### Decision {{ loop.index }}
-- **Area**: {{ decision.area }}
-- **Decision**: {{ decision.decision }}
-- **Rationale**: {{ decision.rationale }}
-- **Trade-offs**: {{ decision.trade_offs }}
-{% endfor %}
-{% else %}
-No significant architectural decisions documented yet.
-{% endif %}
-
-## Technology Stack
-
-### Core Technologies
-{% for tech in core_technologies %}
-- **{{ tech.name }}**: {{ tech.version }} - {{ tech.purpose }}
-{% endfor %}
-
-### Dependencies
-{% for dep in dependencies %}
-- **{{ dep.name }}**: {{ dep.reason }}
-{% endfor %}
+- **Spec ID**: SPEC-{{spec_id}}
+- **Generated**: {{date}}
+- **Optimization Focus**: {{optimization_focus}}
 
 ## Architecture Overview
-
-### System Components
-{% for component in components %}
-#### {{ component.name }}
-- **Purpose**: {{ component.purpose }}
-- **Key Features**: {{ component.features }}
-- **Dependencies**: {{ component.dependencies | join(", ") }}
-{% endfor %}
-
-### Data Models
-{% for model in data_models %}
-#### {{ model.name }}
-- **Fields**: {{ model.fields | join(", ") }}
-- **Relationships**: {{ model.relationships }}
-- **Validation**: {{ model.validation }}
-{% endfor %}
-
-## Implementation Phases
-
-### Phase 0: Critical Path (Week {{ phase_0.weeks | default(1) }})
-{% for task in phase_0.tasks %}
-- [ ] {{ task.description }}
-{% endfor %}
-
-### Phase 1: Foundation (Week {{ phase_1.weeks | default(2) }})
-{% for task in phase_1.tasks %}
-- [ ] {{ task.description }}
-{% endfor %}
-
-### Phase 2: Core Features (Week {{ phase_2.weeks | default(3) }})
-{% for task in phase_2.tasks %}
-- [ ] {{ task.description }}
-{% endfor %}
-
-### Phase 3: Polish (Week {{ phase_3.weeks | default(1) }})
-{% for task in phase_3.tasks %}
-- [ ] {{ task.description }}
-{% endfor %}
-
-## API Contracts
-
-### Endpoints
-{% for endpoint in endpoints %}
-#### {{ endpoint.method }} {{ endpoint.path }}
-- **Description**: {{ endpoint.description }}
-- **Request**: {{ endpoint.request }}
-- **Response**: {{ endpoint.response }}
-- **Authentication**: {{ endpoint.auth | default("Required") }}
-{% endfor %}
-
-### Data Schemas
-{% for schema in schemas %}
-#### {{ schema.name }}
-```json
-{{ schema.json | indent(4) }}
+```mermaid
+graph TD
+    A[User Interface] --> B[Business Logic]
+    B --> C[Data Layer]
+    C --> D[Database]
 ```
-{% endfor %}
 
-## Testing Strategy
+## Phase -1: Pre-Implementation Gates
+**SDD Compliance Check** - Must pass before coding:
+- [ ] Specification First - Complete spec with no ambiguities
+- [ ] Incremental Planning - Phases clearly defined
+- [ ] Task Decomposition - Tasks are concrete and executable
+- [ ] Quality Assurance - Testing strategy defined
+- [ ] Architecture Documentation - Technical decisions recorded
 
-### Test Categories
-- **Unit Tests**: {{ testing.unit.target | default("80% coverage") }}
-- **Integration Tests**: {{ testing.integration.target | default("Critical paths") }}
-- **E2E Tests**: {{ testing.e2e.target | default("Key user workflows") }}
-- **Performance Tests**: {{ testing.performance.target | default("Load testing") }}
+## Phase 0: Foundation
+### Objectives
+- Set up project structure
+- Configure development environment
+- Initialize core components
 
-### Test Environment
-- **Database**: {{ testing.environment.database | default("PostgreSQL") }}
-- **Services**: {{ testing.environment.services | join(", ") }}
-- **Test Data**: {{ testing.environment.data_strategy | default("Seed with realistic data") }}
+### Tasks
+- [ ] Create project scaffolding
+- [ ] Set up dependencies
+- [ ] Configure build system
+- [ ] Initialize testing framework
 
-## Security Considerations
+### Success Criteria
+- Development environment operational
+- All team members can build and run
+- Basic CI/CD pipeline functional
 
-### Authentication & Authorization
-- **Method**: {{ security.auth_method | default("JWT tokens") }}
-- **Roles**: {{ security.roles | join(", ") }}
-- **Permissions**: {{ security.permissions_model | default("Role-based access control") }}
+## Phase 1: Core Implementation
+### Objectives
+- Implement primary functionality
+- Create essential features
+- Establish data models
 
-### Data Protection
-- **Encryption**: {{ security.encryption.transit | default("TLS 1.3") }} in transit, {{ security.encryption.at_rest | default("AES-256") }} at rest
-- **Compliance**: {{ security.compliance | join(", ") }}
+### Tasks
+- [ ] Implement data models
+- [ ] Create core business logic
+- [ ] Build primary API endpoints
+- [ ] Develop basic UI components
 
-## Deployment Strategy
+### Success Criteria
+- Core features working end-to-end
+- Unit tests passing
+- Integration tests defined
 
-### Environments
-{% for env in environments %}
-#### {{ env.name }}
-- **URL**: {{ env.url }}
-- **Auto-deploy**: {{ env.auto_deploy | default("Manual") }}
-- **Health Checks**: {{ env.health_checks | default("Basic monitoring") }}
-{% endfor %}
+## Phase 2: Enhancement
+### Objectives
+- Add secondary features
+- Improve user experience
+- Optimize performance
 
-### Rollback Plan
-- **Strategy**: {{ rollback.strategy | default("Blue-green deployment") }}
-- **Triggers**: {{ rollback.triggers | join(", ") }}
-- **Recovery Time**: {{ rollback.recovery_time | default("< 5 minutes") }}
+### Tasks
+- [ ] Implement additional features
+- [ ] Add error handling
+- [ ] Optimize database queries
+- [ ] Enhance UI/UX
 
-## Success Criteria
+### Success Criteria
+- All features implemented
+- Performance targets met
+- Error handling comprehensive
 
-### Must-Have Metrics
-{% for metric in success_criteria.must %}
-- {{ metric.name }}: {{ metric.target }} ({{ metric.measurement }})
-{% endfor %}
+## Phase 3: Polish & Deploy
+### Objectives
+- Final testing and bug fixes
+- Documentation completion
+- Production deployment
 
-### Should-Have Metrics
-{% for metric in success_criteria.should %}
-- {{ metric.name }}: {{ metric.target }} ({{ metric.measurement }})
-{% endfor %}
+### Tasks
+- [ ] Complete integration testing
+- [ ] Fix identified bugs
+- [ ] Write user documentation
+- [ ] Deploy to production
 
-## Risk Assessment
+### Success Criteria
+- All tests passing
+- Documentation complete
+- Successfully deployed
 
-| Risk | Probability | Impact | Mitigation | Owner |
-|------|------------|--------|------------|-------|
-{% for risk in risks %}
-| {{ risk.description }} | {{ risk.probability }} | {{ risk.impact }} | {{ risk.mitigation }} | {{ risk.owner }} |
-{% endfor %}
+## Technical Decisions
 
-## Monitoring & Observability
+### Architecture Pattern
+- **Pattern**: {{architecture_pattern}}
+- **Rationale**: [Why this pattern was chosen]
 
-### Key Metrics
-{% for metric in monitoring.metrics %}
-- **{{ metric.name }}**: {{ metric.target }} ({{ metric.unit }})
-{% endfor %}
+### Technology Stack
+- **Frontend**: {{frontend_stack}}
+- **Backend**: {{backend_stack}}
+- **Database**: {{database}}
+- **Infrastructure**: {{infrastructure}}
 
-### Alerting
-- **Critical Alerts**: {{ monitoring.alerts.critical | join(", ") }}
-- **Warning Alerts**: {{ monitoring.alerts.warnings | join(", ") }}
+### Key Design Decisions
+1. **Decision 1**: [Description and rationale]
+2. **Decision 2**: [Description and rationale]
+3. **Decision 3**: [Description and rationale]
 
----
-**Generated by**: {{ ai_assistant }} on {{ date }}
-**SDD Gates**: {{ gate_status | default("PENDING") }}
-**Next Steps**: Use `/sp-task breakdown` to break down into executable tasks
+## Risk Management
+
+### Identified Risks
+1. **Risk**: [Description]
+   - **Probability**: [High|Medium|Low]
+   - **Impact**: [High|Medium|Low]
+   - **Mitigation**: [Strategy]
+
+2. **Risk**: [Description]
+   - **Probability**: [High|Medium|Low]
+   - **Impact**: [High|Medium|Low]
+   - **Mitigation**: [Strategy]
+
+## Resource Requirements
+- **Team Size**: {{team_size}}
+- **Timeline**: {{timeline}}
+- **Budget**: {{budget}}
+- **Tools**: {{required_tools}}
+
+## Dependencies
+- External services required
+- Third-party libraries
+- Other team deliverables
+
+## Monitoring & Success Metrics
+- Performance metrics to track
+- Business metrics to measure
+- Quality metrics to monitor
+
+## Notes
+<!-- Additional implementation notes -->

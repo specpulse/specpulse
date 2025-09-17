@@ -55,16 +55,37 @@ mkdir -p "$SPECS_DIR" || error_exit "Failed to create specs directory: $SPECS_DI
 mkdir -p "$PLANS_DIR" || error_exit "Failed to create plans directory: $PLANS_DIR"
 mkdir -p "$TASKS_DIR" || error_exit "Failed to create tasks directory: $TASKS_DIR"
 
-# Create initial files from templates
+# Validate templates exist but don't copy them directly
 TEMPLATE_DIR="$PROJECT_ROOT/templates"
 
-if [ ! -f "$TEMPLATE_DIR/spec.md" ]; then
-    error_exit "Template not found: $TEMPLATE_DIR/spec.md"
-fi
+# Validate all required templates exist
+for template in spec.md plan.md task.md; do
+    if [ ! -f "$TEMPLATE_DIR/$template" ]; then
+        error_exit "Template not found: $TEMPLATE_DIR/$template. Please run 'specpulse init' to initialize templates."
+    fi
+done
 
-cp "$TEMPLATE_DIR/spec.md" "$SPECS_DIR/spec-${FEATURE_ID}.md" || error_exit "Failed to copy spec template"
-cp "$TEMPLATE_DIR/plan.md" "$PLANS_DIR/plan-${FEATURE_ID}.md" || error_exit "Failed to copy plan template"
-cp "$TEMPLATE_DIR/task.md" "$TASKS_DIR/task-${FEATURE_ID}.md" || error_exit "Failed to copy task template"
+# Create marker files that indicate AI should use templates to generate content
+# These are placeholder files that will be replaced by AI-generated content
+echo "# Specification for $FEATURE_NAME" > "$SPECS_DIR/spec-001.md"
+echo "# Implementation Plan for $FEATURE_NAME" > "$PLANS_DIR/plan-001.md"
+echo "# Task Breakdown for $FEATURE_NAME" > "$TASKS_DIR/task-001.md"
+
+# Add markers indicating these files need AI processing
+echo "" >> "$SPECS_DIR/spec-001.md"
+echo "<!-- TO BE GENERATED FROM TEMPLATE: $TEMPLATE_DIR/spec.md -->" >> "$SPECS_DIR/spec-001.md"
+echo "<!-- FEATURE: $FEATURE_NAME -->" >> "$SPECS_DIR/spec-001.md"
+echo "<!-- ID: $FEATURE_ID -->" >> "$SPECS_DIR/spec-001.md"
+
+echo "" >> "$PLANS_DIR/plan-001.md"
+echo "<!-- TO BE GENERATED FROM TEMPLATE: $TEMPLATE_DIR/plan.md -->" >> "$PLANS_DIR/plan-001.md"
+echo "<!-- FEATURE: $FEATURE_NAME -->" >> "$PLANS_DIR/plan-001.md"
+echo "<!-- ID: $FEATURE_ID -->" >> "$PLANS_DIR/plan-001.md"
+
+echo "" >> "$TASKS_DIR/task-001.md"
+echo "<!-- TO BE GENERATED FROM TEMPLATE: $TEMPLATE_DIR/task.md -->" >> "$TASKS_DIR/task-001.md"
+echo "<!-- FEATURE: $FEATURE_NAME -->" >> "$TASKS_DIR/task-001.md"
+echo "<!-- ID: $FEATURE_ID -->" >> "$TASKS_DIR/task-001.md"
 
 # Update context
 CONTEXT_FILE="$PROJECT_ROOT/memory/context.md"

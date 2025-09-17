@@ -131,9 +131,17 @@ class Console:
     
     def spinner(self, message: str):
         """Show a loading spinner"""
-        # Simplified version for Windows compatibility
+        # Return a context manager for compatibility
+        class SpinnerContext:
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                pass
+            def update(self, message):
+                pass
+
         self.console.print(f"[bold cyan]{message}...[/bold cyan]")
-        return None
+        return SpinnerContext()
     
     def animated_text(self, text: str, delay: float = 0.03):
         """Print text with typewriter effect"""
@@ -216,6 +224,42 @@ class Console:
             box=box.DOUBLE
         )
         self.console.print(panel)
+
+    def type_effect(self, text: str, delay: float = 0.05):
+        """Display text with typing effect"""
+        for char in text:
+            self.console.print(char, end="")
+            import time
+            time.sleep(delay)
+        self.console.print()
+
+    def interactive_menu(self, title: str, options: List[str]) -> int:
+        """Display interactive menu and get user choice"""
+        self.header(title)
+        for i, option in enumerate(options, 1):
+            self.console.print(f"[bright_yellow]{i}.[/bright_yellow] {option}")
+
+        while True:
+            try:
+                choice = int(input("\nSelect option: "))
+                if 1 <= choice <= len(options):
+                    return choice - 1
+            except (ValueError, KeyboardInterrupt):
+                pass
+            self.error("Invalid choice. Please try again.")
+
+    def animation_wave(self, text: str = "Processing", duration: float = 2.0):
+        """Display wave animation"""
+        import time
+        frames = ["⚪⚫⚫⚫", "⚫⚪⚫⚫", "⚫⚫⚪⚫", "⚫⚫⚫⚪", "⚫⚫⚪⚫", "⚫⚪⚫⚫"]
+        start_time = time.time()
+        i = 0
+
+        with self.console.status(f"[bold green]{text}...", spinner="dots") as status:
+            while time.time() - start_time < duration:
+                status.update(f"[bold green]{text}... {frames[i % len(frames)]}")
+                time.sleep(0.2)
+                i += 1
     
     def validation_results(self, results: Dict[str, bool]):
         """Display validation results with visual indicators"""
@@ -305,17 +349,21 @@ class Console:
     def gradient_text(self, text: str, colors: List[str] = None):
         """Print text with gradient colors"""
         if not colors:
-            colors = ["bright_red", "bright_yellow", "bright_green", 
+            colors = ["bright_red", "bright_yellow", "bright_green",
                      "bright_cyan", "bright_blue", "bright_magenta"]
-        
+
         words = text.split()
         colored_words = []
-        
+
         for i, word in enumerate(words):
             color = colors[i % len(colors)]
             colored_words.append(f"[{color}]{word}[/{color}]")
-        
+
         self.console.print(" ".join(colored_words))
+
+    def tree_structure(self, data: Dict[str, Any], title: str = "Project Structure"):
+        """Display tree structure - alias for tree method"""
+        return self.tree(title, data)
     
     def celebration(self):
         """Show celebration animation"""

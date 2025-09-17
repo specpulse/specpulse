@@ -346,13 +346,13 @@ class Validator:
         if constitution_path.exists():
             self.constitution = constitution_path.read_text()
             # Extract phase gates from constitution
-            self._extract_phase_gates()
-    
-    def _extract_phase_gates(self):
+            self._extract_phase_gates_from_constitution()
+
+    def _extract_phase_gates_from_constitution(self):
         """Extract phase gates from constitution"""
         if not self.constitution:
             return
-        
+
         # Simple extraction of phase gates from constitution text
         gates = []
         lines = self.constitution.split('\n')
@@ -507,3 +507,113 @@ class Validator:
                     report += f"  - Issue: {issue}\n"
         
         return report
+
+    def validate_constitution(self, project_path: Path) -> Dict:
+        """Validate constitution file"""
+        constitution_path = project_path / "memory" / "constitution.md"
+        if not constitution_path.exists():
+            return {
+                "status": "error",
+                "message": "Constitution file not found"
+            }
+
+        try:
+            with open(constitution_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # Check for required sections
+            required_sections = [
+                "Principles",
+                "Specification First",
+                "Quality Assurance"
+            ]
+
+            missing = []
+            for section in required_sections:
+                if section not in content:
+                    missing.append(section)
+
+            if missing:
+                return {
+                    "status": "warning",
+                    "message": f"Missing sections: {', '.join(missing)}"
+                }
+
+            return {
+                "status": "success",
+                "message": "Constitution valid"
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Error reading constitution: {str(e)}"
+            }
+
+    def _check_phase_gates(self, plan_content: str) -> Dict[str, bool]:
+        """Check phase gates in a plan"""
+        gates = {}
+
+        # Look for phase gate patterns
+        lines = plan_content.split('\n')
+        for line in lines:
+            # Pattern: - [x] Gate Name
+            if re.match(r'^\s*-\s*\[([x ])\]\s+(.+)', line):
+                match = re.match(r'^\s*-\s*\[([x ])\]\s+(.+)', line)
+                if match:
+                    checked = match.group(1).lower() == 'x'
+                    gate_name = match.group(2).strip()
+                    gates[gate_name] = checked
+
+        return gates
+
+    def _extract_phase_gates(self, plan_content: str) -> List[Dict]:
+        """Extract phase gates from plan content"""
+        gates = []
+
+        lines = plan_content.split('\n')
+        for line in lines:
+            # Pattern: - [x] Gate Name or - [ ] Gate Name
+            if re.match(r'^\s*-\s*\[([x ])\]\s+(.+)', line):
+                match = re.match(r'^\s*-\s*\[([x ])\]\s+(.+)', line)
+                if match:
+                    checked = match.group(1).lower() == 'x'
+                    gate_name = match.group(2).strip()
+                    gates.append({
+                        "name": gate_name,
+                        "checked": checked
+                    })
+
+        return gates
+
+    def _fix_common_issues(self, content: str, doc_type: str) -> str:
+        """Fix common issues in documents"""
+        fixed_content = content
+
+        if doc_type == "spec":
+            # Ensure spec has required headers
+            if "## Metadata" not in fixed_content:
+                fixed_content = "## Metadata\n- **ID**: SPEC-XXX\n- **Created**: TBD\n\n" + fixed_content
+
+            if "## Executive Summary" not in fixed_content:
+                fixed_content += "\n\n## Executive Summary\n[To be completed]\n"
+
+            if "## Functional Requirements" not in fixed_content:
+                fixed_content += "\n\n## Functional Requirements\n- FR-001: [Requirement]\n"
+
+        elif doc_type == "plan":
+            # Ensure plan has phase gates
+            if "## Phase -1: Pre-Implementation Gates" not in fixed_content:
+                gates = """
+## Phase -1: Pre-Implementation Gates
+- [ ] Specification First
+- [ ] Quality Assurance
+- [ ] Architecture Documentation
+"""
+                fixed_content = gates + "\n" + fixed_content
+
+        elif doc_type == "task":
+            # Ensure task has proper structure
+            if "## Tasks" not in fixed_content:
+                fixed_content += "\n\n## Tasks\n### T001: [Task Name]\n- **Status**: Pending\n"
+
+        return fixed_content

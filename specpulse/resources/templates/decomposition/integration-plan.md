@@ -1,135 +1,287 @@
-# Integration Plan: {{ feature_name }}
+# Integration Plan: {{feature_name}}
 
-## Metadata
-- **Spec ID**: {{ spec_id }}
-- **Decomposition Date**: {{ decomposition_date }}
-- **Services Count**: {{ service_count }}
-- **Generated**: {{ date }}
-- **Version**: {{ version }}
+## Overview
+Integration strategy for microservices implementing {{feature_name}}
 
-## Service Overview
-
-{{ service_list }}
-
-## Integration Architecture
+## Service Architecture
 
 ```mermaid
-{{ architecture_diagram }}
+graph TD
+    CLIENT[Client Application]
+    GATEWAY[API Gateway]
+
+    AUTH[Auth Service]
+    USER[User Service]
+    NOTIFY[Notification Service]
+
+    DB_AUTH[(Auth DB)]
+    DB_USER[(User DB)]
+
+    CACHE[Redis Cache]
+    QUEUE[Message Queue]
+
+    CLIENT --> GATEWAY
+    GATEWAY --> AUTH
+    GATEWAY --> USER
+
+    AUTH --> DB_AUTH
+    AUTH --> CACHE
+    AUTH --> QUEUE
+
+    USER --> DB_USER
+    USER --> CACHE
+    USER --> QUEUE
+
+    QUEUE --> NOTIFY
+
+    AUTH -.->|Events| USER
+    USER -.->|Events| NOTIFY
 ```
 
-## Communication Strategy
+## Service Communication Matrix
 
-### Synchronous Communication
-{{ sync_communication }}
+| Source Service | Target Service | Protocol | Pattern | Purpose |
+|---------------|---------------|----------|---------|---------|
+| API Gateway | Auth Service | REST | Request-Response | Authentication |
+| API Gateway | User Service | REST | Request-Response | User operations |
+| Auth Service | User Service | Event | Pub-Sub | User created/updated |
+| User Service | Notification | Event | Pub-Sub | Send notifications |
+| All Services | Cache | Redis | Cache-Aside | Performance |
 
-### Asynchronous Communication
-{{ async_communication }}
+## Integration Points
 
-## Data Consistency Strategy
+### 1. Authentication Flow
+**Services**: API Gateway → Auth Service → User Service
 
-### Transaction Boundaries
-{{ transaction_strategy }}
+**Flow**:
+1. Client sends credentials to API Gateway
+2. Gateway forwards to Auth Service
+3. Auth Service validates and generates token
+4. Auth Service publishes `user.authenticated` event
+5. User Service updates last login timestamp
+6. Token returned to client
 
-### Event Sourcing
-{{ event_sourcing }}
+**Contracts**:
+- REST API: `POST /auth/login`
+- Event: `user.authenticated`
+- Response: JWT token
 
-### Saga Patterns
-{{ saga_patterns }}
+### 2. User Registration Flow
+**Services**: API Gateway → User Service → Auth Service → Notification Service
 
-## Integration Phases
+**Flow**:
+1. Client sends registration data to API Gateway
+2. Gateway forwards to User Service
+3. User Service creates user record
+4. User Service publishes `user.created` event
+5. Auth Service creates authentication record
+6. Notification Service sends welcome email
+7. Confirmation sent to client
 
-### Phase 1: Service Infrastructure
-**Duration**: {{ phase1_duration }}
-**Deliverables**:
-- Service discovery setup
-- API Gateway configuration
-- Load balancer setup
-- Service mesh deployment
+**Contracts**:
+- REST API: `POST /users/register`
+- Events: `user.created`, `auth.created`, `notification.sent`
 
-### Phase 2: Inter-Service Communication
-**Duration**: {{ phase2_duration }}
-**Deliverables**:
-- REST API endpoints
-- Message queue setup
-- Event bus configuration
-- Circuit breakers
+### 3. Data Synchronization
+**Services**: All services with shared data
 
-### Phase 3: Data Synchronization
-**Duration**: {{ phase3_duration }}
-**Deliverables**:
-- Data replication strategy
-- Cache synchronization
-- Event replay mechanisms
-- Consistency validation
+**Strategy**:
+- Event-driven synchronization
+- Eventual consistency model
+- Compensation for failures
 
-### Phase 4: Integration Testing
-**Duration**: {{ phase4_duration }}
-**Deliverables**:
-- Contract tests
-- End-to-end scenarios
-- Performance benchmarks
-- Chaos engineering tests
-
-## Service Dependencies
-
-```yaml
-dependencies:
-  {{ service_dependencies }}
-```
+**Events**:
+- `user.updated` - Profile changes
+- `auth.revoked` - Token invalidation
+- `permission.changed` - Authorization updates
 
 ## API Gateway Configuration
 
 ### Routing Rules
-{{ routing_rules }}
+```yaml
+routes:
+  - path: /api/v1/auth/*
+    service: auth-service
+    methods: [GET, POST, PUT, DELETE]
 
-### Rate Limiting
-{{ rate_limiting }}
+  - path: /api/v1/users/*
+    service: user-service
+    methods: [GET, POST, PUT, DELETE]
 
-### Authentication Flow
-{{ auth_flow }}
+  - path: /api/v1/notifications/*
+    service: notification-service
+    methods: [GET, POST]
+```
 
-## Monitoring & Observability
+### Security Policies
+- Rate limiting: 100 requests/minute per IP
+- Authentication: JWT validation
+- CORS: Configured for allowed origins
+- Request/Response validation
+
+## Message Queue Configuration
+
+### Exchanges and Queues
+```yaml
+exchanges:
+  - name: user-events
+    type: topic
+    durable: true
+
+  - name: auth-events
+    type: topic
+    durable: true
+
+queues:
+  - name: user-service-queue
+    bindings:
+      - exchange: auth-events
+        routing_key: auth.*
+
+  - name: notification-queue
+    bindings:
+      - exchange: user-events
+        routing_key: user.*
+```
+
+### Event Schema
+```json
+{
+  "eventId": "uuid",
+  "eventType": "user.created",
+  "timestamp": "ISO-8601",
+  "correlationId": "uuid",
+  "data": {
+    "userId": "uuid",
+    "email": "string"
+  }
+}
+```
+
+## Service Discovery
+
+### Registration
+- Each service registers on startup
+- Health checks every 30 seconds
+- Deregistration on shutdown
+
+### Discovery
+- Service-to-service calls use discovery
+- Client-side load balancing
+- Circuit breaker implementation
+
+## Error Handling Strategy
+
+### Retry Logic
+- Exponential backoff: 1s, 2s, 4s, 8s
+- Max retries: 3
+- Dead letter queue for failures
+
+### Circuit Breaker
+- Threshold: 50% failure rate
+- Window: 60 seconds
+- Half-open attempts: Every 30 seconds
+
+### Compensation
+- Saga pattern for distributed transactions
+- Compensation events for rollback
+- Audit log for all operations
+
+## Testing Strategy
+
+### Integration Tests
+1. **Service-to-Service**: Mock external dependencies
+2. **End-to-End**: Full flow testing
+3. **Contract Tests**: API and event contracts
+4. **Chaos Testing**: Failure scenarios
+
+### Test Scenarios
+- [ ] Happy path: Complete user registration
+- [ ] Service failure: Auth service down
+- [ ] Network partition: Queue unreachable
+- [ ] Data consistency: Concurrent updates
+- [ ] Performance: High load conditions
+
+## Monitoring and Observability
 
 ### Distributed Tracing
-- Correlation ID propagation
-- Span collection strategy
-- Trace sampling rate
+- Correlation IDs across all services
+- Request flow visualization
+- Performance bottleneck identification
 
-### Health Checks
-{{ health_checks }}
+### Metrics
+- Request rate per service
+- Error rate per integration point
+- Message queue depth
+- Cache hit ratio
 
-### SLA Targets
-{{ sla_targets }}
+### Alerting
+- Service unavailable > 1 minute
+- Error rate > 5%
+- Queue depth > 1000 messages
+- Response time > 500ms (p95)
 
-## Rollout Strategy
+## Security Considerations
 
-### Service Deployment Order
-1. {{ deployment_order }}
+### Service-to-Service Authentication
+- mTLS for internal communication
+- Service accounts with limited scope
+- Regular key rotation
 
-### Feature Flags
-{{ feature_flags }}
+### Data Protection
+- Encryption in transit (TLS)
+- Encryption at rest (database)
+- PII masking in logs
+
+## Deployment Strategy
+
+### Order of Deployment
+1. Infrastructure (Database, Cache, Queue)
+2. Core services (Auth, User)
+3. Support services (Notification)
+4. API Gateway
+5. Monitoring and logging
 
 ### Rollback Plan
-{{ rollback_plan }}
+- Blue-green deployment
+- Database migration rollback scripts
+- Event replay capability
+- Configuration rollback
 
-## SDD Compliance
-- [ ] Specifications for each integration point (Principle 1: Specification First)
-- [ ] Phased integration approach (Principle 2: Incremental Planning)
-- [ ] Contract tests defined (Principle 6: Quality Assurance)
-- [ ] Architecture decisions documented (Principle 7: Architecture Documentation)
-- [ ] Stakeholder communication plan (Principle 9: Stakeholder Alignment)
+## Performance Optimization
 
-## Risk Assessment
+### Caching Strategy
+- User profiles: 5 minutes TTL
+- Authentication tokens: Until expiry
+- Permissions: 1 minute TTL
 
-### Integration Risks
-{{ integration_risks }}
+### Database Optimization
+- Read replicas for queries
+- Connection pooling
+- Query optimization
+- Proper indexing
 
-### Mitigation Strategies
-{{ mitigation_strategies }}
+### Async Processing
+- Non-critical operations queued
+- Batch processing where possible
+- Event debouncing
+
+## Timeline
+
+| Phase | Duration | Tasks |
+|-------|----------|-------|
+| Setup | 2 days | Infrastructure, service discovery |
+| Core Integration | 5 days | Auth + User services |
+| Extended Integration | 3 days | Notification, monitoring |
+| Testing | 3 days | Integration tests, load tests |
+| Optimization | 2 days | Performance tuning |
 
 ## Success Criteria
+
 - [ ] All services communicating successfully
-- [ ] Data consistency maintained
+- [ ] End-to-end flows working
 - [ ] Performance targets met
-- [ ] Zero message loss
-- [ ] Graceful degradation working
+- [ ] Monitoring in place
+- [ ] Security scans passed
+- [ ] Documentation complete
+- [ ] Team trained on operations

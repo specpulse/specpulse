@@ -61,23 +61,48 @@ try {
     Exit-WithError "Failed to create directories: $_"
 }
 
-# Create initial files from templates
+# Validate templates exist but don't copy them directly
 $TemplateDir = Join-Path $ProjectRoot "templates"
 
-$specTemplate = Join-Path $TemplateDir "spec.md"
-$planTemplate = Join-Path $TemplateDir "plan.md"
-$taskTemplate = Join-Path $TemplateDir "task.md"
-
-if (-not (Test-Path $specTemplate)) {
-    Exit-WithError "Template not found: $specTemplate"
+# Validate all required templates exist
+@("spec.md", "plan.md", "task.md") | ForEach-Object {
+    $templatePath = Join-Path $TemplateDir $_
+    if (-not (Test-Path $templatePath)) {
+        Exit-WithError "Template not found: $templatePath. Please run 'specpulse init' to initialize templates."
+    }
 }
 
+# Create marker files that indicate AI should use templates to generate content
+# These are placeholder files that will be replaced by AI-generated content
 try {
-    Copy-Item -Path $specTemplate -Destination "$SpecsDir\spec-$FeatureId.md" -Force
-    Copy-Item -Path $planTemplate -Destination "$PlansDir\plan-$FeatureId.md" -Force
-    Copy-Item -Path $taskTemplate -Destination "$TasksDir\task-$FeatureId.md" -Force
+    $specContent = @"
+# Specification for $FeatureName
+
+<!-- TO BE GENERATED FROM TEMPLATE: $TemplateDir\spec.md -->
+<!-- FEATURE: $FeatureName -->
+<!-- ID: $FeatureId -->
+"@
+    Set-Content -Path "$SpecsDir\spec-001.md" -Value $specContent
+
+    $planContent = @"
+# Implementation Plan for $FeatureName
+
+<!-- TO BE GENERATED FROM TEMPLATE: $TemplateDir\plan.md -->
+<!-- FEATURE: $FeatureName -->
+<!-- ID: $FeatureId -->
+"@
+    Set-Content -Path "$PlansDir\plan-001.md" -Value $planContent
+
+    $taskContent = @"
+# Task Breakdown for $FeatureName
+
+<!-- TO BE GENERATED FROM TEMPLATE: $TemplateDir\task.md -->
+<!-- FEATURE: $FeatureName -->
+<!-- ID: $FeatureId -->
+"@
+    Set-Content -Path "$TasksDir\task-001.md" -Value $taskContent
 } catch {
-    Exit-WithError "Failed to copy templates: $_"
+    Exit-WithError "Failed to create marker files: $_"
 }
 
 # Update context

@@ -1,52 +1,97 @@
-description = "Create or manage feature specifications with versioning"
+description = "Create or manage feature specifications using AI-optimized templates"
 prompt = """
-Handle the /sp-spec command with arguments: {{args}}
+## CRITICAL FILE EDIT RESTRICTIONS
+**NEVER EDIT:** templates/, scripts/, commands/, .claude/, .gemini/
+**ONLY EDIT:** specs/, plans/, tasks/, memory/
+Templates are COPIED to specs/ folder, then edited there
 
-First, detect current feature context:
-- Read memory/context.md for current feature metadata
-- Use git branch name if available (e.g., 001-user-authentication)
-- Fall back to most recently created feature directory
-- If no context found, ask user to specify feature or run /sp-pulse first
+## Command: /sp-spec {{args}}
 
-Parse the arguments to determine the action:
-- If starts with "create": Generate new specification
-- If starts with "update": Modify existing specification  
-- If starts with "validate": Check specification completeness
-- If no action specified: Default to "create" with full arguments as description
+Create, update, or validate feature specifications using SpecPulse methodology.
 
-## For /sp-spec create [description] or /sp-spec [description]:
-1. Read template from @{templates/spec.md}
-2. Parse the description to identify:
-   - Functional requirements (Must/Should/Could have)
-   - User stories and acceptance criteria
-   - Technical requirements
-3. Mark any uncertainties with [NEEDS CLARIFICATION: detail]
-4. Find current feature directory from detected context
-5. Check existing spec files and create next version (spec-001.md, spec-002.md, etc.)
-6. Write specification to specs/XXX-feature/spec-XXX.md
-7. Run validation:
-   - !{bash scripts/sp-pulse-spec.sh "XXX-feature"}
+Actions: create, update, validate, clarify (defaults to create)
 
-## For /sp-spec update:
-1. Show list of existing spec files in current feature directory
-2. Ask user which spec file to update
-3. Read selected specification file
-4. Ask user for clarifications or changes
-5. Update content while preserving structure
-6. Remove resolved [NEEDS CLARIFICATION] markers
+### Implementation Steps:
 
-## For /sp-spec validate:
-1. Show list of existing spec files in current feature directory
-2. Ask user which spec file to validate
-3. Run validation:
-   - !{bash scripts/sp-pulse-spec.sh "XXX-feature"}
-4. Check all required sections are filled
-5. Count [NEEDS CLARIFICATION] markers
-6. Verify acceptance criteria are testable
-7. Report validation results
+1. **Detect current feature context**:
+   - Read memory/context.md for current feature metadata
+   - Use git branch name if available (e.g., 001-user-authentication)
+   - Fall back to most recently created feature directory
+   - If no context found, ask user to specify feature or run /sp-pulse first
+
+2. **Parse arguments** to determine action:
+   - If starts with 'create': Generate new specification
+   - If starts with 'update': Modify existing specification
+   - If starts with 'validate': Check specification completeness
+   - If starts with 'clarify': Address [NEEDS CLARIFICATION] markers
+   - Default to 'create' with full arguments as description
+
+3. **Run specification script**:
+   - !{bash scripts/sp-pulse-spec.sh "{{args}}"}
+
+4. **For 'create' action**:
+   - Read template from @{templates/spec.md}
+   - Parse description to identify:
+     * Functional requirements (Must/Should/Could/Won't have)
+     * User stories with testable acceptance criteria
+     * Non-functional requirements (performance, security, scalability)
+     * Technical constraints and dependencies
+   - Fill template with AI-generated content
+   - Mark unclear items with [NEEDS CLARIFICATION]
+   - Create numbered spec file (spec-001.md, spec-002.md, etc.)
+   - Save to specs/XXX-feature/spec-XXX.md
+
+5. **Generate comprehensive specification**:
+   - Executive Summary
+   - Problem Statement
+   - Proposed Solution
+   - Functional Requirements (FR-001, FR-002, etc.)
+   - Non-Functional Requirements (performance, security, scalability)
+   - User Stories with acceptance criteria
+   - Technical Constraints
+   - Dependencies
+   - Risks and Mitigations
+   - Success Criteria
+   - Open Questions marked with [NEEDS CLARIFICATION]
+
+6. **For 'update' action**:
+   - Show list of existing spec files
+   - Ask user which spec file to update
+   - Read selected specification
+   - Ask for clarifications or changes
+   - Update content while preserving structure
+   - Remove resolved [NEEDS CLARIFICATION] markers
+
+7. **For 'validate' action**:
+   - Show list of existing spec files
+   - Run validation script
+   - Check all required sections are filled
+   - Count [NEEDS CLARIFICATION] markers
+   - Verify acceptance criteria are testable
+   - Report validation results
+
+8. **Update context and validate**:
+   - Update memory/context.md with specification status
+   - Check SDD compliance (Principle 1: Specification First)
+   - Validate all sections are filled
+   - Report any missing or incomplete sections
+
+### Example AI-Generated Content:
+For "User authentication with OAuth2":
+- FR-001: System SHALL support OAuth2 authentication with Google/GitHub
+- FR-002: System SHALL issue JWT tokens valid for 24 hours
+- NFR-001: Authentication response time < 200ms
+- User Story: As a user, I want to login with Google so that I don't need to remember another password
+
+### SDD Compliance Checklist:
+- [ ] Every requirement is testable (Principle 1)
+- [ ] User stories have clear acceptance criteria (Principle 1)
+- [ ] Dependencies are identified (Principle 4)
+- [ ] Success metrics defined (Principle 6)
 
 Examples:
 - /sp-spec user authentication with OAuth2 and email/password
 - /sp-spec update
 - /sp-spec validate
+- /sp-spec clarify
 """

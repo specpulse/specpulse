@@ -21,16 +21,22 @@
 
 SpecPulse is a universal **Specification-Driven Development (SDD)** framework that works with ANY software project - web apps, mobile apps, desktop software, games, APIs, ML projects, and more. It ensures every feature starts with clear specifications, validated plans, and tracked tasks.
 
-> **Latest Update (v1.4.1)** - Bug Fix Release:
+> **Latest Update (v1.4.2)** - Template System Enhancement:
+> - 📁 **Physical Template Files**: Templates now exist as physical files for AI tools to read
+> - 🔧 **Complete PowerShell Support**: Added PowerShell scripts matching all Bash functionality
+> - 📝 **Enhanced Decomposition Templates**: Full microservice decomposition template support
+>
+> **v1.4.1** - Bug Fix Release:
 > - 🐛 **Fixed Version Display**: Corrected `--version` command showing old version
 >
 > **v1.4.0** - Complete Framework Revolution:
 > - 🚀 **Universal SDD Framework**: Transformed from Constitutional to Specification-Driven Development
 > - 🎯 **No Technology Restrictions**: Support for ANY technology stack - web, mobile, desktop, games, ML
-> - 🧪 **86% Test Coverage**: Complete test suite rewrite with 98.3% success rate
+> - 🧪 **Comprehensive Testing**: Full test suite with extensive coverage
 > - ✨ **9 Universal Principles**: Flexible principles replacing rigid articles
 > - 🔄 **Major API Updates**: All methods renamed from `constitution` to `sdd_compliance`
 > - 📝 **Enhanced Documentation**: Complete overhaul of docs and templates
+> - 🏗️ **Hybrid Template System**: Templates exist as both files and embedded code
 
 ### Why SpecPulse?
 
@@ -233,10 +239,11 @@ Stop guessing what users want:
 Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
 
 **Script Execution:**
-- **All Platforms**: Bash (.sh) scripts only
-- **Requirements**: Bash shell required (Git Bash on Windows, native on Linux/macOS)
+- **Cross-Platform Scripts**: Bash (.sh) and PowerShell (.ps1) scripts included
+- **Requirements**: Bash shell (Git Bash on Windows) or PowerShell
 - **Universal Compatibility**: Works whether installed via PyPI or source code
 - **Unicode Support**: Full international character support (≤, ≥, →, ←)
+- **Template System**: Templates exist as physical files in `resources/templates/` for AI tools to read
 
 ```bash
 /sp-pulse user-authentication     # Start new feature with name
@@ -258,14 +265,15 @@ Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
 - Commands capture arguments using `$ARGUMENTS` variable
 - **Shell scripts** in `resources/scripts/` folder process the arguments:
   - `sp-pulse-*.sh` - Bash scripts (all platforms)
-- AI reads templates from `resources/templates/` folder
+  - `sp-pulse-*.ps1` - PowerShell scripts (Windows native)
+- Templates are **physical files** in `resources/templates/` and also embedded in code
 - Results are saved in `specs/`, `plans/`, `tasks/` folders
 - Memory system tracks progress in `memory/` folder
 
 **🔒 Important Security Rules:**
 - **Protected Directories** (Read-Only after init):
-  - `templates/` - Original template files
-  - `scripts/` - Shell scripts
+  - `templates/` - Generated template files (created on init)
+  - `scripts/` - Shell and PowerShell scripts
   - `commands/` - AI command definitions
   - `.claude/` and `.gemini/` - AI configurations
 - **Editable Directories**:
@@ -273,7 +281,7 @@ Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
   - `plans/` - Implementation plans (AI creates/edits here)
   - `tasks/` - Task breakdowns (AI creates/edits here)
   - `memory/` - Project context and decisions
-- **Workflow**: Templates are COPIED to working directories, never modified directly
+- **Workflow**: Templates are used as references, content is generated in working directories
 
 **Claude vs Gemini:**
 - **Claude**: Uses Markdown command files (`.claude/commands/*.md`) with YAML frontmatter
@@ -423,12 +431,20 @@ my-project/
 │       ├── auth-service-tasks.md
 │       ├── user-service-tasks.md
 │       └── integration-tasks.md
-├── templates/           # Customizable templates
-├── scripts/             # Shell scripts for AI execution
-│   ├── sp-pulse-init.sh    # Feature initialization
-│   ├── sp-pulse-spec.sh    # Specification creation
-│   ├── sp-pulse-plan.sh    # Plan generation
-│   └── sp-pulse-task.sh    # Task breakdown
+├── templates/           # Generated templates (created on init)
+├── scripts/             # Cross-platform scripts for AI execution
+│   ├── sp-pulse-init.sh     # Feature initialization (Bash)
+│   ├── sp-pulse-init.ps1    # Feature initialization (PowerShell)
+│   ├── sp-pulse-spec.sh     # Specification creation (Bash)
+│   ├── sp-pulse-spec.ps1    # Specification creation (PowerShell)
+│   ├── sp-pulse-plan.sh     # Plan generation (Bash)
+│   ├── sp-pulse-plan.ps1    # Plan generation (PowerShell)
+│   ├── sp-pulse-task.sh     # Task breakdown (Bash)
+│   ├── sp-pulse-task.ps1    # Task breakdown (PowerShell)
+│   ├── sp-pulse-decompose.sh  # Microservice decomposition (Bash)
+│   ├── sp-pulse-decompose.ps1 # Microservice decomposition (PowerShell)
+│   ├── sp-pulse-execute.sh    # Continuous task execution (Bash)
+│   └── sp-pulse-execute.ps1   # Continuous task execution (PowerShell)
 └── PULSE.md            # Project manifest
 ```
 
@@ -578,8 +594,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## 🚦 Project Status
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/specpulse/specpulse)
-[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/specpulse/specpulse)
-[![Tests](https://img.shields.io/badge/tests-37%2B%20passed-brightgreen)](https://github.com/specpulse/specpulse)
+[![Coverage](https://img.shields.io/badge/coverage-improving-yellow)](https://github.com/specpulse/specpulse)
+[![Tests](https://img.shields.io/badge/tests-core%20passing-brightgreen)](https://github.com/specpulse/specpulse)
 [![Maintainability](https://img.shields.io/badge/maintainability-A-brightgreen)](https://github.com/specpulse/specpulse)
 
 ---

@@ -30,13 +30,19 @@ class SpecPulse:
             except:
                 # Final fallback to development path
                 self.resources_dir = Path(__file__).parent.parent / "resources"
+
+        # Set templates directory
+        self.templates_dir = self.resources_dir / "templates"
     
     def _load_config(self) -> Dict:
         """Load project configuration"""
         config_path = self.project_path / ".specpulse" / "config.yaml"
         if config_path.exists():
-            with open(config_path, 'r') as f:
-                return yaml.safe_load(f)
+            try:
+                with open(config_path, 'r') as f:
+                    return yaml.safe_load(f) or {}
+            except:
+                return {}
         return {}
     
     def get_spec_template(self) -> str:
@@ -1073,3 +1079,322 @@ project/
 - Keep commits atomic and focused
 - Reference constitution for all decisions
 """
+
+    def get_template(self, template_name: str, variables: Optional[Dict] = None) -> str:
+        """Get template by name (generic template getter)"""
+        template_path = self.templates_dir / template_name
+        if template_path.exists():
+            with open(template_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                if variables:
+                    for key, value in variables.items():
+                        content = content.replace(f"{{{{{key}}}}}", str(value))
+                return content
+        return ""
+
+    def get_decomposition_template(self, template_name: str) -> str:
+        """Get decomposition template"""
+        template_path = self.templates_dir / "decomposition" / template_name
+        if template_path.exists():
+            with open(template_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        # Try to get from resources
+        resource_path = self.resources_dir / "templates" / "decomposition" / template_name
+        if resource_path.exists():
+            with open(resource_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return ""
+
+    def get_microservice_template(self) -> str:
+        """Get microservice template"""
+        template_path = self.resources_dir / "templates" / "decomposition" / "microservice.md"
+        if template_path.exists():
+            with open(template_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return """# Microservice: {{service_name}}
+
+## Service Overview
+- **Name**: {{service_name}}
+- **Domain**: {{domain}}
+- **Type**: [API|Worker|Gateway]
+
+## Responsibilities
+- Primary responsibility
+- Secondary responsibility
+
+## API Endpoints
+- GET /api/v1/{{resource}}
+- POST /api/v1/{{resource}}
+
+## Dependencies
+- Service A
+- Service B
+
+## Data Model
+```json
+{
+  "id": "string",
+  "field": "value"
+}
+```
+
+## Configuration
+- Environment Variables
+- Secrets
+"""
+
+    def get_api_contract_template(self) -> str:
+        """Get API contract template"""
+        template_path = self.resources_dir / "templates" / "decomposition" / "api-contract.yaml"
+        if template_path.exists():
+            with open(template_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return """openapi: 3.0.0
+info:
+  title: {{service_name}} API
+  version: 1.0.0
+  description: API contract for {{service_name}}
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
+paths:
+  /{{resource}}:
+    get:
+      summary: Get all {{resource}}
+      responses:
+        '200':
+          description: Successful response
+    post:
+      summary: Create new {{resource}}
+      responses:
+        '201':
+          description: Created
+"""
+
+    def get_interface_template(self) -> str:
+        """Get interface template"""
+        template_path = self.resources_dir / "templates" / "decomposition" / "interface.ts"
+        if template_path.exists():
+            with open(template_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return """// Interface for {{service_name}}
+
+export interface {{InterfaceName}} {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  // Add fields
+}
+
+export interface {{ServiceName}}Service {
+  create(data: Partial<{{InterfaceName}}>): Promise<{{InterfaceName}}>;
+  findById(id: string): Promise<{{InterfaceName}} | null>;
+  update(id: string, data: Partial<{{InterfaceName}}>): Promise<{{InterfaceName}}>;
+  delete(id: string): Promise<boolean>;
+}
+"""
+
+    def get_service_plan_template(self) -> str:
+        """Get service plan template"""
+        template_path = self.resources_dir / "templates" / "decomposition" / "service-plan.md"
+        if template_path.exists():
+            with open(template_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return """# Service Implementation Plan: {{service_name}}
+
+## Service Context
+- **Parent Spec**: {{spec_id}}
+- **Service Type**: {{service_type}}
+- **Priority**: {{priority}}
+
+## Implementation Phases
+
+### Phase 1: Foundation
+- [ ] Set up service structure
+- [ ] Configure dependencies
+- [ ] Create base models
+
+### Phase 2: Core Features
+- [ ] Implement primary endpoints
+- [ ] Add business logic
+- [ ] Create tests
+
+### Phase 3: Integration
+- [ ] Connect to other services
+- [ ] Add error handling
+- [ ] Implement monitoring
+
+## Technical Decisions
+- Framework: {{framework}}
+- Database: {{database}}
+- Communication: {{communication}}
+
+## Success Criteria
+- All endpoints responding
+- Tests passing
+- Performance within targets
+"""
+
+    def get_integration_plan_template(self) -> str:
+        """Get integration plan template"""
+        template_path = self.resources_dir / "templates" / "decomposition" / "integration-plan.md"
+        if template_path.exists():
+            with open(template_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return """# Integration Plan
+
+## Overview
+Integration strategy for microservices in {{feature_name}}
+
+## Service Communication Matrix
+| Source Service | Target Service | Protocol | Pattern |
+|---------------|---------------|----------|---------|
+| Service A | Service B | REST | Request-Response |
+| Service B | Service C | gRPC | Stream |
+
+## Integration Points
+1. **Authentication Flow**
+   - Service: auth-service
+   - Integration: API Gateway
+   - Protocol: OAuth2
+
+2. **Data Synchronization**
+   - Services: user-service, profile-service
+   - Pattern: Event Sourcing
+   - Message Queue: RabbitMQ
+
+## API Gateway Configuration
+- Routes mapping
+- Rate limiting
+- Authentication
+
+## Testing Strategy
+- Integration tests
+- Contract tests
+- End-to-end tests
+
+## Rollout Plan
+1. Deploy services independently
+2. Configure service discovery
+3. Enable traffic routing
+4. Monitor and validate
+"""
+
+    def generate_claude_commands(self) -> List[Dict]:
+        """Generate Claude AI commands"""
+        commands = []
+        commands_dir = self.resources_dir / "commands" / "claude"
+        if commands_dir.exists():
+            for cmd_file in commands_dir.glob("*.md"):
+                with open(cmd_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    # Extract description from YAML frontmatter if available
+                    description = "Claude AI command"
+                    if "description:" in content:
+                        for line in content.split('\n'):
+                            if line.startswith("description:"):
+                                description = line.replace("description:", "").strip()
+                                break
+
+                    # Determine script based on command name
+                    script_map = {
+                        "sp-pulse": "sp-pulse-init.sh",
+                        "sp-spec": "sp-pulse-spec.sh",
+                        "sp-plan": "sp-pulse-plan.sh",
+                        "sp-task": "sp-pulse-task.sh",
+                        "sp-execute": "sp-pulse-execute.sh",
+                        "sp-decompose": "sp-pulse-decompose.sh"
+                    }
+                    script = script_map.get(cmd_file.stem, f"{cmd_file.stem}.sh")
+
+                    commands.append({
+                        "name": cmd_file.stem,
+                        "description": description,
+                        "script": script,
+                        "content": content
+                    })
+        return commands
+
+    def generate_gemini_commands(self) -> List[Dict]:
+        """Generate Gemini AI commands"""
+        commands = []
+        commands_dir = self.resources_dir / "commands" / "gemini"
+        if commands_dir.exists():
+            for cmd_file in commands_dir.glob("*.toml"):
+                with open(cmd_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    # Extract description from TOML content
+                    description = "Gemini AI command"
+                    if "description =" in content:
+                        for line in content.split('\n'):
+                            if line.startswith("description ="):
+                                description = line.split('=', 1)[1].strip().strip('"')
+                                break
+
+                    # Determine script based on command name
+                    script_map = {
+                        "sp-pulse": "sp-pulse-init.sh",
+                        "sp-spec": "sp-pulse-spec.sh",
+                        "sp-plan": "sp-pulse-plan.sh",
+                        "sp-task": "sp-pulse-task.sh",
+                        "sp-execute": "sp-pulse-execute.sh",
+                        "sp-decompose": "sp-pulse-decompose.sh"
+                    }
+                    script = script_map.get(cmd_file.stem, f"{cmd_file.stem}.sh")
+
+                    commands.append({
+                        "name": cmd_file.stem,
+                        "description": description,
+                        "script": script,
+                        "content": content
+                    })
+        return commands
+
+    def decompose_specification(self, spec_dir: Path, spec_content: str) -> Dict:
+        """Decompose specification into microservices"""
+        result = {
+            "services": [],
+            "api_contracts": [],
+            "interfaces": [],
+            "integration_points": [],
+            "status": "success"
+        }
+
+        # Enhanced service extraction logic
+        content_lower = spec_content.lower()
+
+        # Check for explicit service mentions
+        if "authentication service" in content_lower or "auth" in content_lower:
+            result["services"].append("authentication")
+
+        if "user management" in content_lower or "user service" in content_lower or "user" in content_lower:
+            result["services"].append("user-management")
+
+        if "product catalog" in content_lower or "product" in content_lower or "catalog" in content_lower:
+            result["services"].append("product-catalog")
+
+        if "payment" in content_lower:
+            result["services"].append("payment-service")
+
+        if "notification" in content_lower:
+            result["services"].append("notification-service")
+
+        # Remove duplicates
+        result["services"] = list(dict.fromkeys(result["services"]))
+
+        # Add integration points
+        if len(result["services"]) > 1:
+            result["integration_points"] = ["message-queue", "api-gateway"]
+
+        # Create decomposition directory
+        decomp_dir = spec_dir / "decomposition"
+        decomp_dir.mkdir(exist_ok=True)
+
+        # Create marker files
+        (decomp_dir / "microservices.md").write_text("# Microservices\n")
+        (decomp_dir / "api-contracts").mkdir(exist_ok=True)
+        (decomp_dir / "interfaces").mkdir(exist_ok=True)
+
+        return result

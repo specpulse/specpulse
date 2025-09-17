@@ -1,169 +1,201 @@
-# Service Plan: {{ service_name }}
+# Service Implementation Plan: {{service_name}}
 
-## Metadata
-- **Service**: {{ service_name }}
-- **Bounded Context**: {{ bounded_context }}
-- **Spec Reference**: {{ spec_id }}
-- **Generated**: {{ date }}
-- **Version**: {{ version }}
+## Service Context
+- **Parent Spec**: SPEC-{{spec_id}}
+- **Service Type**: {{service_type}}
+- **Priority**: {{priority}}
+- **Dependencies**: {{dependencies}}
 
-## Service Overview
-
-### Responsibility
-{{ service_responsibility }}
-
-### Capabilities
-{{ service_capabilities }}
-
-### Data Ownership
-{{ data_ownership }}
-
-## Architecture
-
-### Internal Structure
+## Architecture Overview
 ```
-{{ service_name }}/
-├── domain/          # Business logic
-├── application/     # Use cases
-├── infrastructure/  # External interfaces
-└── presentation/    # API layer
+┌──────────────────────────────┐
+│     {{service_name}}         │
+├──────────────────────────────┤
+│  API Layer                   │
+│  ├── REST Controllers        │
+│  └── GraphQL Resolvers       │
+├──────────────────────────────┤
+│  Business Logic              │
+│  ├── Services                │
+│  └── Domain Models           │
+├──────────────────────────────┤
+│  Data Access Layer           │
+│  ├── Repositories            │
+│  └── Database Connection     │
+└──────────────────────────────┘
 ```
-
-### Technology Stack
-- **Language**: {{ language }}
-- **Framework**: {{ framework }}
-- **Database**: {{ database }}
-- **Cache**: {{ cache }}
-- **Message Queue**: {{ queue }}
-
-## API Design
-
-### REST Endpoints
-{{ rest_endpoints }}
-
-### Event Publications
-{{ event_publications }}
-
-### Event Subscriptions
-{{ event_subscriptions }}
-
-## Data Model
-
-### Entities
-{{ entities }}
-
-### Value Objects
-{{ value_objects }}
-
-### Aggregates
-{{ aggregates }}
 
 ## Implementation Phases
 
-### Phase 1: Domain Layer
-**Duration**: {{ phase1_duration }}
-- Domain entities
-- Business rules
-- Domain events
-- Value objects
+### Phase 1: Foundation (2-3 days)
+**Goal**: Set up service structure and basic infrastructure
 
-### Phase 2: Application Layer
-**Duration**: {{ phase2_duration }}
-- Use cases
-- Application services
-- DTOs
-- Mappers
+#### Tasks
+- [ ] Create service project structure
+- [ ] Set up development environment
+- [ ] Configure database connection
+- [ ] Set up logging and monitoring
+- [ ] Create health check endpoint
+- [ ] Configure CI/CD pipeline
 
-### Phase 3: Infrastructure Layer
-**Duration**: {{ phase3_duration }}
-- Database repositories
-- External service clients
-- Message handlers
-- Cache implementation
+#### Success Criteria
+- Service starts successfully
+- Health check returns 200
+- Logs are being collected
+- CI/CD pipeline runs
 
-### Phase 4: API Layer
-**Duration**: {{ phase4_duration }}
-- REST controllers
-- Request/Response models
-- Validation
-- Error handling
+### Phase 2: Core Features (5-7 days)
+**Goal**: Implement primary business logic and APIs
 
-## Testing Strategy
+#### Tasks
+- [ ] Define domain models
+- [ ] Implement data repositories
+- [ ] Create service layer with business logic
+- [ ] Implement REST API endpoints
+- [ ] Add request/response validation
+- [ ] Write unit tests for business logic
 
-### Unit Tests
-- Domain logic: {{ domain_coverage }}%
-- Use cases: {{ usecase_coverage }}%
-- Infrastructure: {{ infra_coverage }}%
+#### Success Criteria
+- All CRUD operations working
+- Business rules enforced
+- Unit tests passing (>80% coverage)
+- API documentation generated
 
-### Integration Tests
-{{ integration_tests }}
+### Phase 3: Integration (3-4 days)
+**Goal**: Connect with other services and external systems
 
-### Contract Tests
-{{ contract_tests }}
+#### Tasks
+- [ ] Implement event publishing
+- [ ] Set up event subscriptions
+- [ ] Add external service clients
+- [ ] Implement circuit breakers
+- [ ] Add retry logic
+- [ ] Create integration tests
 
-## Service Configuration
+#### Success Criteria
+- Events published successfully
+- Can consume events from other services
+- External service calls working
+- Integration tests passing
 
-### Environment Variables
-```yaml
-{{ env_variables }}
-```
+### Phase 4: Enhancement (2-3 days)
+**Goal**: Optimize performance and add advanced features
 
-### Feature Flags
-{{ feature_flags }}
+#### Tasks
+- [ ] Add caching layer
+- [ ] Optimize database queries
+- [ ] Implement batch operations
+- [ ] Add rate limiting
+- [ ] Enhance error handling
+- [ ] Performance testing
 
-### Secrets Management
-{{ secrets }}
+#### Success Criteria
+- Response time < {{target_response_time}}ms
+- Can handle {{target_throughput}} req/s
+- Cache hit ratio > {{target_cache_ratio}}%
+- All performance tests passing
 
-## Deployment
+### Phase 5: Production Readiness (2 days)
+**Goal**: Prepare for production deployment
 
-### Container Configuration
-```dockerfile
-{{ dockerfile_snippet }}
-```
+#### Tasks
+- [ ] Security audit
+- [ ] Load testing
+- [ ] Documentation review
+- [ ] Deployment scripts
+- [ ] Rollback plan
+- [ ] Monitoring dashboards
 
-### Resource Requirements
-- CPU: {{ cpu_requirements }}
-- Memory: {{ memory_requirements }}
-- Storage: {{ storage_requirements }}
+#### Success Criteria
+- Security scan passes
+- Load tests meet targets
+- Documentation complete
+- Deployment automated
+- Monitoring in place
 
-### Scaling Strategy
-{{ scaling_strategy }}
+## Technical Decisions
 
-## Monitoring
+### Technology Stack
+- **Language**: {{programming_language}}
+- **Framework**: {{framework}}
+- **Database**: {{database}}
+- **Cache**: {{cache}}
+- **Message Queue**: {{message_queue}}
 
-### Metrics
-{{ metrics }}
+### Key Design Patterns
+1. **Repository Pattern**: For data access abstraction
+2. **Service Layer**: For business logic encapsulation
+3. **DTO Pattern**: For API contracts
+4. **Event Sourcing**: For audit trail
+5. **Circuit Breaker**: For resilience
 
-### Logs
-{{ logging_strategy }}
+### Database Design
+- **Type**: {{database_type}}
+- **Main Tables/Collections**:
+  - {{entity_1}}: Core entity
+  - {{entity_2}}: Related entity
+  - {{entity_3}}: Audit log
 
-### Alerts
-{{ alert_rules }}
+### API Design
+- **Style**: RESTful / GraphQL
+- **Versioning**: URL-based (v1, v2)
+- **Authentication**: JWT / API Key
+- **Rate Limiting**: {{rate_limit}} req/min
+
+## Risk Management
+
+### Technical Risks
+| Risk | Impact | Probability | Mitigation |
+|------|--------|------------|------------|
+| Database performance issues | High | Medium | Indexing, query optimization, caching |
+| Service dependencies failure | High | Low | Circuit breakers, fallback mechanisms |
+| Data inconsistency | High | Low | Transactions, event sourcing |
+| Security vulnerabilities | High | Medium | Security scanning, code reviews |
+
+### Schedule Risks
+- **Risk**: Integration complexity
+- **Mitigation**: Early integration testing, mocked services
+
+## Resource Requirements
+- **Developer(s)**: {{developer_count}}
+- **Total Estimate**: {{total_days}} days
+- **Tools Required**:
+  - IDE with {{language}} support
+  - Database client
+  - API testing tool
+  - Monitoring access
+
+## Success Metrics
+- **Performance**:
+  - p95 latency < {{p95_latency}}ms
+  - Availability > {{availability}}%
+  - Error rate < {{error_rate}}%
+
+- **Quality**:
+  - Code coverage > {{coverage}}%
+  - Zero critical vulnerabilities
+  - All acceptance criteria met
+
+- **Business**:
+  - Supports {{concurrent_users}} concurrent users
+  - Processes {{transactions_per_second}} transactions/second
+  - Reduces {{business_metric}} by {{improvement}}%
 
 ## Dependencies
 
-### Internal Services
-{{ internal_dependencies }}
+### Upstream Dependencies
+- {{upstream_service_1}}: Provides {{data_1}}
+- {{upstream_service_2}}: Provides {{data_2}}
 
-### External Services
-{{ external_dependencies }}
+### Downstream Dependencies
+- {{downstream_service_1}}: Consumes {{api_1}}
+- {{downstream_service_2}}: Consumes {{event_1}}
 
-### Libraries
-{{ libraries }}
+### External Dependencies
+- {{external_service_1}}: {{external_purpose_1}}
+- {{external_service_2}}: {{external_purpose_2}}
 
-## SDD Compliance
-- [ ] Service specifications clear (Principle 1: Specification First)
-- [ ] Phased implementation plan (Principle 2: Incremental Planning)
-- [ ] Tasks properly decomposed (Principle 3: Task Decomposition)
-- [ ] Test strategy defined (Principle 6: Quality Assurance)
-- [ ] Architecture documented (Principle 7: Architecture Documentation)
-
-## Risk Assessment
-{{ risks }}
-
-## Success Criteria
-- [ ] All endpoints functional
-- [ ] Test coverage > {{ test_target }}%
-- [ ] Performance targets met
-- [ ] Zero security vulnerabilities
-- [ ] Documentation complete
+## Notes
+- Follow team coding standards
+- Update service registry after deployment
+- Coordinate with DevOps for production setup

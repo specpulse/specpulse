@@ -12,11 +12,11 @@ pytest tests/ --cov=specpulse --cov-report=html --cov-report=term-missing
 # Run specific test file
 pytest tests/test_cli.py -v
 
-# Run tests without coverage (faster)
-pytest tests/ -v
-
 # Run a single test function
 pytest tests/test_cli.py::TestCLI::test_init_command -v
+
+# Run tests without coverage (faster)
+pytest tests/ -v
 ```
 
 ### Code Quality
@@ -44,12 +44,11 @@ pip install -e .
 
 # Run CLI locally
 python -m specpulse.cli.main --help
-
 # Or use the shorthand
 sp --help
 ```
 
-### CLI Testing
+### CLI Commands
 ```bash
 # Initialize a new project
 python -m specpulse.cli.main init test-project
@@ -188,8 +187,6 @@ The `/sp-execute` command enables non-stop task completion:
 /sp-execute all            # Complete EVERYTHING!
 ```
 
-This enables maximum efficiency by eliminating context switching and maintaining flow state.
-
 ## Directory Structure and Script Execution
 
 ### How Scripts Work
@@ -312,7 +309,7 @@ tasks/001-user-authentication/
 ## Important Notes
 
 ### Version Management
-- Current version: 1.3.2 (in `pyproject.toml`)
+- Current version: 1.4.1 (in `pyproject.toml`)
 - Version must sync between `pyproject.toml` and `setup.py`
 - Use semantic versioning for releases
 
@@ -324,7 +321,7 @@ tasks/001-user-authentication/
 
 ### Testing Coverage
 - Comprehensive test suite in `tests/`
-- Multiple test files for complete coverage
+- 86% test coverage with 98.3% success rate
 - Use pytest with coverage reporting
 - Mock external dependencies (Git, filesystem)
 

@@ -78,11 +78,24 @@ def get_update_message(current: str, latest: str, is_major: bool) -> str:
     Returns:
         Formatted update message
     """
+    # Determine update type
+    curr_parts = current.split('.')
+    latest_parts = latest.split('.')
+
+    update_type = "patch"
+    if len(curr_parts) >= 2 and len(latest_parts) >= 2:
+        if curr_parts[0] != latest_parts[0]:
+            update_type = "major"
+        elif curr_parts[1] != latest_parts[1]:
+            update_type = "minor"
+        else:
+            update_type = "patch"
+
     if is_major:
-        urgency = "[!] MAJOR"
+        urgency = f"[!] MAJOR ({update_type} update)"
         color = "bright_red"
     else:
-        urgency = "[i]"
+        urgency = f"[i] {update_type.upper()}"
         color = "yellow"
 
     message = f"""
