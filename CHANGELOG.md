@@ -5,7 +5,14 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.4.0] - 2025-01-17
+## [1.4.1] - 2025-09-17
+
+### 🐛 Bug Fixes
+- Fixed version display issue where `specpulse --version` was showing old version (1.3.3)
+- Corrected all version references throughout the codebase
+- Ensured consistent version reporting across all entry points
+
+## [1.4.0] - 2025-09-17
 
 ### 🎉 MAJOR RELEASE - Universal SDD Framework
 

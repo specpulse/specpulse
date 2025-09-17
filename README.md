@@ -21,7 +21,10 @@
 
 SpecPulse is a universal **Specification-Driven Development (SDD)** framework that works with ANY software project - web apps, mobile apps, desktop software, games, APIs, ML projects, and more. It ensures every feature starts with clear specifications, validated plans, and tracked tasks.
 
-> **Latest Update (v1.4.0)** - Complete Framework Revolution:
+> **Latest Update (v1.4.1)** - Bug Fix Release:
+> - 🐛 **Fixed Version Display**: Corrected `--version` command showing old version
+>
+> **v1.4.0** - Complete Framework Revolution:
 > - 🚀 **Universal SDD Framework**: Transformed from Constitutional to Specification-Driven Development
 > - 🎯 **No Technology Restrictions**: Support for ANY technology stack - web, mobile, desktop, games, ML
 > - 🧪 **86% Test Coverage**: Complete test suite rewrite with 98.3% success rate
