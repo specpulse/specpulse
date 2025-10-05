@@ -7,10 +7,12 @@ from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
 import yaml
 import re
+import difflib
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 from rich.syntax import Syntax
+from ..utils.backup_manager import BackupManager
 from .validation_rules import (
     validation_rules_registry, ValidationResult, ValidationSeverity,
     ValidationCategory
@@ -947,3 +949,248 @@ class Validator:
         output.append("")
 
         return "\n".join(output)
+
+    def auto_fix_validation_issues(
+        self,
+        spec_path: Path,
+        backup: bool = True,
+        dry_run: bool = False
+    ) -> Tuple[bool, List[str], Optional[Path]]:
+        """
+        Automatically fix common validation issues by adding missing sections.
+
+        This method identifies auto-fixable validation errors and adds missing
+        sections with template placeholders. It creates a backup before making
+        changes and provides a diff report.
+
+        Args:
+            spec_path: Path to specification file to fix
+            backup: Whether to create backup before fixing (default: True)
+            dry_run: If True, only report what would be fixed without modifying (default: False)
+
+        Returns:
+            Tuple of (success: bool, changes: List[str], backup_path: Optional[Path])
+            - success: True if fixes applied successfully
+            - changes: List of changes made (for diff reporting)
+            - backup_path: Path to backup file (if backup=True), None otherwise
+
+        Raises:
+            FileNotFoundError: If spec file doesn't exist
+            IOError: If backup or file write fails
+
+        Example:
+            >>> validator = Validator()
+            >>> success, changes, backup = validator.auto_fix_validation_issues(
+            ...     Path("specs/001-feature/spec-001.md"),
+            ...     backup=True
+            ... )
+            >>> if success:
+            ...     print(f"Applied {len(changes)} fixes, backup at {backup}")
+        """
+        if not spec_path.exists():
+            raise FileNotFoundError(f"Specification file not found: {spec_path}")
+
+        # Read current content
+        try:
+            original_content = spec_path.read_text(encoding='utf-8')
+        except Exception as e:
+            raise IOError(f"Failed to read specification file: {e}")
+
+        # Find all auto-fixable issues
+        auto_fixable_issues = []
+        required_sections = [
+            "Executive Summary",
+            "Problem Statement",
+            "Proposed Solution",
+            "Functional Requirements",
+            "User Stories",
+            "Acceptance Criteria",
+            "Technical Constraints",
+            "Dependencies",
+            "Risks and Mitigations",
+            "Success Criteria"
+        ]
+
+        for section in required_sections:
+            error = self._check_section_exists(original_content, section)
+            if error and error.auto_fix:
+                auto_fixable_issues.append((section, error))
+
+        # If no fixable issues, return early
+        if not auto_fixable_issues:
+            return (True, ["No auto-fixable issues found"], None)
+
+        # Dry run: report what would be fixed
+        if dry_run:
+            changes = [f"Would add section: {section}" for section, _ in auto_fixable_issues]
+            return (True, changes, None)
+
+        # Create backup if requested
+        backup_path = None
+        if backup:
+            try:
+                backup_manager = BackupManager()
+                backup_path = backup_manager.create_backup(spec_path)
+            except Exception as e:
+                raise IOError(f"Failed to create backup: {e}")
+
+        # Apply fixes
+        modified_content = original_content
+        changes = []
+
+        try:
+            for section, error in auto_fixable_issues:
+                # Get template content for this section from example
+                section_template = self._get_section_template(section, error)
+
+                # Add section to content
+                modified_content = self._add_section_to_spec(modified_content, section, section_template)
+                changes.append(f"Added section: {section}")
+
+            # Write modified content back to file
+            spec_path.write_text(modified_content, encoding='utf-8')
+
+            return (True, changes, backup_path)
+
+        except Exception as e:
+            # Rollback if anything fails
+            if backup and backup_path:
+                try:
+                    backup_manager = BackupManager()
+                    backup_manager.restore_from_backup(backup_path, spec_path)
+                    changes.append(f"ROLLBACK: Restored from backup due to error: {e}")
+                except Exception as restore_error:
+                    changes.append(f"CRITICAL: Rollback failed: {restore_error}")
+
+            return (False, changes, backup_path)
+
+    def _get_section_template(self, section_name: str, error: ValidationExample) -> str:
+        """
+        Get template content for a missing section.
+
+        Args:
+            section_name: Name of section to add
+            error: ValidationExample with template information
+
+        Returns:
+            Template content for the section
+        """
+        # Extract example content as template
+        # Remove any instructional text and keep just the structure
+        template = error.example.strip()
+
+        # If example doesn't start with ##, add section header
+        if not template.startswith("##"):
+            template = f"## {section_name}\n{template}"
+
+        return template
+
+    def _add_section_to_spec(self, content: str, section_name: str, section_template: str) -> str:
+        """
+        Add a section to specification content in the appropriate location.
+
+        Sections are added in a logical order, not just appended to the end.
+
+        Args:
+            content: Current specification content
+            section_name: Name of section to add
+            section_template: Template content for the section
+
+        Returns:
+            Modified content with section added
+        """
+        # Define section order for insertion
+        section_order = [
+            "Metadata",
+            "Executive Summary",
+            "Problem Statement",
+            "Proposed Solution",
+            "Detailed Requirements",
+            "Functional Requirements",
+            "Non-Functional Requirements",
+            "User Stories",
+            "Acceptance Criteria",
+            "Technical Constraints",
+            "Dependencies",
+            "Risks and Mitigations",
+            "Success Criteria",
+            "Open Questions",
+            "Appendix"
+        ]
+
+        # Find insertion point
+        lines = content.split("\n")
+        insertion_index = len(lines)  # Default: append to end
+
+        # Try to find the best insertion point based on section order
+        section_index = section_order.index(section_name) if section_name in section_order else -1
+
+        if section_index >= 0:
+            # Find the section that should come after this one
+            for i in range(section_index + 1, len(section_order)):
+                next_section = section_order[i]
+                marker = f"## {next_section}"
+
+                for line_num, line in enumerate(lines):
+                    if line.strip() == marker:
+                        insertion_index = line_num
+                        break
+
+                if insertion_index < len(lines):
+                    break
+
+        # Insert the section
+        lines.insert(insertion_index, "")
+        lines.insert(insertion_index + 1, section_template)
+        lines.insert(insertion_index + 2, "")
+
+        return "\n".join(lines)
+
+    def generate_diff(self, original_path: Path, modified_path: Path) -> str:
+        """
+        Generate a unified diff between original and modified files.
+
+        Args:
+            original_path: Path to original file
+            modified_path: Path to modified file
+
+        Returns:
+            Unified diff as string
+        """
+        original_lines = original_path.read_text(encoding='utf-8').splitlines(keepends=True)
+        modified_lines = modified_path.read_text(encoding='utf-8').splitlines(keepends=True)
+
+        diff = difflib.unified_diff(
+            original_lines,
+            modified_lines,
+            fromfile=str(original_path),
+            tofile=str(modified_path),
+            lineterm=''
+        )
+
+        return ''.join(diff)
+
+    def generate_diff_from_content(self, original_content: str, modified_content: str, filename: str = "spec") -> str:
+        """
+        Generate a unified diff from content strings.
+
+        Args:
+            original_content: Original content
+            modified_content: Modified content
+            filename: Name to use in diff header
+
+        Returns:
+            Unified diff as string
+        """
+        original_lines = original_content.splitlines(keepends=True)
+        modified_lines = modified_content.splitlines(keepends=True)
+
+        diff = difflib.unified_diff(
+            original_lines,
+            modified_lines,
+            fromfile=f"{filename} (original)",
+            tofile=f"{filename} (fixed)",
+            lineterm=''
+        )
+
+        return ''.join(diff)
