@@ -154,6 +154,23 @@ ehthumbs.db
 *.bak
 *~
 
-tests/
+# Development artifacts
 test-project/
+existing-project/
+PULSE.md
+UPDATE_TASKS.md
+
+# IDE and editor files
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 

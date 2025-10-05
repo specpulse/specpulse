@@ -18,7 +18,8 @@ $Green = "Green"
 $Yellow = "Yellow"
 
 Write-Host "[SpecPulse Decompose]" -ForegroundColor $Green -NoNewline
-Write-Host " Processing spec: $($SpecId ?? 'current')"
+$specDisplay = if ($SpecId) { $SpecId } else { 'current' }
+Write-Host " Processing spec: $specDisplay"
 
 # Find specification
 if ([string]::IsNullOrEmpty($SpecId)) {

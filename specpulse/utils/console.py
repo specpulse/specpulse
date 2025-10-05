@@ -104,7 +104,19 @@ class Console:
         self.console.print()
         self.console.print(panel)
         self.console.print()
-    
+
+    def subheader(self, message: str, style: str = "bright_yellow"):
+        """Print a subheader with smaller formatting"""
+        self.console.print()
+        panel = Panel(
+            f"[{style}]{message}[/{style}]",
+            box=box.ROUNDED,
+            style=style,
+            padding=(0, 1)
+        )
+        self.console.print(panel)
+        self.console.print()
+
     def section(self, title: str, content: str = None):
         """Print a section with title"""
         self.console.print()

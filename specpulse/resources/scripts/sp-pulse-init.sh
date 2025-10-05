@@ -1,46 +1,48 @@
 #!/bin/bash
 # Initialize a new feature with SpecPulse
 
-set -euo pipefail  # Exit on error, unset vars, pipe failures
+# Source common utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/script_utils.sh"
 
 # Configuration
 SCRIPT_NAME="$(basename "$0")"
 # Script is in project-root/scripts/, so parent dir is project root
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Function to log messages
-log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $SCRIPT_NAME: $1" >&2
-}
+# Initialize script environment with error handling and rollback support
+init_script_env "$SCRIPT_NAME" "$SCRIPT_DIR"
 
-# Function to handle errors
-error_exit() {
-    log "ERROR: $1"
-    exit 1
-}
+# Handle command line arguments
+case "${1:-}" in
+    --help|-h)
+        print_usage "$SCRIPT_NAME" "<feature-name> [feature-id]"
+        exit 0
+        ;;
+    --version|-v)
+        print_version "$SCRIPT_NAME" "1.0.0"
+        exit 0
+        ;;
+    --verbose)
+        export VERBOSE=true
+        shift
+        ;;
+esac
 
 # Validate arguments
 if [ $# -eq 0 ]; then
-    error_exit "Usage: $SCRIPT_NAME <feature-name> [feature-id]"
+    print_usage "$SCRIPT_NAME" "<feature-name> [feature-id]"
+    exit 1
 fi
 
 FEATURE_NAME="$1"
 CUSTOM_ID="${2:-}"
 
-# Sanitize feature name
-BRANCH_SAFE_NAME=$(echo "$FEATURE_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+# Sanitize feature name using utility function
+BRANCH_SAFE_NAME=$(sanitize_feature_name "$FEATURE_NAME")
 
-if [ -z "$BRANCH_SAFE_NAME" ]; then
-    error_exit "Invalid feature name: '$FEATURE_NAME'"
-fi
-
-# Get feature ID
-if [ -n "$CUSTOM_ID" ]; then
-    FEATURE_ID=$(printf "%03d" "$CUSTOM_ID")
-else
-    FEATURE_ID=$(printf "%03d" $(find "$PROJECT_ROOT/specs" -maxdepth 1 -type d -name '[0-9]*' 2>/dev/null | wc -l | awk '{print $1 + 1}'))
-fi
+# Get feature ID using utility function
+FEATURE_ID=$(generate_feature_id "$PROJECT_ROOT" "$CUSTOM_ID")
 
 BRANCH_NAME="${FEATURE_ID}-${BRANCH_SAFE_NAME}"
 
@@ -49,21 +51,25 @@ SPECS_DIR="$PROJECT_ROOT/specs/${BRANCH_NAME}"
 PLANS_DIR="$PROJECT_ROOT/plans/${BRANCH_NAME}"
 TASKS_DIR="$PROJECT_ROOT/tasks/${BRANCH_NAME}"
 
-log "Creating feature directories for '$FEATURE_NAME'"
+log_info "Creating feature directories for '$FEATURE_NAME'"
 
-mkdir -p "$SPECS_DIR" || error_exit "Failed to create specs directory: $SPECS_DIR"
-mkdir -p "$PLANS_DIR" || error_exit "Failed to create plans directory: $PLANS_DIR"
-mkdir -p "$TASKS_DIR" || error_exit "Failed to create tasks directory: $TASKS_DIR"
+# Validate project structure first
+validate_project_structure "$PROJECT_ROOT"
+
+# Create directories with progress tracking
+show_progress 1 4 "Creating directories"
+mkdir -p "$SPECS_DIR"
+show_progress 2 4 "Creating directories"
+mkdir -p "$PLANS_DIR"
+show_progress 3 4 "Creating directories"
+mkdir -p "$TASKS_DIR"
+show_progress 4 4 "Creating directories"
 
 # Validate templates exist but don't copy them directly
 TEMPLATE_DIR="$PROJECT_ROOT/templates"
 
 # Validate all required templates exist
-for template in spec.md plan.md task.md; do
-    if [ ! -f "$TEMPLATE_DIR/$template" ]; then
-        error_exit "Template not found: $TEMPLATE_DIR/$template. Please run 'specpulse init' to initialize templates."
-    fi
-done
+validate_templates "$TEMPLATE_DIR"
 
 # Create marker files that indicate AI should use templates to generate content
 # These are placeholder files that will be replaced by AI-generated content
@@ -90,9 +96,12 @@ echo "<!-- PLAN_FILE: $PLANS_DIR/plan-001.md -->" >> "$TASKS_DIR/task-001.md"
 echo "<!-- FEATURE_DIR: $BRANCH_NAME -->" >> "$TASKS_DIR/task-001.md"
 echo "<!-- FEATURE_ID: $FEATURE_ID -->" >> "$TASKS_DIR/task-001.md"
 
-# Update context
+# Update context with backup
 CONTEXT_FILE="$PROJECT_ROOT/memory/context.md"
 mkdir -p "$(dirname "$CONTEXT_FILE")"
+
+# Backup context file before modification
+backup_file "$CONTEXT_FILE"
 
 {
     echo ""
@@ -100,7 +109,7 @@ mkdir -p "$(dirname "$CONTEXT_FILE")"
     echo "- Feature ID: $FEATURE_ID"
     echo "- Branch: $BRANCH_NAME"
     echo "- Started: $(date -Iseconds)"
-} >> "$CONTEXT_FILE" || error_exit "Failed to update context file"
+} >> "$CONTEXT_FILE"
 
 # Create git branch if in git repo
 if [ -d "$PROJECT_ROOT/.git" ]; then
@@ -114,9 +123,11 @@ if [ -d "$PROJECT_ROOT/.git" ]; then
     fi
 fi
 
-log "Successfully initialized feature '$FEATURE_NAME' with ID $FEATURE_ID"
+log_success "Successfully initialized feature '$FEATURE_NAME' with ID $FEATURE_ID"
 
+# Output results for consumption by other scripts
 echo "BRANCH_NAME=$BRANCH_NAME"
 echo "SPEC_DIR=$SPECS_DIR"
 echo "FEATURE_ID=$FEATURE_ID"
 echo "STATUS=initialized"
+echo "BACKUP_DIR=$BACKUP_DIR"

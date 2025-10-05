@@ -1,41 +1,78 @@
 """
-SpecPulse Validator
+SpecPulse Validator - Enhanced with comprehensive validation rules
 """
 
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 import yaml
 import re
+from .validation_rules import (
+    validation_rules_registry, ValidationResult, ValidationSeverity,
+    ValidationCategory
+)
 
 
 class Validator:
-    """Validates SpecPulse project components"""
-    
+    """Validates SpecPulse project components with enhanced rules"""
+
     def __init__(self, project_root: Optional[Path] = None):
         self.results = []
         self.constitution = None
         self.phase_gates = []
-        
+        self.rules_registry = validation_rules_registry
+
         if project_root:
             self._load_constitution(project_root)
     
-    def validate_all(self, project_path: Path, fix: bool = False, verbose: bool = False) -> List[Dict]:
-        """Validate entire project"""
+    def validate_all(self, project_path: Path, fix: bool = False, verbose: bool = False,
+                   strictness: str = "standard") -> List[Dict]:
+        """Validate entire project with progressive strictness levels"""
         self.results = []
-        
+
         # Check project structure
         self._validate_structure(project_path)
-        
-        # Validate specifications
-        self._validate_specs(project_path, fix, verbose)
-        
-        # Validate plans
-        self._validate_plans(project_path, fix, verbose)
-        
+
+        # Validate based on strictness level
+        if strictness == "basic":
+            self._validate_basic(project_path, fix, verbose)
+        elif strictness == "standard":
+            self._validate_standard(project_path, fix, verbose)
+        elif strictness == "comprehensive":
+            self._validate_comprehensive(project_path, fix, verbose)
+        elif strictness == "strict":
+            self._validate_strict(project_path, fix, verbose)
+        else:
+            # Default to standard
+            self._validate_standard(project_path, fix, verbose)
+
         # Validate SDD principles compliance
         self._validate_sdd_compliance(project_path, verbose)
-        
+
         return self.results
+
+    def _validate_basic(self, project_path: Path, fix: bool, verbose: bool):
+        """Basic validation - check only critical errors"""
+        self._validate_specs(project_path, fix, verbose, severity_filter="error")
+        self._validate_plans(project_path, fix, verbose, severity_filter="error")
+
+    def _validate_standard(self, project_path: Path, fix: bool, verbose: bool):
+        """Standard validation - check errors and warnings"""
+        self._validate_specs(project_path, fix, verbose)
+        self._validate_plans(project_path, fix, verbose)
+
+    def _validate_comprehensive(self, project_path: Path, fix: bool, verbose: bool):
+        """Comprehensive validation - check all issues including info"""
+        self._validate_specs(project_path, fix, verbose, severity_filter="all")
+        self._validate_plans(project_path, fix, verbose, severity_filter="all")
+        self._validate_tasks(project_path, fix, verbose, severity_filter="all")
+
+    def _validate_strict(self, project_path: Path, fix: bool, verbose: bool):
+        """Strict validation - enforce all rules strictly"""
+        self._validate_specs(project_path, fix, verbose, severity_filter="all")
+        self._validate_plans(project_path, fix, verbose, severity_filter="all")
+        self._validate_tasks(project_path, fix, verbose, severity_filter="all")
+        self._validate_cross_references(project_path, verbose)
+        self._validate_naming_conventions(project_path, verbose)
     
     def validate_spec(self, project_path: Path, spec_name: Optional[str] = None, 
                      fix: bool = False, verbose: bool = False) -> List[Dict]:
@@ -144,107 +181,115 @@ class Validator:
             })
     
     def _validate_single_spec(self, spec_path: Path, fix: bool, verbose: bool):
-        """Validate a single specification"""
-        with open(spec_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
+        """Validate a single specification with enhanced rules"""
         spec_name = spec_path.parent.name
-        
-        # Check required sections
-        required_sections = [
-            "## Requirements",
-            "## User Stories",
-            "## Acceptance Criteria"
-        ]
-        
-        missing_sections = []
-        for section in required_sections:
-            if section not in content:
-                missing_sections.append(section)
-        
-        if missing_sections:
+
+        try:
+            # Read content
+            content = spec_path.read_text(encoding='utf-8')
+
+            # Apply validation rules
+            validation_results = self.rules_registry.validate_file(spec_path, content)
+
+            # Auto-fix if requested and possible
             if fix:
-                # Attempt to add missing sections
-                for section in missing_sections:
-                    content += f"\n\n{section}\n[To be completed]\n"
-                with open(spec_path, 'w', encoding='utf-8') as f:
-                    f.write(content)
+                fixed_content, fix_results = self.rules_registry.fix_file(spec_path, content)
+                if fixed_content != content:
+                    spec_path.write_text(fixed_content, encoding='utf-8')
+                    validation_results.extend(fix_results)
+
+            # Convert validation results to legacy format
+            for result in validation_results:
+                legacy_result = self._convert_validation_result(result, spec_name)
+                self.results.append(legacy_result)
+
+            # If no errors, add success message
+            errors = [r for r in validation_results if r.severity in [ValidationSeverity.ERROR, ValidationSeverity.CRITICAL]]
+            if not errors:
                 self.results.append({
-                    "status": "warning",
-                    "message": f"Fixed missing sections in {spec_name}"
+                    "status": "success",
+                    "message": f"{spec_name}: Validation passed"
                 })
-            else:
-                self.results.append({
-                    "status": "error",
-                    "message": f"{spec_name}: Missing sections: {', '.join(missing_sections)}"
-                })
-        else:
+
+        except Exception as e:
             self.results.append({
-                "status": "success",
-                "message": f"{spec_name}: All required sections present"
+                "status": "error",
+                "message": f"{spec_name}: Failed to validate - {str(e)}"
             })
-        
-        # Check for clarification markers
-        if "[NEEDS CLARIFICATION]" in content:
-            clarifications = re.findall(r'\[NEEDS CLARIFICATION\].*', content)
-            if verbose:
-                for clarification in clarifications:
-                    self.results.append({
-                        "status": "warning",
-                        "message": f"{spec_name}: {clarification}"
-                    })
-            else:
-                self.results.append({
-                    "status": "warning",
-                    "message": f"{spec_name}: Contains {len(clarifications)} items needing clarification"
-                })
+
+    def _convert_validation_result(self, result: ValidationResult, context: str) -> Dict:
+        """Convert ValidationResult to legacy format"""
+        severity_map = {
+            ValidationSeverity.INFO: "info",
+            ValidationSeverity.WARNING: "warning",
+            ValidationSeverity.ERROR: "error",
+            ValidationSeverity.CRITICAL: "error"
+        }
+
+        status = severity_map.get(result.severity, "warning")
+        message = result.message
+
+        if result.suggestion:
+            message += f" (Suggestion: {result.suggestion})"
+
+        return {
+            "status": status,
+            "message": f"{context}: {message}",
+            "severity": result.severity.value,
+            "category": result.category.value,
+            "auto_fixable": result.auto_fixable,
+            "location": result.location
+        }
     
     def _validate_single_plan(self, plan_path: Path, fix: bool, verbose: bool):
-        """Validate a single implementation plan"""
-        with open(plan_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
+        """Validate a single implementation plan with enhanced rules"""
         plan_name = plan_path.parent.name
-        
-        # Check required sections
-        required_sections = [
-            "## Architecture",
-            "## Technology Stack",
-            "## Implementation Phases"
-        ]
-        
-        missing_sections = []
-        for section in required_sections:
-            if section not in content:
-                missing_sections.append(section)
-        
-        if missing_sections:
+
+        try:
+            # Read content
+            content = plan_path.read_text(encoding='utf-8')
+
+            # Apply validation rules
+            validation_results = self.rules_registry.validate_file(plan_path, content)
+
+            # Auto-fix if requested and possible
             if fix:
-                # Attempt to add missing sections
-                for section in missing_sections:
-                    content += f"\n\n{section}\n[To be completed]\n"
-                with open(plan_path, 'w', encoding='utf-8') as f:
-                    f.write(content)
+                fixed_content, fix_results = self.rules_registry.fix_file(plan_path, content)
+                if fixed_content != content:
+                    plan_path.write_text(fixed_content, encoding='utf-8')
+                    validation_results.extend(fix_results)
+
+            # Convert validation results to legacy format
+            for result in validation_results:
+                legacy_result = self._convert_validation_result(result, plan_name)
+                self.results.append(legacy_result)
+
+            # Additional plan-specific validations
+            if "Spec ID" not in content and "Specification Reference" not in content:
                 self.results.append({
                     "status": "warning",
-                    "message": f"Fixed missing sections in {plan_name}"
+                    "message": f"{plan_name}: No specification reference found"
                 })
-            else:
+
+            # Check for implementation phases
+            if "Implementation Phases" not in content:
                 self.results.append({
-                    "status": "error",
-                    "message": f"{plan_name}: Missing sections: {', '.join(missing_sections)}"
+                    "status": "warning",
+                    "message": f"{plan_name}: No implementation phases defined"
                 })
-        else:
+
+            # If no errors, add success message
+            errors = [r for r in validation_results if r.severity in [ValidationSeverity.ERROR, ValidationSeverity.CRITICAL]]
+            if not errors:
+                self.results.append({
+                    "status": "success",
+                    "message": f"{plan_name}: Validation passed"
+                })
+
+        except Exception as e:
             self.results.append({
-                "status": "success",
-                "message": f"{plan_name}: All required sections present"
-            })
-        
-        # Check for specification reference
-        if "Spec ID" not in content:
-            self.results.append({
-                "status": "warning",
-                "message": f"{plan_name}: No specification reference found"
+                "status": "error",
+                "message": f"{plan_name}: Failed to validate - {str(e)}"
             })
     
     def _validate_specs(self, project_path: Path, fix: bool, verbose: bool):

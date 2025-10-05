@@ -21,7 +21,15 @@
 
 SpecPulse is a universal **Specification-Driven Development (SDD)** framework that works with ANY software project - web apps, mobile apps, desktop software, games, APIs, ML projects, and more. It ensures every feature starts with clear specifications, validated plans, and tracked tasks.
 
-> **Latest Update (v1.4.5)** - Version Management:
+> **Latest Update (v1.5.0)** - Quality & Documentation Enhancement:
+> - 🎯 **Comprehensive Help System**: Built-in CLI help with 6 detailed topics
+> - 📚 **Enhanced Documentation**: Complete documentation suite with guides and references
+> - 🧪 **Robust Testing Infrastructure**: 377+ tests with cross-platform CI/CD pipeline
+> - 🔧 **Production-Ready Features**: Template validation, memory management, advanced error handling
+> - 🎯 **Improved User Experience**: Rich console output, better error recovery, contextual help
+> - 🚀 **Cross-Platform Support**: Enhanced Windows, macOS, and Linux compatibility
+>
+> **v1.4.5** - Version Management:
 > - 🎯 **Single Source of Truth**: Version now managed only in `_version.py`
 > - 📦 **Module Support**: Can run with `python -m specpulse`
 > - 🔧 **Dynamic Version**: No more version sync issues
@@ -41,8 +49,7 @@ SpecPulse is a universal **Specification-Driven Development (SDD)** framework th
 > - 📁 **Physical Template Files**: Templates now exist as physical files for AI tools to read
 > - 🔧 **Complete PowerShell Support**: Added PowerShell scripts matching all Bash functionality
 > - 📝 **Enhanced Decomposition Templates**: Full microservice decomposition template support
->
-> **v1.4.1** - Bug Fix Release:
+> - **v1.4.1** - Bug Fix Release:
 > - 🐛 **Fixed Version Display**: Corrected `--version` command showing old version
 >
 > **v1.4.0** - Complete Framework Revolution:
@@ -560,9 +567,30 @@ pytest tests/
 
 ## 📚 Documentation
 
+### 🎯 Help System
+SpecPulse includes a comprehensive built-in help system:
+```bash
+# List all help topics
+specpulse help --list
+
+# Get specific help
+specpulse help overview      # Key concepts and principles
+specpulse help commands      # Complete command reference
+specpulse help workflow      # Development workflow
+specpulse help templates     # Template system
+specpulse help examples      # Real-world examples
+specpulse help troubleshooting # Common issues and solutions
+```
+
+### 📖 Documentation Files
+- **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Complete documentation index
+- **[CLI_REFERENCE.md](CLI_REFERENCE.md)** - Comprehensive CLI command reference
+- **[HELP_SYSTEM.md](HELP_SYSTEM.md)** - Help system documentation
+- **[SPECPULSE_USAGE_GUIDE.md](SPECPULSE_USAGE_GUIDE.md)** - Complete usage guide
+- **[SPECDRIVEN.md](SPECDRIVEN.md)** - Specification-Driven Development methodology
+- **[CLAUDE.md](CLAUDE.md)** - Development instructions for AI assistants
 - **[PyPI Package](https://pypi.org/project/specpulse/)** - Official package page
 - **[GitHub Repository](https://github.com/specpulse/specpulse)** - Source code and issues
-- **Command Reference** - See AI Integration section above for full command list
 
 ## 📚 Usage Guide
 

@@ -2,47 +2,69 @@
 # Initialize a new feature with SpecPulse
 
 param(
-    [Parameter(Mandatory=$true, Position=0)]
+    [Parameter(Mandatory=$false, Position=0)]
     [string]$FeatureName,
 
     [Parameter(Mandatory=$false, Position=1)]
-    [string]$CustomId
+    [string]$CustomId,
+
+    [Parameter(Mandatory=$false)]
+    [switch]$Help,
+
+    [Parameter(Mandatory=$false)]
+    [switch]$Version,
+
+    [Parameter(Mandatory=$false)]
+    [switch]$VerboseMode
 )
 
-# Configuration
-$ScriptName = Split-Path -Leaf $PSCommandPath
+# Import common utilities
 $ScriptDir = Split-Path -Parent $PSCommandPath
-$ProjectRoot = Split-Path -Parent $ScriptDir
+$utilsPath = Join-Path $ScriptDir "script_utils.ps1"
 
-# Logging function
-function Log-Message {
-    param([string]$Message)
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Write-Host "[$timestamp] ${ScriptName}: $Message" -ForegroundColor Cyan
-}
-
-# Error handling function
-function Exit-WithError {
-    param([string]$Message)
-    Write-Host "ERROR: $Message" -ForegroundColor Red
+if (Test-Path $utilsPath) {
+    . $utilsPath
+} else {
+    Write-Host "ERROR: Script utilities not found at $utilsPath" -ForegroundColor Red
     exit 1
 }
 
-# Sanitize feature name
-$BranchSafeName = $FeatureName.ToLower() -replace '[^a-z0-9-]', '-' -replace '--+', '-' -replace '^-|-$', ''
+# Configuration
+$ScriptName = Split-Path -Leaf $PSCommandPath
+$ProjectRoot = Split-Path -Parent $ScriptDir
 
-if ([string]::IsNullOrEmpty($BranchSafeName)) {
-    Exit-WithError "Invalid feature name: '$FeatureName'"
+# Initialize script environment with error handling and rollback support
+Initialize-ScriptEnvironment -ScriptName $ScriptName -ScriptDir $ScriptDir
+
+# Handle command line switches
+if ($Help) {
+    Write-Usage -ScriptName $ScriptName -UsageText "<feature-name> [feature-id]"
+    exit 0
 }
 
-# Get feature ID
-if ($CustomId) {
-    $FeatureId = "{0:D3}" -f [int]$CustomId
-} else {
-    $existingDirs = Get-ChildItem -Path "$ProjectRoot\specs" -Directory -Filter "[0-9]*" -ErrorAction SilentlyContinue
-    $nextId = if ($existingDirs) { $existingDirs.Count + 1 } else { 1 }
-    $FeatureId = "{0:D3}" -f $nextId
+if ($Version) {
+    Write-Version -ScriptName $ScriptName -ScriptVersion "1.0.0"
+    exit 0
 }
+
+if ($VerboseMode) {
+    $VerbosePreference = "Continue"
+}
+
+# Validate arguments
+if ([string]::IsNullOrEmpty($FeatureName)) {
+    Write-Usage -ScriptName $ScriptName -UsageText "<feature-name> [feature-id]"
+    exit 1
+}
+
+# Sanitize feature name using utility function
+$BranchSafeName = Get-SanitizedFeatureName -FeatureName $FeatureName
+if (-not $BranchSafeName) {
+    Write-ScriptError -Message "Invalid feature name: '$FeatureName'"
+}
+
+# Get feature ID using utility function
+$FeatureId = Get-FeatureId -ProjectRoot $ProjectRoot -CustomId $CustomId
 
 $BranchName = "$FeatureId-$BranchSafeName"
 
@@ -51,25 +73,28 @@ $SpecsDir = Join-Path $ProjectRoot "specs\$BranchName"
 $PlansDir = Join-Path $ProjectRoot "plans\$BranchName"
 $TasksDir = Join-Path $ProjectRoot "tasks\$BranchName"
 
-Log-Message "Creating feature directories for '$FeatureName'"
+Write-LogInfo "Creating feature directories for '$FeatureName'"
 
-try {
-    New-Item -ItemType Directory -Path $SpecsDir -Force | Out-Null
-    New-Item -ItemType Directory -Path $PlansDir -Force | Out-Null
-    New-Item -ItemType Directory -Path $TasksDir -Force | Out-Null
-} catch {
-    Exit-WithError "Failed to create directories: $_"
+# Validate project structure first
+if (-not (Test-ProjectStructure -ProjectRoot $ProjectRoot)) {
+    Write-ScriptError -Message "Invalid project structure"
 }
+
+# Create directories with progress tracking
+Show-Progress -Current 1 -Total 4 -Description "Creating directories"
+New-Item -ItemType Directory -Path $SpecsDir -Force | Out-Null
+Show-Progress -Current 2 -Total 4 -Description "Creating directories"
+New-Item -ItemType Directory -Path $PlansDir -Force | Out-Null
+Show-Progress -Current 3 -Total 4 -Description "Creating directories"
+New-Item -ItemType Directory -Path $TasksDir -Force | Out-Null
+Show-Progress -Current 4 -Total 4 -Description "Creating directories"
 
 # Validate templates exist but don't copy them directly
 $TemplateDir = Join-Path $ProjectRoot "templates"
 
 # Validate all required templates exist
-@("spec.md", "plan.md", "task.md") | ForEach-Object {
-    $templatePath = Join-Path $TemplateDir $_
-    if (-not (Test-Path $templatePath)) {
-        Exit-WithError "Template not found: $templatePath. Please run 'specpulse init' to initialize templates."
-    }
+if (-not (Test-Templates -TemplateDir $TemplateDir)) {
+    Write-ScriptError -Message "Template validation failed"
 }
 
 # Create marker files that indicate AI should use templates to generate content
@@ -108,13 +133,16 @@ try {
     Exit-WithError "Failed to create marker files: $_"
 }
 
-# Update context
+# Update context with backup
 $ContextFile = Join-Path $ProjectRoot "memory\context.md"
 $memoryDir = Split-Path -Parent $ContextFile
 
 if (-not (Test-Path $memoryDir)) {
     New-Item -ItemType Directory -Path $memoryDir -Force | Out-Null
 }
+
+# Backup context file before modification
+Backup-File -FilePath $ContextFile
 
 $contextEntry = @"
 
@@ -124,11 +152,7 @@ $contextEntry = @"
 - Started: $(Get-Date -Format "yyyy-MM-ddTHH:mm:ss")
 "@
 
-try {
-    Add-Content -Path $ContextFile -Value $contextEntry
-} catch {
-    Exit-WithError "Failed to update context file: $_"
-}
+Add-Content -Path $ContextFile -Value $contextEntry
 
 # Create git branch if in git repo
 $gitDir = Join-Path $ProjectRoot ".git"
@@ -150,10 +174,11 @@ if (Test-Path $gitDir) {
     }
 }
 
-Log-Message "Successfully initialized feature '$FeatureName' with ID $FeatureId"
+Write-LogSuccess "Successfully initialized feature '$FeatureName' with ID $FeatureId"
 
-# Output results
+# Output results for consumption by other scripts
 Write-Output "BRANCH_NAME=$BranchName"
 Write-Output "SPEC_DIR=$SpecsDir"
 Write-Output "FEATURE_ID=$FeatureId"
 Write-Output "STATUS=initialized"
+Write-Output "BACKUP_DIR=$global:BackupDir"

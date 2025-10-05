@@ -9,25 +9,54 @@ import os
 from pathlib import Path
 import yaml
 import shutil
-from datetime import datetime
-from typing import Optional
+from datetime import datetime, timedelta
+from typing import Optional, Dict
 
 from .. import __version__
 from ..core.specpulse import SpecPulse
 from ..core.validator import Validator
+from ..core.template_manager import TemplateManager
+from ..core.memory_manager import MemoryManager
 from ..utils.console import Console
 from ..utils.git_utils import GitUtils
 from ..utils.version_check import check_pypi_version, compare_versions, get_update_message, should_check_version
+from ..utils.error_handler import (
+    ErrorHandler, SpecPulseError, ValidationError, ProjectStructureError,
+    TemplateError, GitError, handle_specpulse_error, validate_project_directory,
+    validate_templates, suggest_recovery_for_error, ErrorSeverity
+)
 
 
 class SpecPulseCLI:
     def __init__(self, no_color: bool = False, verbose: bool = False):
         self.console = Console(no_color=no_color, verbose=verbose)
-        self.specpulse = SpecPulse()
-        self.validator = Validator()
+        self.verbose = verbose
+        self.error_handler = ErrorHandler(verbose=verbose)
 
-        # Check for updates (non-blocking)
-        self._check_for_updates()
+        try:
+            self.specpulse = SpecPulse()
+            self.validator = Validator()
+
+            # Initialize template manager
+            project_root = Path.cwd()
+            if self._is_specpulse_project(project_root):
+                self.template_manager = TemplateManager(project_root)
+                self.memory_manager = MemoryManager(project_root)
+            else:
+                self.template_manager = None
+                self.memory_manager = None
+
+            # Check for updates (non-blocking)
+            self._check_for_updates()
+        except Exception as e:
+            self.console.error("Failed to initialize SpecPulse components")
+            suggestions = suggest_recovery_for_error(str(e))
+            self.console.warning("Recovery suggestions:")
+            for i, suggestion in enumerate(suggestions, 1):
+                self.console.info(f"   {i}. {suggestion}")
+            if verbose:
+                self.console.warning(f"Technical details: {str(e)}")
+            sys.exit(1)
 
     def _check_for_updates(self):
         """Check for available updates on PyPI"""
@@ -51,40 +80,51 @@ class SpecPulseCLI:
             # Never fail due to version check
             pass
 
-    def init(self, project_name: Optional[str] = None, 
-             here: bool = False, 
+    def init(self, project_name: Optional[str] = None,
+             here: bool = False,
              ai: str = "claude",
              template: str = "web"):
         """Initialize SpecPulse in an existing or new project"""
-        
-        # Validate project name for invalid characters
-        import re
-        if project_name and not here:
-            if not re.match(r'^[a-zA-Z0-9_-]+$', project_name):
-                self.console.error(f"Project name contains invalid characters: {project_name}")
-                return False
-        
-        if here:
-            project_path = Path.cwd()
-            project_name = project_path.name
-        else:
-            if not project_name:
-                # If no project name, initialize in current directory
+
+        try:
+            # Validate project name for invalid characters
+            import re
+            if project_name and not here:
+                if not re.match(r'^[a-zA-Z0-9_-]+$', project_name):
+                    raise ValidationError(
+                        f"Project name contains invalid characters: {project_name}",
+                        validation_type="project_name",
+                        missing_items=["Valid characters: letters, numbers, underscore, hyphen"]
+                    )
+  
+            if here:
                 project_path = Path.cwd()
                 project_name = project_path.name
             else:
-                project_path = Path.cwd() / project_name
-                if not project_path.exists():
-                    project_path.mkdir(parents=True)
+                if not project_name:
+                    # If no project name, initialize in current directory
+                    project_path = Path.cwd()
+                    project_name = project_path.name
+                else:
+                    project_path = Path.cwd() / project_name
+                    if not project_path.exists():
+                        project_path.mkdir(parents=True)
+
+            # Validate project path
+            if not project_path.exists():
+                raise ProjectStructureError(
+                    f"Project path does not exist: {project_path}",
+                    missing_dirs=[str(project_path)]
+                )
+
+            # Show banner on init
+            self.console.show_banner()
+            self.console.pulse_animation("Initializing SpecPulse Framework", duration=1.0)
+
+            self.console.header(f"Initializing Project: {project_name}", style="bright_green")
         
-        # Show banner on init
-        self.console.show_banner()
-        self.console.pulse_animation("Initializing SpecPulse Framework", duration=1.0)
-        
-        self.console.header(f"Initializing Project: {project_name}", style="bright_green")
-        
-        # Create directory structure
-        directories = [
+            # Create directory structure
+            directories = [
             ".specpulse",
             ".specpulse/cache",
             ".claude",
@@ -100,18 +140,32 @@ class SpecPulseCLI:
             "templates/decomposition"
         ]
         
-        # Create directories with progress bar
-        with self.console.progress_bar("Creating project structure", len(directories)) as progress:
-            task = progress.add_task("Creating directories...", total=len(directories))
-            
-            for dir_name in directories:
-                (project_path / dir_name).mkdir(parents=True, exist_ok=True)
-                progress.update(task, advance=1, description=f"Created {dir_name}/")
-                import time
-                time.sleep(0.05)  # Small delay for visual effect
+        # Create directories with progress bar and error handling
+            failed_dirs = []
+            with self.console.progress_bar("Creating project structure", len(directories)) as progress:
+                task = progress.add_task("Creating directories...", total=len(directories))
+
+                for dir_name in directories:
+                    try:
+                        dir_path = project_path / dir_name
+                        dir_path.mkdir(parents=True, exist_ok=True)
+                        progress.update(task, advance=1, description=f"Created {dir_name}/")
+                        import time
+                        time.sleep(0.05)  # Small delay for visual effect
+                    except Exception as e:
+                        failed_dirs.append(dir_name)
+                        progress.update(task, advance=1, description=f"Failed {dir_name}/")
+                        if self.verbose:
+                            self.console.warning(f"Failed to create {dir_name}: {str(e)}")
+
+            if failed_dirs:
+                raise ProjectStructureError(
+                    f"Failed to create {len(failed_dirs)} directories: {', '.join(failed_dirs)}",
+                    missing_dirs=failed_dirs
+                )
         
-        # Create config file
-        config = {
+            # Create config file
+            config = {
             "version": __version__,
             "project": {
                 "name": project_name,
@@ -178,34 +232,50 @@ class SpecPulseCLI:
                     "trigger_on": ["plan_approved", "tests_passed"]
                 }
             }
-        }
+            }
         
-        config_path = project_path / ".specpulse" / "config.yaml"
-        with open(config_path, 'w', encoding='utf-8') as f:
-            yaml.dump(config, f, default_flow_style=False)
-        self.console.success("Created config.yaml")
-        
-        # Copy templates
-        self._create_templates(project_path)
-        
-        # Create memory files
-        self._create_memory_files(project_path)
-        
-        # Create scripts
-        self._create_scripts(project_path)
-        
-        # Create AI command files
-        self._create_ai_commands(project_path)
-        
-        # Create PULSE.md manifest
-        self._create_manifest(project_path, project_name)
-        
-        self.console.success(f"SpecPulse project initialized successfully!")
-        self.console.info(f"Next steps:")
-        self.console.info(f"  cd {project_name if not here else '.'}")
-        self.console.info(f"  {ai} ." if ai == "claude" else "gemini")
-        
-        return True
+            config_path = project_path / ".specpulse" / "config.yaml"
+            try:
+                with open(config_path, 'w', encoding='utf-8') as f:
+                    yaml.dump(config, f, default_flow_style=False)
+                self.console.success("Created config.yaml")
+            except Exception as e:
+                raise SpecPulseError(
+                    f"Failed to create config file: {config_path}",
+                    severity=ErrorSeverity.HIGH,
+                    recovery_suggestions=[
+                        "Check write permissions for the project directory",
+                        "Ensure sufficient disk space is available",
+                        "Try running with administrator privileges"
+                    ],
+                    technical_details=str(e)
+                )
+
+            # Copy templates
+            self._create_templates(project_path)
+
+            # Create memory files
+            self._create_memory_files(project_path)
+
+            # Create scripts
+            self._create_scripts(project_path)
+
+            # Create AI command files
+            self._create_ai_commands(project_path)
+
+            # Create PULSE.md manifest
+            self._create_manifest(project_path, project_name)
+
+            self.console.success(f"SpecPulse project initialized successfully!")
+            self.console.info(f"Next steps:")
+            self.console.info(f"  cd {project_name if not here else '.'}")
+            self.console.info(f"  {ai} ." if ai == "claude" else "gemini")
+
+            return True
+
+        except Exception as e:
+            # Handle any errors that occurred during initialization
+            return self.error_handler.handle_error(e, f"Initializing project '{project_name}'")
     
     def _create_templates(self, project_path: Path):
         """Create template files"""
@@ -833,73 +903,1305 @@ graph LR
         
         return all_passed
 
+    def _is_specpulse_project(self, path: Path) -> bool:
+        """Check if current directory is a SpecPulse project"""
+        required_dirs = ['specs', 'plans', 'tasks', 'memory', 'templates']
+        return all((path / dir_name).exists() for dir_name in required_dirs)
+
+    def template_list(self, category: Optional[str] = None):
+        """List all templates"""
+        if not self.template_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            templates = self.template_manager.list_templates(category)
+            if not templates:
+                self.console.info("No templates found")
+                return True
+
+            self.console.header(f"Templates ({category or 'All Categories'})")
+
+            from rich.table import Table
+            table = Table(title="Registered Templates")
+            table.add_column("Name", style="cyan")
+            table.add_column("Category", style="green")
+            table.add_column("Version", style="yellow")
+            table.add_column("Author", style="magenta")
+            table.add_column("Modified", style="blue")
+
+            for template in templates:
+                modified_date = template['modified'][:10] if template['modified'] else 'Unknown'
+                table.add_row(
+                    template['name'],
+                    template['category'],
+                    template['version'],
+                    template['author'],
+                    modified_date
+                )
+
+            self.console.console.print(table)
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Listing templates")
+
+    def template_validate(self, template_name: Optional[str] = None, fix: bool = False):
+        """Validate templates"""
+        if not self.template_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            if template_name:
+                # Validate specific template
+                template_path = self.template_manager.templates_dir / template_name
+                result = self.template_manager.validate_template(template_path)
+                self._display_template_validation_result(template_name, result)
+            else:
+                # Validate all templates
+                results = self.template_manager.validate_all_templates()
+                all_valid = True
+                for template_key, result in results.items():
+                    self._display_template_validation_result(template_key, result)
+                    if not result.valid:
+                        all_valid = False
+
+                if all_valid:
+                    self.console.success("All templates are valid!")
+                else:
+                    self.console.warning("Some templates have validation issues")
+
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Validating templates")
+
+    def _display_template_validation_result(self, template_name: str, result):
+        """Display template validation result"""
+        if result.valid:
+            self.console.success(f"✓ {template_name}: Valid")
+        else:
+            self.console.error(f"✗ {template_name}: Invalid")
+
+        if result.errors:
+            self.console.error("  Errors:")
+            for error in result.errors:
+                self.console.info(f"    • {error}")
+
+        if result.warnings:
+            self.console.warning("  Warnings:")
+            for warning in result.warnings:
+                self.console.info(f"    • {warning}")
+
+        if result.suggestions:
+            self.console.info("  Suggestions:")
+            for suggestion in result.suggestions:
+                self.console.info(f"    💡 {suggestion}")
+
+    def template_preview(self, template_name: str):
+        """Generate template preview"""
+        if not self.template_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            template_path = self.template_manager.templates_dir / template_name
+            preview = self.template_manager.get_template_preview(template_path)
+
+            self.console.header(f"Template Preview: {template_name}")
+            self.console.code_block(preview, language="markdown", theme="monokai")
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, f"Previewing template {template_name}")
+
+    def template_backup(self):
+        """Backup all templates"""
+        if not self.template_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            backup_path = self.template_manager.backup_templates()
+            self.console.success(f"Templates backed up to: {backup_path}")
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Backing up templates")
+
+    def template_restore(self, backup_path: str):
+        """Restore templates from backup"""
+        if not self.template_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            success = self.template_manager.restore_templates(backup_path)
+            if success:
+                self.console.success("Templates restored successfully")
+            return success
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, f"Restoring templates from {backup_path}")
+
+    def memory_search(self, query: str, category: Optional[str] = None, days: Optional[int] = None):
+        """Search memory system"""
+        if not self.memory_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            # Prepare date range if specified
+            date_range = None
+            if days:
+                end_date = datetime.now()
+                start_date = end_date - timedelta(days=days)
+                date_range = (start_date.isoformat(), end_date.isoformat())
+
+            results = self.memory_manager.search_memory(query, category, date_range)
+
+            if not results:
+                self.console.info(f"No results found for: {query}")
+                return True
+
+            self.console.header(f"Memory Search Results: {query}")
+            self.console.info(f"Found {len(results)} results")
+
+            from rich.table import Table
+            table = Table()
+            table.add_column("Type", style="cyan")
+            table.add_column("ID/Name", style="green")
+            table.add_column("Date", style="yellow")
+            table.add_column("Summary", style="magenta")
+
+            for result in results:
+                item_type = result["type"].title()
+                item_data = result["data"]
+                item_id = result.get("id", item_data.get("id", item_data.get("name", "N/A")))
+                item_date = item_data.get("timestamp", item_data.get("date", "N/A"))[:10]
+                item_summary = self._get_memory_item_summary(result)
+
+                table.add_row(item_type, str(item_id)[:30], item_date, item_summary[:50])
+
+            self.console.console.print(table)
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, f"Searching memory for: {query}")
+
+    def _get_memory_item_summary(self, result: Dict) -> str:
+        """Get summary text for memory item"""
+        item_type = result["type"]
+        item_data = result["data"]
+
+        if item_type == "context":
+            action = item_data.get("action", "").replace("_", " ").title()
+            feature = item_data.get("feature_name", "General")
+            return f"{action} - {feature}"
+        elif item_type == "decision":
+            title = item_data.get("title", "Untitled")
+            status = item_data.get("status", "")
+            return f"{title} ({status})"
+        elif item_type == "feature":
+            name = item_data.get("name", "Unnamed")
+            status = item_data.get("status", "")
+            return f"{name} ({status})"
+        else:
+            return "Unknown item type"
+
+    def memory_summary(self):
+        """Show memory system summary"""
+        if not self.memory_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            summary = self.memory_manager.get_memory_summary()
+
+            self.console.header("Memory System Summary")
+
+            # Statistics
+            stats = summary["statistics"]
+            self.console.info("📊 Statistics:")
+            self.console.info(f"  Total Decisions: {stats['total_decisions']}")
+            self.console.info(f"  Active Features: {stats['active_features']}")
+            self.console.info(f"  Completed Features: {stats['completed_features']}")
+            self.console.info(f"  Context Entries: {stats['total_context_entries']}")
+            self.console.info(f"  Memory Size: {stats['memory_size_mb']} MB")
+
+            # Active Features
+            active_features = summary["active_features"]
+            if active_features:
+                self.console.info("🔄 Active Features:")
+                for feature in active_features[:5]:  # Show max 5
+                    self.console.info(f"  • {feature['name']} ({feature['id']})")
+                if len(active_features) > 5:
+                    self.console.info(f"  ... and {len(active_features) - 5} more")
+
+            # Recent Activity
+            recent_activity = summary["recent_activity"]
+            if recent_activity:
+                self.console.info("📝 Recent Activity:")
+                for entry in recent_activity[-3:]:  # Show last 3
+                    action = entry.get("action", "").replace("_", " ").title()
+                    feature = entry.get("feature_name", "General")
+                    date = entry.get("timestamp", "")[:10]
+                    self.console.info(f"  • {action} - {feature} ({date})")
+
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Getting memory summary")
+
+    def memory_cleanup(self, days: int = 90):
+        """Clean up old memory entries"""
+        if not self.memory_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            removed_count = self.memory_manager.cleanup_old_entries(days)
+            if removed_count > 0:
+                self.console.success(f"Cleaned up {removed_count} old entries (older than {days} days)")
+            else:
+                self.console.info(f"No entries to clean up (all entries are newer than {days} days)")
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, f"Cleaning up memory entries older than {days} days")
+
+    def memory_export(self, format: str = "json", output_file: Optional[str] = None):
+        """Export memory data"""
+        if not self.memory_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            output_path = Path(output_file) if output_file else None
+            export_path = self.memory_manager.export_memory(format, output_path)
+
+            if output_path:
+                self.console.success(f"Memory exported to: {export_path}")
+            else:
+                # Display preview if no file specified
+                self.console.header(f"Memory Export Preview ({format.upper()})")
+                self.console.code_block(export_path[:1000] + "..." if len(export_path) > 1000 else export_path,
+                                     language=format.lower())
+
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, f"Exporting memory as {format}")
+
+    def show_help(self, topic: Optional[str] = None, list_topics: bool = False):
+        """Show comprehensive help and documentation"""
+        self.console.show_banner(mini=True)
+
+        help_content = {
+            "overview": {
+                "title": "SpecPulse Overview",
+                "content": """
+SpecPulse is a universal Specification-Driven Development (SDD) framework that works with ANY software project type - web apps, mobile apps, desktop software, games, APIs, ML projects, and more.
+
+## Key Concepts
+
+**Specification-Driven Development (SDD)**: Every feature starts with clear specifications, validated plans, and tracked tasks before implementation begins.
+
+**9 Universal Principles**:
+1. Specification First - Clear requirements drive development
+2. Incremental Planning - Break work into valuable increments
+3. Task Decomposition - Create concrete, executable tasks
+4. Traceable Implementation - Link code to specifications
+5. Continuous Validation - Regular verification against specs
+6. Quality Assurance - Testing strategies for each component
+7. Architecture Documentation - Record technical decisions
+8. Iterative Refinement - Evolve based on learnings
+9. Stakeholder Alignment - Maintain shared understanding
+
+## Project Structure
+
+```
+project/
+├── specs/           # Feature specifications (001-feature/)
+├── plans/           # Implementation plans
+├── tasks/           # Task breakdowns (T001, T002)
+├── memory/          # Project state and decisions
+├── templates/       # Customizable document templates
+└── scripts/         # Automation scripts
+```
+
+## AI Integration
+
+SpecPulse integrates seamlessly with AI assistants like Claude and Gemini through custom commands:
+
+- `/sp-pulse <feature>` - Initialize new feature
+- `/sp-spec create` - Generate specifications
+- `/sp-decompose <spec-id>` - Break down into services/APIs
+- `/sp-plan generate` - Create implementation plans
+- `/sp-task breakdown` - Create task lists
+- `/sp-execute` - Execute tasks continuously
+
+## Getting Started
+
+1. Initialize: `specpulse init my-project`
+2. Navigate: `cd my-project`
+3. Start AI assistant: `claude .` or `gemini .`
+4. Create feature: `/sp-pulse user-authentication`
+5. Generate specs: `/sp-spec create`
+6. Execute tasks: `/sp-execute all`
+"""
+            },
+            "commands": {
+                "title": "Available Commands",
+                "content": """
+## Project Management
+
+**specpulse init [name]** - Initialize new SpecPulse project
+  • `--here` - Initialize in current directory
+  • `--ai claude|gemini` - Set primary AI assistant
+  • `--template web|api|cli|mobile|microservice` - Project template
+
+**specpulse validate [component]** - Validate project components
+  • `--fix` - Attempt to auto-fix issues
+  • `--verbose` - Detailed validation output
+  • Components: all, spec, plan, constitution
+
+**specpulse doctor** - System health check and diagnostics
+
+**specpulse sync** - Synchronize project state
+
+## Specification Management
+
+**specpulse decompose [spec-id]** - Decompose specifications
+  • `--microservices` - Generate service boundaries
+  • `--apis` - Generate API contracts
+  • `--interfaces` - Generate interface specifications
+
+## Template Management
+
+**specpulse template list [--category]** - List available templates
+  • Categories: spec, plan, task, decomposition
+
+**specpulse template validate [name]** - Validate templates
+  • `--fix` - Auto-fix template issues
+
+**specpulse template preview <name>** - Preview template with sample data
+
+**specpulse template backup** - Backup all templates
+**specpulse template restore <path>** - Restore from backup
+
+## Memory Management
+
+**specpulse memory search <query>** - Search memory system
+  • `--category` - Filter by category
+  • `--days N` - Limit to last N days
+
+**specpulse memory summary** - Show memory system summary
+
+**specpulse memory cleanup [--days 90]** - Clean old entries
+
+**specpulse memory export [--format json|yaml]** - Export memory data
+  • `--output <file>` - Save to specific file
+
+## Help & Information
+
+**specpulse help [topic]** - Show detailed help
+  • `--list` - List all available topics
+
+**specpulse --version** - Show version information
+**--no-color** - Disable colored output
+**--verbose** - Enable verbose output
+"""
+            },
+            "workflow": {
+                "title": "Development Workflow",
+                "content": """
+## Complete Development Workflow
+
+### 1. Project Setup
+```bash
+# Initialize new project
+specpulse init my-project
+cd my-project
+
+# Start AI assistant
+claude .    # or gemini .
+```
+
+### 2. Feature Development
+```bash
+# Initialize new feature
+/sp-pulse user-authentication
+
+# Create specification
+/sp-spec create "User authentication system with login, registration, and password reset"
+
+# Review and refine specification
+# (AI assistant helps create comprehensive spec)
+```
+
+### 3. Planning & Decomposition
+```bash
+# Generate implementation plan
+/sp-plan generate
+
+# For large features, decompose into services
+/sp-decompose 001 --microservices --apis --interfaces
+
+# Create task breakdown
+/sp-task breakdown
+```
+
+### 4. Execution
+```bash
+# Execute all tasks continuously
+/sp-execute all
+
+# Or execute specific task
+/sp-execute T001
+
+# Check progress
+/sp-status
+```
+
+### 5. Validation & Quality
+```bash
+# Validate project (in terminal)
+specpulse validate --fix
+
+# Run health check
+specpulse doctor
+
+# Sync project state
+specpulse sync
+```
+
+## AI Command Best Practices
+
+### Sequential Commands
+1. `/sp-pulse <feature-name>` - Always start here
+2. `/sp-spec create` - Generate specification
+3. `/sp-plan generate` - Create implementation plan
+4. `/sp-task breakdown` - Break down into tasks
+5. `/sp-execute all` - Execute everything
+
+### Continuous Execution
+- `/sp-execute` - Execute next task and continue
+- `/sp-execute all` - Execute ALL pending tasks without stopping
+- `/sp-execute T001` - Start from specific task
+
+### Key Features
+- **No Stopping**: Commands don't pause for confirmation
+- **Auto-Progression**: Automatically moves to next task
+- **Context Awareness**: Maintains project state across commands
+- **Error Recovery**: Handles failures gracefully
+
+## File Numbering System
+
+- **Specifications**: spec-001.md, spec-002.md, ...
+- **Plans**: plan-001.md, plan-002.md, ...
+- **Tasks**: task-001.md, task-002.md, ...
+- **Services**: AUTH-T001, USER-T002, ... (for microservices)
+- **Features**: 001-feature-name, 002-feature-name, ...
+
+## Memory System
+
+The memory system automatically tracks:
+- Feature development progress
+- Architecture decisions
+- Context changes
+- Task completion status
+
+Access memory via:
+- CLI commands: `specpulse memory search/summary`
+- Memory files: `memory/context.md`, `memory/decisions.md`
+"""
+            },
+            "templates": {
+                "title": "Template System",
+                "content": """
+## Template Overview
+
+SpecPulse uses customizable templates for consistent documentation across all projects.
+
+## Template Types
+
+### Specification Templates
+- **spec.md** - Feature specification template
+- **decomposition/microservices.md** - Microservice decomposition
+- **decomposition/api-contract.yaml** - API specification
+- **decomposition/interface.ts** - TypeScript interfaces
+
+### Planning Templates
+- **plan.md** - Implementation plan template
+- **decomposition/service-plan.md** - Service-specific plans
+- **decomposition/integration-plan.md** - Integration planning
+
+### Task Templates
+- **task.md** - Task breakdown template
+- **decomposition/*-tasks.md** - Service-specific tasks
+
+## Template Customization
+
+### Adding Custom Templates
+```bash
+# List current templates
+specpulse template list
+
+# Validate template syntax
+specpulse template validate custom-template.md
+
+# Preview template with sample data
+specpulse template preview custom-template.md
+```
+
+### Template Backup & Restore
+```bash
+# Backup current templates
+specpulse template backup
+
+# Restore from backup
+specpulse template restore /path/to/backup
+```
+
+## Template Variables
+
+Templates use Jinja2 syntax with these standard variables:
+
+### Project Variables
+- `{{ project_name }}` - Project name
+- `{{ version }}` - Current version
+- `{{ date }}` - Current date
+
+### Feature Variables
+- `{{ feature_name }}` - Feature description
+- `{{ feature_id }}` - Feature identifier (001, 002, etc.)
+- `{{ spec_id }}` - Specification ID
+
+### System Variables
+- `{{ author }}` - Current user
+- `{{ timestamp }}` - Current timestamp
+
+## Template Best Practices
+
+1. **Keep Templates Simple** - Focus on structure, not content
+2. **Use Standard Variables** - Leverage built-in variables
+3. **Validate Templates** - Check syntax before use
+4. **Backup Before Changes** - Always backup custom templates
+5. **Test Templates** - Preview with sample data
+
+## Advanced Features
+
+### Conditional Sections
+```jinja2
+{% if feature_type == "microservice" %}
+## API Contracts
+- OpenAPI 3.0 specification
+- Service boundaries
+{% endif %}
+```
+
+### Loops and Lists
+```jinja2
+{% for requirement in requirements %}
+- {{ requirement }}
+{% endfor %}
+```
+
+### Template Inheritance
+Templates can extend base templates for reusability.
+"""
+            },
+            "troubleshooting": {
+                "title": "Troubleshooting & Common Issues",
+                "content": """
+## Common Issues & Solutions
+
+### Initialization Problems
+
+**Issue**: `specpulse init` fails
+**Solutions**:
+- Check Python version: `python --version` (needs 3.11+)
+- Verify permissions: Ensure write access to directory
+- Check disk space: `df -h` (Unix) or check drive space
+- Run `specpulse doctor` for system diagnostics
+
+**Issue**: Git not found
+**Solutions**:
+- Install Git: https://git-scm.com/downloads
+- Verify installation: `git --version`
+- Add Git to system PATH
+
+### Template Issues
+
+**Issue**: Template validation fails
+**Solutions**:
+```bash
+# Check template syntax
+specpulse template validate
+
+# Backup and reset templates
+specpulse template backup
+specpulse template restore /path/to/backup
+```
+
+**Issue**: Templates not found
+**Solutions**:
+- Check templates directory: `ls templates/`
+- Verify template permissions
+- Restore default templates: `specpulse update`
+
+### AI Command Issues
+
+**Issue**: AI commands not working
+**Solutions**:
+- Verify project structure: `specpulse doctor`
+- Check AI tool installation (Claude/Gemini)
+- Verify scripts directory: `ls scripts/`
+- Check command files: `ls .claude/commands/` or `ls .gemini/commands/`
+
+**Issue**: Scripts not executable
+**Solutions**:
+```bash
+# Unix/Linux/macOS
+chmod +x scripts/*.sh
+
+# Windows - scripts should work with Git Bash
+# If issues occur, run scripts in PowerShell
+```
+
+### Memory System Issues
+
+**Issue**: Memory not updating
+**Solutions**:
+- Check memory directory: `ls memory/`
+- Verify file permissions
+- Check memory size: `specpulse memory summary`
+- Clean old entries: `specpulse memory cleanup --days 30`
+
+### Performance Issues
+
+**Issue**: Slow performance
+**Solutions**:
+- Check system resources: `specpulse doctor`
+- Clean old memory entries: `specpulse memory cleanup`
+- Reduce project size if very large
+- Check for memory leaks in long-running processes
+
+## Getting Help
+
+### Built-in Help
+```bash
+# General help
+specpulse help
+
+# Specific topics
+specpulse help commands
+specpulse help workflow
+specpulse help templates
+
+# List all topics
+specpulse help --list
+```
+
+### Diagnostic Tools
+```bash
+# System health check
+specpulse doctor
+
+# Validate project
+specpulse validate --verbose
+
+# Check memory status
+specpulse memory summary
+```
+
+### Community Support
+- **GitHub Issues**: https://github.com/specpulse/specpulse/issues
+- **Documentation**: Check SPECPULSE_USAGE_GUIDE.md
+- **Examples**: See examples/ directory in project
+
+### Debug Mode
+Enable verbose output for troubleshooting:
+```bash
+specpulse --verbose <command>
+```
+
+### Log Files
+Check these locations for debug information:
+- `.specpulse/logs/` - Application logs
+- `memory/context.md` - Recent operations
+- AI tool output - Check Claude/Gemini console
+"""
+            },
+            "examples": {
+                "title": "Usage Examples",
+                "content": """
+## Real-World Examples
+
+### Example 1: Web Application Feature
+
+```bash
+# Initialize project
+specpulse init my-web-app
+cd my-web-app
+claude .
+
+# Create user authentication feature
+/sp-pulse user-authentication
+/sp-spec create "Complete user authentication system with registration, login, logout, password reset, and email verification"
+
+# Generate implementation plan
+/sp-plan generate
+
+# Break down into tasks
+/sp-task breakdown
+
+# Execute all tasks
+/sp-execute all
+```
+
+### Example 2: Microservice API
+
+```bash
+# Initialize microservice project
+specpulse init user-service --template microservice
+cd user-service
+gemini .
+
+# Create user management API
+/sp-pulse user-management-api
+/sp-spec create "RESTful API for user management including CRUD operations, authentication, and profile management"
+
+# Decompose into microservices
+/sp-decompose 001 --microservices --apis --interfaces
+
+# Review generated services and APIs
+# (AI creates separate service plans and API contracts)
+
+# Execute implementation
+/sp-execute all
+```
+
+### Example 3: Mobile App Feature
+
+```bash
+# Initialize mobile project
+specpulse init fitness-tracker --template mobile
+cd fitness-tracker
+claude .
+
+# Create workout tracking feature
+/sp-pulse workout-tracking
+/sp-spec create "Workout tracking system with exercise library, workout plans, progress tracking, and social features"
+
+# Generate mobile-specific plans
+/sp-plan generate
+
+# Execute tasks with mobile considerations
+/sp-execute all
+```
+
+### Example 4: CLI Tool Enhancement
+
+```bash
+# Initialize CLI project
+specpulse init data-processor --template cli
+cd data-processor
+gemini .
+
+# Add data validation feature
+/sp-pulse data-validation
+/sp-spec create "Data validation framework with schema validation, error reporting, and data transformation capabilities"
+
+# Generate implementation
+/sp-plan generate
+/sp-task breakdown
+/sp-execute all
+```
+
+### Example 5: API Development
+
+```bash
+# Initialize API project
+specpulse init notification-api --template api
+cd notification-api
+claude .
+
+# Create notification system
+/sp-pulse notification-system
+/sp-spec create "Multi-channel notification system supporting email, SMS, push notifications, and webhooks"
+
+# Generate API specifications
+/sp-decompose 001 --apis --interfaces
+
+# Review generated OpenAPI specifications
+ls specs/001-notification-system/decomposition/api-contracts/
+
+# Execute implementation
+/sp-execute all
+```
+
+## Advanced Workflows
+
+### Workflow 1: Large Feature Decomposition
+
+```bash
+# Start large feature
+/sp-pulse e-commerce-platform
+
+# Create comprehensive specification
+/sp-spec create "Full e-commerce platform with product catalog, user management, order processing, payment integration, and admin dashboard"
+
+# Decompose into microservices
+/sp-decompose 001 --microservices --apis --interfaces
+
+# Review generated services:
+# - product-service
+# - user-service
+# - order-service
+# - payment-service
+# - notification-service
+
+# Generate service-specific plans and tasks
+/sp-plan generate  # Creates plans for each service
+/sp-task breakdown # Creates tasks for each service
+
+# Execute all service implementations
+/sp-execute all
+```
+
+### Workflow 2: Iterative Development
+
+```bash
+# Start with basic feature
+/sp-pulse user-profiles
+
+# Create MVP specification
+/sp-spec create "Basic user profile management with view and edit functionality"
+
+# Implement MVP
+/sp-plan generate
+/sp-task breakdown
+/sp-execute all
+
+# Later - enhance feature
+/sp-spec update "Add profile photo upload, privacy settings, and activity timeline"
+
+# Generate additional tasks for enhancement
+/sp-task breakdown
+
+# Execute enhancement tasks
+/sp-execute all
+```
+
+### Workflow 3: Cross-Platform Development
+
+```bash
+# Initialize shared backend
+specpulse init shared-backend --template api
+cd shared-backend
+
+# Create API specification
+/sp-pulse shared-user-api
+/sp-spec create "Shared user management API for multiple client applications"
+
+# Generate API and documentation
+/sp-decompose 001 --apis --interfaces
+/sp-execute all
+
+# Initialize web client
+cd ../
+specpulse init web-client --template web
+cd web-client
+claude .
+
+# Connect to shared API
+/sp-pulse web-user-interface
+/sp-spec create "Web interface for user management consuming shared API"
+
+# Implement web client
+/sp-execute all
+
+# Repeat for mobile client
+cd ../
+specpulse init mobile-client --template mobile
+# ... similar process
+```
+
+## Tips & Best Practices
+
+### Planning Phase
+- **Start Small**: Break large features into smaller, manageable pieces
+- **Clear Requirements**: Ensure specifications are detailed and unambiguous
+- **Consider Dependencies**: Identify external dependencies early
+
+### Execution Phase
+- **Continuous Execution**: Use `/sp-execute all` for uninterrupted workflow
+- **Monitor Progress**: Use `/sp-status` to track completion
+- **Validate Early**: Run `specpulse validate` after major milestones
+
+### Team Collaboration
+- **Shared Memory**: Use memory system for team decisions and context
+- **Consistent Templates**: Maintain template standards across team
+- **Regular Sync**: Use `specpulse sync` to maintain project state
+
+### Quality Assurance
+- **Regular Validation**: Validate specifications and plans
+- **Code Reviews**: Review generated code and implementations
+- **Testing**: Implement tests as part of task execution
+"""
+            }
+        }
+
+        if list_topics:
+            self._show_help_topics(help_content)
+        elif topic:
+            self._show_help_topic(help_content, topic)
+        else:
+            self._show_default_help(help_content)
+
+    def _show_help_topics(self, help_content):
+        """List all available help topics"""
+        self.console.header("Available Help Topics", style="bright_cyan")
+
+        from rich.table import Table
+        table = Table(title="Choose a topic for detailed information")
+        table.add_column("Topic", style="cyan", width=15)
+        table.add_column("Description", style="white")
+
+        topic_descriptions = {
+            "overview": "What is SpecPulse and key concepts",
+            "commands": "Complete command reference",
+            "workflow": "Step-by-step development workflow",
+            "templates": "Template system and customization",
+            "troubleshooting": "Common issues and solutions",
+            "examples": "Real-world usage examples"
+        }
+
+        for topic, description in topic_descriptions.items():
+            table.add_row(topic, description)
+
+        self.console.console.print(table)
+        self.console.info("Usage: specpulse help <topic>")
+        self.console.info("Example: specpulse help workflow")
+
+    def _show_help_topic(self, help_content, topic):
+        """Show detailed help for specific topic"""
+        if topic not in help_content:
+            available = ", ".join(help_content.keys())
+            self.console.error(f"Unknown topic: {topic}")
+            self.console.info(f"Available topics: {available}")
+            self.console.info("Use 'specpulse help --list' to see all topics")
+            return
+
+        topic_data = help_content[topic]
+        self.console.header(topic_data["title"], style="bright_cyan")
+
+        # Display content with proper formatting
+        content_lines = topic_data["content"].strip().split('\n')
+        in_code_block = False
+        current_section = ""
+
+        for line in content_lines:
+            line = line.rstrip()
+
+            # Handle code blocks
+            if line.startswith('```'):
+                in_code_block = not in_code_block
+                if in_code_block:
+                    self.console.console.print()  # Add spacing
+                continue
+
+            if in_code_block:
+                # Print code lines directly
+                self.console.console.print(line, style="dim white")
+                continue
+
+            # Handle headers
+            if line.startswith('##'):
+                if current_section:
+                    self.console.console.print()  # Add spacing between sections
+                current_section = line.replace('##', '').strip()
+                self.console.subheader(current_section, style="bright_yellow")
+            elif line.startswith('###'):
+                self.console.console.print(f"📋 {line.replace('###', '').strip()}", style="yellow")
+            elif line.startswith('**') and line.endswith('**'):
+                self.console.console.print(f"• {line.replace('**', '')}", style="bright_green")
+            elif line.startswith('- '):
+                self.console.console.print(f"  • {line[2:]}", style="white")
+            elif line.strip() == '':
+                self.console.console.print()
+            else:
+                self.console.console.print(line)
+
+        # Add footer navigation
+        self.console.console.print()
+        self.console.divider()
+        self.console.info("Related topics:")
+
+        # Suggest related topics
+        related_topics = {
+            "overview": ["commands", "workflow"],
+            "commands": ["workflow", "examples"],
+            "workflow": ["examples", "commands"],
+            "templates": ["examples", "workflow"],
+            "troubleshooting": ["commands", "workflow"],
+            "examples": ["workflow", "templates"]
+        }
+
+        if topic in related_topics:
+            for related in related_topics[topic]:
+                self.console.info(f"  • specpulse help {related}")
+
+    def _show_default_help(self, help_content):
+        """Show default help overview"""
+        self.console.header("SpecPulse Help System", style="bright_cyan")
+        self.console.info("Welcome to SpecPulse - Your Specification-Driven Development Framework")
+        self.console.console.print()
+
+        # Quick overview
+        self.console.subheader("Quick Start", style="bright_green")
+        quick_start = """
+1. Initialize: specpulse init my-project
+2. Navigate: cd my-project
+3. Start AI: claude . or gemini .
+4. Create feature: /sp-pulse user-auth
+5. Generate specs: /sp-spec create
+6. Execute: /sp-execute all
+"""
+        for line in quick_start.strip().split('\n'):
+            if line.strip():
+                self.console.console.print(f"  {line}")
+
+        self.console.console.print()
+        self.console.subheader("Available Help Topics", style="bright_yellow")
+
+        topic_info = [
+            ("overview", "What is SpecPulse and key concepts"),
+            ("commands", "Complete command reference"),
+            ("workflow", "Step-by-step development workflow"),
+            ("templates", "Template system and customization"),
+            ("troubleshooting", "Common issues and solutions"),
+            ("examples", "Real-world usage examples")
+        ]
+
+        for topic, description in topic_info:
+            self.console.console.print(f"  • specpulse help {topic:<12} - {description}")
+
+        self.console.console.print()
+        self.console.subheader("Getting Help", style="bright_cyan")
+        help_commands = [
+            "specpulse help --list      - List all topics",
+            "specpulse help <topic>     - Get help on specific topic",
+            "specpulse doctor           - System health check",
+            "specpulse --help           - Show command options"
+        ]
+
+        for cmd in help_commands:
+            self.console.console.print(f"  {cmd}")
+
+        self.console.console.print()
+        self.console.divider()
+        self.console.success("Need more help? Visit: https://github.com/specpulse/specpulse")
+
 
 def main():
-    """Main CLI entry point"""
-    parser = argparse.ArgumentParser(
-        description="SpecPulse - Specification-Driven Development Framework"
-    )
-    
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-    
-    # Init command
-    init_parser = subparsers.add_parser("init", help="Initialize new SpecPulse project")
-    init_parser.add_argument("project_name", nargs="?", help="Project name")
-    init_parser.add_argument("--here", action="store_true", help="Initialize in current directory")
-    init_parser.add_argument("--ai", choices=["claude", "gemini"], default="claude", help="Primary AI assistant")
-    init_parser.add_argument("--template", choices=["web", "api", "cli", "mobile", "microservice"], default="web", help="Project template")
-    
-    # Update command
-    update_parser = subparsers.add_parser("update", help="Update SpecPulse templates")
-    
-    # Validate command
-    validate_parser = subparsers.add_parser("validate", help="Validate project components")
-    validate_parser.add_argument("component", nargs="?", default="all", choices=["all", "spec", "plan", "constitution"], help="Component to validate")
-    validate_parser.add_argument("--fix", action="store_true", help="Attempt to fix issues")
-    validate_parser.add_argument("--verbose", action="store_true", help="Verbose output")
-    
-    # Decompose command
-    decompose_parser = subparsers.add_parser("decompose", help="Decompose specifications into smaller components")
-    decompose_parser.add_argument("spec_id", nargs="?", help="Specification ID (e.g., 001 or 001-feature)")
-    decompose_parser.add_argument("--microservices", action="store_true", help="Generate microservice boundaries")
-    decompose_parser.add_argument("--apis", action="store_true", help="Generate API contracts")
-    decompose_parser.add_argument("--interfaces", action="store_true", help="Generate interface specifications")
-    
-    # Sync command
-    sync_parser = subparsers.add_parser("sync", help="Synchronize project state")
-    
-    # Doctor command
-    doctor_parser = subparsers.add_parser("doctor", help="System check and diagnostics")
-    
-    # Version
-    parser.add_argument("--version", action="version", version=f"SpecPulse {__version__}")
-    parser.add_argument("--no-color", action="store_true", help="Disable colored output")
-    parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
-    
-    args = parser.parse_args()
-    
-    cli = SpecPulseCLI(no_color=args.no_color if hasattr(args, 'no_color') else False,
-                       verbose=args.verbose if hasattr(args, 'verbose') else False)
-    
-    if args.command == "init":
-        cli.init(args.project_name, args.here, args.ai, args.template)
-    elif args.command == "update":
-        cli.update()
-    elif args.command == "validate":
-        cli.validate(args.component, args.fix, args.verbose)
-    elif args.command == "decompose":
-        cli.decompose(args.spec_id, args.microservices, args.apis, args.interfaces)
-    elif args.command == "sync":
-        cli.sync()
-    elif args.command == "doctor":
-        cli.doctor()
-    else:
-        # Show beautiful banner and help when no command
+    """Main CLI entry point with enhanced error handling"""
+
+    try:
+        parser = argparse.ArgumentParser(
+            description="SpecPulse - Specification-Driven Development Framework",
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            epilog="""
+Examples:
+  specpulse init my-project          Initialize new project
+  specpulse init --here              Initialize in current directory
+  specpulse validate --fix           Validate and fix issues
+  specpulse doctor                   System health check
+
+Need help? Visit https://github.com/specpulse/specpulse
+            """
+        )
+
+        subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+        # Init command
+        init_parser = subparsers.add_parser("init", help="Initialize new SpecPulse project")
+        init_parser.add_argument("project_name", nargs="?", help="Project name")
+        init_parser.add_argument("--here", action="store_true", help="Initialize in current directory")
+        init_parser.add_argument("--ai", choices=["claude", "gemini"], default="claude", help="Primary AI assistant")
+        init_parser.add_argument("--template", choices=["web", "api", "cli", "mobile", "microservice"], default="web", help="Project template")
+
+        # Update command
+        update_parser = subparsers.add_parser("update", help="Update SpecPulse templates")
+
+        # Validate command
+        validate_parser = subparsers.add_parser("validate", help="Validate project components")
+        validate_parser.add_argument("component", nargs="?", default="all", choices=["all", "spec", "plan", "constitution"], help="Component to validate")
+        validate_parser.add_argument("--fix", action="store_true", help="Attempt to fix issues")
+        validate_parser.add_argument("--verbose", action="store_true", help="Verbose output")
+
+        # Decompose command
+        decompose_parser = subparsers.add_parser("decompose", help="Decompose specifications into smaller components")
+        decompose_parser.add_argument("spec_id", nargs="?", help="Specification ID (e.g., 001 or 001-feature)")
+        decompose_parser.add_argument("--microservices", action="store_true", help="Generate microservice boundaries")
+        decompose_parser.add_argument("--apis", action="store_true", help="Generate API contracts")
+        decompose_parser.add_argument("--interfaces", action="store_true", help="Generate interface specifications")
+
+        # Sync command
+        sync_parser = subparsers.add_parser("sync", help="Synchronize project state")
+
+        # Doctor command
+        doctor_parser = subparsers.add_parser("doctor", help="System check and diagnostics")
+
+        # Help command
+        help_parser = subparsers.add_parser("help", help="Show comprehensive help and documentation")
+        help_parser.add_argument("topic", nargs="?", help="Specific topic to get help with")
+        help_parser.add_argument("--list", action="store_true", help="List all available help topics")
+
+        # Template commands
+        template_parser = subparsers.add_parser("template", help="Template management")
+        template_subparsers = template_parser.add_subparsers(dest="template_action", help="Template actions")
+
+        # Template list
+        template_list_parser = template_subparsers.add_parser("list", help="List templates")
+        template_list_parser.add_argument("--category", choices=["spec", "plan", "task", "decomposition"], help="Filter by category")
+
+        # Template validate
+        template_validate_parser = template_subparsers.add_parser("validate", help="Validate templates")
+        template_validate_parser.add_argument("template_name", nargs="?", help="Specific template to validate")
+        template_validate_parser.add_argument("--fix", action="store_true", help="Auto-fix issues if possible")
+
+        # Template preview
+        template_preview_parser = template_subparsers.add_parser("preview", help="Preview template with sample data")
+        template_preview_parser.add_argument("template_name", help="Template name to preview")
+
+        # Template backup
+        template_backup_parser = template_subparsers.add_parser("backup", help="Backup all templates")
+
+        # Template restore
+        template_restore_parser = template_subparsers.add_parser("restore", help="Restore templates from backup")
+        template_restore_parser.add_argument("backup_path", help="Path to backup directory")
+
+        # Memory commands
+        memory_parser = subparsers.add_parser("memory", help="Memory management")
+        memory_subparsers = memory_parser.add_subparsers(dest="memory_action", help="Memory actions")
+
+        # Memory search
+        memory_search_parser = memory_subparsers.add_parser("search", help="Search memory system")
+        memory_search_parser.add_argument("query", help="Search query")
+        memory_search_parser.add_argument("--category", help="Filter by category")
+        memory_search_parser.add_argument("--days", type=int, help="Limit to last N days")
+
+        # Memory summary
+        memory_summary_parser = memory_subparsers.add_parser("summary", help="Show memory summary")
+
+        # Memory cleanup
+        memory_cleanup_parser = memory_subparsers.add_parser("cleanup", help="Clean up old memory entries")
+        memory_cleanup_parser.add_argument("--days", type=int, default=90, help="Remove entries older than N days")
+
+        # Memory export
+        memory_export_parser = memory_subparsers.add_parser("export", help="Export memory data")
+        memory_export_parser.add_argument("--format", choices=["json", "yaml"], default="json", help="Export format")
+        memory_export_parser.add_argument("--output", help="Output file path")
+
+        # Global arguments
+        parser.add_argument("--version", action="version", version=f"SpecPulse {__version__}")
+        parser.add_argument("--no-color", action="store_true", help="Disable colored output")
+        parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
+
+        args = parser.parse_args()
+
+        # Initialize CLI with error handling
+        cli = SpecPulseCLI(no_color=getattr(args, 'no_color', False),
+                           verbose=getattr(args, 'verbose', False))
+
+        # Available commands for suggestion
+        available_commands = ["init", "update", "validate", "decompose", "sync", "doctor", "help", "template", "memory"]
+
+        # Execute command with error handling
+        if args.command == "init":
+            cli.init(args.project_name, args.here, args.ai, args.template)
+        elif args.command == "update":
+            cli.update()
+        elif args.command == "validate":
+            cli.validate(args.component, args.fix, args.verbose)
+        elif args.command == "decompose":
+            cli.decompose(args.spec_id, args.microservices, args.apis, args.interfaces)
+        elif args.command == "sync":
+            cli.sync()
+        elif args.command == "doctor":
+            cli.doctor()
+        elif args.command == "help":
+            cli.show_help(args.topic, args.list)
+        elif args.command == "template":
+            if args.template_action == "list":
+                cli.template_list(args.category)
+            elif args.template_action == "validate":
+                cli.template_validate(args.template_name, args.fix)
+            elif args.template_action == "preview":
+                cli.template_preview(args.template_name)
+            elif args.template_action == "backup":
+                cli.template_backup()
+            elif args.template_action == "restore":
+                cli.template_restore(args.backup_path)
+            else:
+                console = Console(no_color=getattr(args, 'no_color', False))
+                console.error("Unknown template action. Use 'specpulse template --help' for available actions.")
+                sys.exit(1)
+        elif args.command == "memory":
+            if args.memory_action == "search":
+                cli.memory_search(args.query, args.category, args.days)
+            elif args.memory_action == "summary":
+                cli.memory_summary()
+            elif args.memory_action == "cleanup":
+                cli.memory_cleanup(args.days)
+            elif args.memory_action == "export":
+                cli.memory_export(args.format, args.output)
+            else:
+                console = Console(no_color=getattr(args, 'no_color', False))
+                console.error("Unknown memory action. Use 'specpulse memory --help' for available actions.")
+                sys.exit(1)
+        elif args.command is None:
+            # Show beautiful banner and help when no command
+            console = Console()
+            console.show_banner()
+            console.gradient_text("Welcome to SpecPulse - Your Specification-Driven Development Framework")
+            console.divider()
+            parser.print_help()
+        else:
+            # Unknown command - suggest correction
+            error_handler = ErrorHandler(verbose=getattr(args, 'verbose', False))
+            suggestion = error_handler.suggest_command_correction(args.command, available_commands)
+
+            if suggestion:
+                console = Console(no_color=getattr(args, 'no_color', False))
+                console.error(f"Unknown command: {args.command}")
+                console.info(f"Did you mean: {suggestion}?")
+                console.info(f"Try: specpulse {suggestion}")
+            else:
+                console = Console(no_color=getattr(args, 'no_color', False))
+                console.error(f"Unknown command: {args.command}")
+                console.info("Available commands: " + ", ".join(available_commands))
+                console.info("Use --help for more information")
+
+            sys.exit(1)
+
+    except KeyboardInterrupt:
+        # Handle Ctrl+C gracefully
         console = Console()
-        console.show_banner()
-        console.gradient_text("Welcome to SpecPulse - Your Specification-Driven Development Framework")
-        console.divider()
-        parser.print_help()
+        console.warning("\nOperation cancelled by user")
+        sys.exit(130)
+    except SystemExit:
+        # Re-raise system exit (from argparse or explicit exit calls)
+        raise
+    except Exception as e:
+        # Handle any other unexpected errors
+        error_handler = ErrorHandler(verbose=getattr(args, 'verbose', False) if 'args' in locals() else False)
+        exit_code = error_handler.handle_error(e, "SpecPulse CLI")
+        sys.exit(exit_code)
 
 
 if __name__ == "__main__":
