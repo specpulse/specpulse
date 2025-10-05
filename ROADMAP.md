@@ -165,7 +165,7 @@ specpulse context auto-detect  # Parse package.json, pyproject.toml
 
 ---
 
-### **v1.7.0: Better Context for LLMs** (1-2 weeks)
+### **v1.7.0: Better Context for LLMs** ✅ COMPLETED (2025-10-06)
 
 #### 2.1 Structured Memory with LLM-Readable Format
 **Problem**: `context.md` is unstructured, LLM struggles to find info
@@ -202,9 +202,19 @@ specpulse memory relevant 003  # Get relevant context for feature 003
 
 **For LLM**: Easy to find relevant info with tags
 
-**Files**:
-- Refactor `specpulse/core/memory_manager.py` (+200 lines for tags/search)
-- Add `specpulse/utils/memory_formatter.py` (100 lines)
+**Implementation Notes**:
+- ✅ Enhanced `specpulse/core/memory_manager.py` (+310 lines)
+  - `add_decision()`, `add_pattern()`, `add_constraint()`
+  - `query_by_tag()`, `query_relevant()`
+  - Auto-migration with `migrate_to_tagged_format()`
+- ✅ CLI commands: `memory add-decision`, `add-pattern`, `query`, `relevant`, `migrate`, `rollback`
+- ✅ Full backward compatibility with auto-migration
+- ✅ Test coverage: Integration tests in `tests/integration/test_v170_workflow.py`
+
+**Related Files**:
+- `specpulse/core/memory_manager.py:591-1151` (v1.7.0 methods)
+- `specpulse/cli/main.py:1240-1454` (CLI commands)
+- `tests/fixtures/context.md` (test data)
 
 ---
 
@@ -232,9 +242,22 @@ EOF
 
 **For LLM**: Always has relevant context without user asking
 
-**Files**:
-- Update all scripts in `resources/scripts/sp-pulse-*.sh` (+20 lines each)
-- Add `specpulse context inject` command
+**Implementation Notes**:
+- ✅ Created `specpulse/core/context_injector.py` (195 lines)
+  - `build_context()` with 500 char limit
+  - `inject()` for template integration
+- ✅ Created `specpulse/models/project_context.py` (273 lines)
+  - YAML-based project context storage
+  - `load()`, `save()`, `set_value()`, `get_value()`
+- ✅ CLI commands: `context set`, `get`, `auto-detect`, `inject`
+- ✅ Updated 5 scripts: sp-pulse-{init,spec,plan,task,decompose}.sh
+- ✅ Auto-detection for: package.json, pyproject.toml, go.mod, Gemfile
+
+**Related Files**:
+- `specpulse/core/context_injector.py` (new)
+- `specpulse/models/project_context.py` (new)
+- `specpulse/cli/main.py:1456-1673` (context commands)
+- `scripts/sp-pulse-*.sh` (context injection added)
 
 ---
 
@@ -265,10 +288,25 @@ Merge note into spec? [number]: 2
 
 **For LLM**: Can suggest "Let me add a note for this" during conversation
 
-**Files**:
-- `specpulse/core/notes.py` (150 lines)
-- Update memory to store notes
-- Add `/sp-note` command for LLM
+**Implementation Notes**:
+- ✅ Created `specpulse/core/notes_manager.py` (273 lines)
+  - `add_note()`, `list_notes()`, `merge_to_spec()`
+  - Auto-detection of target spec sections
+  - Timestamp-based note IDs
+- ✅ CLI commands: `note`, `notes list`, `notes merge`
+- ✅ Integration with `specpulse sync` (shows unmerged notes count)
+- ✅ Smart section detection: security → Security Considerations, performance → Performance Requirements
+
+**Related Files**:
+- `specpulse/core/notes_manager.py` (new)
+- `specpulse/cli/main.py:1675-1782` (notes commands)
+- `specpulse/cli/main.py:795-814` (status integration)
+- `tests/fixtures/notes/*.md` (test data)
+
+**Completion Date**: 2025-10-06
+**Total Implementation**: ~70 hours of development
+**Test Coverage**: Integration tests + performance benchmarks
+**Documentation**: MIGRATION.md + help system (memory.md, context.md, notes.md)
 
 ---
 

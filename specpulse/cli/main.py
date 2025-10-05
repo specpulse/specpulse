@@ -785,13 +785,34 @@ graph LR
         if git_utils.is_git_repo(project_path):
             branch = git_utils.get_current_branch()
             sync_items.append(("Git Branch", branch))
-            
+
             # Check for uncommitted changes
             if git_utils.has_changes():
                 sync_items.append(("Git Status", "Uncommitted changes"))
             else:
                 sync_items.append(("Git Status", "Clean"))
-        
+
+        # v1.7.0: Check for unmerged notes
+        try:
+            from ..core.notes_manager import NotesManager
+            notes_manager = NotesManager(project_path)
+
+            # Get current feature from context
+            context_file = project_path / "memory" / "context.md"
+            if context_file.exists():
+                content = context_file.read_text(encoding='utf-8')
+                import re
+                match = re.search(r'Active Feature[:\s]+(\d{3})', content, re.IGNORECASE)
+                if match:
+                    feature_id = match.group(1)
+                    notes = notes_manager.list_notes(feature_id)
+                    if notes:
+                        active_notes = [n for n in notes if not n.merged]
+                        if active_notes:
+                            sync_items.append(("Unmerged Notes", f"{len(active_notes)} notes"))
+        except Exception:
+            pass  # Silently skip if notes not available
+
         time.sleep(0.5)  # Visual effect
         
         # Display sync status
@@ -914,7 +935,53 @@ graph LR
             checks.append(("Project structure", True, "Complete"))
         else:
             checks.append(("Project structure", False, f"Missing: {', '.join(missing_dirs)}"))
-        
+
+        # v1.7.0: Check memory file size
+        self.console.spinner("Checking memory system")
+        time.sleep(0.3)
+        context_file = project_path / "memory" / "context.md"
+        if context_file.exists():
+            size_mb = context_file.stat().st_size / (1024 * 1024)
+            if size_mb > 1.0:
+                checks.append(("Memory size", False, f"{size_mb:.2f}MB (>1MB, consider archiving)"))
+            else:
+                checks.append(("Memory size", True, f"{size_mb:.2f}MB"))
+
+        # v1.7.0: Check project context
+        context_yaml = project_path / ".specpulse" / "project_context.yaml"
+        if context_yaml.exists():
+            try:
+                import yaml
+                with open(context_yaml) as f:
+                    yaml.safe_load(f)
+                checks.append(("Project context", True, "Valid YAML"))
+            except Exception:
+                checks.append(("Project context", False, "Invalid YAML"))
+        else:
+            checks.append(("Project context", False, "Not configured (run: specpulse context set ...)"))
+
+        # v1.7.0: Check for unmerged notes
+        if self.memory_manager:
+            try:
+                from ..core.notes_manager import NotesManager
+                notes_manager = NotesManager(project_path)
+
+                # Get current feature
+                if context_file.exists():
+                    content = context_file.read_text(encoding='utf-8')
+                    import re
+                    match = re.search(r'Active Feature[:\s]+(\d{3})', content, re.IGNORECASE)
+                    if match:
+                        feature_id = match.group(1)
+                        notes = notes_manager.list_notes(feature_id)
+                        active_notes = [n for n in notes if not n.merged]
+                        if active_notes:
+                            checks.append(("Unmerged notes", False, f"{len(active_notes)} notes (run: specpulse notes list)"))
+                        elif notes:
+                            checks.append(("Notes", True, f"{len(notes)} notes (all merged)"))
+            except Exception:
+                pass
+
         # Display results in a beautiful table
         self.console.section("Diagnostic Results")
         
@@ -1236,6 +1303,550 @@ graph LR
 
         except Exception as e:
             return self.error_handler.handle_error(e, f"Exporting memory as {format}")
+
+    # ==================== v1.7.0 Memory Commands ====================
+
+    def memory_add_decision(self, title: str, rationale: str, feature: Optional[str] = None):
+        """Add architectural decision (v1.7.0)"""
+        if not self.memory_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            # Parse feature IDs if provided
+            related_features = []
+            if feature:
+                related_features = [f.strip() for f in feature.split(',')]
+
+            # Add decision using v1.7.0 method
+            decision_id = self.memory_manager.add_decision(title, rationale, related_features)
+
+            self.console.success(f"✓ Decision added: {decision_id}")
+            self.console.info(f"Title: {title}")
+            self.console.info(f"Related features: {', '.join(related_features) if related_features else 'None'}")
+
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Adding decision")
+
+    def memory_add_pattern(self, title: str, example: str, features: Optional[str] = None):
+        """Add code pattern (v1.7.0)"""
+        if not self.memory_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            # Parse feature IDs if provided
+            features_used = []
+            if features:
+                features_used = [f.strip() for f in features.split(',')]
+
+            # Add pattern using v1.7.0 method
+            pattern_id = self.memory_manager.add_pattern(title, example, features_used)
+
+            self.console.success(f"✓ Pattern added: {pattern_id}")
+            self.console.info(f"Title: {title}")
+            self.console.info(f"Used in features: {', '.join(features_used) if features_used else 'None'}")
+
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Adding pattern")
+
+    def memory_query(self, tag: str, feature: Optional[str] = None, recent: Optional[int] = None):
+        """Query memory by tag (v1.7.0)"""
+        if not self.memory_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            # Query using v1.7.0 method
+            entries = self.memory_manager.query_by_tag(tag, feature, recent)
+
+            if not entries:
+                self.console.warning(f"No {tag} entries found")
+                return True
+
+            # Display results in table
+            self.console.header(f"Memory Query Results: {tag.title()}")
+
+            table_rows = []
+            for entry in entries:
+                related = ', '.join(entry.related_features) if entry.related_features else 'None'
+                table_rows.append([
+                    entry.id,
+                    entry.title[:40] + '...' if len(entry.title) > 40 else entry.title,
+                    entry.date,
+                    related
+                ])
+
+            self.console.table(
+                f"{tag.title()} Entries",
+                ["ID", "Title", "Date", "Related Features"],
+                table_rows
+            )
+
+            self.console.info(f"Total: {len(entries)} entries")
+
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, f"Querying {tag}")
+
+    def memory_relevant(self, feature_id: str):
+        """Get relevant memory for feature (v1.7.0)"""
+        if not self.memory_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            # Normalize feature ID (remove leading zeros if needed)
+            feature_id = feature_id.lstrip('0') or '0'
+            if len(feature_id) < 3:
+                feature_id = feature_id.zfill(3)
+
+            # Query using v1.7.0 method
+            entries = self.memory_manager.query_relevant(feature_id)
+
+            if not entries:
+                self.console.warning(f"No relevant memory found for feature {feature_id}")
+                return True
+
+            # Group by tag
+            by_tag = {}
+            for entry in entries:
+                for tag in entry.tags:
+                    if tag not in by_tag:
+                        by_tag[tag] = []
+                    by_tag[tag].append(entry)
+
+            # Display grouped results
+            self.console.header(f"Relevant Memory for Feature {feature_id}")
+
+            for tag, tag_entries in by_tag.items():
+                self.console.section(f"{tag.title()} ({len(tag_entries)})")
+
+                for entry in tag_entries:
+                    self.console.info(f"• {entry.id}: {entry.title}")
+
+            self.console.divider()
+            self.console.info(f"Total: {len(entries)} relevant entries")
+
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, f"Getting relevant memory for {feature_id}")
+
+    def memory_migrate(self, dry_run: bool = False):
+        """Migrate context.md to tagged format (v1.7.0)"""
+        if not self.memory_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            # Check if migration needed
+            if not self.memory_manager.needs_migration():
+                self.console.info("✓ Context file already uses tagged format")
+                return True
+
+            # Show what will happen
+            if dry_run:
+                self.console.header("Migration Preview (Dry Run)")
+            else:
+                self.console.header("Migrating context.md to Tagged Format")
+
+            # Perform migration
+            report = self.memory_manager.migrate_to_tagged_format(dry_run=dry_run)
+
+            # Display report
+            if report["status"] == "no_migration_needed":
+                self.console.info(report["message"])
+                return True
+
+            self.console.section("Migration Report")
+
+            if not dry_run and report.get("backup_path"):
+                self.console.info(f"✓ Backup created: {report['backup_path']}")
+
+            self.console.info(f"Original lines: {report['original_lines']}")
+            self.console.info(f"New lines: {report['new_lines']}")
+
+            self.console.divider()
+            self.console.info("Categorized entries:")
+            for category, count in report["categorized"].items():
+                if count > 0:
+                    self.console.info(f"  • {category.title()}: {count}")
+
+            if dry_run:
+                self.console.warning("\nThis was a dry run. No changes were made.")
+                self.console.info("Run without --dry-run to apply migration.")
+            else:
+                self.console.success("\n✓ Migration completed successfully!")
+                self.console.info("Use 'specpulse memory rollback' to undo if needed.")
+
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Migrating context")
+
+    def memory_rollback(self, backup_path: Optional[str] = None):
+        """Rollback migration from backup (v1.7.0)"""
+        if not self.memory_manager:
+            self.console.error("Not in a SpecPulse project directory")
+            return False
+
+        try:
+            self.console.header("Rolling Back Migration")
+
+            # Convert backup_path to Path if provided
+            backup = Path(backup_path) if backup_path else None
+
+            # Perform rollback
+            success = self.memory_manager.rollback_migration(backup)
+
+            if success:
+                self.console.success("✓ Migration rolled back successfully")
+                if backup:
+                    self.console.info(f"Restored from: {backup}")
+                else:
+                    self.console.info("Restored from latest backup")
+
+                return True
+
+        except FileNotFoundError as e:
+            self.console.error(f"Backup not found: {e}")
+            return False
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Rolling back migration")
+
+    # ==================== v1.7.0 Context Commands ====================
+
+    def context_set(self, key: str, value: str):
+        """Set project context variable (v1.7.0)"""
+        try:
+            from ..models.project_context import ProjectContext
+
+            # Load current context
+            context = ProjectContext.load()
+
+            # Set value
+            context.set_value(key, value)
+
+            # Save context
+            context.save()
+
+            self.console.success(f"✓ Context variable set: {key} = {value}")
+
+            return True
+
+        except ValueError as e:
+            self.console.error(f"Invalid key: {e}")
+            return False
+        except Exception as e:
+            return self.error_handler.handle_error(e, f"Setting context {key}")
+
+    def context_get(self, key: Optional[str] = None):
+        """Get project context variable (v1.7.0)"""
+        try:
+            from ..models.project_context import ProjectContext
+            import yaml
+
+            # Load current context
+            context = ProjectContext.load()
+
+            if key:
+                # Get specific value
+                value = context.get_value(key)
+
+                if value is None:
+                    self.console.warning(f"Context variable not found: {key}")
+                    return False
+
+                self.console.header(f"Context: {key}")
+                if isinstance(value, (dict, list)):
+                    self.console.code_block(yaml.dump(value, default_flow_style=False), language="yaml")
+                else:
+                    self.console.info(str(value))
+
+            else:
+                # Show all context
+                self.console.header("Project Context")
+
+                # Convert to dict for display
+                context_dict = {
+                    "project": {
+                        "name": context.project.name,
+                        "type": context.project.type,
+                        "description": context.project.description,
+                        "version": context.project.version
+                    },
+                    "tech_stack": {
+                        "frontend": context.tech_stack.frontend,
+                        "backend": context.tech_stack.backend,
+                        "database": context.tech_stack.database,
+                        "message_queue": context.tech_stack.message_queue,
+                        "cache": context.tech_stack.cache,
+                        "other": context.tech_stack.other
+                    },
+                    "team_size": context.team_size,
+                    "preferences": context.preferences
+                }
+
+                # Remove None values
+                context_dict = self._remove_none_recursive(context_dict)
+
+                self.console.code_block(yaml.dump(context_dict, default_flow_style=False, sort_keys=False), language="yaml")
+
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Getting context")
+
+    def context_auto_detect(self):
+        """Auto-detect tech stack from package files (v1.7.0)"""
+        try:
+            from ..models.project_context import ProjectContext
+            import json
+
+            self.console.header("Auto-Detecting Tech Stack")
+
+            project_root = Path.cwd()
+            detected = {}
+
+            # Check for package.json (Node.js)
+            package_json = project_root / "package.json"
+            if package_json.exists():
+                self.console.info("Found package.json")
+                try:
+                    with open(package_json) as f:
+                        pkg = json.load(f)
+                        deps = {**pkg.get("dependencies", {}), **pkg.get("devDependencies", {})}
+
+                        # Detect frontend
+                        if "react" in deps:
+                            detected["frontend"] = "React, TypeScript" if "typescript" in deps else "React"
+                        elif "vue" in deps:
+                            detected["frontend"] = "Vue.js"
+                        elif "angular" in deps or "@angular/core" in deps:
+                            detected["frontend"] = "Angular"
+                        elif "svelte" in deps:
+                            detected["frontend"] = "Svelte"
+
+                        # Detect backend
+                        if "express" in deps:
+                            detected["backend"] = "Node.js, Express"
+                        elif "fastify" in deps:
+                            detected["backend"] = "Node.js, Fastify"
+                        elif "next" in deps:
+                            detected["backend"] = "Next.js"
+
+                except json.JSONDecodeError:
+                    self.console.warning("Could not parse package.json")
+
+            # Check for pyproject.toml (Python)
+            pyproject = project_root / "pyproject.toml"
+            if pyproject.exists():
+                self.console.info("Found pyproject.toml")
+                try:
+                    import toml
+                    with open(pyproject) as f:
+                        proj = toml.load(f)
+                        deps = proj.get("tool", {}).get("poetry", {}).get("dependencies", {})
+                        if not deps:
+                            deps = proj.get("project", {}).get("dependencies", [])
+
+                        deps_str = str(deps).lower()
+
+                        if "fastapi" in deps_str:
+                            detected["backend"] = "Python, FastAPI"
+                        elif "django" in deps_str:
+                            detected["backend"] = "Python, Django"
+                        elif "flask" in deps_str:
+                            detected["backend"] = "Python, Flask"
+
+                except Exception:
+                    self.console.warning("Could not parse pyproject.toml")
+
+            # Check for go.mod (Go)
+            go_mod = project_root / "go.mod"
+            if go_mod.exists():
+                self.console.info("Found go.mod")
+                detected["backend"] = "Go"
+
+            # Check for Gemfile (Ruby)
+            gemfile = project_root / "Gemfile"
+            if gemfile.exists():
+                self.console.info("Found Gemfile")
+                detected["backend"] = "Ruby, Rails"
+
+            if not detected:
+                self.console.warning("No package files found. Tech stack not detected.")
+                return False
+
+            # Display detected values
+            self.console.section("Detected Tech Stack")
+            for key, value in detected.items():
+                self.console.info(f"  • {key}: {value}")
+
+            # Prompt to save
+            self.console.divider()
+            response = input("Apply these values? (y/n): ")
+
+            if response.lower() == 'y':
+                context = ProjectContext.load()
+
+                for key, value in detected.items():
+                    context.set_value(f"tech_stack.{key}", value)
+
+                context.save()
+                self.console.success("✓ Tech stack updated")
+
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Auto-detecting tech stack")
+
+    def context_inject(self, feature_id: Optional[str] = None):
+        """Inject context into template (v1.7.0)"""
+        try:
+            from ..core.context_injector import ContextInjector
+
+            # Create injector
+            injector = ContextInjector(Path.cwd(), self.memory_manager)
+
+            # Build context
+            context = injector.build_context(feature_id)
+
+            # Display context
+            self.console.header("Context for Injection")
+            self.console.code_block(context, language="html")
+
+            self.console.divider()
+            self.console.info("Copy this context block to inject into templates or AI prompts")
+
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Injecting context")
+
+    def _remove_none_recursive(self, obj):
+        """Recursively remove None values from dict"""
+        if isinstance(obj, dict):
+            return {k: self._remove_none_recursive(v) for k, v in obj.items() if v is not None and v != {} and v != []}
+        elif isinstance(obj, list):
+            return [self._remove_none_recursive(item) for item in obj if item is not None]
+        else:
+            return obj
+
+    # ==================== v1.7.0 Notes Commands ====================
+
+    def add_note(self, message: str, feature_id: Optional[str] = None):
+        """Add development note (v1.7.0)"""
+        try:
+            from ..core.notes_manager import NotesManager
+
+            # Create notes manager
+            notes_manager = NotesManager(Path.cwd())
+
+            # Add note
+            note_id = notes_manager.add_note(message, feature_id)
+
+            self.console.success(f"✓ Note added: {note_id}")
+            self.console.info(f"Content: {message[:50]}{'...' if len(message) > 50 else ''}")
+
+            return True
+
+        except ValueError as e:
+            self.console.error(str(e))
+            self.console.info("Hint: Specify feature with --feature or run from feature context")
+            return False
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Adding note")
+
+    def list_notes(self, feature_id: Optional[str] = None):
+        """List notes for feature (v1.7.0)"""
+        try:
+            from ..core.notes_manager import NotesManager
+
+            # Create notes manager
+            notes_manager = NotesManager(Path.cwd())
+
+            # List notes
+            notes = notes_manager.list_notes(feature_id)
+
+            if not notes:
+                feature_str = f"feature {feature_id}" if feature_id else "current feature"
+                self.console.warning(f"No notes found for {feature_str}")
+                return True
+
+            # Display notes in table
+            feature_str = feature_id or notes[0].feature if notes else "Unknown"
+            self.console.header(f"Notes for Feature {feature_str}")
+
+            table_rows = []
+            for note in notes:
+                # Format timestamp
+                timestamp_str = note.timestamp.strftime("%Y-%m-%d %H:%M")
+
+                # Truncate content
+                preview = note.content[:50] + "..." if len(note.content) > 50 else note.content
+
+                # Merged status
+                status = "Merged" if note.merged else "Active"
+
+                table_rows.append([
+                    note.id,
+                    timestamp_str,
+                    preview,
+                    status
+                ])
+
+            self.console.table(
+                "Development Notes",
+                ["ID", "Timestamp", "Preview", "Status"],
+                table_rows
+            )
+
+            # Summary
+            merged_count = sum(1 for n in notes if n.merged)
+            active_count = len(notes) - merged_count
+            self.console.divider()
+            self.console.info(f"Total: {len(notes)} notes ({active_count} active, {merged_count} merged)")
+
+            return True
+
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Listing notes")
+
+    def merge_note(self, feature_id: str, note_id: str, section: Optional[str] = None):
+        """Merge note to specification (v1.7.0)"""
+        try:
+            from ..core.notes_manager import NotesManager
+
+            # Create notes manager
+            notes_manager = NotesManager(Path.cwd())
+
+            self.console.header(f"Merging Note {note_id} to Spec")
+
+            # Merge note
+            spec_file = notes_manager.merge_to_spec(feature_id, note_id, section)
+
+            self.console.success(f"✓ Note merged successfully")
+            self.console.info(f"Updated: {spec_file}")
+
+            if section:
+                self.console.info(f"Section: {section}")
+            else:
+                self.console.info("Section: Auto-detected")
+
+            return True
+
+        except ValueError as e:
+            self.console.error(str(e))
+            return False
+        except Exception as e:
+            return self.error_handler.handle_error(e, "Merging note")
 
     def show_help(self, topic: Optional[str] = None, list_topics: bool = False):
         """Show comprehensive help and documentation"""
@@ -2156,6 +2767,74 @@ Need help? Visit https://github.com/specpulse/specpulse
         memory_export_parser.add_argument("--format", choices=["json", "yaml"], default="json", help="Export format")
         memory_export_parser.add_argument("--output", help="Output file path")
 
+        # Memory add-decision (v1.7.0)
+        memory_add_decision_parser = memory_subparsers.add_parser("add-decision", help="Add architectural decision")
+        memory_add_decision_parser.add_argument("title", help="Decision title")
+        memory_add_decision_parser.add_argument("--rationale", required=True, help="Decision rationale")
+        memory_add_decision_parser.add_argument("--feature", help="Related feature ID(s), comma-separated")
+
+        # Memory add-pattern (v1.7.0)
+        memory_add_pattern_parser = memory_subparsers.add_parser("add-pattern", help="Add code pattern")
+        memory_add_pattern_parser.add_argument("title", help="Pattern title")
+        memory_add_pattern_parser.add_argument("--example", required=True, help="Pattern example or code")
+        memory_add_pattern_parser.add_argument("--features", help="Features using pattern, comma-separated")
+
+        # Memory query (v1.7.0)
+        memory_query_parser = memory_subparsers.add_parser("query", help="Query memory by tag")
+        memory_query_parser.add_argument("--tag", required=True, choices=["decision", "pattern", "current", "constraint"], help="Tag to query")
+        memory_query_parser.add_argument("--feature", help="Filter by feature ID")
+        memory_query_parser.add_argument("--recent", type=int, help="Limit to N recent entries")
+
+        # Memory relevant (v1.7.0)
+        memory_relevant_parser = memory_subparsers.add_parser("relevant", help="Get relevant memory for feature")
+        memory_relevant_parser.add_argument("feature_id", help="Feature ID (e.g., 001)")
+
+        # Memory migrate (v1.7.0)
+        memory_migrate_parser = memory_subparsers.add_parser("migrate", help="Migrate context.md to tagged format")
+        memory_migrate_parser.add_argument("--dry-run", action="store_true", help="Preview migration without applying")
+
+        # Memory rollback (v1.7.0)
+        memory_rollback_parser = memory_subparsers.add_parser("rollback", help="Rollback migration from backup")
+        memory_rollback_parser.add_argument("--backup", help="Specific backup file to restore from")
+
+        # Context commands (v1.7.0)
+        context_parser = subparsers.add_parser("context", help="Project context management")
+        context_subparsers = context_parser.add_subparsers(dest="context_action", help="Context actions")
+
+        # Context set
+        context_set_parser = context_subparsers.add_parser("set", help="Set context variable")
+        context_set_parser.add_argument("key", help="Key in dot notation (e.g., tech_stack.frontend)")
+        context_set_parser.add_argument("value", help="Value to set")
+
+        # Context get
+        context_get_parser = context_subparsers.add_parser("get", help="Get context variable")
+        context_get_parser.add_argument("key", nargs="?", help="Key to get (omit for all)")
+
+        # Context auto-detect
+        context_autodetect_parser = context_subparsers.add_parser("auto-detect", help="Auto-detect tech stack")
+
+        # Context inject
+        context_inject_parser = context_subparsers.add_parser("inject", help="Inject context into template")
+        context_inject_parser.add_argument("--feature", help="Feature ID for feature-specific context")
+
+        # Notes commands (v1.7.0)
+        note_parser = subparsers.add_parser("note", help="Add development note")
+        note_parser.add_argument("message", help="Note content")
+        note_parser.add_argument("--feature", help="Feature ID (auto-detected if omitted)")
+
+        notes_parser = subparsers.add_parser("notes", help="Notes management")
+        notes_subparsers = notes_parser.add_subparsers(dest="notes_action", help="Notes actions")
+
+        # Notes list
+        notes_list_parser = notes_subparsers.add_parser("list", help="List notes for feature")
+        notes_list_parser.add_argument("feature_id", nargs="?", help="Feature ID (auto-detected if omitted)")
+
+        # Notes merge
+        notes_merge_parser = notes_subparsers.add_parser("merge", help="Merge note to specification")
+        notes_merge_parser.add_argument("feature_id", help="Feature ID")
+        notes_merge_parser.add_argument("--note", required=True, help="Note ID to merge")
+        notes_merge_parser.add_argument("--section", help="Target section in spec (auto-detected if omitted)")
+
         # Global arguments
         parser.add_argument("--version", action="version", version=f"SpecPulse {__version__}")
         parser.add_argument("--no-color", action="store_true", help="Disable colored output")
@@ -2168,7 +2847,7 @@ Need help? Visit https://github.com/specpulse/specpulse
                            verbose=getattr(args, 'verbose', False))
 
         # Available commands for suggestion
-        available_commands = ["init", "update", "validate", "decompose", "sync", "doctor", "expand", "help", "template", "memory"]
+        available_commands = ["init", "update", "validate", "decompose", "sync", "doctor", "expand", "help", "template", "memory", "context", "note", "notes"]
 
         # Execute command with error handling
         if args.command == "init":
@@ -2211,9 +2890,45 @@ Need help? Visit https://github.com/specpulse/specpulse
                 cli.memory_cleanup(args.days)
             elif args.memory_action == "export":
                 cli.memory_export(args.format, args.output)
+            elif args.memory_action == "add-decision":
+                cli.memory_add_decision(args.title, args.rationale, args.feature)
+            elif args.memory_action == "add-pattern":
+                cli.memory_add_pattern(args.title, args.example, args.features)
+            elif args.memory_action == "query":
+                cli.memory_query(args.tag, args.feature, args.recent)
+            elif args.memory_action == "relevant":
+                cli.memory_relevant(args.feature_id)
+            elif args.memory_action == "migrate":
+                cli.memory_migrate(args.dry_run)
+            elif args.memory_action == "rollback":
+                cli.memory_rollback(args.backup)
             else:
                 console = Console(no_color=getattr(args, 'no_color', False))
                 console.error("Unknown memory action. Use 'specpulse memory --help' for available actions.")
+                sys.exit(1)
+        elif args.command == "context":
+            if args.context_action == "set":
+                cli.context_set(args.key, args.value)
+            elif args.context_action == "get":
+                cli.context_get(args.key)
+            elif args.context_action == "auto-detect":
+                cli.context_auto_detect()
+            elif args.context_action == "inject":
+                cli.context_inject(args.feature)
+            else:
+                console = Console(no_color=getattr(args, 'no_color', False))
+                console.error("Unknown context action. Use 'specpulse context --help' for available actions.")
+                sys.exit(1)
+        elif args.command == "note":
+            cli.add_note(args.message, args.feature)
+        elif args.command == "notes":
+            if args.notes_action == "list":
+                cli.list_notes(args.feature_id)
+            elif args.notes_action == "merge":
+                cli.merge_note(args.feature_id, args.note, args.section)
+            else:
+                console = Console(no_color=getattr(args, 'no_color', False))
+                console.error("Unknown notes action. Use 'specpulse notes --help' for available actions.")
                 sys.exit(1)
         elif args.command is None:
             # Show beautiful banner and help when no command

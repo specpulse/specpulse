@@ -1,0 +1,56 @@
+description = "Switch context and continue work on a specific feature"
+prompt = """
+Handle the /sp-continue command with arguments: {{args}}
+
+Parse arguments to extract feature name or ID
+
+## Feature Detection:
+1. Find feature directory using context detection:
+   - Search for matching feature directory (specs/*, plans/*, tasks/*)
+   - Support partial matching (e.g., "auth" matches "001-user-authentication")
+   - Support ID matching (e.g., "001" matches "001-user-authentication")
+
+2. Validate feature exists:
+   - Check if feature directory has any files
+   - Verify feature structure is intact
+   - Report if feature not found
+
+3. Update context in memory/context.md:
+   - Switch current feature to selected feature
+   - Update timestamp and switch reason
+   - Preserve previous context data
+
+4. Switch git branch if in git repository:
+   - Checkout feature branch if it exists
+   - Report if branch doesn't exist
+   - Handle branch switching errors gracefully
+
+5. Display feature status:
+   - Show current progress percentage
+   - List next available actions
+   - Highlight any blockers or issues
+   - Show recent activity
+
+6. Suggest next steps based on feature state:
+   - If no spec files: /sp-spec <description>
+   - If spec but no plan: /sp-plan
+   - If plan but no tasks: /sp-task
+   - If tasks exist: Show task completion status and suggest next task
+
+## Supported Feature Identification:
+- By name: /sp-continue user-authentication
+- By ID: /sp-continue 001
+- By partial match: /sp-continue auth
+
+## Context Switching:
+1. Save previous context state
+2. Load new feature context
+3. Update memory/context.md
+4. Switch git branch if available
+5. Display feature status and next steps
+
+Examples:
+- /sp-continue user-authentication
+- /sp-continue 001
+- /sp-continue auth
+"""

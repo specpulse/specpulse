@@ -53,6 +53,17 @@ class MemoryStats:
     memory_size_mb: float
 
 
+@dataclass
+class MemoryEntry:
+    """Memory entry for v1.7.0 tag-based system"""
+    id: str
+    title: str
+    content: str
+    tags: List[str]
+    date: str
+    related_features: List[str]
+
+
 class MemoryManager:
     """Enhanced memory management system"""
 
@@ -576,3 +587,565 @@ class MemoryManager:
 
         except Exception as e:
             raise ValidationError(f"Failed to export memory: {e}")
+
+    # ==================== v1.7.0 Tag-Based Memory Methods ====================
+
+    def add_decision(self, title: str, rationale: str, related_features: Optional[List[str]] = None) -> str:
+        """Add a decision entry with auto-incrementing ID (v1.7.0).
+
+        Args:
+            title: Decision title
+            rationale: Rationale for the decision
+            related_features: List of related feature IDs
+
+        Returns:
+            Decision ID (e.g., "DEC-001")
+        """
+        try:
+            # Get next decision ID
+            decision_id = self._get_next_id("DEC")
+            date_str = datetime.now().strftime("%Y-%m-%d")
+            related_str = ", ".join(related_features) if related_features else "None"
+
+            # Format entry
+            entry_text = f"""
+### {decision_id}: {title}
+Rationale: {rationale}
+Date: {date_str}
+Related: {related_str}
+"""
+
+            # Append to context.md under Decisions section
+            self._append_to_section("Decisions [tag:decision]", entry_text)
+
+            self.console.success(f"Decision added: {decision_id}")
+            return decision_id
+
+        except Exception as e:
+            self.console.error(f"Failed to add decision: {e}")
+            raise ValidationError(f"Failed to add decision: {e}")
+
+    def add_pattern(self, title: str, example: str, features_used: Optional[List[str]] = None) -> str:
+        """Add a pattern entry with auto-incrementing ID (v1.7.0).
+
+        Args:
+            title: Pattern title
+            example: Example code or description
+            features_used: List of features where pattern is used
+
+        Returns:
+            Pattern ID (e.g., "PATTERN-001")
+        """
+        try:
+            # Get next pattern ID
+            pattern_id = self._get_next_id("PATTERN")
+            date_str = datetime.now().strftime("%Y-%m-%d")
+
+            # Truncate long examples
+            if len(example) > 200:
+                example = example[:197] + "..."
+
+            features_str = ", ".join(features_used) if features_used else "None"
+
+            # Format entry
+            entry_text = f"""
+### {pattern_id}: {title}
+{example}
+Used in: {features_str}
+Date: {date_str}
+"""
+
+            # Append to context.md under Patterns section
+            self._append_to_section("Patterns [tag:pattern]", entry_text)
+
+            self.console.success(f"Pattern added: {pattern_id}")
+            return pattern_id
+
+        except Exception as e:
+            self.console.error(f"Failed to add pattern: {e}")
+            raise ValidationError(f"Failed to add pattern: {e}")
+
+    def add_constraint(self, title: str, description: str, scope: str = "All features") -> str:
+        """Add a constraint entry with auto-incrementing ID (v1.7.0).
+
+        Args:
+            title: Constraint title
+            description: Constraint description
+            scope: Scope of constraint (default: "All features")
+
+        Returns:
+            Constraint ID (e.g., "CONST-001")
+        """
+        try:
+            # Get next constraint ID
+            const_id = self._get_next_id("CONST")
+            date_str = datetime.now().strftime("%Y-%m-%d")
+
+            # Format entry
+            entry_text = f"""
+### {const_id}: {title}
+{description}
+Applies to: {scope}
+Date: {date_str}
+"""
+
+            # Append to context.md under Constraints section
+            self._append_to_section("Constraints [tag:constraint]", entry_text)
+
+            self.console.success(f"Constraint added: {const_id}")
+            return const_id
+
+        except Exception as e:
+            self.console.error(f"Failed to add constraint: {e}")
+            raise ValidationError(f"Failed to add constraint: {e}")
+
+    def query_by_tag(self, tag: str, feature: Optional[str] = None, recent: Optional[int] = None) -> List[MemoryEntry]:
+        """Query memory entries by tag (v1.7.0).
+
+        Args:
+            tag: Tag to query (decision, pattern, current, constraint)
+            feature: Optional feature ID filter
+            recent: Optional limit to recent N entries
+
+        Returns:
+            List of MemoryEntry objects
+        """
+        supported_tags = {"decision", "pattern", "current", "constraint"}
+        if tag not in supported_tags:
+            raise ValueError(f"Unsupported tag: {tag}. Must be one of {supported_tags}")
+
+        entries = self._parse_tagged_section(tag)
+
+        # Filter by feature if specified
+        if feature:
+            entries = [e for e in entries if feature in e.related_features]
+
+        # Sort by date (newest first)
+        entries.sort(key=lambda e: e.date, reverse=True)
+
+        # Limit to recent if specified
+        if recent:
+            entries = entries[:recent]
+
+        return entries
+
+    def query_relevant(self, feature_id: str) -> List[MemoryEntry]:
+        """Get all relevant memory entries for a feature (v1.7.0).
+
+        Args:
+            feature_id: Feature ID (e.g., "001")
+
+        Returns:
+            List of relevant MemoryEntry objects
+        """
+        all_entries = []
+
+        # Query all tags for this feature
+        for tag in ["decision", "pattern", "current", "constraint"]:
+            entries = self.query_by_tag(tag, feature=feature_id)
+            all_entries.extend(entries)
+
+        return all_entries
+
+    def _get_next_id(self, prefix: str) -> str:
+        """Get next auto-incrementing ID for a prefix.
+
+        Args:
+            prefix: ID prefix (DEC, PATTERN, CONST)
+
+        Returns:
+            Next ID (e.g., "DEC-002")
+        """
+        content = self.context_file.read_text(encoding='utf-8') if self.context_file.exists() else ""
+
+        # Find all IDs with this prefix
+        pattern = rf'### {prefix}-(\d+):'
+        matches = re.findall(pattern, content)
+
+        if matches:
+            max_num = max(int(m) for m in matches)
+            next_num = max_num + 1
+        else:
+            next_num = 1
+
+        return f"{prefix}-{next_num:03d}"
+
+    def _append_to_section(self, section_header: str, content: str) -> None:
+        """Append content to a specific section in context.md.
+
+        Args:
+            section_header: Section header to append to
+            content: Content to append
+        """
+        if not self.context_file.exists():
+            self._initialize_tagged_memory()
+
+        file_content = self.context_file.read_text(encoding='utf-8')
+
+        # Find the section
+        section_pattern = rf'(## {re.escape(section_header)})'
+        if not re.search(section_pattern, file_content):
+            # Add section if it doesn't exist
+            file_content += f"\n\n## {section_header}\n"
+
+        # Find where to insert (after section header, before next section)
+        parts = re.split(rf'(## {re.escape(section_header)})', file_content)
+
+        if len(parts) >= 3:
+            # parts[0] = before section
+            # parts[1] = section header
+            # parts[2] = section content + rest
+
+            # Find next section in parts[2]
+            next_section = re.search(r'\n## ', parts[2])
+            if next_section:
+                section_content = parts[2][:next_section.start()]
+                rest = parts[2][next_section.start():]
+                new_content = parts[0] + parts[1] + section_content + content + rest
+            else:
+                new_content = parts[0] + parts[1] + parts[2] + content
+        else:
+            new_content = file_content + content
+
+        self.context_file.write_text(new_content, encoding='utf-8')
+
+    def _parse_tagged_section(self, tag: str) -> List[MemoryEntry]:
+        """Parse entries from a tagged section.
+
+        Args:
+            tag: Tag to parse (decision, pattern, constraint, current)
+
+        Returns:
+            List of MemoryEntry objects
+        """
+        if not self.context_file.exists():
+            return []
+
+        content = self.context_file.read_text(encoding='utf-8')
+        entries = []
+
+        # Find section for this tag
+        section_pattern = rf'## .+? \[tag:{tag}\]$(.*?)(?=^## |\Z)'
+        section_match = re.search(section_pattern, content, re.MULTILINE | re.DOTALL)
+
+        if not section_match:
+            return []
+
+        section_content = section_match.group(1)
+
+        # Parse individual entries (### headers)
+        entry_pattern = re.compile(r'^### (.+?)$(.*?)(?=^### |\Z)', re.MULTILINE | re.DOTALL)
+
+        for match in entry_pattern.finditer(section_content):
+            header = match.group(1).strip()
+            body = match.group(2).strip()
+
+            # Extract ID and title
+            id_title_match = re.match(r'([A-Z]+-\d+):\s*(.+)', header)
+            if id_title_match:
+                entry_id = id_title_match.group(1)
+                title = id_title_match.group(2)
+            else:
+                continue
+
+            # Extract metadata
+            related = self._extract_field(body, "Related")
+            date = self._extract_field(body, "Date")
+
+            related_features = []
+            if related and related != "None":
+                # Extract feature IDs (001, 002, etc.)
+                related_features = re.findall(r'\b(\d{3})\b', related)
+
+            entry = MemoryEntry(
+                id=entry_id,
+                title=title,
+                content=body,
+                tags=[tag],
+                date=date or datetime.now().strftime("%Y-%m-%d"),
+                related_features=related_features
+            )
+            entries.append(entry)
+
+        return entries
+
+    def _extract_field(self, content: str, field_name: str) -> Optional[str]:
+        """Extract a field value from entry content.
+
+        Args:
+            content: Entry content
+            field_name: Field name to extract
+
+        Returns:
+            Field value or None
+        """
+        pattern = rf'{field_name}:\s*(.+?)(?:\n|$)'
+        match = re.search(pattern, content, re.IGNORECASE)
+        return match.group(1).strip() if match else None
+
+    def _initialize_tagged_memory(self) -> None:
+        """Initialize context.md with tagged structure for v1.7.0."""
+        template = """# Memory: Context
+
+## Active [tag:current]
+<!-- Current feature and project state -->
+
+## Decisions [tag:decision]
+<!-- Architectural decisions with rationale -->
+
+## Patterns [tag:pattern]
+<!-- Code patterns and conventions -->
+
+## Constraints [tag:constraint]
+<!-- Technical constraints and requirements -->
+"""
+        self.context_file.write_text(template, encoding='utf-8')
+
+    # ==================== Migration Methods (v1.7.0) ====================
+
+    def needs_migration(self) -> bool:
+        """Check if context.md needs migration to tagged format.
+
+        Returns:
+            True if migration needed, False otherwise
+        """
+        if not self.context_file.exists():
+            return False
+
+        content = self.context_file.read_text(encoding='utf-8')
+
+        # Check for tag headers
+        has_tags = bool(re.search(r'\[tag:\w+\]', content))
+
+        return not has_tags
+
+    def migrate_to_tagged_format(self, dry_run: bool = False) -> Dict[str, Any]:
+        """Migrate old context.md to tagged format.
+
+        Args:
+            dry_run: If True, don't actually migrate, just report what would happen
+
+        Returns:
+            Migration report dictionary
+        """
+        if not self.context_file.exists():
+            raise FileNotFoundError("context.md not found")
+
+        if not self.needs_migration():
+            return {
+                "status": "no_migration_needed",
+                "message": "Context file already uses tagged format"
+            }
+
+        # Read original content
+        original_content = self.context_file.read_text(encoding='utf-8')
+        original_lines = len(original_content.splitlines())
+
+        # Create backup
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_path = self.context_file.parent / f"context.md.backup.{timestamp}"
+
+        if not dry_run:
+            backup_path.write_text(original_content, encoding='utf-8')
+
+        # Categorize content
+        categorized = self._categorize_content(original_content)
+
+        # Build new content
+        new_content = self._build_tagged_content(categorized)
+
+        # Validate migration
+        new_lines = len(new_content.splitlines())
+
+        report = {
+            "status": "success" if not dry_run else "dry_run",
+            "backup_path": str(backup_path) if not dry_run else None,
+            "original_lines": original_lines,
+            "new_lines": new_lines,
+            "categorized": {
+                "decisions": len(categorized["decisions"]),
+                "patterns": len(categorized["patterns"]),
+                "constraints": len(categorized["constraints"]),
+                "current": len(categorized["current"]),
+                "uncategorized": len(categorized["uncategorized"])
+            }
+        }
+
+        # Write new content
+        if not dry_run:
+            self.context_file.write_text(new_content, encoding='utf-8')
+
+        return report
+
+    def rollback_migration(self, backup_path: Optional[Path] = None) -> bool:
+        """Rollback migration by restoring from backup.
+
+        Args:
+            backup_path: Path to backup file (auto-detect latest if None)
+
+        Returns:
+            True if rollback successful
+        """
+        if backup_path is None:
+            # Find latest backup
+            backups = sorted(self.context_file.parent.glob("context.md.backup.*"), reverse=True)
+            if not backups:
+                raise FileNotFoundError("No backup files found")
+            backup_path = backups[0]
+
+        backup_path = Path(backup_path)
+
+        if not backup_path.exists():
+            raise FileNotFoundError(f"Backup not found: {backup_path}")
+
+        # Restore from backup
+        backup_content = backup_path.read_text(encoding='utf-8')
+        self.context_file.write_text(backup_content, encoding='utf-8')
+
+        return True
+
+    def _categorize_content(self, content: str) -> Dict[str, List[str]]:
+        """Categorize content using heuristics.
+
+        Args:
+            content: Original content to categorize
+
+        Returns:
+            Dictionary with categorized entries
+        """
+        categorized = {
+            "decisions": [],
+            "patterns": [],
+            "constraints": [],
+            "current": [],
+            "uncategorized": []
+        }
+
+        # Split into sections by headers
+        sections = re.split(r'^## (.+?)$', content, flags=re.MULTILINE)
+
+        for i in range(1, len(sections), 2):
+            if i + 1 >= len(sections):
+                break
+
+            header = sections[i].strip()
+            section_content = sections[i + 1].strip()
+
+            if not section_content:
+                continue
+
+            # Categorize based on header and content
+            category = self._detect_category(header, section_content)
+            categorized[category].append({
+                "header": header,
+                "content": section_content
+            })
+
+        return categorized
+
+    def _detect_category(self, header: str, content: str) -> str:
+        """Detect category for a section.
+
+        Args:
+            header: Section header
+            content: Section content
+
+        Returns:
+            Category name (decision, pattern, constraint, current, uncategorized)
+        """
+        header_lower = header.lower()
+        content_lower = content.lower()
+
+        # Decision keywords
+        if any(kw in header_lower or kw in content_lower for kw in [
+            "decision", "decided", "adr", "architecture decision", "chose", "selected"
+        ]):
+            return "decisions"
+
+        # Pattern keywords
+        if any(kw in header_lower or kw in content_lower for kw in [
+            "pattern", "convention", "standard", "format", "template"
+        ]):
+            return "patterns"
+
+        # Constraint keywords
+        if any(kw in header_lower or kw in content_lower for kw in [
+            "constraint", "limitation", "requirement", "must", "shall", "restriction"
+        ]):
+            return "constraints"
+
+        # Current/active keywords
+        if any(kw in header_lower for kw in [
+            "active", "current", "status", "state", "progress"
+        ]):
+            return "current"
+
+        return "uncategorized"
+
+    def _build_tagged_content(self, categorized: Dict[str, List[str]]) -> str:
+        """Build tagged content from categorized sections.
+
+        Args:
+            categorized: Categorized content dictionary
+
+        Returns:
+            New content with tagged format
+        """
+        parts = ["# Memory: Context\n"]
+
+        # Add Current section
+        parts.append("\n## Active [tag:current]")
+        if categorized["current"]:
+            for item in categorized["current"]:
+                parts.append(f"\n### {item['header']}")
+                parts.append(item['content'])
+        else:
+            parts.append("<!-- Current feature and project state -->\n")
+
+        # Add Decisions section
+        parts.append("\n## Decisions [tag:decision]")
+        if categorized["decisions"]:
+            for idx, item in enumerate(categorized["decisions"], 1):
+                parts.append(f"\n### DEC-{idx:03d}: {item['header']}")
+                parts.append(item['content'])
+                if "date" not in item['content'].lower():
+                    parts.append(f"Date: {datetime.now().strftime('%Y-%m-%d')}")
+                if "related" not in item['content'].lower():
+                    parts.append("Related: None")
+        else:
+            parts.append("<!-- Architectural decisions with rationale -->\n")
+
+        # Add Patterns section
+        parts.append("\n## Patterns [tag:pattern]")
+        if categorized["patterns"]:
+            for idx, item in enumerate(categorized["patterns"], 1):
+                parts.append(f"\n### PATTERN-{idx:03d}: {item['header']}")
+                parts.append(item['content'])
+                if "used in" not in item['content'].lower():
+                    parts.append("Used in: None")
+                if "date" not in item['content'].lower():
+                    parts.append(f"Date: {datetime.now().strftime('%Y-%m-%d')}")
+        else:
+            parts.append("<!-- Code patterns and conventions -->\n")
+
+        # Add Constraints section
+        parts.append("\n## Constraints [tag:constraint]")
+        if categorized["constraints"]:
+            for idx, item in enumerate(categorized["constraints"], 1):
+                parts.append(f"\n### CONST-{idx:03d}: {item['header']}")
+                parts.append(item['content'])
+                if "applies to" not in item['content'].lower():
+                    parts.append("Applies to: All features")
+                if "date" not in item['content'].lower():
+                    parts.append(f"Date: {datetime.now().strftime('%Y-%m-%d')}")
+        else:
+            parts.append("<!-- Technical constraints and requirements -->\n")
+
+        # Add uncategorized at the end
+        if categorized["uncategorized"]:
+            parts.append("\n## Other Notes")
+            for item in categorized["uncategorized"]:
+                parts.append(f"\n### {item['header']}")
+                parts.append(item['content'])
+
+        return "\n".join(parts)

@@ -1,0 +1,66 @@
+description = "Generate or validate implementation plans with versioning"
+prompt = """
+Handle the /sp-plan command with arguments: {{args}}
+
+First, detect current feature context:
+- Read memory/context.md for current feature metadata
+- Use git branch name if available (e.g., 001-user-authentication)
+- Fall back to most recently created feature directory
+- If no context found, ask user to specify feature or run /sp-pulse first
+
+Parse arguments to determine action:
+- If "validate": Check plan against SDD principles
+- Otherwise: Generate new plan
+
+## For /sp-plan generate or /sp-plan:
+1. Show list of existing spec files in current feature directory
+2. Ask user which spec file to base plan on
+3. Read selected specification from @{specs/*/spec-XXX.md}
+
+4. Run Phase Gates checks:
+   - SDD compliance verification
+   - Architecture documentation check
+   - Quality assurance strategy defined
+   - Stakeholder alignment confirmed
+   - Incremental planning validated
+
+5. Generate plan sections:
+   - Technology stack
+   - Architecture overview
+   - Implementation phases
+   - API contracts
+   - Data models
+   - Testing strategy
+
+6. Track architectural decisions:
+   - Document all technology choices
+   - Record trade-offs and rationale
+
+7. Check existing plan files and create next version (plan-001.md, plan-002.md, etc.)
+8. Write plan to plans/XXX-feature/plan-XXX.md
+9. Run validation:
+   - !{bash scripts/sp-pulse-plan.sh "XXX-feature"}
+
+## For /sp-plan validate:
+1. Show list of existing plan files in current feature directory
+2. Ask user which plan file to validate
+3. Read selected plan from @{plans/*/plan-XXX.md}
+4. Run validation:
+   - !{bash scripts/sp-pulse-plan.sh "XXX-feature"}
+5. Verify Phase Gates compliance
+6. Check architecture documentation
+7. Ensure quality assurance strategy
+8. Validate framework choices
+9. Report validation results
+
+SDD Compliance Gates must pass before implementation:
+- ✅ Specification clearly defined
+- ✅ Incremental phases planned
+- ✅ Tasks properly decomposed
+- ✅ Quality strategy appropriate
+- ✅ Architecture documented
+
+Examples:
+- /sp-plan generate
+- /sp-plan validate
+"""

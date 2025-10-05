@@ -1,0 +1,24 @@
+project:
+  name: TestApp
+  type: web-app
+  description: Test application for SpecPulse v1.7.0
+  version: 1.0.0
+
+tech_stack:
+  frontend: React, TypeScript, Tailwind CSS
+  backend: Node.js, Express, TypeScript
+  database: PostgreSQL
+  cache: Redis
+  message_queue: RabbitMQ
+  other:
+    deployment: Docker, Kubernetes
+    ci_cd: GitHub Actions
+
+team_size: 1
+
+preferences:
+  - Functional components over class components
+  - Prefer composition over inheritance
+  - Always include loading states
+  - Use TypeScript strict mode
+  - Follow Airbnb style guide

@@ -1,0 +1,61 @@
+description = "Track progress across all features or specific feature details"
+prompt = """
+Handle the /sp-status command with arguments: {{args}}
+
+First, detect current feature context:
+- Read memory/context.md for current feature metadata
+- Use git branch name if available (e.g., 001-user-authentication)
+- Fall back to most recently created feature directory
+- If no context found, work with all features
+
+Parse arguments to determine scope:
+- If feature name provided: Show detailed status for that feature
+- Otherwise: Show overview of all features
+
+## For /sp-status (all features overview):
+1. Scan all feature directories (specs/*, plans/*, tasks/*)
+2. Count features by status: active, completed, in_progress, paused
+3. Calculate overall project progress
+4. Show summary statistics:
+   ```
+   TOTAL_FEATURES=5
+   ACTIVE_FEATURES=2
+   COMPLETED_FEATURES=1
+   IN_PROGRESS_FEATURES=1
+   PAUSED_FEATURES=1
+   OVERALL_PROGRESS=42%
+   ```
+5. List all features with their status and progress percentage
+6. Highlight current active feature from context
+
+## For /sp-status [feature-name] (detailed feature status):
+1. Detect feature directory using context detection logic
+2. Read all task files in the feature's tasks directory
+3. Calculate completion percentage based on task status
+4. Show detailed breakdown:
+   ```
+   FEATURE: 001-user-authentication
+   STATUS: active
+   PROGRESS: 65%
+   SPECS: 2 files
+   PLANS: 1 file
+   TASKS: 1 file (25 total tasks)
+   COMPLETED_TASKS: 16
+   IN_PROGRESS_TASKS: 5
+   BLOCKED_TASKS: 1
+   LAST_UPDATED: 2025-01-09
+   ```
+5. Show phase-by-phase progress
+6. List any blockers or issues
+7. Provide recommendations for next steps
+
+Progress calculation:
+- Scan task files for completion status: [x] completed, [ ] pending, [-] in progress, [!] blocked
+- Calculate percentages: completed / total * 100
+- Track status: active, completed, in_progress, paused, blocked
+
+Examples:
+- /sp-status
+- /sp-status user-authentication
+- /sp-status 001
+"""

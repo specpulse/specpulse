@@ -21,6 +21,18 @@
 
 SpecPulse is a universal **Specification-Driven Development (SDD)** framework that works with ANY software project - web apps, mobile apps, desktop software, games, APIs, ML projects, and more. It ensures every feature starts with clear specifications, validated plans, and tracked tasks.
 
+## 📋 What's New in v1.7.0 - Better Context for LLMs
+
+> **🧠 Intelligent Context Management**
+> - **🏷️ Structured Memory**: Tag-based organization (decisions, patterns, constraints, current state)
+> - **🔄 Auto Context Injection**: AI scripts automatically receive project context
+> - **📝 Quick Notes**: Capture insights during development, merge to specs later
+> - **🎯 Zero Friction**: LLMs stop asking repetitive questions about tech stack
+> - **🔍 Queryable Memory**: Find past decisions and patterns instantly
+> - **⚡ Performance**: Sub-100ms queries, <500 char context injection
+>
+> See [Memory Management](#-memory-management-v170) section below for details.
+
 ## 📋 What's New in v1.6.0 - Tiered Templates
 
 > **🎯 Progressive Specification Building**
@@ -191,6 +203,52 @@ specpulse help --list                      # List all help topics
 ```
 
 ## ✨ Features
+
+### 🧠 Memory Management (v1.7.0)
+
+**Structured memory with tag-based organization:**
+```bash
+# Add architectural decision
+specpulse memory add-decision "Use Stripe for payments" \
+  --rationale "Better API, superior documentation" \
+  --feature 003
+
+# Add code pattern
+specpulse memory add-pattern "API Error Format" \
+  --example "{ success: bool, data: any, error: string }" \
+  --features "001,002"
+
+# Query decisions
+specpulse memory query --tag decision --recent 5
+
+# Get all relevant memory for feature
+specpulse memory relevant 003
+```
+
+**Context injection for AI:**
+```bash
+# Set project context once
+specpulse context set project.name "MyApp"
+specpulse context set tech_stack.frontend "React, TypeScript"
+specpulse context auto-detect  # Or auto-detect from package.json
+
+# Context auto-injected in all /sp-* commands!
+/sp-pulse new-feature
+# AI sees tech stack automatically - no repetitive questions!
+```
+
+**Quick notes during development:**
+```bash
+# Capture insights without breaking flow
+specpulse note "Stripe webhooks require HTTPS" --feature 003
+specpulse note "Rate limit: 100 req/min per user"
+
+# Review later
+specpulse notes list 003
+
+# Merge important notes to spec
+specpulse notes merge 003 --note 20241006120000
+```
 
 ### 📑 Tiered Templates (v1.6.0+)
 
