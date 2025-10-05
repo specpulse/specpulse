@@ -4,16 +4,52 @@ SpecPulse Validator - Enhanced with comprehensive validation rules
 
 from pathlib import Path
 from typing import List, Dict, Optional, Tuple
+from dataclasses import dataclass
 import yaml
 import re
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
+from rich.syntax import Syntax
 from .validation_rules import (
     validation_rules_registry, ValidationResult, ValidationSeverity,
     ValidationCategory
 )
 
 
+@dataclass
+class ValidationExample:
+    """
+    Enhanced validation error with actionable guidance.
+
+    This dataclass represents a validation error with rich context including
+    examples, suggestions, and help commands to guide LLMs in fixing issues.
+
+    Attributes:
+        message: Short error message (e.g., "Missing: Acceptance Criteria")
+        meaning: Explanation of what this section means and why it's important
+        example: Concrete example of valid content (multiline supported)
+        suggestion: Actionable suggestion for fixing the issue
+        help_command: Command to get more detailed help
+        auto_fix: Whether this issue can be automatically fixed
+    """
+    message: str
+    meaning: str
+    example: str
+    suggestion: str
+    help_command: str
+    auto_fix: bool = False
+
+    def __str__(self) -> str:
+        """String representation for display."""
+        return f"{self.message}\n\nWhat this means:\n  {self.meaning}\n\nSuggestion:\n  {self.suggestion}"
+
+
 class Validator:
     """Validates SpecPulse project components with enhanced rules"""
+
+    # Class-level cache for validation examples (shared across instances)
+    _validation_examples_cache: Optional[Dict[str, ValidationExample]] = None
 
     def __init__(self, project_root: Optional[Path] = None):
         self.results = []
@@ -662,3 +698,252 @@ class Validator:
                 fixed_content += "\n\n## Tasks\n### T001: [Task Name]\n- **Status**: Pending\n"
 
         return fixed_content
+
+    @classmethod
+    def load_validation_examples(cls) -> Dict[str, ValidationExample]:
+        """
+        Load validation examples from YAML file with caching.
+
+        This method loads the validation_examples.yaml file and converts
+        it to ValidationExample objects. Results are cached at the class
+        level to avoid repeated file I/O.
+
+        Returns:
+            Dictionary mapping example keys to ValidationExample objects
+
+        Raises:
+            FileNotFoundError: If validation_examples.yaml not found
+            yaml.YAMLError: If YAML is malformed
+        """
+        # Return cached examples if available
+        if cls._validation_examples_cache is not None:
+            return cls._validation_examples_cache
+
+        # Find the validation_examples.yaml file
+        # It should be in specpulse/resources/validation_examples.yaml
+        current_file = Path(__file__)
+        resources_dir = current_file.parent.parent / "resources"
+        examples_file = resources_dir / "validation_examples.yaml"
+
+        if not examples_file.exists():
+            raise FileNotFoundError(
+                f"Validation examples file not found at {examples_file}"
+            )
+
+        try:
+            with open(examples_file, 'r', encoding='utf-8') as f:
+                yaml_data = yaml.safe_load(f)
+
+            # Convert YAML data to ValidationExample objects
+            examples = {}
+            for key, value in yaml_data.items():
+                # Skip metadata section
+                if key == "metadata":
+                    continue
+
+                # Create ValidationExample from YAML data
+                if isinstance(value, dict) and 'message' in value:
+                    examples[key] = ValidationExample(
+                        message=value.get('message', ''),
+                        meaning=value.get('meaning', ''),
+                        example=value.get('example', ''),
+                        suggestion=value.get('suggestion', ''),
+                        help_command=value.get('help_command', ''),
+                        auto_fix=value.get('auto_fix', False)
+                    )
+
+            # Cache the results
+            cls._validation_examples_cache = examples
+            return examples
+
+        except yaml.YAMLError as e:
+            raise yaml.YAMLError(f"Failed to parse validation examples YAML: {e}")
+        except Exception as e:
+            raise Exception(f"Error loading validation examples: {e}")
+
+    def get_validation_example(self, example_key: str) -> Optional[ValidationExample]:
+        """
+        Get a specific validation example by key.
+
+        Args:
+            example_key: Key for the validation example (e.g., 'missing_acceptance_criteria')
+
+        Returns:
+            ValidationExample if found, None otherwise
+        """
+        examples = self.load_validation_examples()
+        return examples.get(example_key)
+
+    def _check_section_exists(self, content: str, section_name: str) -> Optional[ValidationExample]:
+        """
+        Check if a section exists in spec content and return enhanced error if missing.
+
+        This method replaces simple string error messages with rich ValidationExample
+        objects that provide actionable guidance to LLMs.
+
+        Args:
+            content: Full specification content
+            section_name: Name of section to check (e.g., "Acceptance Criteria")
+
+        Returns:
+            ValidationExample if section is missing, None if section exists
+
+        Example:
+            >>> validator = Validator()
+            >>> content = "# Spec\\n## Executive Summary\\nText here"
+            >>> error = validator._check_section_exists(content, "Acceptance Criteria")
+            >>> if error:
+            >>>     print(error.message)  # "Missing: Acceptance Criteria"
+        """
+        # Check if section exists (case-insensitive)
+        section_marker = f"## {section_name}"
+        if section_marker in content:
+            return None  # Section exists, no error
+
+        # Section is missing - get enhanced error message
+        # Map section names to example keys
+        section_to_key_map = {
+            "Executive Summary": "missing_executive_summary",
+            "Problem Statement": "missing_problem_statement",
+            "Proposed Solution": "missing_proposed_solution",
+            "Functional Requirements": "missing_functional_requirements",
+            "Detailed Requirements": "missing_functional_requirements",  # Alias
+            "Non-Functional Requirements": "missing_nfr_performance",  # Generic NFR
+            "User Stories": "missing_user_stories",
+            "Acceptance Criteria": "missing_acceptance_criteria",
+            "Success Criteria": "missing_success_criteria",
+            "Technical Constraints": "missing_technical_constraints",
+            "Dependencies": "missing_dependencies",
+            "Risks and Mitigations": "missing_risks",
+        }
+
+        # Get the validation example key
+        example_key = section_to_key_map.get(section_name)
+
+        if example_key:
+            # Get pre-defined enhanced error
+            example = self.get_validation_example(example_key)
+            if example:
+                return example
+
+        # Fallback: create basic ValidationExample if no template found
+        return ValidationExample(
+            message=f"Missing: {section_name}",
+            meaning=f"The '{section_name}' section is required but not found in the specification.",
+            example=f"## {section_name}\\n[Content describing {section_name.lower()}]",
+            suggestion=f"Add a section '## {section_name}' to your specification.",
+            help_command=f"specpulse help {section_name.lower().replace(' ', '-')}",
+            auto_fix=True
+        )
+
+    def format_enhanced_error(self, example: ValidationExample, console: Optional[Console] = None) -> str:
+        """
+        Format a ValidationExample into a beautiful, LLM-friendly error message using Rich.
+
+        This method creates a formatted panel with color-coded sections that provide
+        actionable guidance for fixing validation issues.
+
+        Args:
+            example: ValidationExample to format
+            console: Optional Rich Console instance (creates one if not provided)
+
+        Returns:
+            Formatted error message as string (can be printed with Rich or as plain text)
+
+        Example:
+            >>> validator = Validator()
+            >>> example = validator.get_validation_example("missing_acceptance_criteria")
+            >>> formatted = validator.format_enhanced_error(example)
+            >>> print(formatted)
+        """
+        if console is None:
+            console = Console()
+
+        # Create the formatted content
+        content = Text()
+
+        # Title (message) - bold red
+        content.append(f"❌ {example.message}\n\n", style="bold red")
+
+        # What this means section - cyan
+        content.append("What this means:\n", style="bold cyan")
+        content.append(f"  {example.meaning}\n\n", style="white")
+
+        # Example section - green
+        content.append("Example:\n", style="bold green")
+        # Format example with slight indentation and different color
+        for line in example.example.split("\n"):
+            if line.strip():
+                content.append(f"  {line}\n", style="green")
+        content.append("\n")
+
+        # Suggestion section - yellow
+        content.append("Suggestion for LLM:\n", style="bold yellow")
+        content.append(f"  {example.suggestion}\n\n", style="yellow")
+
+        # Quick fix section (if auto-fixable) - magenta
+        if example.auto_fix:
+            content.append("Quick fix:\n", style="bold magenta")
+            content.append("  specpulse validate <spec-id> --fix  # Adds template section\n\n", style="magenta")
+
+        # Help command - blue
+        content.append("Help:\n", style="bold blue")
+        content.append(f"  {example.help_command}\n", style="blue")
+
+        # Create a panel with the content
+        panel = Panel(
+            content,
+            title=f"[bold white]Validation Error[/bold white]",
+            border_style="red",
+            padding=(1, 2)
+        )
+
+        # Render to string using console
+        with console.capture() as capture:
+            console.print(panel)
+
+        return capture.get()
+
+    def format_enhanced_error_plain(self, example: ValidationExample) -> str:
+        """
+        Format a ValidationExample into a plain text error message (no colors).
+
+        This is useful for environments that don't support Rich formatting or
+        for logging purposes.
+
+        Args:
+            example: ValidationExample to format
+
+        Returns:
+            Plain text formatted error message
+
+        Example:
+            >>> validator = Validator()
+            >>> example = validator.get_validation_example("missing_user_stories")
+            >>> plain_text = validator.format_enhanced_error_plain(example)
+        """
+        output = []
+        output.append(f"❌ {example.message}")
+        output.append("")
+        output.append("What this means:")
+        output.append(f"  {example.meaning}")
+        output.append("")
+        output.append("Example:")
+        for line in example.example.split("\n"):
+            if line.strip():
+                output.append(f"  {line}")
+        output.append("")
+        output.append("Suggestion for LLM:")
+        output.append(f"  {example.suggestion}")
+        output.append("")
+
+        if example.auto_fix:
+            output.append("Quick fix:")
+            output.append("  specpulse validate <spec-id> --fix  # Adds template section")
+            output.append("")
+
+        output.append("Help:")
+        output.append(f"  {example.help_command}")
+        output.append("")
+
+        return "\n".join(output)
