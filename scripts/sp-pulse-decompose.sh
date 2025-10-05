@@ -49,16 +49,6 @@ else
     echo "PATH=$SPEC_DIR"
 fi
 
-# v1.7.0: Inject feature-specific context for AI
-if command -v specpulse &> /dev/null; then
-    CONTEXT_INJECTION=$(specpulse context inject --feature "$FEATURE_ID" 2>/dev/null || echo "")
-    if [ -n "$CONTEXT_INJECTION" ]; then
-        echo "CONTEXT_INJECTION<<EOF"
-        echo "$CONTEXT_INJECTION"
-        echo "EOF"
-    fi
-fi
-
 # Return template paths for AI
 echo "TEMPLATES_DIR=templates/decomposition"
 echo "MEMORY_FILE=memory/context.md"

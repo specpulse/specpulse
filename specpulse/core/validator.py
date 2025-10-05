@@ -13,6 +13,7 @@ from rich.panel import Panel
 from rich.text import Text
 from rich.syntax import Syntax
 from ..utils.backup_manager import BackupManager
+from ..utils.progress_calculator import SectionStatus, ProgressCalculator
 from .validation_rules import (
     validation_rules_registry, ValidationResult, ValidationSeverity,
     ValidationCategory
@@ -45,6 +46,48 @@ class ValidationExample:
     def __str__(self) -> str:
         """String representation for display."""
         return f"{self.message}\n\nWhat this means:\n  {self.meaning}\n\nSuggestion:\n  {self.suggestion}"
+
+
+@dataclass
+class ValidationProgress:
+    """
+    Result of partial/progressive validation.
+
+    This dataclass represents the progress of an incomplete specification,
+    showing completion percentage, section statuses, and suggestions for
+    what to work on next.
+
+    Attributes:
+        completion_pct: Completion percentage (0-100)
+        section_statuses: Dict mapping section names to SectionStatus (COMPLETE/PARTIAL/MISSING)
+        next_suggestion: Suggested next section to work on (None if complete)
+        total_sections: Total number of tracked sections
+        complete_sections: Number of complete sections
+        partial_sections: Number of partial sections
+        missing_sections: Number of missing sections
+    """
+    completion_pct: int
+    section_statuses: Dict[str, SectionStatus]
+    next_suggestion: Optional[str]
+    total_sections: int
+    complete_sections: int
+    partial_sections: int
+    missing_sections: int
+
+    def __str__(self) -> str:
+        """String representation for display."""
+        status_lines = []
+        status_lines.append(f"Progress: {self.completion_pct}% complete\n")
+
+        for section, status in self.section_statuses.items():
+            icon = "✓" if status == SectionStatus.COMPLETE else ("⚠️" if status == SectionStatus.PARTIAL else "⭕")
+            status_text = status.value
+            status_lines.append(f"{icon} {section} ({status_text})")
+
+        if self.next_suggestion:
+            status_lines.append(f"\nNext suggested section: {self.next_suggestion}")
+
+        return "\n".join(status_lines)
 
 
 class Validator:
@@ -1194,3 +1237,53 @@ class Validator:
         )
 
         return ''.join(diff)
+
+    def validate_partial(self, spec_path: Path) -> ValidationProgress:
+        """
+        Perform partial/progressive validation on an incomplete specification.
+
+        This method validates a spec that may be incomplete, returning progress
+        information instead of errors. It's designed for incremental spec building.
+
+        Args:
+            spec_path: Path to specification file
+
+        Returns:
+            ValidationProgress with completion percentage and section statuses
+
+        Raises:
+            FileNotFoundError: If spec file doesn't exist
+
+        Example:
+            >>> validator = Validator()
+            >>> progress = validator.validate_partial(Path("specs/001-feature/spec-001.md"))
+            >>> print(f"Spec is {progress.completion_pct}% complete")
+            >>> print(f"Next: {progress.next_suggestion}")
+        """
+        if not spec_path.exists():
+            raise FileNotFoundError(f"Specification file not found: {spec_path}")
+
+        # Read spec content
+        spec_content = spec_path.read_text(encoding='utf-8')
+
+        # Use ProgressCalculator to analyze completion
+        calculator = ProgressCalculator()
+        progress_result = calculator.calculate_completion_percentage(spec_content)
+
+        # Get next section suggestion
+        next_suggestion = calculator.suggest_next_section(progress_result.section_statuses)
+
+        # Count section statuses
+        complete_count = sum(1 for status in progress_result.section_statuses.values() if status == SectionStatus.COMPLETE)
+        partial_count = sum(1 for status in progress_result.section_statuses.values() if status == SectionStatus.PARTIAL)
+        missing_count = sum(1 for status in progress_result.section_statuses.values() if status == SectionStatus.MISSING)
+
+        return ValidationProgress(
+            completion_pct=progress_result.completion_percentage,
+            section_statuses=progress_result.section_statuses,
+            next_suggestion=next_suggestion,
+            total_sections=len(progress_result.section_statuses),
+            complete_sections=complete_count,
+            partial_sections=partial_count,
+            missing_sections=missing_count
+        )
