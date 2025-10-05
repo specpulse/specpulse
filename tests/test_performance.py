@@ -71,20 +71,19 @@ class TestPerformance:
 
         for i in range(num_templates):
             template_path = templates_dir / f"test_template_{i}.md"
-            template_content = f"""
-# Test Template {i}
-
-## Variables
-- feature_name: {{{{ feature_name }}}}
-- spec_id: {{{{ spec_id }}}}
-- date: {{{{ date }}}}
-
-## Content
-This is test template {i} for {{{{ feature_name }}}.
-
-## Sections
-{chr(10).join(f"## Section {j}\\nContent for section {j}\\n" for j in range(5))}
-"""
+            sections_list = [f"## Section {j}\nContent for section {j}\n" for j in range(5)]
+            sections_text = "\n".join(sections_list)
+            template_content = (
+                f"# Test Template {i}\n\n"
+                f"## Variables\n"
+                f"- feature_name: {{{{ feature_name }}}}\n"
+                f"- spec_id: {{{{ spec_id }}}}\n"
+                f"- date: {{{{ date }}}}\n\n"
+                f"## Content\n"
+                f"This is test template {i} for {{{{ feature_name }}}}.\n\n"
+                f"## Sections\n"
+                f"{sections_text}\n"
+            )
             template_path.write_text(template_content)
 
         # Measure validation performance
@@ -430,7 +429,7 @@ Implementation plan for feature {i+1}
                 details={
                     "description": f"Description for feature {i}",
                     "tags": [f"tag_{j}" for j in range(5)],
-                    "metadata": {"key": f"value_{i}"} for key in range(3)
+                    "metadata": {f"key_{k}": f"value_{i}" for k in range(3)}
                 },
                 impact="medium",
                 category="export_test"

@@ -21,45 +21,57 @@
 
 SpecPulse is a universal **Specification-Driven Development (SDD)** framework that works with ANY software project - web apps, mobile apps, desktop software, games, APIs, ML projects, and more. It ensures every feature starts with clear specifications, validated plans, and tracked tasks.
 
-> **Latest Update (v1.5.0)** - Quality & Documentation Enhancement:
-> - 🎯 **Comprehensive Help System**: Built-in CLI help with 6 detailed topics
-> - 📚 **Enhanced Documentation**: Complete documentation suite with guides and references
-> - 🧪 **Robust Testing Infrastructure**: 377+ tests with cross-platform CI/CD pipeline
-> - 🔧 **Production-Ready Features**: Template validation, memory management, advanced error handling
-> - 🎯 **Improved User Experience**: Rich console output, better error recovery, contextual help
-> - 🚀 **Cross-Platform Support**: Enhanced Windows, macOS, and Linux compatibility
+## 📋 What's New in v1.6.0 - Tiered Templates
+
+> **🎯 Progressive Specification Building**
+> - **📑 Three Template Tiers**: Minimal (3 sections), Standard (7-8 sections), Complete (15+ sections)
+> - **✅ Content Preservation**: Your work is never lost during tier expansion
+> - **🎯 LLM Guidance**: AI-optimized comments in every template
+> - **🔄 Flexible Workflow**: Start minimal, expand when ready
+> - **📊 Automatic Backups**: Timestamped backups before each expansion
+> - **👁️ Preview Changes**: `--show-diff` to see what will be added
 >
-> **v1.4.5** - Version Management:
-> - 🎯 **Single Source of Truth**: Version now managed only in `_version.py`
-> - 📦 **Module Support**: Can run with `python -m specpulse`
-> - 🔧 **Dynamic Version**: No more version sync issues
->
-> **v1.4.4** - Critical Workflow Fixes:
-> - 🐛 **Fixed Script Numbering**: Resolved `/sp-pulse` creating empty placeholders while subsequent commands created new files
-> - 🎯 **Fixed Task Detection**: Execute scripts now properly detect task format (`### T001:` with `**Status**:`)
-> - 📝 **Unified Placeholders**: All scripts use consistent `<!-- INSTRUCTION: Generate -->` markers
-> - 🔧 **PowerShell Parity**: PowerShell scripts now match Bash behavior exactly
->
-> **v1.4.3** - Script Numbering Fix:
-> - 🔢 **Fixed Numbering Logic**: Spec, plan, and task files now number correctly (001, 002, 003...)
-> - 📝 **No Empty First Files**: spec-001.md, plan-001.md, task-001.md always contain content
-> - 🎯 **Proper Interactive Mode**: Scripts create placeholder files for AI to fill
->
-> **v1.4.2** - Template System Enhancement:
-> - 📁 **Physical Template Files**: Templates now exist as physical files for AI tools to read
-> - 🔧 **Complete PowerShell Support**: Added PowerShell scripts matching all Bash functionality
-> - 📝 **Enhanced Decomposition Templates**: Full microservice decomposition template support
-> - **v1.4.1** - Bug Fix Release:
-> - 🐛 **Fixed Version Display**: Corrected `--version` command showing old version
->
-> **v1.4.0** - Complete Framework Revolution:
-> - 🚀 **Universal SDD Framework**: Transformed from Constitutional to Specification-Driven Development
-> - 🎯 **No Technology Restrictions**: Support for ANY technology stack - web, mobile, desktop, games, ML
-> - 🧪 **Comprehensive Testing**: Full test suite with extensive coverage
-> - ✨ **9 Universal Principles**: Flexible principles replacing rigid articles
-> - 🔄 **Major API Updates**: All methods renamed from `constitution` to `sdd_compliance`
-> - 📝 **Enhanced Documentation**: Complete overhaul of docs and templates
-> - 🏗️ **Hybrid Template System**: Templates exist as both files and embedded code
+> See [Tiered Templates](#-tiered-templates-v160) section below for details.
+
+## 🔖 Recent Release History
+
+<details>
+<summary>View Previous Releases (v1.4.0 - v1.5.0)</summary>
+
+### v1.5.0 - Quality & Documentation Enhancement
+- 🎯 Comprehensive help system with 6 detailed topics
+- 📚 Complete documentation suite
+- 🧪 377+ tests with cross-platform CI/CD
+- 🔧 Template validation, memory management, advanced error handling
+- 🚀 Enhanced Windows, macOS, and Linux compatibility
+
+### v1.4.5 - Version Management
+- 🎯 Single source of truth in `_version.py`
+- 📦 Module support: `python -m specpulse`
+
+### v1.4.4 - Critical Workflow Fixes
+- 🐛 Fixed script numbering issues
+- 🎯 Proper task detection in execute scripts
+- 🔧 PowerShell parity with Bash scripts
+
+### v1.4.3 - Script Numbering Fix
+- 🔢 Correct file numbering (001, 002, 003...)
+- 📝 No empty first files
+
+### v1.4.2 - Template System Enhancement
+- 📁 Physical template files for AI tools
+- 🔧 Complete PowerShell support
+
+### v1.4.1 - Bug Fix
+- 🐛 Fixed version display
+
+### v1.4.0 - Framework Revolution
+- 🚀 Universal SDD framework
+- ✨ 9 universal principles
+- 🔄 Major API updates
+- 🏗️ Hybrid template system
+
+</details>
 
 ### Why SpecPulse?
 
@@ -159,9 +171,72 @@ specpulse doctor
 
 # Sync project state
 specpulse sync
+
+# Template management
+specpulse template list                    # List all templates
+specpulse template validate [name]         # Validate templates
+specpulse template preview <name>          # Preview template
+specpulse template backup                  # Backup templates
+specpulse template restore <path>          # Restore from backup
+
+# Memory management
+specpulse memory search <query>            # Search memory system
+specpulse memory summary                   # Show memory summary
+specpulse memory cleanup [--days 90]       # Clean old entries
+specpulse memory export [--format json]    # Export memory data
+
+# Help system
+specpulse help [topic]                     # Show help
+specpulse help --list                      # List all help topics
 ```
 
 ## ✨ Features
+
+### 📑 Tiered Templates (v1.6.0+)
+
+SpecPulse supports three template tiers for progressive spec building - start minimal and expand when ready:
+
+#### Tier 1: Minimal (Quick Start)
+Perfect for rapid prototyping and simple features. Complete in 2-3 minutes:
+- **What** (1 sentence)
+- **Why** (1 sentence)
+- **Done When** (3 checkboxes)
+
+```bash
+specpulse pulse new-feature --tier minimal
+```
+
+#### Tier 2: Standard (Ready to Plan)
+Expand when you're ready for implementation planning:
+- All Tier 1 content (preserved!)
+- Executive Summary
+- User Stories
+- Functional Requirements
+- Technical Approach
+
+```bash
+specpulse expand 001 --to-tier standard
+```
+
+#### Tier 3: Complete (Production Ready)
+Full specification with comprehensive production details:
+- All Tier 2 content (preserved!)
+- Non-Functional Requirements
+- Security Considerations
+- Performance Requirements
+- Testing Strategy
+- Deployment Considerations
+
+```bash
+specpulse expand 001 --to-tier complete
+```
+
+**Key Features:**
+- ✅ **Content Preservation**: Your work is never lost during expansion
+- 🎯 **LLM Guidance**: Each template has comments guiding AI assistants
+- 🔄 **Flexible Workflow**: Expand only when you need more detail
+- 📊 **Automatic Backups**: Expansion creates timestamped backups
+- 👁️ **Preview Changes**: Use `--show-diff` to see what will be added
 
 ### 🏛️ Universal SDD Principles
 
@@ -257,6 +332,16 @@ Stop guessing what users want:
 
 ### 🤖 Deep AI Integration
 
+**Available AI Commands:**
+- `/sp-pulse` - Initialize features
+- `/sp-spec` - Create/update specifications
+- `/sp-plan` - Generate implementation plans
+- `/sp-task` - Create task breakdowns
+- `/sp-execute` - Execute tasks continuously
+- `/sp-decompose` - Decompose into microservices
+- `/sp-status` - Show feature progress
+- `/sp-continue` - Resume execution
+
 **How AI Commands Work:**
 
 Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
@@ -278,10 +363,11 @@ Claude and Gemini use slash commands that accept arguments via `$ARGUMENTS`:
 /sp-plan validate                 # Validate plan against constitution
 /sp-task breakdown                # Create task list(s) - per service if decomposed
 /sp-task update                   # Update task statuses
-/sp-task status                   # Show current progress
-/sp-execute all                   # [NEW] Execute ALL tasks non-stop until completion
-/sp-execute                       # [NEW] Execute next task and continue
-/sp-execute T001                  # [NEW] Execute specific task and continue
+/sp-status                        # Show current feature status and progress
+/sp-execute all                   # Execute ALL tasks non-stop until completion
+/sp-execute                       # Execute next task and continue
+/sp-execute T001                  # Execute specific task and continue
+/sp-continue                      # Continue from last stopped task
 ```
 
 **Behind the Scenes:**
@@ -419,12 +505,30 @@ spec-001.md → decomposition/ → service plans → service tasks
                 └── interfaces/           └── integration-plan.md     └── INT-T001
 ```
 
+## 🏗️ Architecture
+
+**Core Components:**
+1. **CLI Layer** (`specpulse/cli/main.py`) - Command-line interface with argparse
+2. **Core Engine** (`specpulse/core/`) - Template management, validation, memory
+   - `specpulse.py` - Project initialization and resource management
+   - `validator.py` - Specification validation with enhanced rules
+   - `template_manager.py` - Template validation and management
+   - `memory_manager.py` - Project memory and context tracking
+   - `validation_rules.py` - Comprehensive validation rule system
+3. **Utilities** (`specpulse/utils/`) - Console, Git, error handling, version check
+   - `console.py` - Rich terminal output with animations
+   - `git_utils.py` - Git integration
+   - `error_handler.py` - Advanced error handling and recovery
+   - `version_check.py` - PyPI version checking
+4. **Resources** (`specpulse/resources/`) - Templates, scripts, commands, memory files
+
 ## 🏗️ Project Structure
 
 ```
 my-project/
 ├── .specpulse/          # Configuration and cache
-│   └── config.yaml      # Project settings
+│   ├── config.yaml      # Project settings
+│   └── backups/         # Template backups
 ├── .claude/             # Claude AI integration
 │   └── commands/        # Claude command definitions (.md)
 ├── .gemini/             # Gemini AI integration
@@ -473,14 +577,53 @@ my-project/
 
 ## 🛠️ Advanced Usage
 
+### Template Management
+
+**List Templates:**
+```bash
+specpulse template list                    # All templates
+specpulse template list --category spec    # Specific category
+```
+
+**Validate Templates:**
+```bash
+specpulse template validate                # All templates
+specpulse template validate spec.md        # Specific template
+specpulse template validate --fix          # Auto-fix issues
+```
+
+**Preview & Backup:**
+```bash
+specpulse template preview spec.md         # Preview with sample data
+specpulse template backup                  # Create backup
+specpulse template restore /path/backup    # Restore from backup
+```
+
+### Memory Management
+
+**Search Memory:**
+```bash
+specpulse memory search "authentication"      # Search all
+specpulse memory search "API" --category decisions  # Filter by category
+specpulse memory search "bug" --days 30      # Last 30 days
+```
+
+**Memory Operations:**
+```bash
+specpulse memory summary                   # Show statistics
+specpulse memory cleanup --days 90         # Remove old entries
+specpulse memory export --format json      # Export to JSON
+specpulse memory export --format yaml --output backup.yaml
+```
+
 ### Custom Templates
 
 Create project-specific templates:
 
 ```bash
-# Copy and modify templates
-cp templates/spec-001.md templates/custom-spec.md
-# Edit to match your needs
+# Templates are in templates/ directory
+# Modify as needed, but keep filenames unchanged
+# spec.md, plan.md, task.md must remain as-is
 ```
 
 ### Validation Rules
@@ -568,19 +711,27 @@ pytest tests/
 ## 📚 Documentation
 
 ### 🎯 Help System
-SpecPulse includes a comprehensive built-in help system:
+SpecPulse includes a comprehensive built-in help system with 6 detailed topics:
 ```bash
 # List all help topics
 specpulse help --list
 
 # Get specific help
-specpulse help overview      # Key concepts and principles
-specpulse help commands      # Complete command reference
-specpulse help workflow      # Development workflow
-specpulse help templates     # Template system
-specpulse help examples      # Real-world examples
-specpulse help troubleshooting # Common issues and solutions
+specpulse help overview         # Key concepts and principles
+specpulse help commands         # Complete command reference
+specpulse help workflow         # Development workflow
+specpulse help templates        # Template system and customization
+specpulse help examples         # Real-world usage examples
+specpulse help troubleshooting  # Common issues and solutions
 ```
+
+**Help Topics Include:**
+- **Overview**: SDD principles, project structure, AI integration
+- **Commands**: Full CLI reference with examples
+- **Workflow**: Step-by-step development process
+- **Templates**: Template system, variables, customization
+- **Examples**: Real-world scenarios for web, mobile, API, microservices
+- **Troubleshooting**: Common issues, solutions, debug mode
 
 ### 📖 Documentation Files
 - **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Complete documentation index
@@ -591,6 +742,31 @@ specpulse help troubleshooting # Common issues and solutions
 - **[CLAUDE.md](CLAUDE.md)** - Development instructions for AI assistants
 - **[PyPI Package](https://pypi.org/project/specpulse/)** - Official package page
 - **[GitHub Repository](https://github.com/specpulse/specpulse)** - Source code and issues
+
+### 🔧 Advanced Features (v1.5.0)
+
+**Template Management:**
+- Template validation with auto-fix capability
+- Template preview with sample data
+- Backup and restore functionality
+- Category filtering (spec, plan, task, decomposition)
+
+**Memory Management:**
+- Full-text search across memory system
+- Memory summary with statistics
+- Automatic cleanup of old entries
+- Export to JSON/YAML formats
+
+**Enhanced Error Handling:**
+- Context-aware error messages
+- Automatic recovery suggestions
+- Command correction suggestions
+- Detailed technical information in verbose mode
+
+**Version Management:**
+- Automatic PyPI version checking
+- Update notifications for new releases
+- Single source of truth in `_version.py`
 
 ## 📚 Usage Guide
 

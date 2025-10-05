@@ -823,6 +823,49 @@ graph LR
         
         return spec_files
     
+    def expand(self, feature_id: str, to_tier: str, show_diff: bool = False):
+        """Expand specification to higher tier"""
+        from ..core.tier_manager import TierManager
+
+        self.console.show_banner(mini=True)
+        self.console.header("Tier Expansion", style="bright_cyan")
+
+        try:
+            tier_manager = TierManager(Path.cwd())
+
+            # Show current tier
+            current_tier = tier_manager.get_current_tier(feature_id)
+            self.console.info(f"Current tier: {current_tier}")
+            self.console.info(f"Target tier: {to_tier}")
+
+            # Expand
+            success = tier_manager.expand_tier(
+                feature_id=feature_id,
+                to_tier=to_tier,  # type: ignore
+                show_diff=show_diff,
+            )
+
+            if success:
+                self.console.success(f"✓ Expanded to {to_tier} tier")
+                return True
+            else:
+                self.console.error("Expansion cancelled or failed")
+                return False
+
+        except ValueError as e:
+            self.console.error(f"Invalid tier transition: {e}")
+            sys.exit(1)
+        except FileNotFoundError as e:
+            self.console.error(f"Spec not found: {e}")
+            sys.exit(1)
+        except Exception as e:
+            self.console.error(f"Expansion failed: {e}")
+            if self.verbose:
+                import traceback
+
+                traceback.print_exc()
+            sys.exit(1)
+
     def doctor(self):
         """System check and diagnostics"""
         self.console.show_banner(mini=True)
@@ -2056,6 +2099,12 @@ Need help? Visit https://github.com/specpulse/specpulse
         # Doctor command
         doctor_parser = subparsers.add_parser("doctor", help="System check and diagnostics")
 
+        # Expand command
+        expand_parser = subparsers.add_parser("expand", help="Expand specification to higher tier")
+        expand_parser.add_argument("feature_id", help="Feature ID (e.g., 001 or 001-feature-name)")
+        expand_parser.add_argument("--to-tier", choices=["standard", "complete"], required=True, help="Target tier level")
+        expand_parser.add_argument("--show-diff", action="store_true", help="Preview changes before applying")
+
         # Help command
         help_parser = subparsers.add_parser("help", help="Show comprehensive help and documentation")
         help_parser.add_argument("topic", nargs="?", help="Specific topic to get help with")
@@ -2119,7 +2168,7 @@ Need help? Visit https://github.com/specpulse/specpulse
                            verbose=getattr(args, 'verbose', False))
 
         # Available commands for suggestion
-        available_commands = ["init", "update", "validate", "decompose", "sync", "doctor", "help", "template", "memory"]
+        available_commands = ["init", "update", "validate", "decompose", "sync", "doctor", "expand", "help", "template", "memory"]
 
         # Execute command with error handling
         if args.command == "init":
@@ -2134,6 +2183,8 @@ Need help? Visit https://github.com/specpulse/specpulse
             cli.sync()
         elif args.command == "doctor":
             cli.doctor()
+        elif args.command == "expand":
+            cli.expand(args.feature_id, args.to_tier, args.show_diff)
         elif args.command == "help":
             cli.show_help(args.topic, args.list)
         elif args.command == "template":

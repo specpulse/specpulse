@@ -17,6 +17,7 @@ from specpulse.cli.main import SpecPulseCLI
 from specpulse.core.template_manager import TemplateManager
 from specpulse.core.memory_manager import MemoryManager
 from specpulse.core.validator import Validator
+from specpulse.core.tier_manager import TierManager
 
 
 class TestIntegration:
@@ -234,11 +235,12 @@ graph TD
         memory_manager.update_context(
             action="template_created",
             details={"template_name": "custom_spec.md"},
-            category="template"
+            category="template",
         )
 
         # Add decision about template
         from specpulse.core.memory_manager import DecisionRecord
+
         decision = DecisionRecord(
             id="001",
             title="Use Custom Template Format",
@@ -249,7 +251,7 @@ graph TD
             alternatives_considered=["Standard templates only"],
             consequences=["More maintenance", "Better customization"],
             related_decisions=[],
-            tags=["template", "customization"]
+            tags=["template", "customization"],
         )
         memory_manager.add_decision_record(decision)
 
@@ -269,7 +271,7 @@ graph TD
         cli.init("memory-test", here=True)
 
         # Memory manager should be initialized since we're in a project
-        assert hasattr(cli, 'memory_manager')
+        assert hasattr(cli, "memory_manager")
         assert cli.memory_manager is not None
 
         # Add some context entries
@@ -277,12 +279,11 @@ graph TD
             feature_name="Memory Test Feature",
             feature_id="001",
             action="feature_created",
-            details={"test": True}
+            details={"test": True},
         )
 
         cli.memory_manager.update_context(
-            action="validation_completed",
-            details={"result": "success"}
+            action="validation_completed", details={"result": "success"}
         )
 
         # Test memory summary
@@ -308,12 +309,13 @@ graph TD
         cli.init("template-test", here=True)
 
         # Template manager should be initialized
-        assert hasattr(cli, 'template_manager')
+        assert hasattr(cli, "template_manager")
         assert cli.template_manager is not None
 
         # Create a test template
         test_template = self.project_path / "templates" / "test_template.md"
-        test_template.write_text("""
+        test_template.write_text(
+            """
 # Test Template: {{ feature_name }}
 
 ## Variables
@@ -323,7 +325,8 @@ graph TD
 
 ## Content
 This is a test template for {{ feature_name }}.
-""")
+"""
+        )
 
         # Test template validation
         success = cli.template_validate("test_template.md")
@@ -357,11 +360,11 @@ This is a test template for {{ feature_name }}.
 
         # Test template operations on non-SpecPulse project
         os.chdir(self.temp_dir)  # Not a SpecPulse project
-        assert hasattr(cli, 'template_manager')
+        assert hasattr(cli, "template_manager")
         assert cli.template_manager is None  # Should not be initialized
 
         # Memory operations should also fail gracefully
-        assert hasattr(cli, 'memory_manager')
+        assert hasattr(cli, "memory_manager")
         assert cli.memory_manager is None
 
     def test_validation_integration_with_errors(self):
@@ -460,7 +463,7 @@ class TestAICommandIntegration:
             "sp-pulse-init.sh",
             "sp-pulse-spec.sh",
             "sp-pulse-plan.sh",
-            "sp-pulse-task.sh"
+            "sp-pulse-task.sh",
         ]
 
         for script_file in script_files:
@@ -478,12 +481,8 @@ class TestAICommandIntegration:
         # Test AI-related context tracking
         memory_manager.update_context(
             action="ai_command_executed",
-            details={
-                "ai_assistant": "claude",
-                "command": "sp-pulse",
-                "feature": "test-feature"
-            },
-            category="ai"
+            details={"ai_assistant": "claude", "command": "sp-pulse", "feature": "test-feature"},
+            category="ai",
         )
 
         # Test search for AI-related entries
@@ -492,6 +491,7 @@ class TestAICommandIntegration:
 
         # Check AI decisions can be tracked
         from specpulse.core.memory_manager import DecisionRecord
+
         ai_decision = DecisionRecord(
             id="AI-001",
             title="Use Claude for Code Generation",
@@ -502,10 +502,133 @@ class TestAICommandIntegration:
             alternatives_considered=["Manual coding", "Other AI tools"],
             consequences=["Dependency on AI", "Faster development"],
             related_decisions=[],
-            tags=["ai", "claude", "code-generation"]
+            tags=["ai", "claude", "code-generation"],
         )
         memory_manager.add_decision_record(ai_decision)
 
         # Search for AI decisions
         decision_results = memory_manager.search_memory("claude")
         assert len(decision_results) >= 1
+
+    def test_tiered_template_workflow(self):
+        """Test full workflow: minimal → standard → complete."""
+        # 1. Initialize project
+        cli = SpecPulseCLI(no_color=True, verbose=False)
+        cli.init("test-project", here=True)
+
+        # 2. Create minimal spec manually
+        spec_dir = self.project_path / "specs" / "001-test-feature"
+        spec_dir.mkdir(parents=True)
+        spec_path = spec_dir / "spec-001.md"
+
+        # Write minimal spec
+        spec_path.write_text(
+            """<!-- TIER: minimal -->
+# Feature: Test Feature
+
+## What
+Build a payment system for premium features
+
+## Why
+Users need to pay for premium features to access exclusive content
+
+## Done When
+- [ ] User can enter credit card information securely
+- [ ] Payment is processed through payment gateway
+- [ ] Receipt is sent via email after successful payment
+"""
+        )
+
+        # Verify minimal content
+        content = spec_path.read_text()
+        assert "## What" in content
+        assert "## Why" in content
+        assert "## Done When" in content
+        assert "Build a payment system" in content
+
+        # 3. Expand to standard using TierManager
+        tier_manager = TierManager(self.project_path)
+        current_tier = tier_manager.get_current_tier("001-test-feature")
+        assert current_tier == "minimal"
+
+        # Expand to standard
+        success = tier_manager.expand_tier("001-test-feature", "standard")
+        assert success
+
+        # Verify expansion
+        content = spec_path.read_text()
+        assert "Build a payment system" in content  # Preserved
+        assert "## Executive Summary" in content  # Added
+        assert "## User Stories" in content  # Added
+        assert "## Functional Requirements" in content  # Added
+        assert "## Technical Approach" in content  # Added
+
+        # Verify tier changed
+        new_tier = tier_manager.get_current_tier("001-test-feature")
+        assert new_tier == "standard"
+
+        # 4. Expand to complete
+        success = tier_manager.expand_tier("001-test-feature", "complete")
+        assert success
+
+        # Verify final state
+        content = spec_path.read_text()
+        assert "Build a payment system" in content  # Still preserved
+        assert "## Non-Functional Requirements" in content  # Added
+        assert "## Security Considerations" in content  # Added
+        assert "## Performance Requirements" in content  # Added
+        assert "## Testing Strategy" in content  # Added
+        assert "## Deployment Considerations" in content  # Added
+
+        # Verify tier changed
+        final_tier = tier_manager.get_current_tier("001-test-feature")
+        assert final_tier == "complete"
+
+        # 5. Test validation
+        validation = tier_manager.validate_tier(spec_path)
+        assert validation["tier"] == "complete"
+
+    def test_tiered_template_cli_workflow(self):
+        """Test tiered templates via CLI."""
+        # 1. Initialize project
+        cli = SpecPulseCLI(no_color=True, verbose=False)
+        cli.init("test-project", here=True)
+
+        # 2. Create minimal spec
+        spec_dir = self.project_path / "specs" / "002-auth-feature"
+        spec_dir.mkdir(parents=True)
+        spec_path = spec_dir / "spec-001.md"
+
+        spec_path.write_text(
+            """<!-- TIER: minimal -->
+# Feature: User Authentication
+
+## What
+Implement OAuth2 authentication
+
+## Why
+Users need secure login
+
+## Done When
+- [ ] OAuth2 implemented
+- [ ] Users can log in
+- [ ] Tokens are secure
+"""
+        )
+
+        # 3. Expand via CLI
+        success = cli.expand("002-auth-feature", "standard", show_diff=False)
+        assert success
+
+        # Verify expansion
+        content = spec_path.read_text()
+        assert "## Executive Summary" in content
+        assert "OAuth2 authentication" in content  # Preserved
+
+        # 4. Expand to complete
+        success = cli.expand("002-auth-feature", "complete", show_diff=False)
+        assert success
+
+        content = spec_path.read_text()
+        assert "## Security Considerations" in content
+        assert "OAuth2 authentication" in content  # Still preserved

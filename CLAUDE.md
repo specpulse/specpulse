@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Overview
+
+SpecPulse is a Python CLI tool (Python 3.11+) that enables Specification-Driven Development for ANY software project. It generates AI commands for Claude and Gemini, manages project templates, and enforces development principles through validation.
+
 ## Development Commands
 
 ### Testing
@@ -65,6 +69,10 @@ python -m specpulse.cli.main sync
 
 # Decompose a specification
 python -m specpulse.cli.main decompose 001
+
+# Get help on various topics
+python -m specpulse.cli.main help --list
+python -m specpulse.cli.main help workflow
 ```
 
 ## Architecture Overview
@@ -88,8 +96,14 @@ SpecPulse is a universal Specification-Driven Development (SDD) framework that w
    - Phase gates system for quality control
 
 4. **Utilities** (`specpulse/utils/`)
-   - `Console`: Rich terminal output with tables, animations, and color coding
-   - `GitUtils`: Git integration for version control
+   - `Console` (`console.py`): Rich terminal output with tables, animations, and color coding
+   - `GitUtils` (`git_utils.py`): Git integration for version control
+
+5. **Resources** (`specpulse/resources/`)
+   - `templates/`: Jinja2 template files (spec.md, plan.md, task.md, decomposition/)
+   - `scripts/`: Bash (.sh) and PowerShell (.ps1) scripts for AI execution
+   - `commands/`: AI command definitions (claude/*.md, gemini/*.toml)
+   - `memory/`: Default memory files (constitution.md, context.md, decisions.md)
 
 ### AI Command System
 
@@ -228,6 +242,68 @@ project-root/                    # User's project directory
 
 The feature directory name (e.g., "001-user-auth") is passed to spec, plan, and task scripts.
 
+## Tiered Templates (v1.6.0+)
+
+### Using Tiered Templates
+
+When creating specs, use the appropriate tier based on feature complexity:
+
+- `/sp-pulse feature-name` - Creates minimal tier by default (quickest start)
+- For simple features: stay at minimal tier (3 sections, 2-3 minutes)
+- For features needing plans: expand to standard tier (7 sections, ready for implementation)
+- For complex/production features: expand to complete tier (15 sections, production-ready)
+
+### Tier Expansion Workflow
+
+```bash
+# 1. Start minimal
+/sp-pulse user-authentication
+
+# 2. Fill out minimal spec (What, Why, Done When)
+# LLM fills in basic details
+
+# 3. Expand when ready for implementation
+specpulse expand 001 --to-tier standard
+
+# 4. Fill out standard sections (User Stories, Requirements, etc.)
+# LLM adds implementation details
+
+# 5. Expand to complete for production
+specpulse expand 001 --to-tier complete
+
+# 6. Fill out comprehensive sections (Security, Performance, etc.)
+# LLM adds production details
+```
+
+### LLM Guidance in Templates
+
+Each template tier has `<!-- LLM GUIDANCE: ... -->` comments:
+- **Minimal tier**: "Keep it minimal - just the essence"
+- **Standard tier**: "Provide enough detail for planning"
+- **Complete tier**: "Comprehensive production-grade details"
+
+Follow these guidance comments when filling out templates. They tell you:
+- What to write in each section
+- How much detail is needed
+- What format to use (bullet points, paragraphs, etc.)
+- Suggested length (1 sentence, 2-3 items, etc.)
+
+### Content Preservation
+
+**IMPORTANT**: When expanding tiers, ALL user content is preserved:
+- Existing sections keep their content
+- New sections are added with template placeholders
+- Nothing is lost or overwritten
+- Backups are created automatically
+
+### Template Tier Reference
+
+| Tier | Sections | Use Case | Time to Complete |
+|------|----------|----------|------------------|
+| **Minimal** | 3 | Quick prototypes, simple features | 2-3 minutes |
+| **Standard** | 7-8 | Most features, implementation planning | 10-15 minutes |
+| **Complete** | 15+ | Production features, complex systems | 30-45 minutes |
+
 ## CRITICAL WORKFLOW RULES
 
 ### ⚠️ NEVER MODIFY TEMPLATE FILES
@@ -309,22 +385,25 @@ tasks/001-user-authentication/
 ## Important Notes
 
 ### Version Management
-- Current version: 1.4.5 (in `specpulse/_version.py`)
+- Current version: 1.5.0 (in `specpulse/_version.py`)
 - Version is defined ONLY in `specpulse/_version.py`
 - All other files read from this single source of truth
 - Use semantic versioning for releases
+- When updating version: modify only `specpulse/_version.py`
 
 ### Resource Handling
 - Templates and scripts are copied from `specpulse/resources/`
+- Resource structure mirrors project structure (templates/, scripts/, commands/, memory/)
 - Never modify files in `.claude/` or `.gemini/` after initialization
 - Templates in `templates/` are editable by users BUT filenames must stay the same
 - Scripts in `scripts/` should remain executable
+- Package data includes: .md, .yaml, .ts, .sh, .ps1, .toml files
 
 ### Testing Coverage
-- Comprehensive test suite in `tests/`
-- 86% test coverage with 98.3% success rate
+- 377+ tests with cross-platform CI/CD pipeline
 - Use pytest with coverage reporting
 - Mock external dependencies (Git, filesystem)
+- Test files organized by component: `test_cli.py`, `test_core.py`, `test_validator.py`, etc.
 
 ### Console Features
 - ASCII art banners for branding
@@ -332,3 +411,19 @@ tasks/001-user-authentication/
 - Color-coded output (success=green, error=red, warning=yellow)
 - Tables for structured data display
 - Pulse animations for visual feedback
+
+### Dependencies
+Key external libraries (see pyproject.toml for full list):
+- `click>=8.0` - CLI framework
+- `rich>=13.0` - Rich terminal output
+- `jinja2>=3.0` - Template rendering
+- `gitpython>=3.1` - Git integration
+- `pyyaml>=6.0` - YAML parsing
+- `toml>=0.10` - TOML parsing
+
+### Entry Points
+The package provides two CLI entry points:
+- `specpulse` - Main command
+- `sp` - Shorthand alias
+
+Both execute `specpulse.cli.main:main`
