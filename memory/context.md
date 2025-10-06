@@ -77,7 +77,3 @@
 - Feature ID: 001
 - Branch: 001-test-feature-2
 - Started: 2025-09-12T00:09:08.283919
-## Active Feature: better-workflow-support
-- Feature ID: 003
-- Branch: 003-better-workflow-support
-- Started: 2025-10-06T16:26:28+03:00

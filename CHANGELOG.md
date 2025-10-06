@@ -5,6 +5,18 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.1] - 2025-10-06
+
+### 🔧 Bug Fix Release
+
+**Fixed:**
+- ✅ Tier templates now correctly copied during `specpulse init`
+- ✅ All 6 tier template files (spec-tier1/2/3.md) now included in new projects
+
+**No Breaking Changes** - Direct upgrade from 1.9.0
+
+---
+
 ## [1.9.0] - 2025-10-06
 
 ### 🚀 MAJOR RELEASE - Better Workflow Support (Incremental Spec Building)

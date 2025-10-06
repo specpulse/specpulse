@@ -296,6 +296,12 @@ class SpecPulseCLI:
         with open(templates_dir / "task.md", 'w', encoding='utf-8') as f:
             f.write(task_template)
 
+        # Copy tier templates (v1.9.0)
+        resources_templates_dir = self.specpulse.resources_dir / "templates"
+        if resources_templates_dir.exists():
+            for tier_template in resources_templates_dir.glob("spec-tier*.md"):
+                shutil.copy2(tier_template, templates_dir / tier_template.name)
+
         # Copy decomposition templates
         decomp_dir = templates_dir / "decomposition"
         decomp_dir.mkdir(parents=True, exist_ok=True)
