@@ -180,14 +180,15 @@ class ProgressCalculator:
         current_content = []
 
         for line in spec_content.split("\n"):
+            stripped_line = line.strip()
             # Check if this is a level-2 heading (## Section Name)
-            if line.startswith("## "):
+            if stripped_line.startswith("## "):
                 # Save previous section if exists
                 if current_section:
                     sections[current_section] = "\n".join(current_content)
 
                 # Start new section
-                current_section = line.replace("## ", "").strip()
+                current_section = stripped_line.replace("## ", "").strip()
                 current_content = []
             elif current_section:
                 # Add line to current section
@@ -220,7 +221,8 @@ class ProgressCalculator:
         """Count subsections (### or ####)."""
         count = 0
         for line in content.split("\n"):
-            if line.startswith("###"):
+            stripped = line.strip()
+            if stripped.startswith("###"):
                 count += 1
         return count
 
