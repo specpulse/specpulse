@@ -1,0 +1,288 @@
+# SpecPulse Custom Validation Rules
+# Version: 1.0.0
+# Purpose: Project-specific validation rules that adapt based on project type
+#
+# Schema:
+#   rules:
+#     - name: Unique rule identifier (lowercase_with_underscores)
+#       enabled: true/false (whether this rule is active)
+#       message: Error message shown when rule fails
+#       applies_to: List of project types [web-app, api, mobile-app, desktop, cli, library]
+#       severity: error/warning/info
+#       description: Explanation of why this rule exists
+#       section: Which spec section to check (optional)
+#       keywords: List of keywords that trigger this rule (optional)
+#
+# Project Types:
+#   - web-app: Web applications (frontend or full-stack)
+#   - api: REST APIs, GraphQL APIs, microservices
+#   - mobile-app: iOS, Android, React Native, Flutter apps
+#   - desktop: Desktop applications (Electron, Qt, etc.)
+#   - cli: Command-line tools
+#   - library: Reusable libraries/packages
+
+rules:
+  # Web Application Rules
+  - name: security_requirement
+    enabled: false  # Disabled by default - user must opt-in
+    message: "Web applications should include security requirements"
+    applies_to:
+      - web-app
+      - api
+    severity: warning
+    description: |
+      Web-facing applications are vulnerable to security threats. Specs should
+      explicitly address authentication, authorization, data protection, and
+      common vulnerabilities (XSS, CSRF, SQL injection, etc.).
+    section: "Non-Functional Requirements"
+    keywords:
+      - security
+      - authentication
+      - authorization
+      - encryption
+
+  - name: accessibility_check
+    enabled: false
+    message: "UI features should include accessibility requirements (WCAG compliance)"
+    applies_to:
+      - web-app
+      - mobile-app
+      - desktop
+    severity: info
+    description: |
+      Applications with user interfaces should consider accessibility for users
+      with disabilities. This includes keyboard navigation, screen reader support,
+      color contrast, and ARIA labels.
+    section: "Non-Functional Requirements"
+    keywords:
+      - accessibility
+      - wcag
+      - aria
+      - screen reader
+
+  - name: performance_requirement
+    enabled: false
+    message: "Consider adding performance requirements (response time, load time, resource usage)"
+    applies_to:
+      - web-app
+      - api
+      - mobile-app
+    severity: info
+    description: |
+      Performance directly impacts user experience. Specs should define targets
+      for response time, page load time, API latency, memory usage, and other
+      performance metrics.
+    section: "Non-Functional Requirements"
+    keywords:
+      - performance
+      - latency
+      - response time
+      - throughput
+
+  # API-Specific Rules
+  - name: api_documentation
+    enabled: false
+    message: "APIs should include documentation requirements (OpenAPI/Swagger spec)"
+    applies_to:
+      - api
+    severity: warning
+    description: |
+      APIs need comprehensive documentation for integration. This includes
+      endpoint documentation, request/response formats, authentication flows,
+      error codes, and usage examples.
+    section: "Functional Requirements"
+    keywords:
+      - api
+      - openapi
+      - swagger
+      - documentation
+
+  - name: rate_limiting
+    enabled: false
+    message: "Public APIs should define rate limiting strategy"
+    applies_to:
+      - api
+    severity: warning
+    description: |
+      Rate limiting prevents abuse and ensures fair usage of API resources.
+      Define limits for authenticated vs unauthenticated users, burst limits,
+      and how rate limit information is communicated.
+    section: "Technical Constraints"
+    keywords:
+      - rate limit
+      - throttling
+      - quota
+
+  - name: authentication_requirement
+    enabled: false
+    message: "APIs should specify authentication and authorization mechanism"
+    applies_to:
+      - api
+      - web-app
+    severity: error
+    description: |
+      Secure APIs require authentication to identify users and authorization
+      to control access. Specify the mechanism (OAuth2, JWT, API keys, etc.)
+      and access control model (RBAC, ABAC, etc.).
+    section: "Non-Functional Requirements"
+    keywords:
+      - authentication
+      - authorization
+      - oauth
+      - jwt
+      - api key
+
+  # Mobile App-Specific Rules
+  - name: platform_support
+    enabled: false
+    message: "Mobile apps should specify supported platforms and OS versions"
+    applies_to:
+      - mobile-app
+    severity: warning
+    description: |
+      Mobile apps must clearly define which platforms (iOS/Android), OS versions,
+      and device types are supported. This affects development, testing, and
+      support strategies.
+    section: "Technical Constraints"
+    keywords:
+      - ios
+      - android
+      - platform
+      - device
+
+  - name: offline_mode
+    enabled: false
+    message: "Consider offline mode support for mobile applications"
+    applies_to:
+      - mobile-app
+    severity: info
+    description: |
+      Mobile apps often experience connectivity issues. Specs should address
+      how the app behaves offline, what data is cached, and how sync works
+      when connectivity is restored.
+    section: "Functional Requirements"
+    keywords:
+      - offline
+      - sync
+      - cache
+      - connectivity
+
+  - name: app_store_requirements
+    enabled: false
+    message: "Mobile apps should address app store submission requirements"
+    applies_to:
+      - mobile-app
+    severity: info
+    description: |
+      Apps submitted to App Store or Play Store must meet platform-specific
+      requirements for privacy policies, permissions, content ratings, and
+      technical specifications.
+    section: "Dependencies"
+    keywords:
+      - app store
+      - play store
+      - submission
+      - privacy policy
+
+  # General Software Quality Rules
+  - name: error_handling_strategy
+    enabled: false
+    message: "Specify error handling and recovery strategy"
+    applies_to:
+      - web-app
+      - api
+      - mobile-app
+      - desktop
+      - cli
+      - library
+    severity: info
+    description: |
+      All software needs a consistent approach to handling errors. Define
+      error categorization, logging strategy, user-facing error messages,
+      and recovery mechanisms.
+    section: "Technical Constraints"
+    keywords:
+      - error
+      - exception
+      - logging
+      - monitoring
+
+  - name: testing_strategy
+    enabled: false
+    message: "Define testing strategy and coverage targets"
+    applies_to:
+      - web-app
+      - api
+      - mobile-app
+      - desktop
+      - cli
+      - library
+    severity: info
+    description: |
+      Quality software requires comprehensive testing. Specify unit test
+      coverage targets, integration testing approach, end-to-end tests,
+      and performance/load testing requirements.
+    section: "Success Criteria"
+    keywords:
+      - testing
+      - test coverage
+      - unit test
+      - integration test
+
+  - name: deployment_strategy
+    enabled: false
+    message: "Specify deployment strategy and rollback plan"
+    applies_to:
+      - web-app
+      - api
+    severity: warning
+    description: |
+      Successful deployment requires planning. Define deployment frequency,
+      CI/CD pipeline, blue-green or canary strategies, rollback procedures,
+      and monitoring during deployment.
+    section: "Technical Constraints"
+    keywords:
+      - deployment
+      - ci/cd
+      - rollback
+      - release
+
+# Configuration
+config:
+  version: "1.0.0"
+  default_severity: warning
+  default_enabled: false  # All rules opt-in by default
+  allow_custom_rules: true
+  max_custom_rules: 50
+
+# Usage Instructions
+#
+# To enable a rule:
+#   1. Copy this file to your project: .specpulse/validation_rules.yaml
+#   2. Set enabled: true for desired rules
+#   3. Or use CLI: specpulse validation rules enable <rule_name>
+#
+# To create custom rules:
+#   1. Add new rule to the rules list
+#   2. Follow the schema above
+#   3. Or use CLI: specpulse validation rules add <rule_name> --template
+#
+# Rule Severity Levels:
+#   - error: Validation fails if rule is not satisfied
+#   - warning: Warning shown but validation passes
+#   - info: Informational message only
+#
+# Examples:
+#
+# # Enable security checks for web app
+# specpulse validation rules enable security_requirement
+# specpulse validation rules enable accessibility_check
+#
+# # Create custom rule
+# specpulse validation rules add gdpr_compliance --template
+#
+# # List all rules
+# specpulse validation rules list
+#
+# # Validate with custom rules
+# specpulse validate 001  # Custom rules automatically applied based on project type

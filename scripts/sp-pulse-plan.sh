@@ -49,13 +49,6 @@ fi
 # Ensure plans directory exists
 mkdir -p "$PLAN_DIR" || error_exit "Failed to create plans directory: $PLAN_DIR"
 
-# v1.7.0: Inject feature-specific context for AI
-CONTEXT_INJECTION=""
-if command -v specpulse &> /dev/null; then
-    log "Injecting project context for feature $FEATURE_ID..."
-    CONTEXT_INJECTION=$(specpulse context inject --feature "$FEATURE_ID" 2>/dev/null || echo "")
-fi
-
 # Find latest spec file
 if [ -d "$SPEC_DIR" ]; then
     SPEC_FILE=$(find "$SPEC_DIR" -name "spec-*.md" -printf "%T@ %p\n" | sort -n | tail -1 | cut -d' ' -f2-)
@@ -87,11 +80,7 @@ fi
 
 # Create placeholder file for AI to generate plan
 log "Creating implementation plan: $PLAN_FILE"
-if [ -n "$CONTEXT_INJECTION" ]; then
-    echo "$CONTEXT_INJECTION" > "$PLAN_FILE"
-    echo "" >> "$PLAN_FILE"
-fi
-echo "# Implementation Plan - $FEATURE_DIR" >> "$PLAN_FILE"
+echo "# Implementation Plan - $FEATURE_DIR" > "$PLAN_FILE"
 echo "" >> "$PLAN_FILE"
 echo "<!-- INSTRUCTION: Generate plan using template: $TEMPLATE_FILE -->" >> "$PLAN_FILE"
 echo "<!-- SPEC_FILE: $SPEC_FILE -->" >> "$PLAN_FILE"

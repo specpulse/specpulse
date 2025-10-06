@@ -2694,7 +2694,10 @@ Need help? Visit https://github.com/specpulse/specpulse
         # Validate command
         validate_parser = subparsers.add_parser("validate", help="Validate project components")
         validate_parser.add_argument("component", nargs="?", default="all", choices=["all", "spec", "plan", "constitution"], help="Component to validate")
-        validate_parser.add_argument("--fix", action="store_true", help="Attempt to fix issues")
+        validate_parser.add_argument("--fix", action="store_true", help="Attempt to auto-fix validation issues")
+        validate_parser.add_argument("--partial", action="store_true", help="Use partial validation (for incomplete specs)")
+        validate_parser.add_argument("--progress", action="store_true", help="Show only completion percentage")
+        validate_parser.add_argument("--show-examples", action="store_true", help="Display all validation examples")
         validate_parser.add_argument("--verbose", action="store_true", help="Verbose output")
 
         # Decompose command

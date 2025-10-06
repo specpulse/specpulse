@@ -71,32 +71,11 @@ TEMPLATE_DIR="$PROJECT_ROOT/templates"
 # Validate all required templates exist
 validate_templates "$TEMPLATE_DIR"
 
-# v1.7.0: Inject project context for AI
-CONTEXT_INJECTION=""
-if command -v specpulse &> /dev/null; then
-    log_info "Injecting project context..."
-    CONTEXT_INJECTION=$(specpulse context inject 2>/dev/null || echo "")
-fi
-
 # Create marker files that indicate AI should use templates to generate content
 # These are placeholder files that will be replaced by AI-generated content
-if [ -n "$CONTEXT_INJECTION" ]; then
-    echo "$CONTEXT_INJECTION" > "$SPECS_DIR/spec-001.md"
-    echo "" >> "$SPECS_DIR/spec-001.md"
-fi
-echo "# Specification for $FEATURE_NAME" >> "$SPECS_DIR/spec-001.md"
-
-if [ -n "$CONTEXT_INJECTION" ]; then
-    echo "$CONTEXT_INJECTION" > "$PLANS_DIR/plan-001.md"
-    echo "" >> "$PLANS_DIR/plan-001.md"
-fi
-echo "# Implementation Plan for $FEATURE_NAME" >> "$PLANS_DIR/plan-001.md"
-
-if [ -n "$CONTEXT_INJECTION" ]; then
-    echo "$CONTEXT_INJECTION" > "$TASKS_DIR/task-001.md"
-    echo "" >> "$TASKS_DIR/task-001.md"
-fi
-echo "# Task Breakdown for $FEATURE_NAME" >> "$TASKS_DIR/task-001.md"
+echo "# Specification for $FEATURE_NAME" > "$SPECS_DIR/spec-001.md"
+echo "# Implementation Plan for $FEATURE_NAME" > "$PLANS_DIR/plan-001.md"
+echo "# Task Breakdown for $FEATURE_NAME" > "$TASKS_DIR/task-001.md"
 
 # Add markers indicating these files need AI processing
 echo "" >> "$SPECS_DIR/spec-001.md"
@@ -136,10 +115,10 @@ backup_file "$CONTEXT_FILE"
 if [ -d "$PROJECT_ROOT/.git" ]; then
     cd "$PROJECT_ROOT"
     if git rev-parse --verify "$BRANCH_NAME" >/dev/null 2>&1; then
-        log "Git branch '$BRANCH_NAME' already exists, checking out"
+        log_info "Git branch '$BRANCH_NAME' already exists, checking out"
         git checkout "$BRANCH_NAME" || error_exit "Failed to checkout existing branch"
     else
-        log "Creating new git branch '$BRANCH_NAME'"
+        log_info "Creating new git branch '$BRANCH_NAME'"
         git checkout -b "$BRANCH_NAME" || error_exit "Failed to create new branch"
     fi
 fi

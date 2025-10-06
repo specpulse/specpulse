@@ -21,6 +21,19 @@
 
 SpecPulse is a universal **Specification-Driven Development (SDD)** framework that works with ANY software project - web apps, mobile apps, desktop software, games, APIs, ML projects, and more. It ensures every feature starts with clear specifications, validated plans, and tracked tasks.
 
+## 📋 What's New in v1.8.0 - Better Validation Feedback
+
+> **✨ Actionable Validation for LLMs**
+> - **💬 Enhanced Error Messages**: Errors include meaning, examples, suggestions, and help commands
+> - **🔧 Auto-Fix**: `--fix` flag automatically adds missing sections with backups
+> - **📊 Partial Validation**: `--partial` for work-in-progress specs (shows completion %)
+> - **🎨 Rich Formatting**: Beautiful color-coded error panels with icons (✓ ⚠️ ⭕)
+> - **🎯 Custom Rules**: Project-type-specific validation (web-app, api, mobile-app)
+> - **🤖 LLM-Optimized**: Examples show exactly what to add, suggestions are actionable
+> - **⚡ Smart Suggestions**: Next section recommendations based on completion state
+>
+> See [Validation Feedback](#-validation-feedback-v180) section below for details.
+
 ## 📋 What's New in v1.7.0 - Better Context for LLMs
 
 > **🧠 Intelligent Context Management**

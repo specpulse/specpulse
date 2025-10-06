@@ -50,13 +50,6 @@ fi
 # Ensure tasks directory exists
 mkdir -p "$TASK_DIR" || error_exit "Failed to create tasks directory: $TASK_DIR"
 
-# v1.7.0: Inject feature-specific context for AI
-CONTEXT_INJECTION=""
-if command -v specpulse &> /dev/null; then
-    log "Injecting project context for feature $FEATURE_ID..."
-    CONTEXT_INJECTION=$(specpulse context inject --feature "$FEATURE_ID" 2>/dev/null || echo "")
-fi
-
 # Find latest spec file
 if [ -d "$SPEC_DIR" ]; then
     SPEC_FILE=$(find "$SPEC_DIR" -name "spec-*.md" -printf "%T@ %p\n" | sort -n | tail -1 | cut -d' ' -f2-)
@@ -98,11 +91,7 @@ fi
 
 # Create placeholder file for AI to generate tasks
 log "Creating task breakdown: $TASK_FILE"
-if [ -n "$CONTEXT_INJECTION" ]; then
-    echo "$CONTEXT_INJECTION" > "$TASK_FILE"
-    echo "" >> "$TASK_FILE"
-fi
-echo "# Task Breakdown - $FEATURE_DIR" >> "$TASK_FILE"
+echo "# Task Breakdown - $FEATURE_DIR" > "$TASK_FILE"
 echo "" >> "$TASK_FILE"
 echo "<!-- INSTRUCTION: Generate tasks using template: $TEMPLATE_FILE -->" >> "$TASK_FILE"
 echo "<!-- SPEC_FILE: $SPEC_FILE -->" >> "$TASK_FILE"

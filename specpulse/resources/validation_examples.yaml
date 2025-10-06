@@ -1,0 +1,318 @@
+# SpecPulse Validation Examples Database
+# Version: 1.0.0
+# Purpose: Provide actionable, LLM-friendly validation error messages
+#
+# Schema:
+#   <section_key>:
+#     message: Short error message
+#     meaning: Explanation of what this section means
+#     example: Concrete example of valid content (multiline supported)
+#     suggestion: Actionable suggestion for fixing the issue
+#     help_command: Command to get more help
+#     auto_fix: Whether this can be auto-fixed (true/false)
+
+# Executive Summary
+missing_executive_summary:
+  message: "Missing: Executive Summary"
+  meaning: "Executive summary provides a high-level overview of the feature in 1-2 paragraphs"
+  example: |
+    This feature enhances the validation system to provide actionable, LLM-friendly
+    feedback. It transforms cryptic validation errors into clear guidance with examples,
+    supports progressive validation for incomplete specs, and enables project-specific
+    validation rules.
+  suggestion: "Add a section '## Executive Summary' with a 1-2 paragraph overview of the feature"
+  help_command: "specpulse help executive-summary"
+  auto_fix: true
+
+# Problem Statement
+missing_problem_statement:
+  message: "Missing: Problem Statement"
+  meaning: "Problem statement describes the specific problem being solved and why it matters"
+  example: |
+    Current validation in SpecPulse has several critical issues:
+    1. Cryptic error messages - Validation says "Missing section X" but doesn't explain what to add
+    2. Binary validation - Specs either pass or fail; no support for partial/incomplete specs
+    3. Generic validation - Same rules apply to all projects regardless of type
+
+    These issues slow down spec creation and prevent incremental workflows.
+  suggestion: "Add a section '## Problem Statement' with 2-4 specific problems and their impact"
+  help_command: "specpulse help problem-statement"
+  auto_fix: true
+
+# Proposed Solution
+missing_proposed_solution:
+  message: "Missing: Proposed Solution"
+  meaning: "Proposed solution describes the high-level approach to solving the problem"
+  example: |
+    Implement a three-component validation enhancement system:
+
+    1. Actionable Validation Messages: Transform errors into guidance with examples
+    2. Partial Validation: Support progressive validation showing completion status
+    3. Context-Based Rules: Enable project-specific validation rules
+  suggestion: "Add a section '## Proposed Solution' with your high-level approach"
+  help_command: "specpulse help proposed-solution"
+  auto_fix: true
+
+# Functional Requirements
+missing_functional_requirements:
+  message: "Missing: Functional Requirements"
+  meaning: "Functional requirements are specific, testable requirements that define WHAT the system must do"
+  example: |
+    FR-001: Actionable Validation Error Messages
+      - Acceptance: Each validation error includes: what it means, example, suggestion, and help command
+      - Priority: MUST
+
+    FR-002: Auto-Fix Command for Common Issues
+      - Acceptance: `specpulse validate 001 --fix` adds missing template sections automatically
+      - Priority: MUST
+
+    FR-003: Partial Validation Mode
+      - Acceptance: `specpulse validate 001 --partial` shows completion percentage and progress
+      - Priority: MUST
+  suggestion: "Add a section '## Functional Requirements' or '## Detailed Requirements > ### Functional Requirements' with 3-7 numbered requirements (FR-001, FR-002, etc.)"
+  help_command: "specpulse help functional-requirements"
+  auto_fix: true
+
+insufficient_functional_requirements:
+  message: "Insufficient: Functional Requirements (only {count} found)"
+  meaning: "Functional requirements should have at least 3 specific, testable requirements"
+  example: |
+    FR-001: User can login with email/password
+    FR-002: Invalid credentials show error message within 2 seconds
+    FR-003: Successful login redirects to dashboard
+  suggestion: "Add at least {needed} more functional requirements with clear acceptance criteria"
+  help_command: "specpulse help functional-requirements"
+  auto_fix: false
+
+# User Stories
+missing_user_stories:
+  message: "Missing: User Stories"
+  meaning: "User stories describe features from the user's perspective using 'As a... I want... So that...' format"
+  example: |
+    ### Story 1: LLM Receives Actionable Error Messages
+    **As a** LLM (Claude/Gemini) using SpecPulse
+    **I want** validation errors that include examples and suggestions
+    **So that** I know exactly what content to generate to fix the issue
+
+    **Acceptance Criteria:**
+    - [ ] Error message explains what the missing/invalid section means
+    - [ ] Error includes a concrete example of valid content
+    - [ ] Error suggests specific action to take
+  suggestion: "Add a section '## User Stories' with 2-5 stories in standard format"
+  help_command: "specpulse help user-stories"
+  auto_fix: true
+
+insufficient_user_stories:
+  message: "Insufficient: User Stories (only {count} found)"
+  meaning: "A well-specified feature should have at least 2 user stories from different perspectives"
+  example: |
+    ### Story 1: Solo Developer Creates Spec
+    **As a** solo developer
+    **I want** validation to guide me through missing sections
+    **So that** I can create complete specs without manual review
+
+    ### Story 2: LLM Validates Spec
+    **As a** LLM
+    **I want** structured, parseable validation output
+    **So that** I can automatically fix validation issues
+  suggestion: "Add {needed} more user stories from different user perspectives"
+  help_command: "specpulse help user-stories"
+  auto_fix: false
+
+# Acceptance Criteria
+missing_acceptance_criteria:
+  message: "Missing: Acceptance Criteria"
+  meaning: "Acceptance criteria define when the feature is 'done' - testable conditions that must be met"
+  example: |
+    - [ ] All functional requirements implemented and tested
+    - [ ] Validation errors include examples, suggestions, and help commands
+    - [ ] Partial validation supports incomplete specs without errors
+    - [ ] Custom validation rules work for web-app, api, and mobile-app project types
+    - [ ] Test coverage >90% for new validation code
+    - [ ] Validation completes in <2 seconds
+  suggestion: "Add a section '## Acceptance Criteria' or '## Success Criteria' with 3-7 testable checkboxes"
+  help_command: "specpulse help acceptance-criteria"
+  auto_fix: true
+
+# Technical Constraints
+missing_technical_constraints:
+  message: "Missing: Technical Constraints"
+  meaning: "Technical constraints are limitations or requirements that affect implementation (e.g., compatibility, performance, platform)"
+  example: |
+    1. Backward Compatibility: Existing validation must continue to work
+    2. Performance: Validation enhancements must not slow down existing validation by >10%
+    3. File Format: Validation rules must use YAML for consistency
+    4. Cross-Platform: Validation must work on Windows, macOS, and Linux
+  suggestion: "Add a section '## Technical Constraints' with 2-5 technical limitations or requirements"
+  help_command: "specpulse help technical-constraints"
+  auto_fix: true
+
+# Dependencies
+missing_dependencies:
+  message: "Missing: Dependencies"
+  meaning: "Dependencies are external services, libraries, or other features required for this feature to work"
+  example: |
+    - Existing `specpulse/core/validator.py` module
+    - YAML parsing library (PyYAML)
+    - Template rendering system (Jinja2)
+    - Rich library for formatted CLI output
+    - Project context system (from v1.7.0)
+  suggestion: "Add a section '## Dependencies' listing external services, libraries, or other features needed"
+  help_command: "specpulse help dependencies"
+  auto_fix: true
+
+# Risks and Mitigations
+missing_risks:
+  message: "Missing: Risks and Mitigations"
+  meaning: "Risks are potential problems that could occur, with mitigations explaining how to address them"
+  example: |
+    **Risk 1: Auto-Fix Breaks Existing Content**
+    - Probability: Low
+    - Impact: High
+    - Mitigation: Always create backups before auto-fix, make auto-fix append-only
+
+    **Risk 2: Performance Degradation**
+    - Probability: Low
+    - Impact: Medium
+    - Mitigation: Cache validation examples, optimize YAML parsing, add performance benchmarks
+  suggestion: "Add a section '## Risks and Mitigations' with 2-4 risks, each with probability, impact, and mitigation"
+  help_command: "specpulse help risks"
+  auto_fix: true
+
+# Success Criteria
+missing_success_criteria:
+  message: "Missing: Success Criteria"
+  meaning: "Success criteria define what success looks like - measurable outcomes and quality standards"
+  example: |
+    - [ ] All 10 functional requirements implemented and tested
+    - [ ] LLMs receive actionable feedback on validation errors
+    - [ ] Partial validation supports incremental spec building
+    - [ ] Test coverage: >90% for new validation code
+    - [ ] Performance: validation completes in <2 seconds
+    - [ ] Documentation: validation examples file includes 15+ examples
+  suggestion: "Add a section '## Success Criteria' with 3-7 measurable outcomes and quality standards"
+  help_command: "specpulse help success-criteria"
+  auto_fix: true
+
+# Non-Functional Requirements - Performance
+missing_nfr_performance:
+  message: "Missing: Non-Functional Requirements (Performance)"
+  meaning: "Performance requirements define speed, throughput, and resource usage targets"
+  example: |
+    #### Performance
+    - Response Time: Validation should complete in <2 seconds for typical specs
+    - Throughput: Support validation of 100+ specs in batch mode
+    - Resource Usage: Memory usage <50MB for validation operations
+  suggestion: "Add a section '## Non-Functional Requirements > ### Performance' with response time, throughput, and resource targets"
+  help_command: "specpulse help performance-requirements"
+  auto_fix: true
+
+# Non-Functional Requirements - Security
+missing_nfr_security:
+  message: "Missing: Non-Functional Requirements (Security)"
+  meaning: "Security requirements define authentication, authorization, and data protection needs"
+  example: |
+    #### Security
+    - Authentication: OAuth2 with JWT tokens
+    - Authorization: Role-based access control (RBAC)
+    - Data Protection: All sensitive data encrypted at rest and in transit
+    - Audit Logging: All authentication attempts logged
+  suggestion: "Add a section '## Non-Functional Requirements > ### Security' with authentication, authorization, and data protection requirements"
+  help_command: "specpulse help security-requirements"
+  auto_fix: true
+
+# Project-Type-Specific Examples
+
+# Web App Specific
+missing_accessibility_requirements_webapp:
+  message: "Recommendation: Consider adding accessibility requirements (Web App project)"
+  meaning: "Web applications should consider accessibility for users with disabilities (WCAG compliance)"
+  example: |
+    ## Accessibility Requirements
+    - WCAG 2.1 Level AA compliance
+    - Keyboard navigation support for all interactive elements
+    - Screen reader compatibility (ARIA labels)
+    - Color contrast ratios meet accessibility standards
+  suggestion: "Add accessibility requirements to ensure your web app is usable by all users"
+  help_command: "specpulse help accessibility"
+  auto_fix: false
+
+missing_performance_requirements_webapp:
+  message: "Recommendation: Consider adding performance requirements (Web App project)"
+  meaning: "Web applications should define performance targets for user experience"
+  example: |
+    ## Performance Requirements
+    - Initial page load: <2 seconds on 3G connection
+    - Time to Interactive (TTI): <3 seconds
+    - Lighthouse score: >90 for performance
+    - Bundle size: <500KB gzipped
+  suggestion: "Add performance requirements with specific targets for load time and bundle size"
+  help_command: "specpulse help performance"
+  auto_fix: false
+
+# API Specific
+missing_api_documentation_api:
+  message: "Recommendation: Consider adding API documentation requirements (API project)"
+  meaning: "APIs should have comprehensive documentation including endpoints, request/response formats, and examples"
+  example: |
+    ## API Documentation Requirements
+    - OpenAPI 3.0 specification for all endpoints
+    - Example requests and responses for each endpoint
+    - Authentication flow documentation
+    - Error code reference
+    - Rate limiting documentation
+  suggestion: "Add API documentation requirements to ensure your API is easy to integrate"
+  help_command: "specpulse help api-documentation"
+  auto_fix: false
+
+missing_rate_limiting_api:
+  message: "Recommendation: Consider adding rate limiting (API project)"
+  meaning: "APIs should have rate limiting to prevent abuse and ensure fair usage"
+  example: |
+    ## Rate Limiting
+    - Authenticated users: 1000 requests/hour
+    - Unauthenticated users: 100 requests/hour
+    - Burst limit: 20 requests/second
+    - Rate limit headers included in all responses
+  suggestion: "Add rate limiting requirements to protect your API from abuse"
+  help_command: "specpulse help rate-limiting"
+  auto_fix: false
+
+# Mobile App Specific
+missing_platform_support_mobile:
+  message: "Recommendation: Consider specifying platform support (Mobile App project)"
+  meaning: "Mobile apps should clearly define which platforms and OS versions are supported"
+  example: |
+    ## Platform Support
+    - iOS: 14.0 and above
+    - Android: API level 21 (Android 5.0) and above
+    - Devices: iPhone 8 and newer, Android devices with 2GB+ RAM
+    - Tablets: iPad (5th gen) and newer, Android tablets
+  suggestion: "Add platform support requirements specifying iOS/Android versions and device requirements"
+  help_command: "specpulse help platform-support"
+  auto_fix: false
+
+missing_offline_mode_mobile:
+  message: "Recommendation: Consider adding offline mode support (Mobile App project)"
+  meaning: "Mobile apps should handle offline scenarios gracefully"
+  example: |
+    ## Offline Mode
+    - Core features available offline (read-only access to cached data)
+    - Automatic sync when connection restored
+    - User notification when offline
+    - Queue actions for upload when back online
+  suggestion: "Add offline mode requirements to ensure your app works without connectivity"
+  help_command: "specpulse help offline-mode"
+  auto_fix: false
+
+# Metadata Section
+metadata:
+  version: "1.0.0"
+  last_updated: "2025-10-06"
+  total_examples: 20
+  description: "Validation examples database for SpecPulse v1.8.0"
+  categories:
+    - core_sections
+    - requirements
+    - quality_attributes
+    - project_type_specific

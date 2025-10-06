@@ -49,13 +49,6 @@ fi
 # Ensure specs directory exists
 mkdir -p "$SPEC_DIR" || error_exit "Failed to create specs directory: $SPEC_DIR"
 
-# v1.7.0: Inject feature-specific context for AI
-CONTEXT_INJECTION=""
-if command -v specpulse &> /dev/null; then
-    log "Injecting project context for feature $FEATURE_ID..."
-    CONTEXT_INJECTION=$(specpulse context inject --feature "$FEATURE_ID" 2>/dev/null || echo "")
-fi
-
 # Find latest spec file or create new one
 if [ -n "$SPEC_CONTENT" ]; then
     # Find next available spec number
@@ -89,11 +82,7 @@ else
         SPEC_FILE="$SPEC_DIR/spec-$(printf "%03d" $spec_number).md"
         log "Creating specification file for AI generation: $SPEC_FILE"
         # Create placeholder file for AI to fill
-        if [ -n "$CONTEXT_INJECTION" ]; then
-            echo "$CONTEXT_INJECTION" > "$SPEC_FILE"
-            echo "" >> "$SPEC_FILE"
-        fi
-        echo "# Specification - $FEATURE_DIR" >> "$SPEC_FILE"
+        echo "# Specification - $FEATURE_DIR" > "$SPEC_FILE"
         echo "" >> "$SPEC_FILE"
         echo "<!-- INSTRUCTION: Generate specification content using template: $TEMPLATE_FILE -->" >> "$SPEC_FILE"
         echo "<!-- FEATURE_DIR: $FEATURE_DIR -->" >> "$SPEC_FILE"
@@ -103,11 +92,7 @@ else
         SPEC_FILE="$SPEC_DIR/spec-001.md"
         log "Creating first specification file for AI generation: $SPEC_FILE"
         # Create placeholder file for AI to fill
-        if [ -n "$CONTEXT_INJECTION" ]; then
-            echo "$CONTEXT_INJECTION" > "$SPEC_FILE"
-            echo "" >> "$SPEC_FILE"
-        fi
-        echo "# Specification - $FEATURE_DIR" >> "$SPEC_FILE"
+        echo "# Specification - $FEATURE_DIR" > "$SPEC_FILE"
         echo "" >> "$SPEC_FILE"
         echo "<!-- INSTRUCTION: Generate specification content using template: $TEMPLATE_FILE -->" >> "$SPEC_FILE"
         echo "<!-- FEATURE_DIR: $FEATURE_DIR -->" >> "$SPEC_FILE"
