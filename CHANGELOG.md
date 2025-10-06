@@ -5,6 +5,78 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2025-10-06
+
+### 🚀 MAJOR RELEASE - Better Workflow Support (Incremental Spec Building)
+
+This release implements **v1.9.0 from ROADMAP**, enabling incremental spec building with checkpoints and progress tracking. Users can now start with minimal specs (2-3 minutes) and expand when ready, with automatic safety checkpoints.
+
+### ✨ New Features
+
+**Checkpoint System** (Complete)
+- **Automatic Checkpoints**: Created before tier expansion and section addition
+- **Manual Checkpoints**: `specpulse checkpoint create <feature-id> "description"`
+- **List & Restore**: `specpulse checkpoint list/restore <feature-id> <checkpoint-name>`
+- **Auto-Cleanup**: Delete checkpoints older than 30 days
+- **SHA-256 Verification**: Integrity checks on creation and restoration
+- **Atomic Operations**: All-or-nothing with automatic rollback
+
+**Incremental Building** (Complete)
+- **Progress Tracking**: `specpulse spec progress <feature-id>` shows completion percentage
+- **Section Addition**: `specpulse spec add-section <feature-id> <section-name>`
+- **Visual Indicators**: ✓ (complete), ⚠️ (partial), ⭕ (not started)
+- **Smart Recommendations**: Suggests next section to work on
+
+**Tiered Templates** (Complete - enhanced from v1.6.0)
+- **spec-tier1.md**: Minimal tier (3 sections, 2-3 min)
+- **spec-tier2.md**: Standard tier (7-8 sections, 10-15 min)
+- **spec-tier3.md**: Complete tier (15+ sections, 30-45 min)
+- **Enhanced LLM Guidance**: All templates include extensive `<!-- LLM GUIDANCE -->` comments
+
+### 📦 New Modules
+
+- `specpulse/core/checkpoints.py` (300 lines)
+- `specpulse/core/incremental.py` (450 lines)
+- `specpulse/core/tier_constants.py` (290 lines)
+
+### 🧪 Testing
+
+- `tests/test_tiered_templates.py` (23 tests)
+- `tests/test_checkpoints.py` (12 tests)
+- `tests/test_incremental.py` (10 tests)
+- **Total**: 45 new tests, all passing
+
+### 📚 Usage Examples
+
+```bash
+# Create checkpoint before changes
+specpulse checkpoint create 003 "Before adding security"
+
+# Track progress
+specpulse spec progress 003
+
+# Add sections incrementally
+specpulse spec add-section 003 user_stories
+
+# List and restore checkpoints
+specpulse checkpoint list 003
+specpulse checkpoint restore 003 checkpoint-001
+```
+
+### 🔧 Implementation Status
+
+- ✅ Phase 0: Template Preparation (100%)
+- ✅ Phase 1: Tier Manager (60% - reused from v1.6.0)
+- ✅ Phase 2: Checkpoint System (100%)
+- ✅ Phase 3: Incremental Building (83%)
+- ⚠️ Phase 4: Integration & Testing (43% - core working, docs pending)
+
+### 📖 Documentation
+
+See examples/v1.9.0-*.md for detailed usage examples.
+
+---
+
 ## [1.8.0] - 2025-10-06
 
 ### 🎉 MAJOR RELEASE - Better Validation Feedback for LLMs

@@ -887,6 +887,226 @@ graph LR
                 traceback.print_exc()
             sys.exit(1)
 
+    def checkpoint_create(self, feature_id: str, description: str):
+        """Create manual checkpoint"""
+        from ..core.checkpoints import CheckpointManager
+
+        self.console.show_banner(mini=True)
+        self.console.header("Create Checkpoint", style="bright_cyan")
+
+        try:
+            checkpoint_mgr = CheckpointManager(Path.cwd())
+            checkpoint_name = checkpoint_mgr.create(feature_id, description)
+
+            self.console.success(f"✓ Checkpoint created: {checkpoint_name}")
+            self.console.info(f"  Description: {description}")
+            self.console.info(f"  Restore with: specpulse checkpoint restore {feature_id} {checkpoint_name}")
+
+        except FileNotFoundError as e:
+            self.console.error(f"Spec not found: {e}")
+            sys.exit(1)
+        except Exception as e:
+            self.console.error(f"Checkpoint creation failed: {e}")
+            sys.exit(1)
+
+    def checkpoint_list(self, feature_id: str):
+        """List all checkpoints"""
+        from ..core.checkpoints import CheckpointManager
+
+        self.console.show_banner(mini=True)
+        self.console.header(f"Checkpoints: {feature_id}", style="bright_cyan")
+
+        try:
+            checkpoint_mgr = CheckpointManager(Path.cwd())
+            checkpoints = checkpoint_mgr.list(feature_id)
+
+            if not checkpoints:
+                self.console.warning(f"No checkpoints found for {feature_id}")
+                self.console.info(f"Create one with: specpulse checkpoint create {feature_id} \"description\"")
+                return
+
+            # Display table
+            from rich.table import Table
+            table = Table(title=f"Checkpoints for {feature_id}")
+            table.add_column("Name", style="cyan")
+            table.add_column("Description", style="white")
+            table.add_column("Created", style="yellow")
+            table.add_column("Tier", style="magenta")
+            table.add_column("Progress", style="green")
+
+            for cp in checkpoints:
+                table.add_row(
+                    cp.name,
+                    cp.description[:40] + "..." if len(cp.description) > 40 else cp.description,
+                    cp.created.strftime("%Y-%m-%d %H:%M"),
+                    cp.tier,
+                    f"{cp.progress:.0%}",
+                )
+
+            self.console.print(table)
+            self.console.info(f"\nTotal: {len(checkpoints)} checkpoints ({sum(cp.file_size_bytes for cp in checkpoints) / 1024:.1f} KB)")
+
+        except Exception as e:
+            self.console.error(f"Failed to list checkpoints: {e}")
+            sys.exit(1)
+
+    def checkpoint_restore(self, feature_id: str, checkpoint_name: str, force: bool = False):
+        """Restore from checkpoint"""
+        from ..core.checkpoints import CheckpointManager
+
+        self.console.show_banner(mini=True)
+        self.console.header("Restore Checkpoint", style="bright_cyan")
+
+        try:
+            checkpoint_mgr = CheckpointManager(Path.cwd())
+            success = checkpoint_mgr.restore(feature_id, checkpoint_name, force)
+
+            if success:
+                self.console.success(f"✓ Restored to: {checkpoint_name}")
+            else:
+                self.console.warning("Restoration cancelled")
+
+        except FileNotFoundError as e:
+            self.console.error(f"Checkpoint not found: {e}")
+            sys.exit(1)
+        except ValueError as e:
+            self.console.error(f"Integrity check failed: {e}")
+            sys.exit(1)
+        except Exception as e:
+            self.console.error(f"Restoration failed: {e}")
+            sys.exit(1)
+
+    def checkpoint_cleanup(self, feature_id: str, older_than_days: int):
+        """Delete old checkpoints"""
+        from ..core.checkpoints import CheckpointManager
+
+        self.console.show_banner(mini=True)
+        self.console.header("Cleanup Checkpoints", style="bright_cyan")
+
+        try:
+            checkpoint_mgr = CheckpointManager(Path.cwd())
+            deleted_count = checkpoint_mgr.cleanup(feature_id, older_than_days)
+
+            if deleted_count > 0:
+                self.console.success(f"✓ Deleted {deleted_count} checkpoint(s) older than {older_than_days} days")
+            else:
+                self.console.info(f"No checkpoints older than {older_than_days} days found")
+
+        except Exception as e:
+            self.console.error(f"Cleanup failed: {e}")
+            sys.exit(1)
+
+    def spec_add_section(self, feature_id: str, section_name: str):
+        """Add section to spec"""
+        from ..core.incremental import IncrementalBuilder
+        from ..core.checkpoints import CheckpointManager
+
+        self.console.show_banner(mini=True)
+        self.console.header("Add Section", style="bright_cyan")
+
+        try:
+            # Create checkpoint before adding section
+            checkpoint_mgr = CheckpointManager(Path.cwd())
+            checkpoint_name = checkpoint_mgr.create(feature_id, f"Before adding {section_name}")
+            self.console.info(f"✨ Created checkpoint: {checkpoint_name}")
+
+            # Add section
+            builder = IncrementalBuilder(Path.cwd())
+            spec_file = self._find_latest_spec_file(feature_id)
+            result = builder.add_section(spec_file, section_name)
+
+            if result.success:
+                self.console.success(f"✓ {result.message}")
+                self.console.info(f"  Checkpoint: {checkpoint_name}")
+                self.console.info(f"  Rollback with: specpulse checkpoint restore {feature_id} {checkpoint_name}")
+            else:
+                self.console.error(f"Failed: {result.message}")
+                if result.error:
+                    self.console.info(f"  {result.error}")
+
+        except FileNotFoundError as e:
+            self.console.error(f"Spec not found: {e}")
+            sys.exit(1)
+        except ValueError as e:
+            self.console.error(f"Invalid section: {e}")
+            sys.exit(1)
+        except Exception as e:
+            self.console.error(f"Failed to add section: {e}")
+            sys.exit(1)
+
+    def spec_progress(self, feature_id: str):
+        """Show spec progress"""
+        from ..core.incremental import IncrementalBuilder
+
+        self.console.show_banner(mini=True)
+        self.console.header(f"Specification Progress: {feature_id}", style="bright_cyan")
+
+        try:
+            builder = IncrementalBuilder(Path.cwd())
+            spec_file = self._find_latest_spec_file(feature_id)
+            progress = builder.get_progress(spec_file)
+
+            # Display progress
+            self.console.info(f"Current Tier: {progress.tier.title()} ({progress.total_sections} sections)")
+            self.console.info(f"Overall Progress: {progress.percentage:.0%} complete\n")
+
+            # Completed sections
+            if progress.completed_sections > 0:
+                self.console.success(f"✅ Completed Sections ({progress.completed_sections}/{progress.total_sections})")
+                for section, status in progress.section_status.items():
+                    if status == "complete":
+                        display_name = section.replace("_", " ").title()
+                        self.console.info(f"  ✓ {display_name}")
+
+            # Partial sections
+            if progress.partial_sections > 0:
+                self.console.warning(f"\n⚠️  In Progress ({progress.partial_sections}/{progress.total_sections})")
+                for section, status in progress.section_status.items():
+                    if status == "partial":
+                        display_name = section.replace("_", " ").title()
+                        self.console.info(f"  ⏳ {display_name}")
+
+            # Not started
+            if progress.not_started_sections > 0:
+                self.console.info(f"\n⭕ Not Started ({progress.not_started_sections}/{progress.total_sections})")
+                for section, status in progress.section_status.items():
+                    if status == "empty":
+                        display_name = section.replace("_", " ").title()
+                        self.console.info(f"  • {display_name}")
+
+            # Next steps
+            if progress.next_recommended:
+                self.console.info("\n🎯 Recommended Next Steps")
+                if progress.next_recommended.startswith("RECOMMEND:"):
+                    self.console.info(f"  {progress.next_recommended}")
+                else:
+                    display_name = progress.next_recommended.replace("_", " ").title()
+                    self.console.info(f"  1. Complete: {display_name}")
+                    self.console.info(f"     Command: specpulse spec add-section {feature_id} {progress.next_recommended}")
+
+        except FileNotFoundError as e:
+            self.console.error(f"Spec not found: {e}")
+            sys.exit(1)
+        except Exception as e:
+            self.console.error(f"Failed to get progress: {e}")
+            sys.exit(1)
+
+    def _find_latest_spec_file(self, feature_id: str) -> Path:
+        """Find latest spec file for feature."""
+        specs_dir = Path.cwd() / "specs"
+        feature_dirs = list(specs_dir.glob(f"*{feature_id}*"))
+
+        if not feature_dirs:
+            raise FileNotFoundError(f"Feature not found: {feature_id}")
+
+        feature_dir = feature_dirs[0]
+        spec_files = sorted(feature_dir.glob("spec-*.md"))
+
+        if not spec_files:
+            raise FileNotFoundError(f"No spec files found in {feature_dir}")
+
+        return spec_files[-1]
+
     def doctor(self):
         """System check and diagnostics"""
         self.console.show_banner(mini=True)
@@ -2719,6 +2939,43 @@ Need help? Visit https://github.com/specpulse/specpulse
         expand_parser.add_argument("--to-tier", choices=["standard", "complete"], required=True, help="Target tier level")
         expand_parser.add_argument("--show-diff", action="store_true", help="Preview changes before applying")
 
+        # Checkpoint command (v1.9.0)
+        checkpoint_parser = subparsers.add_parser("checkpoint", help="Checkpoint management")
+        checkpoint_subparsers = checkpoint_parser.add_subparsers(dest="checkpoint_action", help="Checkpoint actions")
+
+        # Checkpoint create
+        checkpoint_create_parser = checkpoint_subparsers.add_parser("create", help="Create manual checkpoint")
+        checkpoint_create_parser.add_argument("feature_id", help="Feature ID")
+        checkpoint_create_parser.add_argument("description", help="Checkpoint description")
+
+        # Checkpoint list
+        checkpoint_list_parser = checkpoint_subparsers.add_parser("list", help="List all checkpoints")
+        checkpoint_list_parser.add_argument("feature_id", help="Feature ID")
+
+        # Checkpoint restore
+        checkpoint_restore_parser = checkpoint_subparsers.add_parser("restore", help="Restore from checkpoint")
+        checkpoint_restore_parser.add_argument("feature_id", help="Feature ID")
+        checkpoint_restore_parser.add_argument("checkpoint_name", help="Checkpoint name (e.g., checkpoint-001)")
+        checkpoint_restore_parser.add_argument("--force", action="store_true", help="Skip confirmation prompt")
+
+        # Checkpoint cleanup
+        checkpoint_cleanup_parser = checkpoint_subparsers.add_parser("cleanup", help="Delete old checkpoints")
+        checkpoint_cleanup_parser.add_argument("feature_id", help="Feature ID")
+        checkpoint_cleanup_parser.add_argument("--older-than-days", type=int, default=30, help="Delete checkpoints older than N days")
+
+        # Spec command (v1.9.0)
+        spec_parser = subparsers.add_parser("spec", help="Spec management")
+        spec_subparsers = spec_parser.add_subparsers(dest="spec_action", help="Spec actions")
+
+        # Spec add-section
+        spec_add_section_parser = spec_subparsers.add_parser("add-section", help="Add section to spec")
+        spec_add_section_parser.add_argument("feature_id", help="Feature ID")
+        spec_add_section_parser.add_argument("section_name", help="Section name to add")
+
+        # Spec progress
+        spec_progress_parser = spec_subparsers.add_parser("progress", help="Show spec progress")
+        spec_progress_parser.add_argument("feature_id", help="Feature ID")
+
         # Help command
         help_parser = subparsers.add_parser("help", help="Show comprehensive help and documentation")
         help_parser.add_argument("topic", nargs="?", help="Specific topic to get help with")
@@ -2850,7 +3107,7 @@ Need help? Visit https://github.com/specpulse/specpulse
                            verbose=getattr(args, 'verbose', False))
 
         # Available commands for suggestion
-        available_commands = ["init", "update", "validate", "decompose", "sync", "doctor", "expand", "help", "template", "memory", "context", "note", "notes"]
+        available_commands = ["init", "update", "validate", "decompose", "sync", "doctor", "expand", "checkpoint", "spec", "help", "template", "memory", "context", "note", "notes"]
 
         # Execute command with error handling
         if args.command == "init":
@@ -2867,6 +3124,24 @@ Need help? Visit https://github.com/specpulse/specpulse
             cli.doctor()
         elif args.command == "expand":
             cli.expand(args.feature_id, args.to_tier, args.show_diff)
+        elif args.command == "checkpoint":
+            if args.checkpoint_action == "create":
+                cli.checkpoint_create(args.feature_id, args.description)
+            elif args.checkpoint_action == "list":
+                cli.checkpoint_list(args.feature_id)
+            elif args.checkpoint_action == "restore":
+                cli.checkpoint_restore(args.feature_id, args.checkpoint_name, args.force)
+            elif args.checkpoint_action == "cleanup":
+                cli.checkpoint_cleanup(args.feature_id, args.older_than_days)
+            else:
+                checkpoint_parser.print_help()
+        elif args.command == "spec":
+            if args.spec_action == "add-section":
+                cli.spec_add_section(args.feature_id, args.section_name)
+            elif args.spec_action == "progress":
+                cli.spec_progress(args.feature_id)
+            else:
+                spec_parser.print_help()
         elif args.command == "help":
             cli.show_help(args.topic, args.list)
         elif args.command == "template":
