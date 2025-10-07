@@ -5,6 +5,27 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2025-10-07
+
+### 🔧 Patch Release - Missing Commands Added
+
+**Added:**
+- ✅ `sp-clarify` command for both Claude and Gemini
+- ✅ `sp-validate` command for both Claude and Gemini
+
+**Details:**
+- `sp-clarify`: Interactive command to resolve `[NEEDS CLARIFICATION]` markers
+- `sp-validate`: Comprehensive validation for specs, plans, tasks
+
+**Command Parity:**
+- Claude: 11 commands
+- Gemini: 11 commands
+- Full feature parity achieved ✅
+
+**No Breaking Changes** - Direct upgrade from v2.1.0
+
+---
+
 ## [2.1.0] - 2025-10-07
 
 ### 🚀 MAJOR ARCHITECTURE CHANGE - CLI-First Design
