@@ -1,0 +1,73 @@
+[command]
+name = "sp-validate"
+description = "Validate specifications, plans, or tasks"
+
+[command.prompt]
+text = """
+Validate project components for completeness and SDD compliance.
+
+Usage:
+  /sp-validate        # Validate current spec
+  /sp-validate spec   # Validate specifications
+  /sp-validate plan   # Validate plans
+  /sp-validate task   # Validate tasks
+  /sp-validate all    # Validate everything
+
+Implementation:
+
+1. Parse validation target (spec/plan/task/all)
+
+2. For spec validation:
+   - Read spec file
+   - Check required sections
+   - Count [NEEDS CLARIFICATION] markers
+   - Verify acceptance criteria format
+   - Run: specpulse validate spec --verbose
+
+3. For plan validation:
+   - Read plan file
+   - Check phases defined
+   - Verify dependencies
+   - Run: specpulse validate plan
+
+4. For task validation:
+   - Read task files
+   - Check status fields
+   - Verify dependencies
+   - Run: specpulse validate task
+
+5. Report results:
+   - Show validation status
+   - List missing sections
+   - Count clarifications
+   - Suggest next steps
+
+Example Output:
+
+✓ Specification Validation
+  File: specs/001-auth/spec-001.md
+  Status: Complete
+  Sections: 12/12
+  Clarifications: 0
+
+  → Next: /sp-plan generate
+
+Or with issues:
+
+✗ Specification Validation
+  File: specs/001-auth/spec-001.md
+  Status: Incomplete
+
+  Missing:
+    - Risk assessment
+    - Deployment strategy
+
+  Clarifications: 3
+
+  → Next: /sp-clarify
+"""
+
+[options]
+default_target = "spec"
+verbose = true
+show_suggestions = true
