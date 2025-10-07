@@ -3,6 +3,7 @@ Git utilities for SpecPulse
 """
 
 import subprocess
+import re
 from pathlib import Path
 from typing import Optional, List, Tuple
 
@@ -218,4 +219,19 @@ class GitUtils:
         """Merge branch into current branch"""
         success, _ = self._run_git_command("merge", branch)
         return success
+
+    def create_branch(self, branch_name: str) -> bool:
+        """Create and checkout a new branch"""
+        success, _ = self._run_git_command("checkout", "-b", branch_name)
+        return success
+
+    def checkout_branch(self, branch_name: str) -> bool:
+        """Checkout an existing branch"""
+        success, _ = self._run_git_command("checkout", branch_name)
+        return success
+
+    def branch_exists(self, branch_name: str) -> bool:
+        """Check if branch exists"""
+        success, output = self._run_git_command("branch", "--list", branch_name)
+        return success and branch_name in output
 

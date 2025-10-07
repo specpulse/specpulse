@@ -36,8 +36,10 @@ Initialize a new feature following SpecPulse methodology with SDD compliance.
 When called with `/sp-pulse $ARGUMENTS`, I will:
 
 1. **Validate arguments** and extract feature name + optional ID
-2. **Run initialization script**:
-   - `bash scripts/sp-pulse-init.sh "$FEATURE_NAME" "$OPTIONAL_ID"`
+2. **Create feature using SpecPulse CLI**:
+   - `specpulse --no-color context set current.feature "$FEATURE_NAME"`
+   - `specpulse --no-color context set current.feature_id "$FEATURE_ID"`
+   - `specpulse --no-color context set current.branch "$BRANCH_NAME"`
 3. **Create complete feature structure**:
    - Generate feature ID (001, 002, etc.) or use provided ID
    - Create sanitized branch name: `ID-feature-name`
@@ -71,7 +73,9 @@ User: /sp-pulse user-authentication-oauth2
 ```
 
 I will:
-- Run: `bash scripts/sp-pulse-init.sh "user-authentication-oauth2"`
+- Create feature structure using CLI calls
+- Set context: `specpulse context set current.feature "user-authentication-oauth2"`
+- Update context: `specpulse context set current.feature_id "001"`
 - Create: `specs/001-user-authentication-oauth2/` (empty, ready for spec)
 - Create: `plans/001-user-authentication-oauth2/` (empty, ready for plan)
 - Create: `tasks/001-user-authentication-oauth2/` (empty, ready for tasks)

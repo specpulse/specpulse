@@ -26,7 +26,7 @@ setup(
     version=get_version(),
     author="SpecPulse",
     author_email="",
-    description="Next-Generation Specification-Driven Development Framework",
+    description="SpecPulse v2.0.0 - AI-Enhanced Specification-Driven Development Framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/specpulse",
@@ -41,6 +41,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.11",
@@ -71,9 +72,6 @@ setup(
     package_data={
         "specpulse": [
             "resources/templates/*.md",
-            "resources/templates/decomposition/*.md",
-            "resources/templates/decomposition/*.yaml",
-            "resources/templates/decomposition/*.ts",
             "resources/memory/*.md",
             "resources/scripts/*.sh",
             "resources/scripts/*.ps1",

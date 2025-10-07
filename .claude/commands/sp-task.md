@@ -53,9 +53,9 @@ When called with `/sp-task $ARGUMENTS`, I will:
    c. **If not decomposed**:
       - Show existing plan files and ask user to select
       - Generate single task file with standard IDs (T001, T002)
-   c. **Validation** using script:
+   c. **Validation** using CLI:
       ```bash
-      bash scripts/sp-pulse-task.sh "$FEATURE_DIR"
+      specpulse --no-color validate task --verbose
       ```
    
    d. **Read implementation plan** from selected plan file

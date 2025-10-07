@@ -1,541 +1,488 @@
-# Specification: {{feature_name}}
-
 ---
+template: spec-tier3
+name: Complete Specification
 tier: complete
-progress: 0.0
-sections_completed: []
-sections_partial: []
-last_updated: {{date}}
+description: 15+ section complete template for production features (30-45 minutes)
+sections: [what, why, done-when, user-stories, requirements, acceptance-criteria, dependencies, non-functional, security, performance, scalability, monitoring, testing, deployment, maintenance, risks]
+estimated_time: "30-45 min"
+tags: [complete, production, enterprise]
+extends: spec-tier2-standard
+---
+
+# Specification: {{ feature_name }}
+
+## Metadata
+- **ID**: SPEC-{{ feature_id }}
+- **Version**: {{ version }}
+- **Created**: {{ date }}
+- **Author**: {{ author }}
+- **AI Assistant**: {{ ai_assistant }}
+- **Reviewers**: {{ reviewers }}
+- **Stakeholders**: {{ stakeholders }}
+- **Team**: {{ development_team }}
+
+## Executive Summary
+{{ executive_summary }}
+
 ---
 
 ## What
+**Feature Overview**
+{{ problem_statement }}
 
-<!-- LLM GUIDANCE: Same as Tier 1 & 2 - ONE sentence -->
+**Proposed Solution**
+{{ proposed_solution }}
 
-[One sentence: What does this feature do?]
+**Scope**
+- **In Scope**: {{ in_scope }}
+- **Out of Scope**: {{ out_of_scope }}
+
+**Technical Architecture**
+{{ technical_architecture }}
+
+**Integration Points**
+{{ integration_points }}
+
+<!-- LLM GUIDANCE: Complete technical specification:
+- Include detailed system architecture
+- Define all integration points
+- Document API contracts and data flows -->
 
 ---
 
 ## Why
+**Business Value**
+{{ business_value }}
 
-<!-- LLM GUIDANCE: Same as Tier 1 & 2 - ONE sentence -->
+**Problem Details**
+{{ problem_details }}
 
-[One sentence: Why is this feature needed?]
+**Strategic Alignment**
+{{ strategic_alignment }}
+
+**Market Analysis**
+{{ market_analysis }}
+
+**Competitive Landscape**
+{{ competitive_landscape }}
+
+<!-- LLM GUIDANCE: Comprehensive business case:
+- Include market research
+- Competitive analysis
+- ROI calculations -->
 
 ---
 
 ## Done When
+**Success Criteria**
+{{ success_criteria }}
 
-<!-- LLM GUIDANCE: Same as Tier 1 & 2 - 3 testable acceptance criteria -->
+**Definition of Done**
+{{ definition_of_done }}
 
-- [ ] [First acceptance criterion]
-- [ ] [Second acceptance criterion]
-- [ ] [Third acceptance criterion]
+**Performance Requirements**
+{{ performance_requirements }}
+
+**Business Metrics**
+{{ business_metrics }}
+
+**Quality Gates**
+{{ quality_gates }}
+
+<!-- LLM GUIDANCE: Comprehensive success criteria:
+- Include business KPIs
+- Define quality gates
+- Specify performance benchmarks -->
 
 ---
 
 ## User Stories
 
-<!-- LLM GUIDANCE: Same as Tier 2 - 3-5 user stories -->
+### Primary Users
+{{ primary_users }}
 
-### Story 1: [Title]
+### User Stories
+**User Story 1**: {{ user_story_1 }}
+- **Description**: {{ user_story_1_description }}
+- **Acceptance Criteria**: {{ ac_1 }}
+- **Priority**: {{ priority_1 }}
+- **Effort**: {{ effort_1 }}
+- **Business Value**: {{ business_value_1 }}
 
-**As a** [type of user]
-**I want** [action/capability]
-**So that** [benefit/value]
+**User Story 2**: {{ user_story_2 }}
+- **Description**: {{ user_story_2_description }}
+- **Acceptance Criteria**: {{ ac_2 }}
+- **Priority**: {{ priority_2 }}
+- **Effort**: {{ effort_2 }}
+- **Business Value**: {{ business_value_2 }}
 
-**Acceptance Criteria:**
-- [ ] [Testable criterion 1]
-- [ ] [Testable criterion 2]
-- [ ] [Testable criterion 3]
+**User Story 3**: {{ user_story_3 }}
+- **Description**: {{ user_story_3_description }}
+- **Acceptance Criteria**: {{ ac_3 }}
+- **Priority**: {{ priority_3 }}
+- **Effort**: {{ effort_3 }}
+- **Business Value**: {{ business_value_3 }}
+
+<!-- LLM GUIDANCE: Complete user story mapping:
+- Include detailed descriptions
+- Add business value estimates
+- Map to features and epics -->
 
 ---
 
-## Functional Requirements
+## Requirements
 
-<!-- LLM GUIDANCE: Same as Tier 2 - 5-8 requirements with FR-XXX numbering -->
+### Functional Requirements
+**FR-001**: {{ functional_requirement_1 }}
+- **Priority**: {{ fr1_priority }}
+- **Complexity**: {{ fr1_complexity }}
+- **Dependencies**: {{ fr1_dependencies }}
 
-**FR-001**: [Requirement statement]
-- **Acceptance**: [How to verify]
-- **Priority**: MUST | SHOULD | COULD
+**FR-002**: {{ functional_requirement_2 }}
+- **Priority**: {{ fr2_priority }}
+- **Complexity**: {{ fr2_complexity }}
+- **Dependencies**: {{ fr2_dependencies }}
+
+**FR-003**: {{ functional_requirement_3 }}
+- **Priority**: {{ fr3_priority }}
+- **Complexity**: {{ fr3_complexity }}
+- **Dependencies**: {{ fr3_dependencies }}
+
+### Non-Functional Requirements
+**NFR-001**: {{ non_functional_requirement_1 }}
+- **Metric**: {{ nfr1_metric }}
+- **Target**: {{ nfr1_target }}
+
+**NFR-002**: {{ non_functional_requirement_2 }}
+- **Metric**: {{ nfr2_metric }}
+- **Target**: {{ nfr2_target }}
+
+### Business Requirements
+**BR-001**: {{ business_requirement_1 }}
+**BR-002**: {{ business_requirement_2 }}
+
+### Technical Constraints
+{{ technical_constraints }}
+
+### Regulatory Requirements
+{{ regulatory_requirements }}
+
+<!-- LLM GUIDANCE: Complete requirements specification:
+- Include business, functional, and non-functional requirements
+- Add metrics and targets
+- Consider regulatory compliance -->
 
 ---
 
-## Technical Approach
+## Acceptance Criteria
 
-<!-- LLM GUIDANCE: Same as Tier 2 - HIGH-LEVEL architecture, 2-4 paragraphs -->
+### Feature Level
+{{ feature_acceptance_criteria }}
 
-[Technical approach description]
+### User Story Level
+{{ user_story_acceptance_criteria }}
 
----
+### Quality Criteria
+{{ quality_acceptance_criteria }}
 
-## API Design
+### Performance Criteria
+{{ performance_acceptance_criteria }}
 
-<!-- LLM GUIDANCE: Same as Tier 2 - Main endpoints/interfaces -->
+### Security Criteria
+{{ security_acceptance_criteria }}
 
-### Main Endpoints
-
-**[METHOD] /api/path**
-- **Description**: [What this does]
-- **Request**: [Request format]
-- **Response**: [Response format]
-- **Auth**: Required | Not required
+<!-- LLM GUIDANCE: Comprehensive acceptance criteria:
+- Include performance and security criteria
+- Use Given-When-Then format
+- Cover edge cases and error conditions -->
 
 ---
 
 ## Dependencies
 
-<!-- LLM GUIDANCE: Same as Tier 2 - Internal, External, Infrastructure -->
+### Technical Dependencies
+{{ technical_dependencies }}
 
-### Internal Dependencies
-- **[Feature/Service]**: [Why needed]
+### Business Dependencies
+{{ business_dependencies }}
 
 ### External Dependencies
-- **[API/Service]**: [Why needed]
+{{ external_dependencies }}
 
-### Infrastructure
-- **[Database/Queue]**: [Why needed]
+### Resource Dependencies
+{{ resource_dependencies }}
 
----
+**Blockers**: {{ blockers }}
 
-## Risks and Mitigations
+**Risks**: {{ dependency_risks }}
 
-<!-- LLM GUIDANCE: Same as Tier 2 - 2-4 major risks -->
-
-**[Risk Name]**: [Description]
-- **Impact**: High | Medium | Low
-- **Likelihood**: High | Medium | Low
-- **Mitigation**: [Plan]
+<!-- LLM GUIDANCE: Complete dependency mapping:
+- Include resource dependencies
+- Identify potential blockers
+- Assess dependency risks -->
 
 ---
 
-## Security Considerations
+## Non-Functional Requirements
 
-<!-- LLM GUIDANCE:
-Production-grade security analysis.
+### Performance
+{{ performance_requirements }}
 
-Cover these areas:
-1. **Authentication**: How users prove identity
-2. **Authorization**: Who can access what
-3. **Data Protection**: Encryption, PII handling
-4. **Input Validation**: Prevent injection attacks
-5. **Threat Model**: What attacks are possible
+### Security
+{{ security_requirements }}
 
-Examples (GOOD):
-**Authentication**: JWT tokens with 15-minute expiry, httpOnly refresh tokens
-**Authorization**: Role-based access control (RBAC) - admin, user, guest roles
-**Data Protection**: Passwords hashed with bcrypt (work factor 10), PII encrypted at rest with AES-256
-**Input Validation**: All inputs sanitized, parameterized queries prevent SQL injection
-**Threat Model**: Main risks are credential stuffing (mitigated by rate limiting) and session hijacking (mitigated by short token expiry)
+### Availability
+{{ availability_requirements }}
 
-Examples (BAD):
-**Security**: We'll follow security best practices
-(Too vague - WHICH practices?)
+### Maintainability
+{{ maintainability_requirements }}
 
-Think: What could an attacker do? How do we prevent it?
-Length: 1-2 paragraphs covering the 5 areas
-Be specific: Name actual technologies and techniques
--->
+### Usability
+{{ usability_requirements }}
 
-### Authentication & Authorization
-[How users authenticate and what they can access]
+### Accessibility
+{{ accessibility_requirements }}
+
+<!-- LLM GUIDANCE: Comprehensive NFRs:
+- Define specific metrics and targets
+- Include security and accessibility
+- Consider maintenance and operations -->
+
+---
+
+## Security
+
+### Security Requirements
+{{ security_requirements }}
+
+### Threat Model
+{{ threat_model }}
+
+### Security Controls
+{{ security_controls }}
+
+### Compliance
+{{ security_compliance }}
 
 ### Data Protection
-[How sensitive data is protected - encryption, hashing, PII handling]
+{{ data_protection }}
 
-### Input Validation & Threat Model
-[How we prevent attacks - injection, XSS, CSRF, etc.]
-
----
-
-## Performance Requirements
-
-<!-- LLM GUIDANCE:
-Define measurable performance targets.
-
-Categories:
-1. **Response Time**: How fast should API calls be?
-2. **Throughput**: How many requests per second?
-3. **Resource Usage**: Memory, CPU, disk limits
-4. **Data Limits**: Max file size, record count, etc.
-
-Format:
-- **[Metric]**: [Target] under [conditions]
-
-Examples (GOOD):
-- **API Response Time**: < 200ms (p95) for read operations, < 500ms (p95) for writes
-- **Throughput**: Support 1000 concurrent users, 10,000 requests/minute
-- **Database Queries**: < 100ms (p95), max 3 queries per request
-- **Memory**: < 512MB per instance under normal load
-- **File Upload**: Max 10MB per file, 50MB per request
-
-Examples (BAD):
-- **Performance**: Should be fast
-- **Scalability**: Should scale well
-(Not measurable)
-
-Think: What performance do users expect? What's acceptable?
-Include: p50, p95, p99 targets (not just averages)
-Be realistic: Based on technology choices and constraints
--->
-
-### Response Time
-- **[Operation]**: [Target latency] under [load conditions]
-
-### Throughput
-- **[Metric]**: [Target requests/sec] with [concurrent users]
-
-### Resource Usage
-- **[Resource]**: [Max usage] under [conditions]
+<!-- LLM GUIDANCE: Complete security specification:
+- Include threat modeling
+- Define security controls
+- Consider compliance requirements -->
 
 ---
 
-## Monitoring & Alerts
+## Performance
 
-<!-- LLM GUIDANCE:
-Define what to monitor and when to alert.
+### Performance Metrics
+{{ performance_metrics }}
 
-Categories:
-1. **Key Metrics**: What to track (dashboards)
-2. **Health Checks**: How to know system is working
-3. **Alert Rules**: When to page someone
-4. **SLOs**: Service Level Objectives (uptime, latency)
+### Benchmarks
+{{ performance_benchmarks }}
 
-Format:
-**[Metric]**: [What to track]
-- **Dashboard**: [Where to view]
-- **Alert**: [When to fire] → [Who to notify]
+### Scalability Requirements
+{{ scalability_requirements }}
 
-Examples (GOOD):
-**Login Success Rate**: Track % successful vs failed logins
-- **Dashboard**: Auth dashboard, updated every 5 minutes
-- **Alert**: < 95% success rate for 5 minutes → Page on-call engineer
-- **SLO**: 99% success rate over 30 days
+### Monitoring Requirements
+{{ performance_monitoring }}
 
-**API Response Time**: Track p50, p95, p99 latency
-- **Dashboard**: Performance dashboard, real-time
-- **Alert**: p95 > 1 second for 5 minutes → Slack #engineering
-- **SLO**: p95 < 500ms for 99% of requests
-
-**Error Rate**: Track 5xx errors per minute
-- **Dashboard**: Error dashboard with breakdown by endpoint
-- **Alert**: > 10 errors/minute → Page on-call, > 1% error rate → Slack
-- **SLO**: < 0.1% error rate over 30 days
-
-Examples (BAD):
-**Monitor everything**: Track all the metrics
-(Too vague)
-
-**Alert on any error**: Send alert for every 500 error
-(Alert fatigue - will be ignored)
-
-Think: What indicates the system is healthy vs broken?
-Focus: 3-5 KEY metrics (not everything)
-Alerts: Only actionable issues worth waking someone up
--->
-
-### Key Metrics
-**[Metric Name]**: [What to measure]
-- **Dashboard**: [Where to view it]
-- **Alert Rule**: [When to alert] → [Who/where]
-- **SLO**: [Service level objective]
+<!-- LLM GUIDANCE: Detailed performance specification:
+- Define specific metrics
+- Include benchmarks
+- Plan for monitoring -->
 
 ---
 
-## Rollback Strategy
+## Scalability
 
-<!-- LLM GUIDANCE:
-Define how to safely rollback if deployment fails.
+### Current Scale
+{{ current_scale }}
 
-Include:
-1. **Deployment Method**: Blue/green, canary, rolling, etc.
-2. **Rollback Trigger**: What indicates deployment failure
-3. **Rollback Process**: Steps to revert
-4. **Data Migrations**: How to handle schema changes
-5. **Rollback Time**: How long does rollback take
+### Target Scale
+{{ target_scale }}
 
-Examples (GOOD):
-**Deployment**: Blue/green deployment with 10-minute soak period
-**Triggers**: Error rate > 1%, p95 latency > 2x baseline, manual rollback command
-**Process**:
-1. Stop routing traffic to new version (30 seconds)
-2. Route all traffic back to old version
-3. Keep new version running for 1 hour for debugging
-4. Total rollback time: < 2 minutes
+### Scalability Strategy
+{{ scalability_strategy }}
 
-**Data Migrations**: Use backward-compatible schema changes only
-- Add new columns as nullable
-- Keep old columns until next release
-- Run data migration in background, not during deploy
+### Capacity Planning
+{{ capacity_planning }}
 
-**Zero-Downtime**: Keep both versions running, seamless cutover
-
-Examples (BAD):
-**Rollback**: Git revert and redeploy
-(Too slow - what about downtime? data?)
-
-Think: How quickly can we undo a bad deploy?
-Critical: Database migrations - can they be reversed?
-Goal: < 5 minutes to rollback, zero data loss
--->
-
-### Deployment Method
-[Blue/green, canary, rolling, etc.]
-
-### Rollback Triggers
-[What indicates we should rollback]
-
-### Rollback Process
-[Step-by-step revert process]
-
-### Data Migration Strategy
-[How to handle schema changes safely]
+<!-- LLM GUIDANCE: Long-term scalability planning:
+- Define growth targets
+- Plan capacity needs
+- Consider architectural implications -->
 
 ---
 
-## Operational Runbook
+## Monitoring
 
-<!-- LLM GUIDANCE:
-Document how to operate and troubleshoot this feature.
+### Monitoring Requirements
+{{ monitoring_requirements }}
 
-Include:
-1. **Common Issues**: Problems and solutions
-2. **Debug Steps**: How to investigate issues
-3. **Support Escalation**: When to escalate, to whom
-4. **Maintenance Tasks**: Regular upkeep needed
+### Metrics
+{{ monitoring_metrics }}
 
-Examples (GOOD):
-**Users can't log in**:
-1. Check auth service status: `kubectl get pods -n auth`
-2. Check database connectivity: `psql -h db.example.com -U auth_user`
-3. Review recent logins: `SELECT * FROM audit_log WHERE created_at > NOW() - INTERVAL '1 hour'`
-4. Check for rate limiting: Redis key `rate_limit:login:{user_id}`
-5. Escalate to: #auth-team if issue persists > 15 minutes
+### Alerting
+{{ alerting_requirements }}
 
-**High API latency**:
-1. Check database slow query log: `SELECT * FROM pg_stat_statements ORDER BY mean_time DESC`
-2. Check Redis connection pool: `INFO stats` in Redis CLI
-3. Check for long-running transactions: `SELECT * FROM pg_stat_activity WHERE state = 'active'`
-4. Escalate to: On-call engineer if p95 > 2 seconds
+### Dashboards
+{{ dashboard_requirements }}
 
-Examples (BAD):
-**If something breaks**: Check the logs
-(Too vague - WHICH logs? What to look for?)
-
-Think: What will break at 2am? How does on-call fix it?
-Format: Symptom → Diagnostic steps → Solution
-Include: Actual commands to run, not just "check logs"
--->
-
-### Common Issues
-
-**[Issue]: [Symptom]**
-- **Diagnosis**: [How to identify root cause]
-- **Resolution**: [How to fix]
-- **Prevention**: [How to avoid in future]
-
-### Debug Commands
-
-```bash
-# Check service health
-[command to check if service is running]
-
-# View recent errors
-[command to see error logs]
-
-# Check dependencies
-[commands to verify DB, Redis, etc. are accessible]
-```
-
-### Escalation
-
-- **Tier 1** (Self-service): Common issues, documented solutions
-- **Tier 2** (Team Slack): Issues requiring code knowledge
-- **Tier 3** (On-call Page): Production outages, data loss risk
+<!-- LLM GUIDANCE: Complete monitoring strategy:
+- Define key metrics
+- Plan alerting
+- Design dashboards -->
 
 ---
 
-## Compliance Requirements
+## Testing
 
-<!-- LLM GUIDANCE:
-Document regulatory and compliance needs.
+### Test Strategy
+{{ test_strategy }}
 
-Common frameworks:
-- **GDPR**: EU data protection (right to delete, data portability, consent)
-- **CCPA**: California privacy law (similar to GDPR)
-- **HIPAA**: Healthcare data protection (encryption, audit logs, access controls)
-- **SOC 2**: Security controls audit (Type I = design, Type II = operation)
-- **PCI-DSS**: Payment card data security (if handling credit cards)
+### Test Types
+- **Unit Tests**: {{ unit_test_coverage }}
+- **Integration Tests**: {{ integration_test_coverage }}
+- **End-to-End Tests**: {{ e2e_test_coverage }}
+- **Performance Tests**: {{ performance_test_coverage }}
+- **Security Tests**: {{ security_test_coverage }}
 
-Format:
-**[Framework]**: [Requirements]
-- **Impact**: [What this means for our feature]
-- **Implementation**: [How we comply]
+### Test Environment
+{{ test_environment }}
 
-Examples (GOOD):
-**GDPR**: EU users have right to delete their data
-- **Impact**: Must provide "Delete Account" functionality
-- **Implementation**: DELETE /api/users/:id endpoint, cascade deletes across all tables, confirmation email sent
+### Test Data
+{{ test_data }}
 
-**SOC 2 Type II**: Must log all access to sensitive data
-- **Impact**: Audit logs for all authentication attempts
-- **Implementation**: Write to audit_log table on every login/logout, retain for 1 year
-
-Examples (BAD):
-**Compliance**: We'll be compliant with all regulations
-(Too vague - WHICH regulations?)
-
-**GDPR**: Users can delete their data
-(Missing HOW we implement this)
-
-Think: What regulations apply to this feature?
-Only include: Frameworks that actually apply (not hypothetical)
-Be specific: Cite actual requirements and our solution
--->
-
-### Applicable Frameworks
-
-**[Framework Name]**: [Brief description]
-- **Requirements**: [What regulations say]
-- **Implementation**: [How we comply]
-- **Evidence**: [How to prove compliance]
+<!-- LLM GUIDANCE: Comprehensive testing plan:
+- Include all test types
+- Define coverage targets
+- Plan test environments -->
 
 ---
 
-## Cost Analysis
+## Deployment
 
-<!-- LLM GUIDANCE:
-Estimate infrastructure and operational costs.
+### Deployment Strategy
+{{ deployment_strategy }}
 
-Break down by:
-1. **Compute**: Servers, containers, lambda functions
-2. **Storage**: Database, file storage, backups
-3. **Network**: Data transfer, CDN, load balancers
-4. **Third-party**: APIs, SaaS services
-5. **Support**: On-call, monitoring, logging
+### Release Process
+{{ release_process }}
 
-Format:
-**[Resource]**: [Cost] per [unit] = [monthly estimate]
+### Rollback Plan
+{{ rollback_plan }}
 
-Examples (GOOD):
-**Compute**: 2 t3.medium instances @ $0.0416/hour = $60/month
-**Database**: RDS PostgreSQL db.t3.small @ $0.034/hour = $25/month
-**Storage**: 100GB database storage @ $0.115/GB = $12/month
-**SendGrid**: 40,000 emails/month @ $0.0005/email = $20/month
-**CloudWatch**: 10GB logs @ $0.50/GB + 5M API calls @ $0.01/10K = $6/month
+### Environment Requirements
+{{ environment_requirements }}
 
-**Total**: ~$123/month at 1000 active users
-**Cost per user**: $0.12/month
+### Migration Plan
+{{ migration_plan }}
 
-**Scaling**: At 10,000 users, need 4x instances = ~$400/month ($0.04/user)
-
-Examples (BAD):
-**Infrastructure**: Will cost money
-(Not helpful)
-
-**AWS**: $500/month
-(No breakdown - can't optimize)
-
-Think: What resources does this feature need?
-Include: Fixed costs (minimum infrastructure) + variable costs (per user/request)
-Estimate: At different scales (1K, 10K, 100K users)
--->
-
-### Infrastructure Costs
-
-**[Resource]**: [Cost calculation] = [Monthly total]
-
-### Third-Party Services
-
-**[Service]**: [Cost calculation] = [Monthly total]
-
-### Total Cost Estimate
-
-- **At 1,000 users**: $X/month ($Y per user)
-- **At 10,000 users**: $X/month ($Y per user)
-- **At 100,000 users**: $X/month ($Y per user)
+<!-- LLM GUIDANCE: Complete deployment planning:
+- Define release process
+- Plan rollbacks
+- Consider data migration -->
 
 ---
 
-## Migration Strategy
+## Maintenance
 
-<!-- LLM GUIDANCE:
-How to migrate from current state to new feature (if applicable).
+### Maintenance Requirements
+{{ maintenance_requirements }}
 
-Only include if:
-- Replacing an existing feature
-- Migrating data from old system
-- Changing data models
-- Backwards compatibility needed
+### Support Plan
+{{ support_plan }}
 
-Include:
-1. **Current State**: What exists today
-2. **Migration Steps**: How to transition
-3. **Backwards Compatibility**: Do old systems keep working?
-4. **Rollout Plan**: Gradual or all-at-once
-5. **Data Migration**: How to move/transform data
+### Documentation Requirements
+{{ documentation_requirements }}
 
-Examples (GOOD):
-**Current State**: Using session cookies for authentication
-**Migration Plan**:
-1. Add JWT support alongside sessions (both work)
-2. Update frontend to use JWT for new logins
-3. Keep sessions working for existing users
-4. After 30 days, deprecate session support
-5. After 60 days, remove session code
+### Training Requirements
+{{ training_requirements }}
 
-**Data Migration**:
-- No data migration needed (JWT is stateless)
-- Existing sessions expire naturally (24 hour TTL)
-- Users seamlessly transition on next login
-
-**Backwards Compatibility**: 60-day overlap period
-
-Examples (BAD):
-**Migration**: Switch to new system
-(No plan - how? when? what breaks?)
-
-Think: How do we get from HERE to THERE without breaking production?
-Critical: Zero downtime, no data loss, rollback plan
-Timeline: Specific dates and milestones
--->
-
-### Current State
-[What exists today that we're changing/replacing]
-
-### Migration Steps
-1. [Step 1 with timeline]
-2. [Step 2 with timeline]
-3. [Step 3 with timeline]
-
-### Backwards Compatibility
-[What old systems/clients keep working during migration]
-
-### Data Migration
-[How to move/transform data, estimated time, validation]
+<!-- LLM GUIDANCE: Long-term maintenance planning:
+- Define support processes
+- Plan documentation needs
+- Consider training requirements -->
 
 ---
 
-## Next Steps
+## Risks
 
-<!--
-This is a COMPLETE tier specification (Tier 3 of 3).
-You have production-ready detail for critical features.
+### Technical Risks
+{{ technical_risks }}
 
-Next actions:
-1. Generate implementation plan:
-   Command: /sp-plan
+### Business Risks
+{{ business_risks }}
 
-2. Generate task breakdown:
-   Command: /sp-task
+### Operational Risks
+{{ operational_risks }}
 
-3. Check progress:
-   Command: specpulse spec progress {{feature_id}}
--->
+### Mitigation Strategies
+{{ risk_mitigation }}
 
-**Current Tier**: Complete (15+ sections)
-**Time to Complete**: 30-45 minutes
-**Ready for Planning**: ✓ Yes
-**Production-Ready**: ✓ Yes
+<!-- LLM GUIDANCE: Comprehensive risk assessment:
+- Identify all risk categories
+- Assess impact and probability
+- Define mitigation strategies -->
 
-💡 **Tip**: Complete tier is for production-critical features requiring security audits, compliance, and detailed operational runbooks. Most features don't need this level of detail!
+---
+
+## Validation Checklist
+- [ ] Problem statement is clear and specific
+- [ ] Success criteria are measurable
+- [ ] Business value is articulated
+- [ ] User stories follow standard format
+- [ ] Functional requirements are testable
+- [ ] Acceptance criteria use Given-When-Then
+- [ ] Dependencies are identified
+- [ ] Security requirements are defined
+- [ ] Performance metrics are specified
+- [ ] Testing strategy is comprehensive
+- [ ] Deployment plan is complete
+- [ ] Maintenance requirements are defined
+- [ ] Risks are assessed and mitigated
+- [ ] No [NEEDS CLARIFICATION] markers remain
+
+## SDD Compliance
+**Principle 1: Specification First**
+- [ ] Requirements clearly documented
+- [ ] Success criteria defined
+- [ ] User stories included
+
+**Principle 2: Incremental Planning**
+- [ ] Implementation phases defined
+- [ ] Milestones identified
+
+**Principle 3: Task Decomposition**
+- [ ] Dependencies identified
+- [ ] Effort estimates provided
+
+**Principle 4: Traceable Implementation**
+- [ ] Requirements traced to tasks
+- [ ] Acceptance criteria testable
+
+**Principle 5: Continuous Validation**
+- [ ] Validation checkpoints defined
+- [ ] Quality gates established
+
+**Principle 6: Quality Assurance**
+- [ ] Acceptance criteria testable
+- [ ] Quality metrics specified
+- [ ] Testing strategy comprehensive
+
+**Principle 7: Architecture Documentation**
+- [ ] Technical decisions documented
+- [ ] Integration points identified
+- [ ] Security considerations addressed
+
+**Principle 8: Iterative Refinement**
+- [ ] Feedback mechanisms defined
+- [ ] Review checkpoints established
+
+**Principle 9: Stakeholder Alignment**
+- [ ] Stakeholders identified
+- [ ] Business value articulated
+
+---
+*Generated by SpecPulse v{{ version }} - {{ date }}*

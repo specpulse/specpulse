@@ -118,7 +118,7 @@ When called with `/sp-decompose $ARGUMENTS`, I will:
    - Create feature-specific plan template with services
    - Prepare for `/sp-plan generate` with service context
    - Enable `/sp-task breakdown` per service
-   - Run validation: `bash scripts/sp-pulse-decompose.sh validate`
+   - Run validation: `specpulse --no-color validate decomposition --verbose`
 
 ## Examples
 

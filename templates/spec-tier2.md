@@ -1,375 +1,191 @@
-# Specification: {{feature_name}}
-
 ---
+template: spec-tier2
+name: Standard Specification
 tier: standard
-progress: 0.0
-sections_completed: []
-sections_partial: []
-last_updated: {{date}}
+description: 7-section standard template for most features (10-15 minutes)
+sections: [what, why, done-when, user-stories, requirements, acceptance-criteria, dependencies]
+estimated_time: "10-15 min"
+tags: [standard, detailed, production]
+extends: spec-tier1-minimal
+---
+
+# Specification: {{ feature_name }}
+
+## Metadata
+- **ID**: SPEC-{{ feature_id }}
+- **Version**: {{ version }}
+- **Created**: {{ date }}
+- **Author**: {{ author }}
+- **AI Assistant**: {{ ai_assistant }}
+- **Reviewers**: {{ reviewers }}
+
+## Executive Summary
+{{ executive_summary }}
+
 ---
 
 ## What
+**Feature Overview**
+{{ problem_statement }}
 
-<!-- LLM GUIDANCE: Same as Tier 1 - keep it to ONE sentence -->
+**Proposed Solution**
+{{ proposed_solution }}
 
-[One sentence: What does this feature do?]
+**Scope**
+- **In Scope**: {{ in_scope }}
+- **Out of Scope**: {{ out_of_scope }}
+
+<!-- LLM GUIDANCE: Expand on Tier 1 with more detail:
+- Include detailed technical specifications
+- Define clear boundaries (in/out scope)
+- Mention integration points -->
 
 ---
 
 ## Why
+**Business Value**
+{{ business_value }}
 
-<!-- LLM GUIDANCE: Same as Tier 1 - keep it to ONE sentence -->
+**Problem Details**
+{{ problem_details }}
 
-[One sentence: Why is this feature needed?]
+**Strategic Alignment**
+{{ strategic_alignment }}
+
+<!-- LLM GUIDANCE: Include business context:
+- How does this align with company goals?
+- What's the ROI or business impact?
+- Why is this the right solution? -->
 
 ---
 
 ## Done When
+**Success Criteria**
+{{ success_criteria }}
 
-<!-- LLM GUIDANCE: Same as Tier 1 - list 3 testable acceptance criteria -->
+**Definition of Done**
+{{ definition_of_done }}
 
-- [ ] [First acceptance criterion]
-- [ ] [Second acceptance criterion]
-- [ ] [Third acceptance criterion]
+**Performance Requirements**
+{{ performance_requirements }}
+
+<!-- LLM GUIDANCE: Add technical success criteria:
+- Include performance benchmarks
+- Define quality gates
+- Specify measurable outcomes -->
 
 ---
 
 ## User Stories
+### Primary Users
+{{ primary_users }}
 
-<!-- LLM GUIDANCE:
-Write 3-5 user stories in standard format.
+### User Stories
+**As a** [user type], **I want to** [action], **so that** [benefit].
 
-Format:
-**As a** [type of user]
-**I want** [action/capability]
-**So that** [benefit/value]
+1. **User Story 1**: {{ user_story_1 }}
+   - **Acceptance Criteria**: {{ ac_1 }}
+   - **Priority**: {{ priority_1 }}
+   - **Effort**: {{ effort_1 }}
 
-Each story should have 2-4 acceptance criteria.
+2. **User Story 2**: {{ user_story_2 }}
+   - **Acceptance Criteria**: {{ ac_2 }}
+   - **Priority**: {{ priority_2 }}
+   - **Effort**: {{ effort_2 }}
 
-Examples (GOOD):
-**As a** registered user
-**I want** to reset my password via email
-**So that** I can regain access if I forget my credentials
-
-**Acceptance Criteria:**
-- [ ] Password reset link sent within 1 minute
-- [ ] Link expires after 24 hours
-- [ ] New password meets security requirements
-- [ ] User receives confirmation after successful reset
-
-Examples (BAD):
-**As a** user
-**I want** authentication
-**So that** security
-(Too vague - no specific action or benefit)
-
-Think: WHO needs this? WHAT do they want to do? WHY does it matter?
-Count: 3-5 stories recommended
-Focus: Cover main user workflows, not every edge case
--->
-
-### Story 1: [Title describing the user action]
-
-**As a** [type of user]
-**I want** [action/capability]
-**So that** [benefit/value]
-
-**Acceptance Criteria:**
-- [ ] [Testable criterion 1]
-- [ ] [Testable criterion 2]
-- [ ] [Testable criterion 3]
-
-### Story 2: [Title]
-
-**As a** [type of user]
-**I want** [action/capability]
-**So that** [benefit/value]
-
-**Acceptance Criteria:**
-- [ ] [Testable criterion 1]
-- [ ] [Testable criterion 2]
-- [ ] [Testable criterion 3]
-
-### Story 3: [Title]
-
-**As a** [type of user]
-**I want** [action/capability]
-**So that** [benefit/value]
-
-**Acceptance Criteria:**
-- [ ] [Testable criterion 1]
-- [ ] [Testable criterion 2]
-- [ ] [Testable criterion 3]
+<!-- LLM GUIDANCE: Write user stories in standard format:
+- Use "As a..., I want to..., so that..." format
+- Include specific acceptance criteria
+- Estimate effort and set priorities -->
 
 ---
 
-## Functional Requirements
+## Requirements
 
-<!-- LLM GUIDANCE:
-List 5-8 specific, testable requirements using FR-XXX numbering.
+### Functional Requirements
+**FR-001**: {{ functional_requirement_1 }}
+**FR-002**: {{ functional_requirement_2 }}
+**FR-003**: {{ functional_requirement_3 }}
 
-Format:
-**FR-XXX**: [Requirement statement]
-- **Acceptance**: [How to verify]
-- **Priority**: MUST | SHOULD | COULD
+### Non-Functional Requirements
+**NFR-001**: {{ non_functional_requirement_1 }}
+**NFR-002**: {{ non_functional_requirement_2 }}
 
-Priority guide:
-- MUST: Critical for MVP, feature broken without it
-- SHOULD: Important but feature works without it
-- COULD: Nice to have, low priority
+### Technical Constraints
+{{ technical_constraints }}
 
-Examples (GOOD):
-**FR-001**: Users can log in with email and password
-- **Acceptance**: Successful login redirects to dashboard, invalid credentials show error
-- **Priority**: MUST
-
-**FR-002**: System locks account after 5 failed login attempts
-- **Acceptance**: 6th attempt blocked, unlock email sent after 15 minutes
-- **Priority**: SHOULD
-
-Examples (BAD):
-**FR-001**: Implement authentication
-- **Acceptance**: Authentication works
-- **Priority**: MUST
-(Too vague - what KIND of auth? How verify?)
-
-Think: WHAT must the system do? (not HOW)
-Count: 5-8 requirements (fewer is better than bloat)
-Focus: Concrete capabilities, not implementation details
--->
-
-**FR-001**: [Requirement statement - what system must do]
-- **Acceptance**: [How to verify this works]
-- **Priority**: MUST | SHOULD | COULD
-
-**FR-002**: [Requirement statement]
-- **Acceptance**: [How to verify this works]
-- **Priority**: MUST | SHOULD | COULD
-
-**FR-003**: [Requirement statement]
-- **Acceptance**: [How to verify this works]
-- **Priority**: MUST | SHOULD | COULD
-
-**FR-004**: [Requirement statement]
-- **Acceptance**: [How to verify this works]
-- **Priority**: MUST | SHOULD | COULD
-
-**FR-005**: [Requirement statement]
-- **Acceptance**: [How to verify this works]
-- **Priority**: MUST | SHOULD | COULD
+<!-- LLM GUIDANCE: Requirements should be:
+- Specific and measurable
+- Testable and verifiable
+- Complete and unambiguous -->
 
 ---
 
-## Technical Approach
+## Acceptance Criteria
 
-<!-- LLM GUIDANCE:
-Describe the HIGH-LEVEL architecture and technology choices.
+### Feature Level
+{{ feature_acceptance_criteria }}
 
-Include:
-- Architecture style (monolithic, microservices, serverless, etc.)
-- Key technologies (languages, frameworks, databases)
-- Integration points (APIs, services, third-party)
-- Data flow (high-level - don't design database schema here)
+### User Story Level
+{{ user_story_acceptance_criteria }}
 
-Length: 2-4 paragraphs
+### Quality Criteria
+{{ quality_acceptance_criteria }}
 
-Examples (GOOD):
-"We'll implement a REST API using Node.js and Express, with JWT tokens for stateless authentication. User credentials will be hashed with bcrypt and stored in PostgreSQL. The API will integrate with SendGrid for password reset emails."
-
-"This will be a React SPA with TypeScript, calling backend APIs. State management via Redux Toolkit. Real-time updates using WebSocket connection to backend server."
-
-Examples (BAD):
-"We'll use the best technologies available and follow industry standards."
-(Too vague)
-
-"Authentication will use OAuth2 with PKCE flow, JWT access tokens with 15-minute expiry, refresh tokens in httpOnly cookies with 7-day sliding expiration, Redis for session storage with LRU eviction..."
-(Too detailed - save for implementation planning)
-
-Think: What's the overall approach? What big decisions need to be made?
-Keep it high-level: Details come later in planning
--->
-
-[2-4 paragraphs describing the technical approach:
-- Architecture style
-- Key technologies
-- Integration points
-- Data flow
-]
-
----
-
-## API Design
-
-<!-- LLM GUIDANCE:
-List the main API endpoints or interfaces this feature exposes.
-
-Format (REST API):
-- **POST /api/resource** - Create new resource
-- **GET /api/resource/:id** - Get single resource
-- **PUT /api/resource/:id** - Update resource
-- **DELETE /api/resource/:id** - Delete resource
-
-Format (GraphQL):
-- **mutation createResource** - Create new resource
-- **query getResource(id)** - Fetch single resource
-
-Format (Function/Method):
-- **authenticateUser(email, password)** → User | Error
-- **sendPasswordReset(email)** → Success | Error
-
-Include:
-- HTTP method and path (for REST)
-- Brief description
-- Key request parameters
-- Expected response
-
-Examples (GOOD):
-**POST /api/auth/login**
-- Request: `{ email, password }`
-- Response: `{ token, user: { id, email, name } }`
-- Errors: 401 Unauthorized, 400 Bad Request
-
-**GET /api/users/:id**
-- Request: No body (requires auth token in header)
-- Response: `{ user: { id, email, name, createdAt } }`
-- Errors: 401 Unauthorized, 404 Not Found
-
-Examples (BAD):
-**POST /api/auth**
-- Does authentication stuff
-(Too vague - login? logout? register?)
-
-Think: What endpoints will other systems or the frontend call?
-Count: 3-7 main endpoints (don't list every CRUD operation)
-Focus: Public interface, not internal implementation
--->
-
-### Main Endpoints
-
-**[METHOD] /api/path**
-- **Description**: [What this endpoint does]
-- **Request**: `{ field1, field2 }`
-- **Response**: `{ data }` or `{ error }`
-- **Auth**: Required | Not required
-- **Errors**: 400, 401, 404, 500
-
-**[METHOD] /api/path/:id**
-- **Description**: [What this endpoint does]
-- **Request**: [Request format]
-- **Response**: [Response format]
-- **Auth**: Required | Not required
-- **Errors**: [Common error codes]
+<!-- LLM GUIDANCE: Use Given-When-Then format:
+- Given [context], when [action], then [outcome]
+- Make criteria testable
+- Include edge cases -->
 
 ---
 
 ## Dependencies
 
-<!-- LLM GUIDANCE:
-List what this feature depends on to work.
+### Technical Dependencies
+{{ technical_dependencies }}
 
-Categories:
-1. Internal dependencies (other features, services, modules)
-2. External dependencies (third-party APIs, services, libraries)
-3. Infrastructure dependencies (databases, message queues, storage)
-
-Format:
-**[Dependency Name]**: [Why needed]
-
-Examples (GOOD):
-**User Service**: Required to fetch user profiles and permissions
-**SendGrid API**: Required to send password reset emails
-**PostgreSQL**: Required to store user credentials and sessions
-**Redis**: Required for rate limiting (optional - can fall back to in-memory)
-
-Examples (BAD):
-**Node.js**: Runtime environment
-**Express**: Web framework
-(These are technology choices, not dependencies)
-
-**The internet**: Required to work
-(Too obvious)
-
-Think: What MUST exist for this to work? What external systems do we call?
-Count: 2-6 dependencies typical
-Mark optional dependencies clearly
--->
-
-### Internal Dependencies
-- **[Feature/Service]**: [Why needed]
+### Business Dependencies
+{{ business_dependencies }}
 
 ### External Dependencies
-- **[API/Service]**: [Why needed]
-- **[Library/Tool]**: [Why needed]
+{{ external_dependencies }}
 
-### Infrastructure
-- **[Database/Queue/Storage]**: [Why needed]
+**Blockers**: {{ blockers }}
 
----
-
-## Risks and Mitigations
-
-<!-- LLM GUIDANCE:
-Identify 2-4 major risks and how to mitigate them.
-
-Format:
-**[Risk]**: [Description]
-- **Impact**: High | Medium | Low
-- **Likelihood**: High | Medium | Low
-- **Mitigation**: [How to reduce risk]
-
-Examples (GOOD):
-**Third-party API downtime**: SendGrid outage prevents password reset emails
-- **Impact**: High (users locked out)
-- **Likelihood**: Low (99.9% uptime SLA)
-- **Mitigation**: Queue failed emails for retry, provide support contact option
-
-**Performance degradation**: Bcrypt hashing slows login under high load
-- **Impact**: Medium (slow but functional)
-- **Likelihood**: Medium (during peak hours)
-- **Mitigation**: Use work factor 10 (not 12), consider Redis caching for repeat logins
-
-Examples (BAD):
-**Bugs in code**: Code might have bugs
-- **Impact**: Unknown
-- **Likelihood**: Unknown
-- **Mitigation**: Test everything
-(Too vague - every project has bugs)
-
-Think: What could go wrong? What's the plan if it does?
-Count: 2-4 real risks (not hypothetical disasters)
-Focus: Risks specific to THIS feature
--->
-
-**[Risk Name]**: [Description of what could go wrong]
-- **Impact**: High | Medium | Low
-- **Likelihood**: High | Medium | Low
-- **Mitigation**: [Specific plan to reduce or handle risk]
+<!-- LLM GUIDANCE: List all dependencies:
+- What needs to be built first?
+- What external systems do we rely on?
+- What could block this work? -->
 
 ---
 
-## Next Steps
+## Validation Checklist
+- [ ] Problem statement is clear and specific
+- [ ] Success criteria are measurable
+- [ ] Business value is articulated
+- [ ] User stories follow standard format
+- [ ] Functional requirements are testable
+- [ ] Acceptance criteria use Given-When-Then
+- [ ] Dependencies are identified
+- [ ] No [NEEDS CLARIFICATION] markers remain
 
-<!--
-This is a STANDARD tier specification (Tier 2 of 3).
-You have enough detail to start planning implementation.
+## SDD Compliance
+**Principle 1: Specification First**
+- [ ] Requirements clearly documented
+- [ ] Success criteria defined
+- [ ] User stories included
 
-Next actions:
-1. Generate implementation plan:
-   Command: /sp-plan
+**Principle 4: Task Decomposition**
+- [ ] Dependencies identified
+- [ ] Effort estimates provided
 
-2. Expand to COMPLETE tier if this is production-critical:
-   Command: specpulse expand {{feature_id}} --to-tier complete
-   (Adds: Security, Performance, Monitoring, Compliance, Cost Analysis)
+**Principle 6: Quality Assurance**
+- [ ] Acceptance criteria testable
+- [ ] Quality metrics specified
 
-3. Add individual sections if needed:
-   Command: specpulse spec add-section {{feature_id}} <section-name>
+**Principle 7: Architecture Documentation**
+- [ ] Technical constraints documented
+- [ ] Integration points identified
 
-Check your progress:
-   Command: specpulse spec progress {{feature_id}}
--->
-
-**Current Tier**: Standard (7-8 sections)
-**Time to Complete**: 10-15 minutes
-**Ready for Planning**: ✓ Yes
-
-💡 **Tip**: Most features work well at Standard tier. Only expand to Complete if you need production-grade detail (security audits, compliance, etc.)
+---
+*Generated by SpecPulse v{{ version }} - {{ date }}*

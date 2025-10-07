@@ -1,72 +1,191 @@
-<!-- TIER: standard -->
-# Feature: {{ feature_name }}
+---
+template: spec-tier2-standard
+name: Standard Specification
+tier: 2
+description: 7-section standard template for most features (10-15 minutes)
+sections: [what, why, done-when, user-stories, requirements, acceptance-criteria, dependencies]
+estimated_time: "10-15 min"
+tags: [standard, detailed, production]
+extends: spec-tier1-minimal
+---
 
-<!-- LLM GUIDANCE:
-This is the standard tier for most features. Provide enough detail for planning and implementation.
-Include user stories, requirements, and technical approach.
-User can expand to complete tier if needed for production-grade specs.
--->
+# Specification: {{ feature_name }}
+
+## Metadata
+- **ID**: SPEC-{{ feature_id }}
+- **Version**: {{ version }}
+- **Created**: {{ date }}
+- **Author**: {{ author }}
+- **AI Assistant**: {{ ai_assistant }}
+- **Reviewers**: {{ reviewers }}
 
 ## Executive Summary
 {{ executive_summary }}
 
-<!-- LLM GUIDANCE: 2-3 sentences summarizing the feature, its purpose, and expected impact -->
+---
 
 ## What
-{{ what_description }}
+**Feature Overview**
+{{ problem_statement }}
 
-<!-- LLM GUIDANCE: Clear description of what is being built (2-3 sentences) -->
+**Proposed Solution**
+{{ proposed_solution }}
 
-## Why
-{{ why_description }}
+**Scope**
+- **In Scope**: {{ in_scope }}
+- **Out of Scope**: {{ out_of_scope }}
 
-<!-- LLM GUIDANCE: Business value, user benefit, or problem being solved (2-3 sentences) -->
-
-## User Stories
-<!-- LLM GUIDANCE: 2-3 user stories in "As a... I want... So that..." format -->
-
-1. **{{ user_story_1_title }}**
-   - As a {{ user_role_1 }}
-   - I want {{ user_want_1 }}
-   - So that {{ user_benefit_1 }}
-
-2. **{{ user_story_2_title }}**
-   - As a {{ user_role_2 }}
-   - I want {{ user_want_2 }}
-   - So that {{ user_benefit_2 }}
-
-## Functional Requirements
-<!-- LLM GUIDANCE: 3-7 specific, testable requirements with FR-XXX identifiers -->
-
-- **FR-001**: {{ requirement_1 }}
-- **FR-002**: {{ requirement_2 }}
-- **FR-003**: {{ requirement_3 }}
-- **FR-004**: {{ requirement_4 }}
-- **FR-005**: {{ requirement_5 }}
-
-## Technical Approach
-<!-- LLM GUIDANCE: High-level architecture, key technologies, design patterns, data models -->
-
-### Architecture
-{{ architecture_overview }}
-
-### Key Technologies
-- {{ technology_1 }}
-- {{ technology_2 }}
-- {{ technology_3 }}
-
-### Data Model
-{{ data_model_description }}
-
-## Acceptance Criteria
-<!-- LLM GUIDANCE: 3-5 detailed, testable criteria that define "done" -->
-
-- [ ] {{ acceptance_criterion_1 }}
-- [ ] {{ acceptance_criterion_2 }}
-- [ ] {{ acceptance_criterion_3 }}
-- [ ] {{ acceptance_criterion_4 }}
-- [ ] {{ acceptance_criterion_5 }}
+<!-- LLM GUIDANCE: Expand on Tier 1 with more detail:
+- Include detailed technical specifications
+- Define clear boundaries (in/out scope)
+- Mention integration points -->
 
 ---
-<!-- EXPAND_NEXT: tier3 -->
-💡 Need comprehensive spec for production? Run: `specpulse expand {{ feature_id }} --to-tier complete`
+
+## Why
+**Business Value**
+{{ business_value }}
+
+**Problem Details**
+{{ problem_details }}
+
+**Strategic Alignment**
+{{ strategic_alignment }}
+
+<!-- LLM GUIDANCE: Include business context:
+- How does this align with company goals?
+- What's the ROI or business impact?
+- Why is this the right solution? -->
+
+---
+
+## Done When
+**Success Criteria**
+{{ success_criteria }}
+
+**Definition of Done**
+{{ definition_of_done }}
+
+**Performance Requirements**
+{{ performance_requirements }}
+
+<!-- LLM GUIDANCE: Add technical success criteria:
+- Include performance benchmarks
+- Define quality gates
+- Specify measurable outcomes -->
+
+---
+
+## User Stories
+### Primary Users
+{{ primary_users }}
+
+### User Stories
+**As a** [user type], **I want to** [action], **so that** [benefit].
+
+1. **User Story 1**: {{ user_story_1 }}
+   - **Acceptance Criteria**: {{ ac_1 }}
+   - **Priority**: {{ priority_1 }}
+   - **Effort**: {{ effort_1 }}
+
+2. **User Story 2**: {{ user_story_2 }}
+   - **Acceptance Criteria**: {{ ac_2 }}
+   - **Priority**: {{ priority_2 }}
+   - **Effort**: {{ effort_2 }}
+
+<!-- LLM GUIDANCE: Write user stories in standard format:
+- Use "As a..., I want to..., so that..." format
+- Include specific acceptance criteria
+- Estimate effort and set priorities -->
+
+---
+
+## Requirements
+
+### Functional Requirements
+**FR-001**: {{ functional_requirement_1 }}
+**FR-002**: {{ functional_requirement_2 }}
+**FR-003**: {{ functional_requirement_3 }}
+
+### Non-Functional Requirements
+**NFR-001**: {{ non_functional_requirement_1 }}
+**NFR-002**: {{ non_functional_requirement_2 }}
+
+### Technical Constraints
+{{ technical_constraints }}
+
+<!-- LLM GUIDANCE: Requirements should be:
+- Specific and measurable
+- Testable and verifiable
+- Complete and unambiguous -->
+
+---
+
+## Acceptance Criteria
+
+### Feature Level
+{{ feature_acceptance_criteria }}
+
+### User Story Level
+{{ user_story_acceptance_criteria }}
+
+### Quality Criteria
+{{ quality_acceptance_criteria }}
+
+<!-- LLM GUIDANCE: Use Given-When-Then format:
+- Given [context], when [action], then [outcome]
+- Make criteria testable
+- Include edge cases -->
+
+---
+
+## Dependencies
+
+### Technical Dependencies
+{{ technical_dependencies }}
+
+### Business Dependencies
+{{ business_dependencies }}
+
+### External Dependencies
+{{ external_dependencies }}
+
+**Blockers**: {{ blockers }}
+
+<!-- LLM GUIDANCE: List all dependencies:
+- What needs to be built first?
+- What external systems do we rely on?
+- What could block this work? -->
+
+---
+
+## Validation Checklist
+- [ ] Problem statement is clear and specific
+- [ ] Success criteria are measurable
+- [ ] Business value is articulated
+- [ ] User stories follow standard format
+- [ ] Functional requirements are testable
+- [ ] Acceptance criteria use Given-When-Then
+- [ ] Dependencies are identified
+- [ ] No [NEEDS CLARIFICATION] markers remain
+
+## SDD Compliance
+**Principle 1: Specification First**
+- [ ] Requirements clearly documented
+- [ ] Success criteria defined
+- [ ] User stories included
+
+**Principle 4: Task Decomposition**
+- [ ] Dependencies identified
+- [ ] Effort estimates provided
+
+**Principle 6: Quality Assurance**
+- [ ] Acceptance criteria testable
+- [ ] Quality metrics specified
+
+**Principle 7: Architecture Documentation**
+- [ ] Technical constraints documented
+- [ ] Integration points identified
+
+---
+*Generated by SpecPulse v{{ version }} - {{ date }}*

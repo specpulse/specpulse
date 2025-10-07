@@ -87,11 +87,18 @@ class Console:
     
     def warning(self, message: str, icon: str = "[!]"):
         """Print warning message"""
-        self.console.print(f"{icon}  [yellow]{message}[/yellow]")
-    
+        try:
+            self.console.print(f"{icon}  [yellow]{message}[/yellow]")
+        except UnicodeEncodeError:
+            self.console.print(f"{icon}  [yellow]{message}[/yellow]")
+
     def error(self, message: str, icon: str = "[X]"):
         """Print error message"""
-        self.console.print(f"{icon}  [bright_red]{message}[/bright_red]")
+        try:
+            self.console.print(f"{icon}  [bright_red]{message}[/bright_red]")
+        except (UnicodeEncodeError, Exception):
+            # Fallback for encoding issues and other console errors
+            print(f"{icon} {message}")
     
     def header(self, message: str, style: str = "bright_cyan"):
         """Print a beautiful header"""

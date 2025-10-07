@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "specpulse"
 dynamic = ["version"]
-description = "Specification-Driven Development Framework"
+description = "SpecPulse v2.1.0 - AI-Enhanced Specification-Driven Development Framework"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
@@ -35,6 +35,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent",
 ]
 
@@ -76,29 +77,27 @@ version = {attr = "specpulse._version.__version__"}
 packages = [
     "specpulse",
     "specpulse.cli",
-    "specpulse.core", 
+    "specpulse.core",
     "specpulse.utils",
     "specpulse.resources",
     "specpulse.resources.commands",
     "specpulse.resources.commands.claude",
     "specpulse.resources.commands.gemini",
     "specpulse.resources.memory",
-    "specpulse.resources.scripts",
     "specpulse.resources.templates",
-    "specpulse.resources.templates.decomposition",
 ]
 
 [tool.setuptools.package-data]
 specpulse = [
     "resources/templates/*.md",
-    "resources/templates/decomposition/*.md",
-    "resources/templates/decomposition/*.yaml",
-    "resources/templates/decomposition/*.ts",
+    "resources/templates/**/*.md",
     "resources/memory/*.md",
-    "resources/scripts/*.sh",
-    "resources/scripts/*.ps1",
     "resources/commands/claude/*.md",
+    "resources/commands/claude/**/*.md",
     "resources/commands/gemini/*.toml",
+    "resources/commands/gemini/**/*.toml",
+    "resources/validation_rules.yaml",
+    "resources/validation_examples.yaml",
 ]
 
 [tool.black]

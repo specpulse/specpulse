@@ -38,15 +38,15 @@ Parse arguments to determine action:
 
 7. Check existing plan files and create next version (plan-001.md, plan-002.md, etc.)
 8. Write plan to plans/XXX-feature/plan-XXX.md
-9. Run validation:
-   - !{bash scripts/sp-pulse-plan.sh "XXX-feature"}
+9. Run validation using CLI:
+   - !{bash specpulse --no-color validate plan --verbose}
 
 ## For /sp-plan validate:
 1. Show list of existing plan files in current feature directory
 2. Ask user which plan file to validate
 3. Read selected plan from @{plans/*/plan-XXX.md}
-4. Run validation:
-   - !{bash scripts/sp-pulse-plan.sh "XXX-feature"}
+4. Run validation using CLI:
+   - !{bash specpulse --no-color validate plan --verbose}
 5. Verify Phase Gates compliance
 6. Check architecture documentation
 7. Ensure quality assurance strategy
