@@ -1,0 +1,66 @@
+[command]
+name = "sp-clarify"
+description = "Address clarification markers in specifications"
+
+[command.prompt]
+text = """
+Address all [NEEDS CLARIFICATION] markers in the current specification.
+
+Usage: /sp-clarify [spec-id]
+
+Implementation:
+
+1. Detect target specification:
+   - Read memory/context.md for current feature
+   - If spec ID provided, use that spec
+   - Otherwise, use most recent spec
+
+2. Find all clarification markers:
+   - Read spec file
+   - Search for [NEEDS CLARIFICATION: ...] patterns
+   - List all questions needing answers
+
+3. For each clarification:
+   - Display the question with context
+   - Wait for user answer
+   - Update spec by replacing marker with answer
+   - Continue to next clarification
+
+4. Validate updated spec:
+   - Run: specpulse validate spec
+
+5. Report results:
+   - Number of clarifications resolved
+   - Validation status
+   - Next steps
+
+Example:
+
+User: /sp-clarify
+
+Output:
+Found 3 clarifications needed:
+
+1/3 - Database Configuration
+Question: Which database? (MongoDB/PostgreSQL/MySQL)
+Your answer: [wait for input]
+
+2/3 - Authentication
+Question: Token type? (JWT/Session/OAuth2)
+Your answer: [wait for input]
+
+3/3 - Deployment
+Question: Cloud provider? (AWS/Azure/GCP)
+Your answer: [wait for input]
+
+✓ All clarifications resolved
+✓ Specification complete
+→ Next: /sp-plan generate
+
+Note: This command is INTERACTIVE - waits for user input for each question.
+"""
+
+[options]
+interactive = true
+wait_for_input = true
+one_at_a_time = true
