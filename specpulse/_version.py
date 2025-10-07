@@ -5,4 +5,4 @@ This file is the ONLY place where version should be defined.
 All other files should import or read from this file.
 """
 
-__version__ = "1.8.0"
+__version__ = "2.1.0"

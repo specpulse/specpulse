@@ -52,9 +52,9 @@ When called with `/sp-plan $ARGUMENTS`, I will:
       - Generate single monolithic plan
    d. **Find and validate specification** from selected spec file
    
-   d. **Validation** using script:
+   d. **Validation** using CLI:
       ```bash
-      bash scripts/sp-pulse-plan.sh "$FEATURE_DIR"
+      specpulse --no-color validate plan --verbose
       ```
 
    e. **Run SDD Compliance Gates**:

@@ -24,9 +24,11 @@ When called, perform the following steps:
    - Optional ID: second argument (if provided)
    - Sanitize feature name (alphanumeric, hyphens only)
 
-2. **Run initialization script**:
-   - !{bash scripts/sp-pulse-init.sh "{{args}}"}
-   - This creates the complete feature structure
+2. **Create feature using SpecPulse CLI**:
+   - !{bash specpulse --no-color context set current.feature "{{feature_name}}"}
+   - !{bash specpulse --no-color context set current.feature_id "{{feature_id}}"}
+   - !{bash specpulse --no-color context set current.branch "{{branch_name}}"}
+   - This creates the feature structure using CLI commands
 
 3. **Create feature structure**:
    - Generate feature ID (001, 002, etc.) or use provided ID

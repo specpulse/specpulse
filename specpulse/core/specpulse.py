@@ -21,7 +21,16 @@ class SpecPulse:
         try:
             # Use modern importlib.resources (Python 3.9+)
             from importlib import resources
-            self.resources_dir = Path(resources.files('specpulse').joinpath('resources'))
+            if hasattr(resources, 'files'):
+                self.resources_dir = Path(resources.files('specpulse').joinpath('resources'))
+            else:
+                # Fallback for older importlib.resources
+                import importlib.util
+                spec = importlib.util.find_spec('specpulse')
+                if spec and spec.origin:
+                    self.resources_dir = Path(spec.origin).parent.parent / "resources"
+                else:
+                    raise ImportError("Cannot find specpulse package")
         except:
             try:
                 # Fallback to pkg_resources for older Python versions
@@ -30,6 +39,16 @@ class SpecPulse:
             except:
                 # Final fallback to development path
                 self.resources_dir = Path(__file__).parent.parent / "resources"
+
+        # Ensure resources directory exists
+        if not self.resources_dir.exists():
+            # Try project root templates
+            project_root = Path(__file__).parent.parent.parent
+            fallback_resources = project_root / "templates"
+            if fallback_resources.exists():
+                self.resources_dir = project_root
+            else:
+                raise FileNotFoundError(f"Resources directory not found: {self.resources_dir}")
 
         # Set templates directory
         self.templates_dir = self.resources_dir / "templates"
@@ -919,6 +938,22 @@ Always use templates from `templates/` directory:
             with open(command_path, 'r', encoding='utf-8') as f:
                 return f.read()
         return "# /sp-task command not found"
+
+    def get_claude_execute_command(self) -> str:
+        """Get Claude execute command"""
+        command_path = self.resources_dir / "commands" / "claude" / "sp-execute.md"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# /sp-execute command not found"
+
+    def get_claude_validate_command(self) -> str:
+        """Get Claude validate command"""
+        command_path = self.resources_dir / "commands" / "claude" / "sp-validate.md"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# /sp-validate command not found"
     
     # Gemini command getters
     def get_gemini_pulse_command(self) -> str:
@@ -952,6 +987,46 @@ Always use templates from `templates/` directory:
             with open(command_path, 'r', encoding='utf-8') as f:
                 return f.read()
         return "# Gemini task command not found"
+
+    def get_gemini_execute_command(self) -> str:
+        """Get Gemini execute command"""
+        command_path = self.resources_dir / "commands" / "gemini" / "sp-execute.toml"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# Gemini execute command not found"
+
+    def get_gemini_validate_command(self) -> str:
+        """Get Gemini validate command"""
+        command_path = self.resources_dir / "commands" / "gemini" / "sp-validate.toml"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# Gemini validate command not found"
+
+    def get_claude_decompose_command(self) -> str:
+        """Get Claude decompose command"""
+        command_path = self.resources_dir / "commands" / "claude" / "sp-decompose.md"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# /sp-decompose command not found"
+
+    def get_gemini_decompose_command(self) -> str:
+        """Get Gemini decompose command"""
+        command_path = self.resources_dir / "commands" / "gemini" / "sp-decompose.toml"
+        if command_path.exists():
+            with open(command_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return "# Gemini decompose command not found"
+
+    def get_decomposition_template(self, template_name: str) -> str:
+        """Get decomposition template by name"""
+        template_path = self.resources_dir / "templates" / "decomposition" / f"{template_name}"
+        if template_path.exists():
+            with open(template_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        return f"# Decomposition template '{template_name}' not found"
     
     def get_gemini_instructions(self) -> str:
         """Get Gemini instructions"""

@@ -36,15 +36,37 @@ Initialize a new feature following SpecPulse methodology with SDD compliance.
 When called with `/sp-pulse $ARGUMENTS`, I will:
 
 1. **Validate arguments** and extract feature name + optional ID
-2. **Run initialization script**:
-   - `bash scripts/sp-pulse-init.sh "$FEATURE_NAME" "$OPTIONAL_ID"`
-3. **Create complete feature structure**:
-   - Generate feature ID (001, 002, etc.) or use provided ID
-   - Create sanitized branch name: `ID-feature-name`
-   - Create directories: `specs/ID-feature-name/`, `plans/ID-feature-name/`, `tasks/ID-feature-name/`
-   - Copy AI-optimized templates to feature directories
-   - Update `memory/context.md` with current feature metadata
-   - Create and switch to git branch if in git repository
+2. **Create feature using SpecPulse CLI**:
+   - `specpulse --no-color context set current.feature "$FEATURE_NAME"`
+   - `specpulse --no-color context set current.feature_id "$FEATURE_ID"`
+   - `specpulse --no-color context set current.branch "$BRANCH_NAME"`
+3. **Create complete feature structure using File Operations**:
+
+   - **Step 1: Determine Feature ID**
+     ```
+     Read: specs/ directory (list subdirectories)
+     Find highest number (e.g., 001, 002) and increment
+     Or use 001 if no features exist
+     ```
+
+   - **Step 2: Create Feature Directories Using Bash**
+     ```bash
+     mkdir -p specs/001-feature-name
+     mkdir -p plans/001-feature-name
+     mkdir -p tasks/001-feature-name
+     ```
+
+   - **Step 3: Update Context File**
+     ```
+     Read: memory/context.md
+     Edit: memory/context.md
+     (Add new feature entry with ID, name, timestamp)
+     ```
+
+   - **Step 4: Create Git Branch (Optional)**
+     ```bash
+     git checkout -b 001-feature-name
+     ```
 
 4. **Suggest specification creation**:
    - Provide user with 2-3 AI-generated specification suggestions
@@ -71,7 +93,9 @@ User: /sp-pulse user-authentication-oauth2
 ```
 
 I will:
-- Run: `bash scripts/sp-pulse-init.sh "user-authentication-oauth2"`
+- Create feature structure using CLI calls
+- Set context: `specpulse context set current.feature "user-authentication-oauth2"`
+- Update context: `specpulse context set current.feature_id "001"`
 - Create: `specs/001-user-authentication-oauth2/` (empty, ready for spec)
 - Create: `plans/001-user-authentication-oauth2/` (empty, ready for plan)
 - Create: `tasks/001-user-authentication-oauth2/` (empty, ready for tasks)

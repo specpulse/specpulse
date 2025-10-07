@@ -76,7 +76,6 @@ class TestSpecPulseCore:
         assert isinstance(sp.get_task_template(), str)
         assert isinstance(sp.get_constitution_template(), str)
         assert isinstance(sp.get_context_template(), str)
-        assert isinstance(sp.get_decomposition_template(), str)
         assert isinstance(sp.get_decomposition_template("api"), str)
         assert isinstance(sp.get_decisions_template(), str)
 

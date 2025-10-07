@@ -26,8 +26,8 @@ Actions: create, update, validate, clarify (defaults to create)
    - If starts with 'clarify': Address [NEEDS CLARIFICATION] markers
    - Default to 'create' with full arguments as description
 
-3. **Run specification script**:
-   - !{bash scripts/sp-pulse-spec.sh "{{args}}"}
+3. **Run specification validation using CLI**:
+   - !{bash specpulse --no-color validate spec --verbose}
 
 4. **For 'create' action**:
    - Read template from @{templates/spec.md}

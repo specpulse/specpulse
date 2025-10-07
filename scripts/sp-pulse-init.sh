@@ -115,10 +115,10 @@ backup_file "$CONTEXT_FILE"
 if [ -d "$PROJECT_ROOT/.git" ]; then
     cd "$PROJECT_ROOT"
     if git rev-parse --verify "$BRANCH_NAME" >/dev/null 2>&1; then
-        log_info "Git branch '$BRANCH_NAME' already exists, checking out"
+        log "Git branch '$BRANCH_NAME' already exists, checking out"
         git checkout "$BRANCH_NAME" || error_exit "Failed to checkout existing branch"
     else
-        log_info "Creating new git branch '$BRANCH_NAME'"
+        log "Creating new git branch '$BRANCH_NAME'"
         git checkout -b "$BRANCH_NAME" || error_exit "Failed to create new branch"
     fi
 fi

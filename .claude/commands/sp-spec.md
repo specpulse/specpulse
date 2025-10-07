@@ -68,7 +68,7 @@ When called with `/sp-spec $ARGUMENTS`, I will:
    - Write FULL specification content to `specs/ID-feature-name/spec-XXX.md`
    - Can EDIT files in specs/ folder, but NEVER modify templates/, scripts/, or commands/ folders
    - Run validation:
-     - `bash scripts/sp-pulse-spec.sh "$FEATURE_DIR" "$SPEC_CONTENT"`
+     - `specpulse --no-color validate spec --verbose`
 
 4. **For `/sp-spec update`:**
    - **Show existing spec files**: List all spec-XXX.md files in current feature directory

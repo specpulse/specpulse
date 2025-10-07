@@ -1,139 +1,191 @@
-# Implementation Plan: {{feature_name}}
+<!-- SpecPulse Implementation Plan Template v1.0 -->
+<!-- AI Instructions: Generate plan from specification -->
+
+# Implementation Plan: [FEATURE_NAME]
 
 ## Specification Reference
-- **Spec ID**: SPEC-{{spec_id}}
-- **Generated**: {{date}}
-- **Optimization Focus**: {{optimization_focus}}
+- **Spec ID**: SPEC-[XXX]
+- **Generated**: [DATE]
+- **Optimization Focus**: [PERFORMANCE|SECURITY|SIMPLICITY|COST]
 
 ## Architecture Overview
 ```mermaid
-graph TD
-    A[User Interface] --> B[Business Logic]
-    B --> C[Data Layer]
-    C --> D[Database]
+<!-- AI: Generate architecture diagram -->
 ```
 
-## Phase -1: Pre-Implementation Gates
-**SDD Compliance Check** - Must pass before coding:
-- [ ] Specification First - Complete spec with no ambiguities
-- [ ] Incremental Planning - Phases clearly defined
-- [ ] Task Decomposition - Tasks are concrete and executable
-- [ ] Quality Assurance - Testing strategy defined
-- [ ] Architecture Documentation - Technical decisions recorded
+## Technology Stack
 
-## Phase 0: Foundation
-### Objectives
-- Set up project structure
-- Configure development environment
-- Initialize core components
+### Core Technologies
+- **Language**: [Choice with rationale]
+- **Framework**: [Choice with rationale]
+- **Database**: [Choice with rationale]
+- **Cache**: [Choice with rationale]
 
-### Tasks
-- [ ] Create project scaffolding
-- [ ] Set up dependencies
-- [ ] Configure build system
-- [ ] Initialize testing framework
+### Supporting Tools
+- **Testing**: [Framework choice]
+- **CI/CD**: [Platform choice]
+- **Monitoring**: [Solution choice]
 
-### Success Criteria
-- Development environment operational
-- All team members can build and run
-- Basic CI/CD pipeline functional
+## Implementation Phases
 
-## Phase 1: Core Implementation
-### Objectives
-- Implement primary functionality
-- Create essential features
-- Establish data models
+### Phase 0: Setup and Prerequisites
+**Duration**: [Estimate]
+**Tasks**:
+1. Environment setup
+2. Repository initialization
+3. Dependency installation
+4. Configuration
 
-### Tasks
-- [ ] Implement data models
-- [ ] Create core business logic
-- [ ] Build primary API endpoints
-- [ ] Develop basic UI components
+### Phase 1: Data Layer
+**Duration**: [Estimate]
+**Deliverables**:
+- Database schema
+- Migration scripts
+- Data models
+- Repository pattern implementation
 
-### Success Criteria
-- Core features working end-to-end
-- Unit tests passing
-- Integration tests defined
+**Tasks**:
+1. Design database schema
+2. Create migration scripts
+3. Implement data models
+4. Create repository interfaces
+5. Write data layer tests
 
-## Phase 2: Enhancement
-### Objectives
-- Add secondary features
-- Improve user experience
-- Optimize performance
+### Phase 2: Business Logic
+**Duration**: [Estimate]
+**Deliverables**:
+- Service layer
+- Business rules implementation
+- Validation logic
 
-### Tasks
-- [ ] Implement additional features
-- [ ] Add error handling
-- [ ] Optimize database queries
-- [ ] Enhance UI/UX
+**Tasks**:
+1. Implement service interfaces
+2. Create business logic modules
+3. Add validation rules
+4. Implement error handling
+5. Write unit tests
 
-### Success Criteria
-- All features implemented
-- Performance targets met
-- Error handling comprehensive
+### Phase 3: API Layer
+**Duration**: [Estimate]
+**Deliverables**:
+- REST/GraphQL endpoints
+- API documentation
+- Authentication/Authorization
 
-## Phase 3: Polish & Deploy
-### Objectives
-- Final testing and bug fixes
-- Documentation completion
-- Production deployment
+**Tasks**:
+1. Design API contracts
+2. Implement endpoints
+3. Add authentication
+4. Create API documentation
+5. Write integration tests
 
-### Tasks
-- [ ] Complete integration testing
-- [ ] Fix identified bugs
-- [ ] Write user documentation
-- [ ] Deploy to production
+### Phase 4: Testing and Optimization
+**Duration**: [Estimate]
+**Deliverables**:
+- Complete test suite
+- Performance optimization
+- Security hardening
 
-### Success Criteria
-- All tests passing
-- Documentation complete
-- Successfully deployed
+**Tasks**:
+1. Complete test coverage
+2. Performance testing
+3. Security audit
+4. Load testing
+5. Documentation
 
-## Technical Decisions
+## File Structure
+```
+[feature-name]/
+├── src/
+│   ├── models/
+│   ├── services/
+│   ├── controllers/
+│   └── utils/
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/
+├── docs/
+└── config/
+```
 
-### Architecture Pattern
-- **Pattern**: {{architecture_pattern}}
-- **Rationale**: [Why this pattern was chosen]
+## API Contracts
 
-### Technology Stack
-- **Frontend**: {{frontend_stack}}
-- **Backend**: {{backend_stack}}
-- **Database**: {{database}}
-- **Infrastructure**: {{infrastructure}}
+### Endpoint: [ENDPOINT_NAME]
+```yaml
+method: POST
+path: /api/v1/[resource]
+request:
+  headers:
+    Content-Type: application/json
+    Authorization: Bearer {token}
+  body:
+    field1: string
+    field2: number
+response:
+  200:
+    success: true
+    data: object
+  400:
+    error: string
+```
 
-### Key Design Decisions
-1. **Decision 1**: [Description and rationale]
-2. **Decision 2**: [Description and rationale]
-3. **Decision 3**: [Description and rationale]
+## Data Models
 
-## Risk Management
+### Entity: [ENTITY_NAME]
+```yaml
+fields:
+  id: uuid
+  created_at: timestamp
+  updated_at: timestamp
+  [field_name]: [type]
+relations:
+  [relation_name]: [type]
+indexes:
+  - [field_name]
+```
 
-### Identified Risks
-1. **Risk**: [Description]
-   - **Probability**: [High|Medium|Low]
-   - **Impact**: [High|Medium|Low]
-   - **Mitigation**: [Strategy]
+## Testing Strategy
 
-2. **Risk**: [Description]
-   - **Probability**: [High|Medium|Low]
-   - **Impact**: [High|Medium|Low]
-   - **Mitigation**: [Strategy]
+### Unit Tests
+- Coverage Target: 80%
+- Framework: [Choice]
+- Mock Strategy: [Approach]
 
-## Resource Requirements
-- **Team Size**: {{team_size}}
-- **Timeline**: {{timeline}}
-- **Budget**: {{budget}}
-- **Tools**: {{required_tools}}
+### Integration Tests
+- API Contract Tests
+- Database Integration Tests
+- External Service Tests
 
-## Dependencies
-- External services required
-- Third-party libraries
-- Other team deliverables
+### E2E Tests
+- Critical User Journeys
+- Performance Benchmarks
+- Security Scenarios
 
-## Monitoring & Success Metrics
-- Performance metrics to track
-- Business metrics to measure
-- Quality metrics to monitor
+## SDD Compliance
 
-## Notes
-<!-- Additional implementation notes -->
+### Principle Validation
+- [ ] Specification First: Requirements clearly defined
+- [ ] Incremental Planning: Phased approach planned
+- [ ] Task Decomposition: Broken into executable tasks
+- [ ] Quality Assurance: Appropriate testing strategy
+- [ ] Architecture Documentation: Decisions recorded
+
+## Risk Assessment
+
+### Technical Risks
+| Risk | Probability | Impact | Mitigation |
+|------|------------|--------|------------|
+| [Risk] | [H/M/L] | [H/M/L] | [Strategy] |
+
+### Timeline Risks
+| Risk | Probability | Impact | Mitigation |
+|------|------------|--------|------------|
+| [Risk] | [H/M/L] | [H/M/L] | [Strategy] |
+
+## Success Criteria
+- [ ] All functional requirements implemented
+- [ ] Appropriate test coverage for project type
+- [ ] Performance targets met
+- [ ] Security audit passed
+- [ ] Documentation complete

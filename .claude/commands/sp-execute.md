@@ -43,9 +43,10 @@ Execute tasks continuously from the task list without stopping between tasks. Pe
 
 When called with `/sp-execute $ARGUMENTS`, I will:
 
-1. **Run the execution script**:
+1. **Check project status using CLI**:
    ```bash
-   scripts/sp-pulse-execute.sh $ARGUMENTS
+   specpulse --no-color doctor
+   specpulse --no-color spec progress [feature-id]
    ```
 
 2. **Analyze task status** from script output:

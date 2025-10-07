@@ -147,7 +147,10 @@ class ErrorHandler:
         console = Console()
 
         # Print error header
-        console.error(f"❌ {error.message}")
+        try:
+            console.error(f"❌ {error.message}")
+        except UnicodeEncodeError:
+            console.error(f"X {error.message}")
 
         if context:
             console.info(f"📍 Context: {context}")

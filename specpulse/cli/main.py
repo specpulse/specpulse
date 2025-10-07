@@ -6,6 +6,7 @@ SpecPulse CLI - Main entry point
 import argparse
 import sys
 import os
+import re
 from pathlib import Path
 import yaml
 import shutil
@@ -26,6 +27,11 @@ from ..utils.error_handler import (
     validate_templates, suggest_recovery_for_error, ErrorSeverity
 )
 
+# v2.1.0: Import new command modules
+from .feature_commands import FeatureCommands
+from .spec_commands import SpecCommands
+from .plan_task_commands import PlanCommands, TaskCommands, ExecuteCommands
+
 
 class SpecPulseCLI:
     def __init__(self, no_color: bool = False, verbose: bool = False):
@@ -42,9 +48,20 @@ class SpecPulseCLI:
             if self._is_specpulse_project(project_root):
                 self.template_manager = TemplateManager(project_root)
                 self.memory_manager = MemoryManager(project_root)
+                # v2.1.0: Initialize new command handlers
+                self.feature_commands = FeatureCommands(self.console, project_root)
+                self.spec_commands = SpecCommands(self.console, project_root)
+                self.plan_commands = PlanCommands(self.console, project_root)
+                self.task_commands = TaskCommands(self.console, project_root)
+                self.execute_commands = ExecuteCommands(self.console, project_root)
             else:
                 self.template_manager = None
                 self.memory_manager = None
+                self.feature_commands = None
+                self.spec_commands = None
+                self.plan_commands = None
+                self.task_commands = None
+                self.execute_commands = None
 
             # Check for updates (non-blocking)
             self._check_for_updates()
@@ -124,6 +141,7 @@ class SpecPulseCLI:
             self.console.header(f"Initializing Project: {project_name}", style="bright_green")
         
             # Create directory structure
+            # v2.1.0: Removed "scripts" - no longer needed
             directories = [
             ".specpulse",
             ".specpulse/cache",
@@ -135,7 +153,6 @@ class SpecPulseCLI:
             "specs",
             "plans",
             "tasks",
-            "scripts",
             "templates",
             "templates/decomposition"
         ]
@@ -257,8 +274,8 @@ class SpecPulseCLI:
             # Create memory files
             self._create_memory_files(project_path)
 
-            # Create scripts
-            self._create_scripts(project_path)
+            # v2.1.0: Scripts removed - all functionality moved to CLI
+            # Script creation disabled
 
             # Create AI command files
             self._create_ai_commands(project_path)
@@ -275,7 +292,8 @@ class SpecPulseCLI:
 
         except Exception as e:
             # Handle any errors that occurred during initialization
-            return self.error_handler.handle_error(e, f"Initializing project '{project_name}'")
+            exit_code = self.error_handler.handle_error(e, f"Initializing project '{project_name}'")
+            return False if exit_code != 0 else True
     
     def _create_templates(self, project_path: Path):
         """Create template files"""
@@ -295,6 +313,12 @@ class SpecPulseCLI:
         task_template = self.specpulse.get_task_template()
         with open(templates_dir / "task.md", 'w', encoding='utf-8') as f:
             f.write(task_template)
+
+        # Copy tier templates (v1.9.0)
+        resources_templates_dir = self.specpulse.resources_dir / "templates"
+        if resources_templates_dir.exists():
+            for tier_template in resources_templates_dir.glob("spec-tier*.md"):
+                shutil.copy2(tier_template, templates_dir / tier_template.name)
 
         # Copy decomposition templates
         decomp_dir = templates_dir / "decomposition"
@@ -327,7 +351,7 @@ class SpecPulseCLI:
         with open(memory_dir / "decisions.md", 'w', encoding='utf-8') as f:
             f.write(decisions)
         
-        self.console.animated_success("Memory files created")
+        self.console.success("Memory files created")
     
     def _create_scripts(self, project_path: Path):
         """Create automation scripts - copy all cross-platform scripts from resources"""
@@ -364,7 +388,7 @@ class SpecPulseCLI:
         if scripts_copied == 0:
             self.console.warning("No scripts found in resources directory")
         else:
-            self.console.animated_success(f"Scripts created ({scripts_copied} files)")
+            self.console.success(f"Scripts created ({scripts_copied} files)")
     
     def _create_ai_commands(self, project_path: Path):
         """Create AI command files for Claude and Gemini CLI integration"""
@@ -409,7 +433,7 @@ class SpecPulseCLI:
         if commands_copied == 0:
             self.console.warning("No AI command files found in resources directory")
         else:
-            self.console.animated_success(f"AI command files created ({commands_copied} files)")
+            self.console.success(f"AI command files created ({commands_copied} files)")
     
     # def _create_ai_files(self, project_path: Path, ai: str):
     #     """Create AI instruction files (deprecated - AI tools create these themselves)"""
@@ -453,7 +477,7 @@ Generated with SpecPulse v1.0.0
         with open(project_path / "PULSE.md", 'w', encoding='utf-8') as f:
             f.write(manifest)
         
-        self.console.animated_success("PULSE.md manifest created")
+        self.console.success("PULSE.md manifest created")
         
         # Show celebration animation
         self.console.celebration()
@@ -503,7 +527,7 @@ Generated with SpecPulse v1.0.0
             time.sleep(0.3)
         
         self.console.info(f"Templates backed up to: {backup_dir}")
-        self.console.animated_success("Templates updated successfully!")
+        self.console.success("Templates updated successfully!")
         
         # Show what was updated
         update_items = [
@@ -531,6 +555,17 @@ Generated with SpecPulse v1.0.0
             results = self.validator.validate_spec(project_path, fix=fix, verbose=verbose)
         elif component == "plan":
             results = self.validator.validate_plan(project_path, fix=fix, verbose=verbose)
+        elif component == "task":
+            # Task validation - check if task files exist in proper structure
+            tasks_dir = project_path / "tasks"
+            if tasks_dir.exists():
+                task_files = list(tasks_dir.glob("**/task-*.md"))
+                if task_files:
+                    results = [{"component": "task", "status": "success", "message": f"Found {len(task_files)} task files"}]
+                else:
+                    results = [{"component": "task", "status": "warning", "message": "No task files found"}]
+            else:
+                results = [{"component": "task", "status": "warning", "message": "Tasks directory not found"}]
         elif component == "constitution":
             results = self.validator.validate_constitution(project_path, verbose=verbose)
         else:
@@ -743,7 +778,7 @@ graph LR
         
         # Display results
         self.console.status_panel("Decomposition Complete", decomp_items)
-        self.console.animated_success(f"Specification decomposed into {len(decomp_items)} components")
+        self.console.success(f"Specification decomposed into {len(decomp_items)} components")
         self.console.info(f"Output: {decomp_dir}")
         
         return True
@@ -817,7 +852,7 @@ graph LR
         
         # Display sync status
         self.console.status_panel("Synchronization Complete", sync_items)
-        self.console.animated_success("Project synchronized successfully!")
+        self.console.success("Project synchronized successfully!")
         
         return True
     
@@ -886,6 +921,226 @@ graph LR
 
                 traceback.print_exc()
             sys.exit(1)
+
+    def checkpoint_create(self, feature_id: str, description: str):
+        """Create manual checkpoint"""
+        from ..core.checkpoints import CheckpointManager
+
+        self.console.show_banner(mini=True)
+        self.console.header("Create Checkpoint", style="bright_cyan")
+
+        try:
+            checkpoint_mgr = CheckpointManager(Path.cwd())
+            checkpoint_name = checkpoint_mgr.create(feature_id, description)
+
+            self.console.success(f"✓ Checkpoint created: {checkpoint_name}")
+            self.console.info(f"  Description: {description}")
+            self.console.info(f"  Restore with: specpulse checkpoint restore {feature_id} {checkpoint_name}")
+
+        except FileNotFoundError as e:
+            self.console.error(f"Spec not found: {e}")
+            sys.exit(1)
+        except Exception as e:
+            self.console.error(f"Checkpoint creation failed: {e}")
+            sys.exit(1)
+
+    def checkpoint_list(self, feature_id: str):
+        """List all checkpoints"""
+        from ..core.checkpoints import CheckpointManager
+
+        self.console.show_banner(mini=True)
+        self.console.header(f"Checkpoints: {feature_id}", style="bright_cyan")
+
+        try:
+            checkpoint_mgr = CheckpointManager(Path.cwd())
+            checkpoints = checkpoint_mgr.list(feature_id)
+
+            if not checkpoints:
+                self.console.warning(f"No checkpoints found for {feature_id}")
+                self.console.info(f"Create one with: specpulse checkpoint create {feature_id} \"description\"")
+                return
+
+            # Display table
+            from rich.table import Table
+            table = Table(title=f"Checkpoints for {feature_id}")
+            table.add_column("Name", style="cyan")
+            table.add_column("Description", style="white")
+            table.add_column("Created", style="yellow")
+            table.add_column("Tier", style="magenta")
+            table.add_column("Progress", style="green")
+
+            for cp in checkpoints:
+                table.add_row(
+                    cp.name,
+                    cp.description[:40] + "..." if len(cp.description) > 40 else cp.description,
+                    cp.created.strftime("%Y-%m-%d %H:%M"),
+                    cp.tier,
+                    f"{cp.progress:.0%}",
+                )
+
+            self.console.print(table)
+            self.console.info(f"\nTotal: {len(checkpoints)} checkpoints ({sum(cp.file_size_bytes for cp in checkpoints) / 1024:.1f} KB)")
+
+        except Exception as e:
+            self.console.error(f"Failed to list checkpoints: {e}")
+            sys.exit(1)
+
+    def checkpoint_restore(self, feature_id: str, checkpoint_name: str, force: bool = False):
+        """Restore from checkpoint"""
+        from ..core.checkpoints import CheckpointManager
+
+        self.console.show_banner(mini=True)
+        self.console.header("Restore Checkpoint", style="bright_cyan")
+
+        try:
+            checkpoint_mgr = CheckpointManager(Path.cwd())
+            success = checkpoint_mgr.restore(feature_id, checkpoint_name, force)
+
+            if success:
+                self.console.success(f"✓ Restored to: {checkpoint_name}")
+            else:
+                self.console.warning("Restoration cancelled")
+
+        except FileNotFoundError as e:
+            self.console.error(f"Checkpoint not found: {e}")
+            sys.exit(1)
+        except ValueError as e:
+            self.console.error(f"Integrity check failed: {e}")
+            sys.exit(1)
+        except Exception as e:
+            self.console.error(f"Restoration failed: {e}")
+            sys.exit(1)
+
+    def checkpoint_cleanup(self, feature_id: str, older_than_days: int):
+        """Delete old checkpoints"""
+        from ..core.checkpoints import CheckpointManager
+
+        self.console.show_banner(mini=True)
+        self.console.header("Cleanup Checkpoints", style="bright_cyan")
+
+        try:
+            checkpoint_mgr = CheckpointManager(Path.cwd())
+            deleted_count = checkpoint_mgr.cleanup(feature_id, older_than_days)
+
+            if deleted_count > 0:
+                self.console.success(f"✓ Deleted {deleted_count} checkpoint(s) older than {older_than_days} days")
+            else:
+                self.console.info(f"No checkpoints older than {older_than_days} days found")
+
+        except Exception as e:
+            self.console.error(f"Cleanup failed: {e}")
+            sys.exit(1)
+
+    def spec_add_section(self, feature_id: str, section_name: str):
+        """Add section to spec"""
+        from ..core.incremental import IncrementalBuilder
+        from ..core.checkpoints import CheckpointManager
+
+        self.console.show_banner(mini=True)
+        self.console.header("Add Section", style="bright_cyan")
+
+        try:
+            # Create checkpoint before adding section
+            checkpoint_mgr = CheckpointManager(Path.cwd())
+            checkpoint_name = checkpoint_mgr.create(feature_id, f"Before adding {section_name}")
+            self.console.info(f"✨ Created checkpoint: {checkpoint_name}")
+
+            # Add section
+            builder = IncrementalBuilder(Path.cwd())
+            spec_file = self._find_latest_spec_file(feature_id)
+            result = builder.add_section(spec_file, section_name)
+
+            if result.success:
+                self.console.success(f"✓ {result.message}")
+                self.console.info(f"  Checkpoint: {checkpoint_name}")
+                self.console.info(f"  Rollback with: specpulse checkpoint restore {feature_id} {checkpoint_name}")
+            else:
+                self.console.error(f"Failed: {result.message}")
+                if result.error:
+                    self.console.info(f"  {result.error}")
+
+        except FileNotFoundError as e:
+            self.console.error(f"Spec not found: {e}")
+            sys.exit(1)
+        except ValueError as e:
+            self.console.error(f"Invalid section: {e}")
+            sys.exit(1)
+        except Exception as e:
+            self.console.error(f"Failed to add section: {e}")
+            sys.exit(1)
+
+    def spec_progress(self, feature_id: str):
+        """Show spec progress"""
+        from ..core.incremental import IncrementalBuilder
+
+        self.console.show_banner(mini=True)
+        self.console.header(f"Specification Progress: {feature_id}", style="bright_cyan")
+
+        try:
+            builder = IncrementalBuilder(Path.cwd())
+            spec_file = self._find_latest_spec_file(feature_id)
+            progress = builder.get_progress(spec_file)
+
+            # Display progress
+            self.console.info(f"Current Tier: {progress.tier.title()} ({progress.total_sections} sections)")
+            self.console.info(f"Overall Progress: {progress.percentage:.0%} complete\n")
+
+            # Completed sections
+            if progress.completed_sections > 0:
+                self.console.success(f"✅ Completed Sections ({progress.completed_sections}/{progress.total_sections})")
+                for section, status in progress.section_status.items():
+                    if status == "complete":
+                        display_name = section.replace("_", " ").title()
+                        self.console.info(f"  ✓ {display_name}")
+
+            # Partial sections
+            if progress.partial_sections > 0:
+                self.console.warning(f"\n⚠️  In Progress ({progress.partial_sections}/{progress.total_sections})")
+                for section, status in progress.section_status.items():
+                    if status == "partial":
+                        display_name = section.replace("_", " ").title()
+                        self.console.info(f"  ⏳ {display_name}")
+
+            # Not started
+            if progress.not_started_sections > 0:
+                self.console.info(f"\n⭕ Not Started ({progress.not_started_sections}/{progress.total_sections})")
+                for section, status in progress.section_status.items():
+                    if status == "empty":
+                        display_name = section.replace("_", " ").title()
+                        self.console.info(f"  • {display_name}")
+
+            # Next steps
+            if progress.next_recommended:
+                self.console.info("\n🎯 Recommended Next Steps")
+                if progress.next_recommended.startswith("RECOMMEND:"):
+                    self.console.info(f"  {progress.next_recommended}")
+                else:
+                    display_name = progress.next_recommended.replace("_", " ").title()
+                    self.console.info(f"  1. Complete: {display_name}")
+                    self.console.info(f"     Command: specpulse spec add-section {feature_id} {progress.next_recommended}")
+
+        except FileNotFoundError as e:
+            self.console.error(f"Spec not found: {e}")
+            sys.exit(1)
+        except Exception as e:
+            self.console.error(f"Failed to get progress: {e}")
+            sys.exit(1)
+
+    def _find_latest_spec_file(self, feature_id: str) -> Path:
+        """Find latest spec file for feature."""
+        specs_dir = Path.cwd() / "specs"
+        feature_dirs = list(specs_dir.glob(f"*{feature_id}*"))
+
+        if not feature_dirs:
+            raise FileNotFoundError(f"Feature not found: {feature_id}")
+
+        feature_dir = feature_dirs[0]
+        spec_files = sorted(feature_dir.glob("spec-*.md"))
+
+        if not spec_files:
+            raise FileNotFoundError(f"No spec files found in {feature_dir}")
+
+        return spec_files[-1]
 
     def doctor(self):
         """System check and diagnostics"""
@@ -1007,7 +1262,7 @@ graph LR
         # Overall status
         all_passed = all(item[1] for item in checks)
         if all_passed:
-            self.console.animated_success("All checks passed! System is healthy.")
+            self.console.success("All checks passed! System is healthy.")
         else:
             self.console.error("Some checks failed. Please address the issues above.")
         
@@ -1526,19 +1781,48 @@ graph LR
         """Set project context variable (v1.7.0)"""
         try:
             from ..models.project_context import ProjectContext
+            import yaml
 
-            # Load current context
-            context = ProjectContext.load()
+            # Handle current.* keys specially for /sp-pulse compatibility
+            if key.startswith("current."):
+                # Store in context.yaml for current feature tracking
+                context_file = Path.cwd() / ".specpulse" / "project_context.yaml"
+                context_file.parent.mkdir(parents=True, exist_ok=True)
 
-            # Set value
-            context.set_value(key, value)
+                # Load existing context if exists
+                if context_file.exists():
+                    with open(context_file) as f:
+                        context_data = yaml.safe_load(f) or {}
+                else:
+                    context_data = {}
 
-            # Save context
-            context.save()
+                # Initialize current section if doesn't exist
+                if "current" not in context_data:
+                    context_data["current"] = {}
 
-            self.console.success(f"✓ Context variable set: {key} = {value}")
+                # Set the value
+                current_key = key[8:]  # Remove "current." prefix
+                context_data["current"][current_key] = value
 
-            return True
+                # Save context
+                with open(context_file, 'w') as f:
+                    yaml.dump(context_data, f, default_flow_style=False)
+
+                self.console.success(f"[OK] Context variable set: {key} = {value}")
+                return True
+            else:
+                # Load current context
+                context = ProjectContext.load()
+
+                # Set value
+                context.set_value(key, value)
+
+                # Save context
+                context.save()
+
+                self.console.success(f"[OK] Context variable set: {key} = {value}")
+
+                return True
 
         except ValueError as e:
             self.console.error(f"Invalid key: {e}")
@@ -1552,53 +1836,75 @@ graph LR
             from ..models.project_context import ProjectContext
             import yaml
 
-            # Load current context
-            context = ProjectContext.load()
+            if key and key.startswith("current."):
+                # Handle current.* keys specially for /sp-pulse compatibility
+                context_file = Path.cwd() / ".specpulse" / "project_context.yaml"
+                if context_file.exists():
+                    with open(context_file) as f:
+                        context_data = yaml.safe_load(f) or {}
 
-            if key:
-                # Get specific value
-                value = context.get_value(key)
-
-                if value is None:
+                    current_key = key[8:]  # Remove "current." prefix
+                    if "current" in context_data and current_key in context_data["current"]:
+                        value = context_data["current"][current_key]
+                        self.console.header(f"Context: {key}")
+                        if isinstance(value, (dict, list)):
+                            self.console.code_block(yaml.dump(value, default_flow_style=False), language="yaml")
+                        else:
+                            self.console.info(str(value))
+                        return True
+                    else:
+                        self.console.warning(f"Context variable not found: {key}")
+                        return False
+                else:
                     self.console.warning(f"Context variable not found: {key}")
                     return False
-
-                self.console.header(f"Context: {key}")
-                if isinstance(value, (dict, list)):
-                    self.console.code_block(yaml.dump(value, default_flow_style=False), language="yaml")
-                else:
-                    self.console.info(str(value))
-
             else:
-                # Show all context
-                self.console.header("Project Context")
+                # Load current context
+                context = ProjectContext.load()
 
-                # Convert to dict for display
-                context_dict = {
-                    "project": {
-                        "name": context.project.name,
-                        "type": context.project.type,
-                        "description": context.project.description,
-                        "version": context.project.version
-                    },
-                    "tech_stack": {
-                        "frontend": context.tech_stack.frontend,
-                        "backend": context.tech_stack.backend,
-                        "database": context.tech_stack.database,
-                        "message_queue": context.tech_stack.message_queue,
-                        "cache": context.tech_stack.cache,
-                        "other": context.tech_stack.other
-                    },
-                    "team_size": context.team_size,
-                    "preferences": context.preferences
-                }
+                if key:
+                    # Get specific value
+                    value = context.get_value(key)
 
-                # Remove None values
-                context_dict = self._remove_none_recursive(context_dict)
+                    if value is None:
+                        self.console.warning(f"Context variable not found: {key}")
+                        return False
 
-                self.console.code_block(yaml.dump(context_dict, default_flow_style=False, sort_keys=False), language="yaml")
+                    self.console.header(f"Context: {key}")
+                    if isinstance(value, (dict, list)):
+                        self.console.code_block(yaml.dump(value, default_flow_style=False), language="yaml")
+                    else:
+                        self.console.info(str(value))
+                else:
+                    # Show all context
+                    self.console.header("Project Context")
 
-            return True
+                    # Convert to dict for display
+                    context_dict = {
+                        "project": {
+                            "name": context.project.name,
+                            "type": context.project.type,
+                            "description": context.project.description,
+                            "version": context.project.version
+                        },
+                        "tech_stack": {
+                            "frontend": context.tech_stack.frontend,
+                            "backend": context.tech_stack.backend,
+                            "database": context.tech_stack.database,
+                            "message_queue": context.tech_stack.message_queue,
+                            "cache": context.tech_stack.cache,
+                            "other": context.tech_stack.other
+                        },
+                        "team_size": context.team_size,
+                        "preferences": context.preferences
+                    }
+
+                    # Remove None values
+                    context_dict = self._remove_none_recursive(context_dict)
+
+                    self.console.code_block(yaml.dump(context_dict, default_flow_style=False, sort_keys=False), language="yaml")
+
+                return True
 
         except Exception as e:
             return self.error_handler.handle_error(e, "Getting context")
@@ -2660,6 +2966,272 @@ specpulse init mobile-client --template mobile
         self.console.divider()
         self.console.success("Need more help? Visit: https://github.com/specpulse/specpulse")
 
+    def handle_ai_command(self, args):
+        """Handle AI integration commands"""
+        from ..core.ai_integration import AIIntegration
+
+        try:
+            # Initialize AI integration
+            ai_integration = AIIntegration(Path.cwd())
+
+            if args.ai_action == "context":
+                self._show_ai_context(ai_integration, args.refresh)
+            elif args.ai_action == "suggest":
+                self._show_ai_suggestions(ai_integration, args.query)
+            elif args.ai_action == "switch":
+                self._switch_ai_llm(ai_integration, args.llm)
+            elif args.ai_action == "checkpoint":
+                self._create_ai_checkpoint(ai_integration, args.description)
+            elif args.ai_action == "summary":
+                self._show_ai_summary(ai_integration)
+            else:
+                self.console.error("Unknown AI action. Use 'specpulse ai --help' for available actions.")
+
+        except Exception as e:
+            self.console.error(f"AI command failed: {e}")
+            if self.verbose:
+                import traceback
+                traceback.print_exc()
+
+    def _show_ai_context(self, ai_integration, refresh=False):
+        """Show AI-detected context"""
+        self.console.show_banner(mini=True)
+        self.console.header("AI Context Detection", style="bright_cyan")
+
+        if refresh:
+            self.console.info("Refreshing context detection...")
+
+        context = ai_integration.detect_context()
+
+        self.console.subheader("Current Feature")
+        if context.current_feature:
+            self.console.success(f"Feature: {context.current_feature}")
+        else:
+            self.console.warning("No current feature detected")
+            self.console.info("  Use /sp-pulse <feature-name> to start a new feature")
+
+        self.console.subheader("Git Context")
+        if context.branch_name:
+            self.console.info(f"Branch: {context.branch_name}")
+        else:
+            self.console.warning("Not in a git repository")
+
+        self.console.subheader("Recent Activity")
+        if context.recent_specs:
+            self.console.info("Recent Specs:")
+            for spec in context.recent_specs[:3]:
+                self.console.info(f"  • {spec}")
+
+        if context.recent_plans:
+            self.console.info("Recent Plans:")
+            for plan in context.recent_plans[:3]:
+                self.console.info(f"  • {plan}")
+
+        if context.tech_stack:
+            self.console.subheader("Technology Stack")
+            for tech, version in context.tech_stack.items():
+                self.console.info(f"  • {tech}: {version}")
+
+    def _show_ai_suggestions(self, ai_integration, query=None):
+        """Show AI-powered suggestions"""
+        self.console.show_banner(mini=True)
+        self.console.header("AI-Powered Suggestions", style="bright_cyan")
+
+        context = ai_integration.detect_context()
+
+        if query:
+            self.console.subheader(f"Query: {query}")
+            assistance = ai_integration.get_ai_assistance(query, context)
+
+            if assistance["suggestions"]:
+                self.console.subheader("Suggestions")
+                for suggestion in assistance["suggestions"]:
+                    self.console.info(f"- {suggestion}")
+
+            if assistance["template_recommendations"]:
+                self.console.subheader("Template Recommendations")
+                for template in assistance["template_recommendations"]:
+                    self.console.info(f"- {template}")
+        else:
+            suggestions = ai_integration.suggest_next_action(context)
+
+            if suggestions:
+                self.console.subheader("Next Steps")
+                for i, suggestion in enumerate(suggestions, 1):
+                    self.console.info(f"{i}. {suggestion}")
+            else:
+                self.console.info("Ready for your next command!")
+
+    def _switch_ai_llm(self, ai_integration, llm):
+        """Switch active LLM"""
+        if ai_integration.switch_llm(llm):
+            self.console.success(f"Switched to {llm.upper()}")
+            if llm == "both":
+                self.console.info("Using both Claude and Gemini for enhanced capabilities")
+        else:
+            self.console.error(f"Failed to switch to {llm}")
+
+    def _create_ai_checkpoint(self, ai_integration, description):
+        """Create AI workflow checkpoint"""
+        self.console.show_banner(mini=True)
+        self.console.header("AI Workflow Checkpoint", style="bright_cyan")
+
+        checkpoint_id = ai_integration.create_ai_checkpoint(description)
+        self.console.success(f"Checkpoint created: {checkpoint_id}")
+        self.console.info(f"Description: {description}")
+
+    def _show_ai_summary(self, ai_integration):
+        """Show AI workflow summary"""
+        self.console.show_banner(mini=True)
+        self.console.header("AI Workflow Summary", style="bright_cyan")
+
+        summary = ai_integration.get_workflow_summary()
+
+        self.console.subheader("Current Status")
+        if summary["current_feature"]:
+            self.console.info(f"Feature: {summary['current_feature']}")
+        else:
+            self.console.warning("No active feature")
+
+        self.console.info(f"Phase: {summary['current_phase'].title()}")
+        self.console.info(f"Active LLM: {summary['active_llm'].upper()}")
+        self.console.info(f"Progress: {summary['progress']*100:.1f}%")
+
+        if summary["suggestions"]:
+            self.console.subheader("Suggestions")
+            for suggestion in summary["suggestions"]:
+                self.console.info(f"- {suggestion}")
+
+        self.console.subheader("Recent Activity")
+        if summary["last_activity"]:
+            from datetime import datetime
+            last_time = datetime.fromisoformat(summary["last_activity"])
+            self.console.info(f"Last activity: {last_time.strftime('%Y-%m-%d %H:%M')}")
+
+        self.console.info(f"Checkpoints: {summary['checkpoints_count']}")
+
+    # Feature Management Methods for /sp-pulse compatibility
+    def _generate_feature_id(self, custom_id: Optional[str] = None) -> str:
+        """Generate unique feature ID (001, 002, etc.)"""
+        if custom_id:
+            return f"{int(custom_id):03d}"
+
+        project_root = Path.cwd()
+        specs_dir = project_root / "specs"
+
+        if specs_dir.exists():
+            # Count existing feature directories
+            feature_dirs = [d for d in specs_dir.iterdir()
+                          if d.is_dir() and re.match(r'^\d{3}', d.name)]
+            feature_count = len(feature_dirs)
+            return f"{feature_count + 1:03d}"
+        else:
+            return "001"
+
+    def _sanitize_feature_name(self, feature_name: str) -> str:
+        """Sanitize feature name for safe directory/branch names"""
+        # Convert to lowercase, replace spaces with hyphens, remove special chars
+        sanitized = re.sub(r'[^a-zA-Z0-9-]', '-', feature_name.lower())
+        # Replace multiple hyphens with single hyphen
+        sanitized = re.sub(r'-+', '-', sanitized)
+        # Remove leading/trailing hyphens
+        sanitized = sanitized.strip('-')
+        return sanitized
+
+    def create_feature_structure(self, feature_name: str, custom_id: Optional[str] = None) -> dict:
+        """Create feature directory structure following /sp-pulse behavior"""
+        try:
+            # Generate feature ID and sanitized name
+            feature_id = self._generate_feature_id(custom_id)
+            sanitized_name = self._sanitize_feature_name(feature_name)
+            branch_name = f"{feature_id}-{sanitized_name}"
+
+            project_root = Path.cwd()
+
+            # Create directories
+            specs_dir = project_root / "specs" / branch_name
+            plans_dir = project_root / "plans" / branch_name
+            tasks_dir = project_root / "tasks" / branch_name
+
+            directories = [specs_dir, plans_dir, tasks_dir]
+            created_dirs = []
+
+            for directory in directories:
+                directory.mkdir(parents=True, exist_ok=True)
+                created_dirs.append(str(directory))
+
+            # Create placeholder files (like the original script)
+            spec_file = specs_dir / "spec-001.md"
+            plan_file = plans_dir / "plan-001.md"
+            task_file = tasks_dir / "task-001.md"
+
+            # Create initial content
+            spec_file.write_text(f"# Specification for {feature_name}\n\n<!-- FEATURE_DIR: {branch_name} -->\n<!-- FEATURE_ID: {feature_id} -->\n")
+            plan_file.write_text(f"# Implementation Plan for {feature_name}\n\n<!-- SPEC_FILE: {spec_file} -->\n<!-- FEATURE_DIR: {branch_name} -->\n<!-- FEATURE_ID: {feature_id} -->\n")
+            task_file.write_text(f"# Task Breakdown for {feature_name}\n\n<!-- SPEC_FILE: {spec_file} -->\n<!-- PLAN_FILE: {plan_file} -->\n<!-- FEATURE_DIR: {branch_name} -->\n<!-- FEATURE_ID: {feature_id} -->\n")
+
+            # Update context file
+            context_file = project_root / "memory" / "context.md"
+            context_file.parent.mkdir(parents=True, exist_ok=True)
+
+            context_content = f"""
+## Active Feature: {feature_name}
+- Feature ID: {feature_id}
+- Branch: {branch_name}
+- Started: {datetime.now().isoformat()}
+"""
+
+            with open(context_file, 'a', encoding='utf-8') as f:
+                f.write(context_content)
+
+            # Create git branch if in git repo
+            git_utils = GitUtils()
+            if git_utils.is_repo():
+                if git_utils.branch_exists(branch_name):
+                    git_utils.checkout_branch(branch_name)
+                    self.console.info(f"Switched to existing branch: {branch_name}")
+                else:
+                    git_utils.create_branch(branch_name)
+                    self.console.success(f"Created and switched to branch: {branch_name}")
+
+            return {
+                "feature_id": feature_id,
+                "branch_name": branch_name,
+                "specs_dir": str(specs_dir),
+                "plans_dir": str(plans_dir),
+                "tasks_dir": str(tasks_dir),
+                "status": "success"
+            }
+
+        except Exception as e:
+            return {
+                "status": "error",
+                "error": str(e)
+            }
+
+    def get_next_file_number(self, directory: Path, prefix: str) -> int:
+        """Get next file number in sequence (for spec-001.md, plan-001.md, etc.)"""
+        if not directory.exists():
+            return 1
+
+        pattern = f"{prefix}-*.md"
+        files = list(directory.glob(pattern))
+
+        if not files:
+            return 1
+
+        # Extract numbers from existing files
+        numbers = []
+        for file in files:
+            match = re.match(rf"{prefix}-(\d+)\.md", file.name)
+            if match:
+                numbers.append(int(match.group(1)))
+
+        if numbers:
+            return max(numbers) + 1
+        else:
+            return 1
+
 
 def main():
     """Main CLI entry point with enhanced error handling"""
@@ -2693,7 +3265,7 @@ Need help? Visit https://github.com/specpulse/specpulse
 
         # Validate command
         validate_parser = subparsers.add_parser("validate", help="Validate project components")
-        validate_parser.add_argument("component", nargs="?", default="all", choices=["all", "spec", "plan", "constitution"], help="Component to validate")
+        validate_parser.add_argument("component", nargs="?", default="all", choices=["all", "spec", "plan", "constitution", "task"], help="Component to validate")
         validate_parser.add_argument("--fix", action="store_true", help="Attempt to auto-fix validation issues")
         validate_parser.add_argument("--partial", action="store_true", help="Use partial validation (for incomplete specs)")
         validate_parser.add_argument("--progress", action="store_true", help="Show only completion percentage")
@@ -2718,6 +3290,43 @@ Need help? Visit https://github.com/specpulse/specpulse
         expand_parser.add_argument("feature_id", help="Feature ID (e.g., 001 or 001-feature-name)")
         expand_parser.add_argument("--to-tier", choices=["standard", "complete"], required=True, help="Target tier level")
         expand_parser.add_argument("--show-diff", action="store_true", help="Preview changes before applying")
+
+        # Checkpoint command (v1.9.0)
+        checkpoint_parser = subparsers.add_parser("checkpoint", help="Checkpoint management")
+        checkpoint_subparsers = checkpoint_parser.add_subparsers(dest="checkpoint_action", help="Checkpoint actions")
+
+        # Checkpoint create
+        checkpoint_create_parser = checkpoint_subparsers.add_parser("create", help="Create manual checkpoint")
+        checkpoint_create_parser.add_argument("feature_id", help="Feature ID")
+        checkpoint_create_parser.add_argument("description", help="Checkpoint description")
+
+        # Checkpoint list
+        checkpoint_list_parser = checkpoint_subparsers.add_parser("list", help="List all checkpoints")
+        checkpoint_list_parser.add_argument("feature_id", help="Feature ID")
+
+        # Checkpoint restore
+        checkpoint_restore_parser = checkpoint_subparsers.add_parser("restore", help="Restore from checkpoint")
+        checkpoint_restore_parser.add_argument("feature_id", help="Feature ID")
+        checkpoint_restore_parser.add_argument("checkpoint_name", help="Checkpoint name (e.g., checkpoint-001)")
+        checkpoint_restore_parser.add_argument("--force", action="store_true", help="Skip confirmation prompt")
+
+        # Checkpoint cleanup
+        checkpoint_cleanup_parser = checkpoint_subparsers.add_parser("cleanup", help="Delete old checkpoints")
+        checkpoint_cleanup_parser.add_argument("feature_id", help="Feature ID")
+        checkpoint_cleanup_parser.add_argument("--older-than-days", type=int, default=30, help="Delete checkpoints older than N days")
+
+        # Spec command (v1.9.0)
+        spec_parser = subparsers.add_parser("spec", help="Spec management")
+        spec_subparsers = spec_parser.add_subparsers(dest="spec_action", help="Spec actions")
+
+        # Spec add-section
+        spec_add_section_parser = spec_subparsers.add_parser("add-section", help="Add section to spec")
+        spec_add_section_parser.add_argument("feature_id", help="Feature ID")
+        spec_add_section_parser.add_argument("section_name", help="Section name to add")
+
+        # Spec progress
+        spec_progress_parser = spec_subparsers.add_parser("progress", help="Show spec progress")
+        spec_progress_parser.add_argument("feature_id", help="Feature ID")
 
         # Help command
         help_parser = subparsers.add_parser("help", help="Show comprehensive help and documentation")
@@ -2838,6 +3447,24 @@ Need help? Visit https://github.com/specpulse/specpulse
         notes_merge_parser.add_argument("--note", required=True, help="Note ID to merge")
         notes_merge_parser.add_argument("--section", help="Target section in spec (auto-detected if omitted)")
 
+        # AI Integration Commands (v2.0.0)
+        ai_parser = subparsers.add_parser("ai", help="AI integration and workflow management")
+        ai_subparsers = ai_parser.add_subparsers(dest="ai_action", help="AI actions")
+
+        ai_context_parser = ai_subparsers.add_parser("context", help="Show AI-detected context")
+        ai_context_parser.add_argument("--refresh", action="store_true", help="Refresh context detection")
+
+        ai_suggest_parser = ai_subparsers.add_parser("suggest", help="Get AI-powered suggestions")
+        ai_suggest_parser.add_argument("--query", help="Specific query for assistance")
+
+        ai_switch_parser = ai_subparsers.add_parser("switch", help="Switch active LLM")
+        ai_switch_parser.add_argument("llm", choices=["claude", "gemini", "both"], help="LLM to switch to")
+
+        ai_checkpoint_parser = ai_subparsers.add_parser("checkpoint", help="Create AI workflow checkpoint")
+        ai_checkpoint_parser.add_argument("description", help="Checkpoint description")
+
+        ai_summary_parser = ai_subparsers.add_parser("summary", help="Show AI workflow summary")
+
         # Global arguments
         parser.add_argument("--version", action="version", version=f"SpecPulse {__version__}")
         parser.add_argument("--no-color", action="store_true", help="Disable colored output")
@@ -2850,7 +3477,7 @@ Need help? Visit https://github.com/specpulse/specpulse
                            verbose=getattr(args, 'verbose', False))
 
         # Available commands for suggestion
-        available_commands = ["init", "update", "validate", "decompose", "sync", "doctor", "expand", "help", "template", "memory", "context", "note", "notes"]
+        available_commands = ["init", "update", "validate", "decompose", "sync", "doctor", "expand", "checkpoint", "spec", "help", "template", "memory", "context", "note", "notes"]
 
         # Execute command with error handling
         if args.command == "init":
@@ -2867,6 +3494,24 @@ Need help? Visit https://github.com/specpulse/specpulse
             cli.doctor()
         elif args.command == "expand":
             cli.expand(args.feature_id, args.to_tier, args.show_diff)
+        elif args.command == "checkpoint":
+            if args.checkpoint_action == "create":
+                cli.checkpoint_create(args.feature_id, args.description)
+            elif args.checkpoint_action == "list":
+                cli.checkpoint_list(args.feature_id)
+            elif args.checkpoint_action == "restore":
+                cli.checkpoint_restore(args.feature_id, args.checkpoint_name, args.force)
+            elif args.checkpoint_action == "cleanup":
+                cli.checkpoint_cleanup(args.feature_id, args.older_than_days)
+            else:
+                checkpoint_parser.print_help()
+        elif args.command == "spec":
+            if args.spec_action == "add-section":
+                cli.spec_add_section(args.feature_id, args.section_name)
+            elif args.spec_action == "progress":
+                cli.spec_progress(args.feature_id)
+            else:
+                spec_parser.print_help()
         elif args.command == "help":
             cli.show_help(args.topic, args.list)
         elif args.command == "template":
@@ -2933,6 +3578,8 @@ Need help? Visit https://github.com/specpulse/specpulse
                 console = Console(no_color=getattr(args, 'no_color', False))
                 console.error("Unknown notes action. Use 'specpulse notes --help' for available actions.")
                 sys.exit(1)
+        elif args.command == "ai":
+            cli.handle_ai_command(args)
         elif args.command is None:
             # Show beautiful banner and help when no command
             console = Console()

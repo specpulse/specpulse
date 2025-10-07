@@ -22,7 +22,7 @@ NO STOPPING between tasks unless:
 
 ## Steps:
 
-1. Run: scripts/sp-pulse-execute.sh {{args}}
+1. Check project status using CLI: specpulse --no-color doctor
 
 2. Analyze the output to identify:
    - Next task to execute (T001 or AUTH-T001 format)

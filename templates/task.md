@@ -1,220 +1,81 @@
-# Task Breakdown: {{feature_name}}
+<!-- SpecPulse Task List Template v1.0 -->
+<!-- AI Instructions: Generate from implementation plan -->
 
-## Feature Overview
-- **Feature ID**: {{feature_id}}
-- **Specification**: SPEC-{{spec_id}}
-- **Plan**: PLAN-{{plan_id}}
-- **Created**: {{date}}
+# Task List: [FEATURE_NAME]
 
-## Task Summary
-Total Tasks: {{total_tasks}}
-Estimated Effort: {{estimated_effort}}
-Priority: {{priority}}
+## Metadata
+- **Plan Reference**: [PLAN_ID]
+- **Total Tasks**: [COUNT]
+- **Estimated Duration**: [TOTAL_HOURS]
+- **Parallel Groups**: [COUNT]
 
-## Task Status Legend
-- [ ] Pending
-- [>] In Progress
-- [x] Completed
-- [!] Blocked
+## Task Organization
 
-## Phase 0: Foundation Tasks
+### 🔄 Parallel Group A
+*These tasks can be executed simultaneously*
 
-### T001: Project Setup
-**Complexity**: Simple
-**Estimate**: 1 hour
-**Status**: [ ] Pending
+#### TASK-001: [Task Name]
+- **Type**: [setup|development|testing|documentation]
+- **Priority**: [HIGH|MEDIUM|LOW]
+- **Estimate**: [hours]
+- **Dependencies**: None
+- **Description**: [What needs to be done]
+- **Acceptance**: [How to verify completion]
+- **Assignable**: [role/skill required]
 
-**Description**: Initialize project structure and configuration
-**Acceptance Criteria**:
-- [ ] Project scaffolding created
-- [ ] Configuration files in place
-- [ ] Build system configured
+#### TASK-002: [Task Name]
+[Same structure as above]
 
-**Technical Notes**:
-- Use standard project template
-- Ensure all paths are relative
+### 📝 Sequential Tasks
+*These tasks must be completed in order*
 
----
+#### TASK-003: [Task Name]
+- **Dependencies**: TASK-001
+[Rest of structure]
 
-### T002: Development Environment
-**Complexity**: Simple
-**Estimate**: 2 hours
-**Status**: [ ] Pending
+### 🎯 Critical Path
+*Tasks that directly impact timeline*
 
-**Description**: Set up development environment and dependencies
-**Acceptance Criteria**:
-- [ ] All dependencies installed
-- [ ] Environment variables configured
-- [ ] Development server runs successfully
+1. TASK-001 → TASK-003 → TASK-007
+2. Estimated critical path duration: [hours]
 
-**Technical Notes**:
-- Document any special setup requirements
-- Create setup script if needed
+## Task Details
 
----
+### Development Tasks
+- [ ] TASK-XXX: Implement [component]
+- [ ] TASK-XXX: Create [feature]
+- [ ] TASK-XXX: Integrate [service]
 
-## Phase 1: Core Implementation Tasks
+### Testing Tasks
+- [ ] TASK-XXX: Write unit tests for [component]
+- [ ] TASK-XXX: Create integration tests
+- [ ] TASK-XXX: Perform security testing
 
-### T003: Data Models
-**Complexity**: Medium
-**Estimate**: 4 hours
-**Status**: [ ] Pending
+### Documentation Tasks
+- [ ] TASK-XXX: Document API endpoints
+- [ ] TASK-XXX: Create user guide
+- [ ] TASK-XXX: Update README
 
-**Description**: Create data models and database schema
-**Acceptance Criteria**:
-- [ ] Models defined with proper types
-- [ ] Relationships established
-- [ ] Migrations created and tested
+## Execution Schedule
 
-**Technical Notes**:
-- Follow existing naming conventions
-- Add appropriate indexes
+### Day 1-2
+- Morning: TASK-001, TASK-002 (parallel)
+- Afternoon: TASK-003
 
----
-
-### T004: Business Logic
-**Complexity**: Complex
-**Estimate**: 8 hours
-**Status**: [ ] Pending
-
-**Description**: Implement core business logic
-**Acceptance Criteria**:
-- [ ] All business rules implemented
-- [ ] Edge cases handled
-- [ ] Unit tests written and passing
-
-**Technical Notes**:
-- Ensure proper error handling
-- Follow SOLID principles
-
----
-
-### T005: API Endpoints
-**Complexity**: Medium
-**Estimate**: 6 hours
-**Status**: [ ] Pending
-
-**Description**: Create API endpoints for feature
-**Acceptance Criteria**:
-- [ ] All endpoints implemented
-- [ ] Request/response validation
-- [ ] API documentation updated
-
-**Technical Notes**:
-- Follow RESTful conventions
-- Implement proper status codes
-
----
-
-## Phase 2: Enhancement Tasks
-
-### T006: Error Handling
-**Complexity**: Medium
-**Estimate**: 3 hours
-**Status**: [ ] Pending
-
-**Description**: Implement comprehensive error handling
-**Acceptance Criteria**:
-- [ ] All errors caught and logged
-- [ ] User-friendly error messages
-- [ ] Error recovery mechanisms
-
-**Technical Notes**:
-- Use centralized error handling
-- Log errors with context
-
----
-
-### T007: Performance Optimization
-**Complexity**: Medium
-**Estimate**: 4 hours
-**Status**: [ ] Pending
-
-**Description**: Optimize performance bottlenecks
-**Acceptance Criteria**:
-- [ ] Database queries optimized
-- [ ] Caching implemented where needed
-- [ ] Load testing completed
-
-**Technical Notes**:
-- Profile before optimizing
-- Document optimization decisions
-
----
-
-## Phase 3: Testing & Documentation
-
-### T008: Integration Testing
-**Complexity**: Medium
-**Estimate**: 4 hours
-**Status**: [ ] Pending
-
-**Description**: Write and run integration tests
-**Acceptance Criteria**:
-- [ ] All happy paths tested
-- [ ] Error scenarios tested
-- [ ] Tests automated in CI/CD
-
-**Technical Notes**:
-- Use existing test framework
-- Mock external dependencies
-
----
-
-### T009: Documentation
-**Complexity**: Simple
-**Estimate**: 2 hours
-**Status**: [ ] Pending
-
-**Description**: Complete feature documentation
-**Acceptance Criteria**:
-- [ ] API documentation complete
-- [ ] User guide written
-- [ ] Code comments added
-
-**Technical Notes**:
-- Follow documentation standards
-- Include examples
-
----
-
-### T010: Deployment
-**Complexity**: Simple
-**Estimate**: 2 hours
-**Status**: [ ] Pending
-
-**Description**: Deploy feature to production
-**Acceptance Criteria**:
-- [ ] Deployed successfully
-- [ ] Monitoring configured
-- [ ] Rollback plan tested
-
-**Technical Notes**:
-- Follow deployment checklist
-- Verify in staging first
-
----
-
-## Dependencies
-- T003 depends on T001 and T002
-- T004 depends on T003
-- T005 depends on T004
-- T006-T007 can be done in parallel after T005
-- T008 depends on all implementation tasks
-- T009 can be done in parallel with testing
-- T010 depends on all other tasks
+### Day 3-4
+- Morning: TASK-004
+- Afternoon: TASK-005, TASK-006
 
 ## Progress Tracking
+```yaml
+status:
+  total: [count]
+  completed: 0
+  in_progress: 0
+  blocked: 0
+  
+metrics:
+  velocity: [tasks/day]
+  estimated_completion: [date]
+  blockers: []
 ```
-[##########----------] 50% Complete
-Completed: 5/10
-In Progress: 1/10
-Pending: 4/10
-Blocked: 0/10
-```
-
-## Notes
-<!-- Additional task notes -->
-- Review with team before starting
-- Update estimates based on actual effort
-- Log any blockers immediately

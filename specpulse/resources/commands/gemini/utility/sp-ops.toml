@@ -1,0 +1,44 @@
+[command]
+name = "sp-ops"
+description = "Utility operations for project maintenance"
+
+[command.prompt]
+text = "
+Handle utility operations: {{args}}
+
+Arguments:
+- "backup": Create backup of current project state
+- "restore": Restore from backup
+- "clean": Clean up old files and optimize storage
+- "archive": Archive completed features
+
+## Backup Operations
+1. Create timestamped backup in .specpulse/backups/
+2. Include specs, plans, tasks, and memory
+3. Compress backup files
+4. Log backup details
+
+## Restore Operations
+1. List available backups
+2. Select backup to restore
+3. Restore files to original locations
+4. Validate restored content
+
+## Cleanup Operations
+1. Remove old temporary files
+2. Archive completed features
+3. Clean up memory entries
+4. Optimize storage usage
+
+## Archive Operations
+1. Identify completed features
+2. Create archive packages
+3. Update project documentation
+4. Remove from active workspace
+"
+
+[options]
+backup = "Create project backup"
+restore = "Restore from backup"
+clean = "Clean up old files"
+archive = "Archive completed features"

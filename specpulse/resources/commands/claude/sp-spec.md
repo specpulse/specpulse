@@ -48,27 +48,48 @@ When called with `/sp-spec $ARGUMENTS`, I will:
      - If spec-001.md does NOT exist: Create spec-001.md with full content from template
      - If spec-001.md EXISTS: Create spec-002.md (or next number) with new content
      - NEVER leave spec-001.md as placeholder if it's the first spec
-   - READ template from `templates/spec.md` and use it to generate content
-   - IMPORTANT: Only edit files in specs/, plans/, tasks/ folders. NEVER edit templates/, scripts/, or commands/
-   - Parse the description to identify:
-     - Functional requirements (Must/Should/Could/Won't have)
-     - User stories with testable acceptance criteria
-     - Technical specifications and constraints
-     - Success metrics and out-of-scope items
-   - Generate specification using Jinja2-style template variables:
-     ```markdown
-     # Specification: {{ feature_name }}
-     ## Metadata
-     - **ID**: SPEC-{{ feature_id }}
-     - **Version**: {{ version }}
-     - **Created**: {{ date }}
+
+   - **Step 1: Read Template**
      ```
-   - Mark any uncertainties with `[NEEDS CLARIFICATION: specific question]`
-   - Use detected feature context to determine target directory
-   - Write FULL specification content to `specs/ID-feature-name/spec-XXX.md`
-   - Can EDIT files in specs/ folder, but NEVER modify templates/, scripts/, or commands/ folders
-   - Run validation:
-     - `bash scripts/sp-pulse-spec.sh "$FEATURE_DIR" "$SPEC_CONTENT"`
+     Read: templates/spec.md
+     ```
+
+   - **Step 2: Create Spec File Using Write Tool**
+     ```
+     Write: specs/XXX-feature/spec-YYY.md
+
+     Content should include:
+     - Metadata section with feature ID, date, version
+     - User's description
+     - Full template content for LLM expansion
+     - [NEEDS CLARIFICATION] markers for uncertainties
+     ```
+
+   - **Step 3: Read Created File**
+     ```
+     Read: specs/XXX-feature/spec-YYY.md
+     ```
+
+   - **Step 4: EXPAND Specification**
+     - Parse the description to identify:
+       * Functional requirements (Must/Should/Could/Won't have)
+       * User stories with testable acceptance criteria
+       * Technical specifications and constraints
+       * Success metrics and out-of-scope items
+     - Fill in ALL template sections with complete details
+     - Mark any uncertainties with `[NEEDS CLARIFICATION: specific question]`
+
+   - **Step 5: Write Expanded Content Back**
+     ```
+     Edit: specs/XXX-feature/spec-YYY.md
+     (Replace template placeholders with full specification)
+     ```
+
+   - **Step 6: Validate (Optional)**
+     ```
+     Bash: specpulse validate spec
+     ```
+     Note: Validation is optional - only if user requests it
 
 4. **For `/sp-spec update`:**
    - **Show existing spec files**: List all spec-XXX.md files in current feature directory
@@ -80,17 +101,28 @@ When called with `/sp-spec $ARGUMENTS`, I will:
    - Run validation to ensure completeness
 
 5. **For `/sp-spec validate`:**
-   - **Show existing spec files**: List all spec-XXX.md files in current feature directory
-   - **Ask user to select**: Which spec file to validate
-   - Read selected specification file from detected context
-   - Check all required sections using enhanced validation:
-     ```bash
-     bash scripts/sp-pulse-spec.sh "$FEATURE_DIR"
+   - **Step 1: Read Spec File**
      ```
-   - Count `[NEEDS CLARIFICATION]` markers
-   - Verify acceptance criteria follow Given-When-Then format
-   - Check SDD compliance indicators
-   - Report detailed validation results
+     Read: specs/XXX-feature/spec-YYY.md
+     ```
+
+   - **Step 2: Manual Validation Checks**
+     - Count `[NEEDS CLARIFICATION]` markers
+     - Verify all template sections are filled
+     - Check acceptance criteria follow Given-When-Then format
+     - Verify SDD compliance indicators present
+
+   - **Step 3: Run SpecPulse Validation (Optional)**
+     ```
+     Bash: specpulse validate spec
+     ```
+     Note: This is optional, manual checks are primary
+
+   - **Step 4: Report Results**
+     - Show validation status (complete/incomplete)
+     - List missing sections
+     - Highlight clarifications needed
+     - Suggest next steps
 
 6. **For `/sp-spec clarify`:**
    - **Show existing spec files**: List all spec-XXX.md files in current feature directory
