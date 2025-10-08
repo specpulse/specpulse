@@ -13,8 +13,18 @@ allowed_tools:
 
 Decompose large specifications into smaller, manageable components with microservice boundaries, API contracts, and interface specifications.
 
-## CRITICAL: File Edit Restrictions
-- **NEVER EDIT**: templates/, scripts/, commands/, .claude/, .gemini/
+## CRITICAL: LLM Workflow Rules
+
+**PRIMARY WORKFLOW: Use CLI when available**
+- Prefer `specpulse` CLI commands when they exist
+- Use Bash tool ONLY for CLI commands, not for file editing
+- Only use Read/Write/Edit tools when CLI doesn't cover the operation
+
+**PROTECTED DIRECTORIES (NEVER EDIT):**
+- `templates/` - Template files
+- `.specpulse/` - Internal config
+- `specpulse/` - Package code
+- `.claude/` and `.gemini/` - AI configuration
 - **ONLY EDIT**: specs/, plans/, tasks/, memory/
 - Decomposition templates are COPIED to specs/XXX-feature/decomposition/, then edited there
 

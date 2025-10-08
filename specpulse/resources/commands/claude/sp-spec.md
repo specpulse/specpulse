@@ -13,10 +13,23 @@ allowed_tools:
 
 Create, update, or validate feature specifications using SpecPulse methodology with AI-optimized templates.
 
-## CRITICAL: File Edit Restrictions
-- **NEVER EDIT**: templates/, scripts/, commands/, .claude/, .gemini/
-- **ONLY EDIT**: specs/, plans/, tasks/, memory/
-- Templates are COPIED to specs/ folder, then edited there
+## CRITICAL: LLM Workflow Rules
+
+**PRIMARY WORKFLOW: Use CLI when available**
+- Prefer `specpulse spec create/update/validate` when those commands exist
+- Use Bash tool ONLY for CLI commands, not for file editing
+- Only use Read/Write/Edit tools for specs/ files when CLI doesn't cover the operation
+
+**PROTECTED DIRECTORIES (NEVER EDIT):**
+- `templates/` - Template files
+- `.specpulse/` - Internal config
+- `specpulse/` - Package code
+- `.claude/` and `.gemini/` - AI configuration
+
+**WORKFLOW:**
+1. Try `specpulse spec create "description"` first
+2. If CLI doesn't exist or doesn't cover your need, use File Operations
+3. Templates are READ from templates/, then specs are CREATED/EDITED in specs/
 
 ## Usage
 ```

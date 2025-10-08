@@ -13,18 +13,24 @@ allowed_tools:
 
 Initialize a new feature following SpecPulse methodology with SDD compliance.
 
-## CRITICAL SECURITY NOTE
-**NEVER edit files in these protected directories:**
-- `templates/` - Template files (spec.md, plan.md, task.md)
-- `scripts/` - Shell scripts (sp-pulse-*.sh)
-- `commands/` - AI command definitions
-- `.claude/` and `.gemini/` - AI configuration files
+## CRITICAL: LLM Workflow Rules
 
-**ONLY create and edit files in:**
-- `specs/` - Feature specifications
-- `plans/` - Implementation plans
-- `tasks/` - Task breakdowns
-- `memory/` - Project context (context.md, decisions.md)
+**PRIMARY WORKFLOW: Use CLI when available**
+- Always prefer `specpulse` CLI commands over direct file operations
+- Use Bash tool ONLY for CLI commands, not for file editing
+- Only use Read/Write/Edit tools when CLI doesn't provide functionality
+
+**PROTECTED DIRECTORIES (NEVER EDIT):**
+- `templates/` - Template files
+- `.specpulse/` - Internal config
+- `specpulse/` - Package code
+- `.claude/` and `.gemini/` - AI configuration
+
+**ALLOWED DIRECT EDITS (When NO CLI exists):**
+- `specs/` - Feature specifications (create/edit spec files)
+- `plans/` - Implementation plans (create/edit plan files)
+- `tasks/` - Task breakdowns (create/edit task files)
+- `memory/` - Project context (update context.md, decisions.md)
 
 ## Usage
 ```
@@ -36,11 +42,13 @@ Initialize a new feature following SpecPulse methodology with SDD compliance.
 When called with `/sp-pulse $ARGUMENTS`, I will:
 
 1. **Validate arguments** and extract feature name + optional ID
-2. **Create feature using SpecPulse CLI**:
-   - `specpulse --no-color context set current.feature "$FEATURE_NAME"`
-   - `specpulse --no-color context set current.feature_id "$FEATURE_ID"`
-   - `specpulse --no-color context set current.branch "$BRANCH_NAME"`
-3. **Create complete feature structure using File Operations**:
+2. **Try CLI first (if feature init exists)**:
+   ```bash
+   specpulse feature init feature-name
+   ```
+   If this succeeds, STOP HERE. CLI handles everything.
+
+3. **If CLI doesn't exist, use File Operations**:
 
    - **Step 1: Determine Feature ID**
      ```
