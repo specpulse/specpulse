@@ -470,7 +470,7 @@ class Validator:
         """Load constitution from project"""
         constitution_path = project_root / "memory" / "constitution.md"
         if constitution_path.exists():
-            self.constitution = constitution_path.read_text()
+            self.constitution = constitution_path.read_text(encoding='utf-8')
             # Extract phase gates from constitution
             self._extract_phase_gates_from_constitution()
 

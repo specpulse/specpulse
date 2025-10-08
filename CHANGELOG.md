@@ -5,6 +5,87 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.3] - 2025-10-08
+
+### 🎯 Major Refactoring: sp-* Commands (27 new commands!)
+
+**Breaking Changes:**
+- ❌ Removed `sp` command alias (use full `specpulse` instead)
+
+**New Command Architecture:**
+Four new CLI modules with 27 sub-commands total:
+
+#### ✨ sp-pulse (5 commands) - Feature Management
+```bash
+specpulse sp-pulse init <name>           # Initialize feature
+specpulse sp-pulse continue <name>       # Switch feature
+specpulse sp-pulse list                  # List features
+specpulse sp-pulse status                # Current status
+specpulse sp-pulse delete <name>         # Delete feature
+```
+
+#### ✨ sp-spec (7 commands) - Specification Management
+```bash
+specpulse sp-spec create "<desc>"        # Create spec
+specpulse sp-spec update <id> "<changes>" # Update spec
+specpulse sp-spec validate [id]          # Validate
+specpulse sp-spec clarify <id>           # Show clarifications
+specpulse sp-spec list                   # List all
+specpulse sp-spec show <id>              # Display
+specpulse sp-spec progress <id>          # Progress %
+```
+
+#### ✨ sp-plan (7 commands) - Implementation Plans
+```bash
+specpulse sp-plan create "<desc>"        # Create plan
+specpulse sp-plan update <id> "<changes>" # Update
+specpulse sp-plan validate [id]          # Validate
+specpulse sp-plan list                   # List all
+specpulse sp-plan show <id>              # Display
+specpulse sp-plan progress <id>          # Progress
+specpulse sp-plan phases <id>            # Show phases
+```
+
+#### ✨ sp-task (8 commands) - Task Management
+```bash
+specpulse sp-task breakdown <plan-id>    # Generate tasks
+specpulse sp-task create "<desc>"        # Manual task
+specpulse sp-task update <id> "<changes>" # Update
+specpulse sp-task start <id>             # Start task
+specpulse sp-task done <id>              # Complete task
+specpulse sp-task list                   # List all
+specpulse sp-task show <id>              # Display
+specpulse sp-task progress               # Overall progress
+```
+
+**Added:**
+- ✅ 2,182 lines of new CLI code (4 modules)
+- ✅ Context-aware operations (auto-detect feature from context.md)
+- ✅ HTML comment-based metadata tracking
+- ✅ Progress calculation and visualization
+- ✅ Git branch integration
+- ✅ Status tracking (draft/in_progress/completed)
+- ✅ Enhanced error messages
+- ✅ Feature ID auto-generation
+- ✅ Updated slash commands to use new CLI
+
+**Improved:**
+- ⚡ Better separation of concerns (modular architecture)
+- 📦 Consistent naming convention (sp-pulse, sp-spec, etc.)
+- 🎯 Enhanced user feedback
+- 🔄 Automatic metadata management
+- ✅ Validation at every level
+
+**Deprecated:**
+- ⚠️ `specpulse feature init` → use `specpulse sp-pulse init`
+- ⚠️ `specpulse spec create` → use `specpulse sp-spec create`
+- ⚠️ Old modules will be removed in v3.0.0
+
+**Technical:**
+- Four new modules: `sp_pulse_commands.py`, `sp_spec_commands.py`, `sp_plan_commands.py`, `sp_task_commands.py`
+- Updated `main.py` with 27 new command handlers
+- CLI-first workflow enforced (as per CLAUDE.md v2.1.2+)
+
 ## [2.1.2] - 2025-10-08
 
 ### 🔧 Quality & Maintenance Release - Project Health Improvements

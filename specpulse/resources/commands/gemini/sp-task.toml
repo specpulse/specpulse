@@ -1,5 +1,9 @@
 description = "Generate and manage task breakdowns with versioning"
 prompt = """
+## CRITICAL: v2.1.3+ Use CLI FIRST
+**PRIMARY**: specpulse sp-task breakdown <plan-id>
+**FALLBACK**: File Operations if CLI fails
+
 Handle the /sp-task command with arguments: {{args}}
 
 First, detect current feature context:

@@ -1,4 +1,4 @@
-# SpecPulse v2.1.2
+# SpecPulse v2.1.3
 
 <div align="center">
 
@@ -26,15 +26,17 @@ SpecPulse is a **CLI-first, AI-enhanced framework** for Specification-Driven Dev
 3. **CLI-Driven**: Pure Python CLI - no scripts, fully cross-platform
 4. **LLM-Friendly**: Generates files optimized for AI assistants to expand
 
-### 🚀 v2.1.2 Highlights
+### 🚀 v2.1.3 Highlights
 
-- ✅ **CLI-First Architecture**: LLM MUST use `specpulse` CLI before file operations
-- ✅ **Protected Directories**: Templates, configs, and package code cannot be modified by LLM
-- ✅ **Enhanced Logging**: File-based logging with rotation (10MB, 5 backups)
-- ✅ **Config Validation**: Automatic validation for `.specpulse/config.yaml`
-- ✅ **Faster Performance**: Template caching with @lru_cache (2-3x faster)
-- ✅ **Better Testing**: Organized into unit/integration/performance folders
-- ✅ **Cross-Platform Unicode**: Emoji auto-detection for Windows/macOS/Linux
+- ✨ **27 New sp-* Commands**: Complete CLI refactoring with dedicated command modules
+- ✅ **sp-pulse**: Feature initialization and management (5 commands)
+- ✅ **sp-spec**: Specification management (7 commands)
+- ✅ **sp-plan**: Implementation plan management (7 commands)
+- ✅ **sp-task**: Task management and execution (8 commands)
+- ✅ **Context-Aware**: Auto-detect current feature from context.md or git branch
+- ✅ **Metadata Tracking**: Automatic HTML comment-based tracking
+- ✅ **Progress Visualization**: Built-in progress calculation
+- ⚠️ **Breaking**: Removed `sp` alias (use full `specpulse` command)
 
 ---
 
@@ -45,7 +47,7 @@ SpecPulse is a **CLI-first, AI-enhanced framework** for Specification-Driven Dev
 pip install specpulse
 
 # Or install specific version
-pip install specpulse==2.1.2
+pip install specpulse==2.1.3
 
 # Or upgrade from previous version
 pip install --upgrade specpulse
@@ -71,27 +73,29 @@ cd existing-project
 specpulse init --here --ai claude
 ```
 
-### 2. Start a Feature
+### 2. Start a Feature (NEW in v2.1.3)
 
 ```bash
 # Initialize feature structure
-specpulse feature init user-authentication
+specpulse sp-pulse init user-authentication
 
 # This creates:
 # - specs/001-user-authentication/
 # - plans/001-user-authentication/
 # - tasks/001-user-authentication/
+# - Git branch: 001-user-authentication
 # - Updates memory/context.md
 ```
 
-### 3. Create Specification
+### 3. Create Specification (NEW in v2.1.3)
 
 ```bash
-# Create spec (LLM will expand this)
-specpulse spec create "OAuth2 login with JWT tokens"
+# Create spec template (LLM will expand this)
+specpulse sp-spec create "OAuth2 login with JWT tokens"
 
 # Creates: specs/001-user-authentication/spec-001.md
-# With template and LLM expansion markers
+# With template, metadata, and LLM expansion markers
+# LLM then reads and expands with actual requirements
 ```
 
 ### 4. Work in Claude Code or Gemini CLI
@@ -155,84 +159,80 @@ LLM must follow this order:
 2. ✅ **SECOND**: Use File Operations (Read/Write/Edit) if CLI doesn't exist
 3. ❌ **NEVER**: Edit templates/, .specpulse/, specpulse/, .claude/, .gemini/
 
-### Feature Management
+### Feature Management (v2.1.3)
 
 ```bash
-# Terminal use
-specpulse feature init <name>           # Initialize new feature
-specpulse feature continue <name>       # Switch to existing feature
+# NEW: sp-pulse commands (5 total)
+specpulse sp-pulse init <name>          # Initialize new feature
+specpulse sp-pulse continue <name>      # Switch to existing feature
+specpulse sp-pulse list                 # List all features
+specpulse sp-pulse status               # Show current feature status
+specpulse sp-pulse delete <name>        # Delete feature (with confirmation)
 
-# Inside Claude/Gemini (v2.1.2+ workflow)
+# Inside Claude/Gemini (v2.1.3+ workflow)
 /sp-pulse user-authentication
-# Step 1 (LLM MUST try first):
-#   Bash: specpulse feature init user-authentication
-# Step 2 (if CLI doesn't exist):
-#   Use mkdir, Write, Edit tools to create structure
+# Runs: specpulse sp-pulse init user-authentication
+# Creates structure, branch, updates context
 ```
 
-### Specification Management
+### Specification Management (v2.1.3)
 
 ```bash
-# Terminal use
-specpulse spec create <description>     # Create specification
-specpulse spec update <id> <desc>       # Update specification
-specpulse spec validate                 # Validate specifications
-specpulse spec progress <feature-id>    # Show completion progress
+# NEW: sp-spec commands (7 total)
+specpulse sp-spec create "<desc>"       # Create specification template
+specpulse sp-spec update <id> "<changes>" # Update specification
+specpulse sp-spec validate [id]         # Validate spec(s)
+specpulse sp-spec clarify <id>          # Show clarification markers
+specpulse sp-spec list                  # List all specifications
+specpulse sp-spec show <id>             # Display spec content
+specpulse sp-spec progress <id>         # Show completion progress
 
-# Inside Claude/Gemini (v2.1.2+ workflow)
+# Inside Claude/Gemini (v2.1.3+ workflow)
 /sp-spec OAuth2 login with JWT
-# Step 1 (LLM MUST try first):
-#   Bash: specpulse spec create "OAuth2 login with JWT"
-# Step 2 (if CLI doesn't exist):
-#   Read: templates/spec.md
-#   Write: specs/001-feature/spec-001.md
-#   Edit: specs/001-feature/spec-001.md (expand)
+# Step 1: Runs CLI to create template
+#   specpulse sp-spec create "OAuth2 login with JWT"
+# Step 2: LLM expands template with actual content
+#   Read: specs/001-feature/spec-001.md
+#   Edit: Add requirements, user stories, etc.
 ```
 
-### Plan Management
+### Plan Management (v2.1.3)
 
 ```bash
-# Terminal use
-specpulse plan create <description>     # Create implementation plan
-specpulse plan update <id> <desc>       # Update plan
+# NEW: sp-plan commands (7 total)
+specpulse sp-plan create "<desc>"       # Create plan template
+specpulse sp-plan update <id> "<changes>" # Update plan
+specpulse sp-plan validate [id]         # Validate plan(s)
+specpulse sp-plan list                  # List all plans
+specpulse sp-plan show <id>             # Display plan content
+specpulse sp-plan progress <id>         # Show completion progress
+specpulse sp-plan phases <id>           # Show implementation phases
 
-# Inside Claude/Gemini (v2.1.2+ workflow)
+# Inside Claude/Gemini (v2.1.3+ workflow)
 /sp-plan generate
-# Step 1 (LLM MUST try first):
-#   Bash: specpulse plan create "Implementation plan"
-# Step 2 (if CLI doesn't exist):
-#   Read: templates/plan.md
-#   Write: plans/001-feature/plan-001.md
+# Step 1: Runs CLI to create template
+#   specpulse sp-plan create "Implementation plan"
+# Step 2: LLM expands with architecture, tech stack, phases
 ```
 
-### Task Management
+### Task Management (v2.1.3)
 
 ```bash
-# Terminal use
-specpulse task create <description>     # Create task
-specpulse task breakdown <plan-id>      # Generate tasks from plan
-specpulse task update <id> <desc>       # Update task
+# NEW: sp-task commands (8 total)
+specpulse sp-task breakdown <plan-id>   # Create task template from plan
+specpulse sp-task create "<desc>"       # Create manual task
+specpulse sp-task update <id> "<changes>" # Update task
+specpulse sp-task start <id>            # Mark task as started
+specpulse sp-task done <id>             # Mark task as completed
+specpulse sp-task list                  # List all tasks
+specpulse sp-task show <id>             # Display task content
+specpulse sp-task progress              # Show overall progress
 
-# Inside Claude/Gemini (v2.1.2+ workflow)
+# Inside Claude/Gemini (v2.1.3+ workflow)
 /sp-task breakdown
-# Step 1 (LLM MUST try first):
-#   Bash: specpulse task breakdown 001
-# Step 2 (if CLI doesn't exist):
-#   Read: templates/task.md
-#   Write: tasks/001-feature/tasks-001.md
-```
-
-### Execution Tracking
-
-```bash
-# Terminal use
-specpulse execute start <task-id>       # Mark task as started
-specpulse execute done <task-id>        # Mark task as completed
-
-# Inside Claude/Gemini (v2.1.2+ workflow)
-/sp-execute
-# LLM reads tasks, executes them, updates status via Edit tool
-# No CLI for execute yet - uses File Operations
+# Step 1: Runs CLI to create template
+#   specpulse sp-task breakdown 001
+# Step 2: LLM breaks down plan into detailed tasks
 ```
 
 ### Project Management (Terminal Only)
@@ -310,36 +310,50 @@ specpulse ai summary                    # Show workflow summary
 
 ---
 
-## 📋 Complete Workflow Example
+## 📋 Complete Workflow Example (v2.1.3)
 
 ```bash
 # 1. Initialize project
 specpulse init my-app --ai claude
 
-# 2. Start feature
-specpulse feature init user-authentication
+# 2. Start feature (NEW sp-pulse)
+specpulse sp-pulse init user-authentication
 
-# 3. Create specification
-specpulse spec create "OAuth2 login with JWT tokens and 2FA"
+# 3. Create specification template (NEW sp-spec)
+specpulse sp-spec create "OAuth2 login with JWT tokens and 2FA"
 
-# 4. LLM expands spec (in Claude Code: /sp-spec validate)
+# 4. LLM expands spec (in Claude Code)
+#    - Reads spec-001.md
+#    - Adds requirements, user stories, acceptance criteria
+#    - Edits spec-001.md with full content
 
-# 5. Generate plan
-specpulse plan create "Implementation roadmap for OAuth2"
+# 5. Validate specification
+specpulse sp-spec validate 001
 
-# 6. LLM generates plan (in Claude Code: /sp-plan validate)
+# 6. Generate plan template (NEW sp-plan)
+specpulse sp-plan create "Implementation roadmap for OAuth2"
 
-# 7. Break down tasks
-specpulse task breakdown 001
+# 7. LLM expands plan (in Claude Code)
+#    - Reads plan-001.md
+#    - Adds architecture, tech stack, phases
+#    - Edits plan-001.md with full plan
 
-# 8. LLM creates tasks (in Claude Code: /sp-task validate)
+# 8. Break down to tasks template (NEW sp-task)
+specpulse sp-task breakdown 001
 
-# 9. Execute tasks
-specpulse execute start 001
+# 9. LLM creates task details (in Claude Code)
+#    - Reads tasks-001.md
+#    - Breaks down each phase into actionable tasks
+#    - Edits tasks-001.md with task list
+
+# 10. Execute tasks (NEW sp-task)
+specpulse sp-task start 001
 # [Implement task]
-specpulse execute done 001
+specpulse sp-task done 001
+specpulse sp-task progress
+# Shows: 33% complete
 
-# 10. Repeat for all tasks
+# 11. Repeat for all tasks
 ```
 
 ---
@@ -366,10 +380,12 @@ my-project/
 
 **Note**: No `scripts/` folder! v2.1.0+ uses pure Python CLI.
 
-**v2.1.2 Additions**:
+**v2.1.3 Additions**:
 - `.specpulse/logs/` - Application logs with rotation
 - Enhanced config validation
-- CLI-first workflow enforcement
+- 27 new sp-* CLI commands
+- Metadata tracking in all files
+- Context-aware operations
 
 ---
 
@@ -396,7 +412,33 @@ specpulse --version
 
 ---
 
-## 🔄 Migration to v2.1.2
+## 🔄 Migration to v2.1.3
+
+### From v2.1.2
+
+```bash
+# 1. Upgrade SpecPulse
+pip install --upgrade specpulse
+
+# 2. Update any scripts using 'sp' alias
+# Change 'sp' to 'specpulse'
+
+# 3. That's it!
+```
+
+**What's New in v2.1.3:**
+- ✨ 27 new sp-* commands (sp-pulse, sp-spec, sp-plan, sp-task)
+- ✅ Context-aware operations (auto-detect feature)
+- ✅ Metadata tracking (HTML comments)
+- ✅ Progress visualization
+- ✅ Feature switching
+- ⚠️ Breaking: Removed `sp` alias
+
+**Deprecated Commands:**
+- `specpulse feature init` → use `specpulse sp-pulse init`
+- `specpulse spec create` → use `specpulse sp-spec create`
+
+See [MIGRATION_v2.1.3.md](MIGRATION_v2.1.3.md) for details.
 
 ### From v2.1.0 or v2.1.1
 
@@ -404,18 +446,8 @@ specpulse --version
 # 1. Upgrade SpecPulse
 pip install --upgrade specpulse
 
-# 2. That's it! No breaking changes
+# 2. Same as above - update 'sp' alias
 ```
-
-**What's New in v2.1.2:**
-- ✅ CLI-first workflow (LLM uses CLI before file operations)
-- ✅ Logging infrastructure (automatic)
-- ✅ Config validation (automatic)
-- ✅ Template caching (automatic performance boost)
-- ✅ Better test organization (transparent to users)
-- ✅ Enhanced error messages
-
-**No Breaking Changes** - Direct upgrade compatible
 
 ### From v2.0.0
 
@@ -557,11 +589,12 @@ Special thanks to:
 
 ---
 
-**🎉 Start building better software today with SpecPulse v2.1.2!**
+**🎉 Start building better software today with SpecPulse v2.1.3!**
 
 ```bash
 pip install specpulse
 specpulse init my-project --ai claude
+specpulse sp-pulse init my-feature
 ```
 
 ---
@@ -570,6 +603,6 @@ specpulse init my-project --ai claude
 
 **Made with ❤️ for developers who value specifications**
 
-[⬆ Back to Top](#specpulse-v212)
+[⬆ Back to Top](#specpulse-v213)
 
 </div>

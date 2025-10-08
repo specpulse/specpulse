@@ -4,6 +4,9 @@ description = "Execute tasks continuously without stopping - complete all pendin
 
 [command.prompt]
 text = """
+## CRITICAL: v2.1.3+ Use CLI for task tracking
+**Use**: specpulse sp-task start/done for status updates
+
 Execute tasks continuously from the task list without stopping between tasks.
 
 Arguments: {{args}}

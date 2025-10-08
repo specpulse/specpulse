@@ -1,46 +1,37 @@
-# SpecPulse Custom Commands System
+# SpecPulse Custom Commands System (v2.1.3)
 
-## 📁 Directory Structure
+## 📁 Directory Structure (v2.1.3)
 
 ```
 commands/
 ├── README.md                     # This file - system documentation
-├── claude/                       # Claude Code commands
-│   ├── workflow/               # Workflow management commands
-│   │   ├── sp-init.md        # Initialize new feature
-│   │   ├── sp-spec.md         # Specification creation
-│   │   ├── sp-plan.md        # Implementation planning
-│   │   ├── sp-task.md        # Task breakdown
-│   │   ├── sp-execute.md     # Task execution
-│   │   ├── sp-status.md      # Progress tracking
-│   │   ├── sp-continue.md    # Resume work
-│   │   └── sp-summary.md     # Generate summaries
-│   ├── analysis/               # Analysis and decomposition commands
-│   │   ├── sp-decompose.md   # Feature decomposition
-│   │   ├── sp-analyze.md     # Code analysis
-│   │   └── sp-validate.md    # Validation and quality
+├── claude/                       # Claude Code commands (.md format)
+│   ├── sp-pulse.md             # Feature initialization (v2.1.3 CLI)
+│   ├── sp-spec.md              # Specification management (v2.1.3 CLI)
+│   ├── sp-plan.md              # Implementation planning (v2.1.3 CLI)
+│   ├── sp-task.md              # Task management (v2.1.3 CLI)
+│   ├── sp-execute.md           # Continuous execution
+│   ├── sp-status.md            # Progress tracking
+│   ├── sp-continue.md          # Resume work
+│   ├── sp-decompose.md         # Feature decomposition
+│   ├── sp-validate.md          # Validation
+│   ├── sp-clarify.md           # Clarifications
 │   └── utility/                # Utility commands
-│       ├── sp-backup.md      # Backup operations
-│       ├── sp-restore.md    # Restore operations
-│       └── sp-clean.md       # Cleanup operations
-└── gemini/                       # Gemini CLI commands
-    ├── workflow/
-    │   ├── sp-init.toml
-    │   ├── sp-spec.toml
-    │   ├── sp-plan.toml
-    │   ├── sp-task.toml
-    │   ├── sp-execute.toml
-    │   ├── sp-status.toml
-    │   ├── sp-continue.toml
-    │   └── sp-summary.toml
-    ├── analysis/
-    │   ├── sp-decompose.toml
-    │   ├── sp-analyze.toml
-    │   └── sp-validate.toml
-    └── utility/
-        ├── sp-backup.toml
-        ├── sp-restore.toml
-        └── sp-clean.toml
+└── gemini/                       # Gemini CLI commands (.toml format)
+    ├── sp-pulse.toml           # Same as Claude (TOML format)
+    ├── sp-spec.toml            # Same as Claude (TOML format)
+    ├── sp-plan.toml            # Same as Claude (TOML format)
+    ├── sp-task.toml            # Same as Claude (TOML format)
+    ├── sp-execute.toml         # Same as Claude (TOML format)
+    ├── sp-status.toml          # Same as Claude (TOML format)
+    ├── sp-continue.toml        # Same as Claude (TOML format)
+    ├── sp-decompose.toml       # Same as Claude (TOML format)
+    ├── sp-validate.toml        # Same as Claude (TOML format)
+    ├── sp-clarify.toml         # Same as Claude (TOML format)
+    └── utility/                # Utility commands
+
+Note: Claude uses Markdown (.md), Gemini uses TOML (.toml)
+Both formats contain the SAME instructions and workflows!
 ```
 
 ## 🚀 Command Categories
@@ -81,29 +72,51 @@ commands/
 | `/sp-continue` | Resume work | `specpulse context get` |
 
 ### Analysis Commands
-| Command | Purpose | CLI Integration |
-|---------|---------|-----------------|
-| `/sp-decompose` | Decompose features | `specpulse validate decomposition` |
-| `/sp-analyze` | Analyze code | `specpulse doctor --analyze` |
-| `/sp-validate` | Quality checks | `specpulse validate --fix` |
+| Command | Purpose | CLI Integration (v2.1.3) |
+|---------|---------|--------------------------|
+| `/sp-decompose` | Decompose features | `specpulse decompose <spec-id>` |
+| `/sp-validate` | Quality checks | `specpulse sp-spec validate` |
+| `/sp-clarify` | Address clarifications | `specpulse sp-spec clarify <id>` |
 
-## 🔧 Integration Guidelines
+## 🔧 Integration Guidelines (v2.1.3+)
 
 ### Custom Commands CLI Integration
 ```bash
-# Example: sp-spec command structure
-# Instead of: bash scripts/sp-pulse-spec.sh
-# Use: specpulse --no-color validate spec --verbose
+# v2.1.3: New sp-* command structure
+# Claude/Gemini slash commands now call:
+
+/sp-pulse user-auth
+  → specpulse sp-pulse init user-auth
+  → Creates structure
+  → LLM continues with /sp-spec
+
+/sp-spec OAuth2 authentication
+  → specpulse sp-spec create "OAuth2 authentication"
+  → Creates template
+  → LLM reads and expands with requirements
+
+/sp-plan
+  → specpulse sp-plan create "Implementation plan"
+  → Creates template
+  → LLM reads and expands with architecture
+
+/sp-task
+  → specpulse sp-task breakdown 001
+  → Creates template
+  → LLM reads plan and creates task breakdown
 ```
 
 ### Memory Integration
 ```bash
-# Set current feature context
-specpulse context set current.feature "user-auth"
-specpulse context set current.feature_id "001"
+# Context is now auto-managed by sp-pulse commands
+# No manual context setting needed!
 
-# Get context for AI
-specpulse context get current.feature
+# Context auto-updated by:
+specpulse sp-pulse init <name>      # Sets active feature
+specpulse sp-pulse continue <name>  # Switches feature
+
+# LLM can read context:
+cat memory/context.md
 ```
 
 ## 📝 Development Guidelines

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "specpulse"
 dynamic = ["version"]
-description = "SpecPulse v2.1.0 - AI-Enhanced Specification-Driven Development Framework"
+description = "SpecPulse v2.1.3 - AI-Enhanced Specification-Driven Development Framework"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
@@ -61,7 +61,6 @@ dev = [
 
 [project.scripts]
 specpulse = "specpulse.cli.main:main"
-sp = "specpulse.cli.main:main"
 
 [project.urls]
 Homepage = "https://github.com/specpulse"
@@ -79,18 +78,16 @@ packages = [
     "specpulse.cli",
     "specpulse.core",
     "specpulse.utils",
+    "specpulse.models",
     "specpulse.resources",
     "specpulse.resources.commands",
     "specpulse.resources.commands.claude",
     "specpulse.resources.commands.gemini",
     "specpulse.resources.memory",
-    "specpulse.resources.templates",
 ]
 
 [tool.setuptools.package-data]
 specpulse = [
-    "resources/templates/*.md",
-    "resources/templates/**/*.md",
     "resources/memory/*.md",
     "resources/commands/claude/*.md",
     "resources/commands/claude/**/*.md",

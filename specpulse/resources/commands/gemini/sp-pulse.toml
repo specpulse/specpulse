@@ -2,12 +2,12 @@ description = "Initialize a new feature with SpecPulse framework (SDD compliant)
 prompt = """
 Initialize a new SpecPulse feature following Specification-Driven Development (SDD) principles.
 
-## CRITICAL: LLM Workflow Rules
+## CRITICAL: LLM Workflow Rules (v2.1.3+)
 
-**PRIMARY WORKFLOW: Use CLI when available**
-- Always prefer `specpulse feature init` CLI command first
-- Use Bash tool ONLY for CLI commands, not for file editing
-- Only use Read/Write/Edit tools when CLI doesn't provide functionality
+**PRIMARY WORKFLOW: Use CLI FIRST**
+- Use `specpulse sp-pulse init <feature-name>` as PRIMARY method
+- CLI handles metadata, validation, and file structure automatically
+- Use File Operations ONLY if CLI fails or doesn't exist
 
 **PROTECTED DIRECTORIES (NEVER EDIT):**
 - templates/ - Template files
@@ -30,12 +30,13 @@ When called, perform the following steps:
    - Optional ID: second argument (if provided)
    - Sanitize feature name (alphanumeric, hyphens only)
 
-2. **Try CLI first (if feature init exists)**:
-   !{bash specpulse feature init {{feature_name}}}
+2. **Use CLI Command (PRIMARY - v2.1.3+)**:
+   !{bash specpulse sp-pulse init {{feature_name}}}
 
-   If this succeeds, STOP HERE. CLI handles everything.
+   This is the PRIMARY method. Use this FIRST.
+   CLI creates directories, updates context, creates git branch.
 
-3. **If CLI doesn't exist, use File Operations**:
+3. **If CLI fails or doesn't exist, use File Operations (FALLBACK)**:
    - Generate feature ID (001, 002, etc.) or use provided ID
    - Create sanitized branch name: ID-feature-name
    - Create directories: specs/ID-feature/, plans/ID-feature/, tasks/ID-feature/

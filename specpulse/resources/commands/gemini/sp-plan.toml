@@ -1,5 +1,9 @@
 description = "Generate or validate implementation plans with versioning"
 prompt = """
+## CRITICAL: v2.1.3+ Use CLI FIRST
+**PRIMARY**: specpulse sp-plan create "description"
+**FALLBACK**: File Operations if CLI fails
+
 Handle the /sp-plan command with arguments: {{args}}
 
 First, detect current feature context:

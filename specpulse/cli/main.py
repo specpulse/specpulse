@@ -32,6 +32,12 @@ from .feature_commands import FeatureCommands
 from .spec_commands import SpecCommands
 from .plan_task_commands import PlanCommands, TaskCommands, ExecuteCommands
 
+# v2.1.3: Import refactored sp-* commands
+from .sp_pulse_commands import SpPulseCommands
+from .sp_spec_commands import SpSpecCommands
+from .sp_plan_commands import SpPlanCommands
+from .sp_task_commands import SpTaskCommands
+
 
 class SpecPulseCLI:
     def __init__(self, no_color: bool = False, verbose: bool = False):
@@ -54,6 +60,12 @@ class SpecPulseCLI:
                 self.plan_commands = PlanCommands(self.console, project_root)
                 self.task_commands = TaskCommands(self.console, project_root)
                 self.execute_commands = ExecuteCommands(self.console, project_root)
+
+                # v2.1.3: Initialize sp-* command handlers
+                self.sp_pulse_commands = SpPulseCommands(self.console, project_root)
+                self.sp_spec_commands = SpSpecCommands(self.console, project_root)
+                self.sp_plan_commands = SpPlanCommands(self.console, project_root)
+                self.sp_task_commands = SpTaskCommands(self.console, project_root)
             else:
                 self.template_manager = None
                 self.memory_manager = None
@@ -62,6 +74,10 @@ class SpecPulseCLI:
                 self.plan_commands = None
                 self.task_commands = None
                 self.execute_commands = None
+                self.sp_pulse_commands = None
+                self.sp_spec_commands = None
+                self.sp_plan_commands = None
+                self.sp_task_commands = None
 
             # Check for updates (non-blocking)
             self._check_for_updates()
@@ -3465,6 +3481,151 @@ Need help? Visit https://github.com/specpulse/specpulse
 
         ai_summary_parser = ai_subparsers.add_parser("summary", help="Show AI workflow summary")
 
+        # sp-pulse Command (v2.1.3)
+        sp_pulse_parser = subparsers.add_parser("sp-pulse", help="Feature initialization and management")
+        sp_pulse_subparsers = sp_pulse_parser.add_subparsers(dest="sp_pulse_action", help="sp-pulse actions")
+
+        # sp-pulse init
+        sp_pulse_init_parser = sp_pulse_subparsers.add_parser("init", help="Initialize new feature")
+        sp_pulse_init_parser.add_argument("feature_name", help="Feature name (e.g., user-authentication)")
+        sp_pulse_init_parser.add_argument("--feature-id", help="Optional feature ID (auto-generated if not provided)")
+
+        # sp-pulse continue
+        sp_pulse_continue_parser = sp_pulse_subparsers.add_parser("continue", help="Switch to existing feature")
+        sp_pulse_continue_parser.add_argument("feature_name", help="Feature name or ID")
+
+        # sp-pulse list
+        sp_pulse_list_parser = sp_pulse_subparsers.add_parser("list", help="List all features")
+
+        # sp-pulse status
+        sp_pulse_status_parser = sp_pulse_subparsers.add_parser("status", help="Show current feature status")
+
+        # sp-pulse delete
+        sp_pulse_delete_parser = sp_pulse_subparsers.add_parser("delete", help="Delete feature")
+        sp_pulse_delete_parser.add_argument("feature_name", help="Feature name or ID")
+        sp_pulse_delete_parser.add_argument("--force", action="store_true", help="Skip confirmation prompt")
+
+        # sp-spec Command (v2.1.3)
+        sp_spec_parser = subparsers.add_parser("sp-spec", help="Specification management")
+        sp_spec_subparsers = sp_spec_parser.add_subparsers(dest="sp_spec_action", help="sp-spec actions")
+
+        # sp-spec create
+        sp_spec_create_parser = sp_spec_subparsers.add_parser("create", help="Create new specification")
+        sp_spec_create_parser.add_argument("description", help="Specification description")
+        sp_spec_create_parser.add_argument("--feature", help="Feature name or ID (auto-detects if not provided)")
+
+        # sp-spec update
+        sp_spec_update_parser = sp_spec_subparsers.add_parser("update", help="Update existing specification")
+        sp_spec_update_parser.add_argument("spec_id", help="Specification ID (e.g., 001)")
+        sp_spec_update_parser.add_argument("changes", help="Description of changes")
+        sp_spec_update_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-spec validate
+        sp_spec_validate_parser = sp_spec_subparsers.add_parser("validate", help="Validate specification(s)")
+        sp_spec_validate_parser.add_argument("spec_id", nargs="?", help="Specification ID (validates all if not provided)")
+        sp_spec_validate_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-spec clarify
+        sp_spec_clarify_parser = sp_spec_subparsers.add_parser("clarify", help="Show clarification markers")
+        sp_spec_clarify_parser.add_argument("spec_id", help="Specification ID")
+        sp_spec_clarify_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-spec list
+        sp_spec_list_parser = sp_spec_subparsers.add_parser("list", help="List all specifications")
+        sp_spec_list_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-spec show
+        sp_spec_show_parser = sp_spec_subparsers.add_parser("show", help="Display specification content")
+        sp_spec_show_parser.add_argument("spec_id", help="Specification ID")
+        sp_spec_show_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-spec progress
+        sp_spec_progress_parser = sp_spec_subparsers.add_parser("progress", help="Show completion progress")
+        sp_spec_progress_parser.add_argument("spec_id", help="Specification ID")
+        sp_spec_progress_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-plan Command (v2.1.3)
+        sp_plan_parser = subparsers.add_parser("sp-plan", help="Implementation plan management")
+        sp_plan_subparsers = sp_plan_parser.add_subparsers(dest="sp_plan_action", help="sp-plan actions")
+
+        # sp-plan create
+        sp_plan_create_parser = sp_plan_subparsers.add_parser("create", help="Create implementation plan")
+        sp_plan_create_parser.add_argument("description", help="Plan description")
+        sp_plan_create_parser.add_argument("--feature", help="Feature name or ID (auto-detects if not provided)")
+
+        # sp-plan update
+        sp_plan_update_parser = sp_plan_subparsers.add_parser("update", help="Update existing plan")
+        sp_plan_update_parser.add_argument("plan_id", help="Plan ID (e.g., 001)")
+        sp_plan_update_parser.add_argument("changes", help="Description of changes")
+        sp_plan_update_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-plan validate
+        sp_plan_validate_parser = sp_plan_subparsers.add_parser("validate", help="Validate plan(s)")
+        sp_plan_validate_parser.add_argument("plan_id", nargs="?", help="Plan ID (validates all if not provided)")
+        sp_plan_validate_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-plan list
+        sp_plan_list_parser = sp_plan_subparsers.add_parser("list", help="List all plans")
+        sp_plan_list_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-plan show
+        sp_plan_show_parser = sp_plan_subparsers.add_parser("show", help="Display plan content")
+        sp_plan_show_parser.add_argument("plan_id", help="Plan ID")
+        sp_plan_show_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-plan progress
+        sp_plan_progress_parser = sp_plan_subparsers.add_parser("progress", help="Show completion progress")
+        sp_plan_progress_parser.add_argument("plan_id", help="Plan ID")
+        sp_plan_progress_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-plan phases
+        sp_plan_phases_parser = sp_plan_subparsers.add_parser("phases", help="Show implementation phases")
+        sp_plan_phases_parser.add_argument("plan_id", help="Plan ID")
+        sp_plan_phases_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-task Command (v2.1.3)
+        sp_task_parser = subparsers.add_parser("sp-task", help="Task management and execution")
+        sp_task_subparsers = sp_task_parser.add_subparsers(dest="sp_task_action", help="sp-task actions")
+
+        # sp-task breakdown
+        sp_task_breakdown_parser = sp_task_subparsers.add_parser("breakdown", help="Generate tasks from plan")
+        sp_task_breakdown_parser.add_argument("plan_id", help="Plan ID to break down")
+        sp_task_breakdown_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-task create
+        sp_task_create_parser = sp_task_subparsers.add_parser("create", help="Create manual task")
+        sp_task_create_parser.add_argument("description", help="Task description")
+        sp_task_create_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-task update
+        sp_task_update_parser = sp_task_subparsers.add_parser("update", help="Update task")
+        sp_task_update_parser.add_argument("task_id", help="Task ID (e.g., 001)")
+        sp_task_update_parser.add_argument("changes", help="Description of changes")
+        sp_task_update_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-task start
+        sp_task_start_parser = sp_task_subparsers.add_parser("start", help="Mark task as started")
+        sp_task_start_parser.add_argument("task_id", help="Task ID")
+        sp_task_start_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-task done
+        sp_task_done_parser = sp_task_subparsers.add_parser("done", help="Mark task as completed")
+        sp_task_done_parser.add_argument("task_id", help="Task ID")
+        sp_task_done_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-task list
+        sp_task_list_parser = sp_task_subparsers.add_parser("list", help="List all tasks")
+        sp_task_list_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-task show
+        sp_task_show_parser = sp_task_subparsers.add_parser("show", help="Display task content")
+        sp_task_show_parser.add_argument("task_id", help="Task ID")
+        sp_task_show_parser.add_argument("--feature", help="Feature name or ID")
+
+        # sp-task progress
+        sp_task_progress_parser = sp_task_subparsers.add_parser("progress", help="Show overall task progress")
+        sp_task_progress_parser.add_argument("--feature", help="Feature name or ID")
+
         # Global arguments
         parser.add_argument("--version", action="version", version=f"SpecPulse {__version__}")
         parser.add_argument("--no-color", action="store_true", help="Disable colored output")
@@ -3580,6 +3741,207 @@ Need help? Visit https://github.com/specpulse/specpulse
                 sys.exit(1)
         elif args.command == "ai":
             cli.handle_ai_command(args)
+        elif args.command == "sp-pulse":
+            if args.sp_pulse_action == "init":
+                if cli.sp_pulse_commands:
+                    cli.sp_pulse_commands.init_feature(args.feature_name, args.feature_id)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project. Run: specpulse init <project>")
+                    sys.exit(1)
+            elif args.sp_pulse_action == "continue":
+                if cli.sp_pulse_commands:
+                    cli.sp_pulse_commands.continue_feature(args.feature_name)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_pulse_action == "list":
+                if cli.sp_pulse_commands:
+                    cli.sp_pulse_commands.list_features()
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_pulse_action == "status":
+                if cli.sp_pulse_commands:
+                    cli.sp_pulse_commands.status()
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_pulse_action == "delete":
+                if cli.sp_pulse_commands:
+                    cli.sp_pulse_commands.delete_feature(args.feature_name, args.force)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            else:
+                sp_pulse_parser.print_help()
+        elif args.command == "sp-spec":
+            if args.sp_spec_action == "create":
+                if cli.sp_spec_commands:
+                    cli.sp_spec_commands.create(args.description, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project. Run: specpulse init <project>")
+                    sys.exit(1)
+            elif args.sp_spec_action == "update":
+                if cli.sp_spec_commands:
+                    cli.sp_spec_commands.update(args.spec_id, args.changes, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_spec_action == "validate":
+                if cli.sp_spec_commands:
+                    cli.sp_spec_commands.validate(args.spec_id, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_spec_action == "clarify":
+                if cli.sp_spec_commands:
+                    cli.sp_spec_commands.clarify(args.spec_id, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_spec_action == "list":
+                if cli.sp_spec_commands:
+                    cli.sp_spec_commands.list_specs(args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_spec_action == "show":
+                if cli.sp_spec_commands:
+                    cli.sp_spec_commands.show(args.spec_id, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_spec_action == "progress":
+                if cli.sp_spec_commands:
+                    cli.sp_spec_commands.progress(args.spec_id, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            else:
+                sp_spec_parser.print_help()
+        elif args.command == "sp-plan":
+            if args.sp_plan_action == "create":
+                if cli.sp_plan_commands:
+                    cli.sp_plan_commands.create(args.description, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_plan_action == "update":
+                if cli.sp_plan_commands:
+                    cli.sp_plan_commands.update(args.plan_id, args.changes, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_plan_action == "validate":
+                if cli.sp_plan_commands:
+                    cli.sp_plan_commands.validate(args.plan_id, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_plan_action == "list":
+                if cli.sp_plan_commands:
+                    cli.sp_plan_commands.list_plans(args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_plan_action == "show":
+                if cli.sp_plan_commands:
+                    cli.sp_plan_commands.show(args.plan_id, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_plan_action == "progress":
+                if cli.sp_plan_commands:
+                    cli.sp_plan_commands.progress(args.plan_id, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_plan_action == "phases":
+                if cli.sp_plan_commands:
+                    cli.sp_plan_commands.phases(args.plan_id, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            else:
+                sp_plan_parser.print_help()
+        elif args.command == "sp-task":
+            if args.sp_task_action == "breakdown":
+                if cli.sp_task_commands:
+                    cli.sp_task_commands.breakdown(args.plan_id, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_task_action == "create":
+                if cli.sp_task_commands:
+                    cli.sp_task_commands.create(args.description, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_task_action == "update":
+                if cli.sp_task_commands:
+                    cli.sp_task_commands.update(args.task_id, args.changes, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_task_action == "start":
+                if cli.sp_task_commands:
+                    cli.sp_task_commands.start(args.task_id, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_task_action == "done":
+                if cli.sp_task_commands:
+                    cli.sp_task_commands.done(args.task_id, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_task_action == "list":
+                if cli.sp_task_commands:
+                    cli.sp_task_commands.list_tasks(args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_task_action == "show":
+                if cli.sp_task_commands:
+                    cli.sp_task_commands.show(args.task_id, args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            elif args.sp_task_action == "progress":
+                if cli.sp_task_commands:
+                    cli.sp_task_commands.progress(args.feature)
+                else:
+                    console = Console(no_color=getattr(args, 'no_color', False))
+                    console.error("Not a SpecPulse project.")
+                    sys.exit(1)
+            else:
+                sp_task_parser.print_help()
         elif args.command is None:
             # Show beautiful banner and help when no command
             console = Console()

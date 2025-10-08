@@ -26,7 +26,7 @@ setup(
     version=get_version(),
     author="SpecPulse",
     author_email="",
-    description="SpecPulse v2.1.2 - AI-Enhanced Specification-Driven Development Framework",
+    description="SpecPulse v2.1.3 - AI-Enhanced Specification-Driven Development Framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/specpulse",
@@ -71,12 +71,11 @@ setup(
     include_package_data=True,
     package_data={
         "specpulse": [
-            "resources/templates/*.md",
             "resources/memory/*.md",
-            "resources/scripts/*.sh",
-            "resources/scripts/*.ps1",
             "resources/commands/claude/*.md",
             "resources/commands/gemini/*.toml",
+            "resources/validation_rules.yaml",
+            "resources/validation_examples.yaml",
         ],
     },
     zip_safe=False,
