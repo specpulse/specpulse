@@ -1,0 +1,37 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.7, pytest-7.3.1, pluggy-1.5.0
+rootdir: C:\Sync\Codebox\__PIP__\SpecPulse
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.9.0, Faker-19.13.0, asyncio-0.15.1, cov-4.1.0, mock-3.10.0
+collected 615 items
+
+tests\test_all.py .......................F......FF..F..F                 [  6%]
+tests\test_checkpoints.py ............                                   [  8%]
+tests\test_cli.py ..F.F................                                  [ 11%]
+tests\test_cli_fixed.py .........F.F..FF.F                               [ 14%]
+tests\test_complete_100.py .F.FFFFF..F......F.F.F........FF.FF........FF [ 21%]
+..........FFF.F                                                          [ 24%]
+tests\test_complete_coverage.py .F..F..F.FF...F..F.FF.FF                 [ 28%]
+tests\test_console.py .......F.................                          [ 32%]
+tests\test_coverage_100.py .FFFFFFFFFF......F...F..FF.                   [ 36%]
+tests\test_final_100.py .F........................F..............F...... [ 44%]
+.......F....                                                             [ 46%]
+tests\test_full_coverage.py ..............F.....F....                    [ 50%]
+tests\test_git_utils.py ..F..F.F.F...FF...F.F......F                     [ 54%]
+tests\test_incremental.py ..........                                     [ 56%]
+tests\test_integration.py .....                                          [ 57%]
+tests\test_integration_workflow.py FF.FFFFFF.FF                          [ 59%]
+tests\test_memory_manager.py F.FFFF....FFF.FFFF....                      [ 62%]
+tests\test_performance.py ..F...F..                                      [ 64%]
+tests\test_progress_calculator.py ...............................        [ 69%]
+tests\test_specpulse.py ..............                                   [ 71%]
+tests\test_template_manager.py F..FF..F..FFF..F....                      [ 74%]
+tests\test_tier_manager.py .....FFFFF...F..........                      [ 78%]
+tests\test_tiered_templates.py FFFFFFFFFFFFFFFFFFFFFFF                   [ 82%]
+tests\test_validation_helpers.py .                                       [ 82%]
+tests\test_validator.py .............................................    [ 90%]
+tests\test_validator_autofix.py ...............                          [ 92%]
+tests\test_validator_partial.py ............                             [ 94%]
+tests\test_version_utils.py ........FF.FFF                               [ 96%]
+tests\benchmarks\test_v170_performance.py 

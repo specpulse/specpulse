@@ -5,6 +5,7 @@ SpecPulse Core Implementation
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Optional
+from functools import lru_cache
 import yaml
 import json
 import os
@@ -45,8 +46,9 @@ class SpecPulse:
                 return {}
         return {}
     
+    @lru_cache(maxsize=32)
     def get_spec_template(self) -> str:
-        """Get specification template from file"""
+        """Get specification template from file (cached)"""
         template_path = self.resources_dir / "templates" / "spec.md"
         if template_path.exists():
             with open(template_path, 'r', encoding='utf-8') as f:
@@ -129,8 +131,9 @@ FR-001: [Requirement]
 <!-- Additional diagrams, mockups, or references -->
 """
     
+    @lru_cache(maxsize=32)
     def get_plan_template(self) -> str:
-        """Get implementation plan template from file"""
+        """Get implementation plan template from file (cached)"""
         template_path = self.resources_dir / "templates" / "plan.md"
         if template_path.exists():
             with open(template_path, 'r', encoding='utf-8') as f:
@@ -329,8 +332,9 @@ indexes:
 - [ ] Documentation complete
 """
     
+    @lru_cache(maxsize=32)
     def get_task_template(self) -> str:
-        """Get task list template from file"""
+        """Get task list template from file (cached)"""
         template_path = self.resources_dir / "templates" / "task.md"
         if template_path.exists():
             with open(template_path, 'r', encoding='utf-8') as f:

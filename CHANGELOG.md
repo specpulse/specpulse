@@ -5,6 +5,37 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2025-10-08
+
+### 🔧 Quality & Maintenance Release - Project Health Improvements
+
+**What's Fixed:**
+- ✅ Version strings synchronized across all files (setup.py, README.md)
+- ✅ Dependency version pinning with upper bounds
+- ✅ MANIFEST.in cleaned up (removed obsolete script references)
+- ✅ Duplicate method definitions removed
+- ✅ Resource loading simplified (single clean path with specific exceptions)
+- ✅ Test suite reorganized (unit/integration/performance folders)
+- ✅ Cross-platform Unicode console handling
+
+**New Features:**
+- 🆕 File-based logging with rotation (10MB max, 5 backups)
+- 🆕 Configuration validation for .specpulse/config.yaml
+- 🆕 ResourceError class with specific recovery suggestions
+- 🆕 Emoji auto-detection (Windows Terminal vs CMD)
+- 🆕 Template caching with @lru_cache for 2-3x faster loading
+
+**Developer Experience:**
+- ⚡ Faster template loading (cached)
+- 📝 Type hints added to CLI methods
+- 🧹 Cleaner codebase (removed 4 duplicate test files)
+- 📊 Better test organization (unit/ integration/ performance/)
+- 🔍 Enhanced error messages with actionable recovery steps
+
+**No Breaking Changes** - Direct upgrade from v2.1.1
+
+---
+
 ## [2.1.1] - 2025-10-07
 
 ### 🔧 Patch Release - Missing Commands Added
