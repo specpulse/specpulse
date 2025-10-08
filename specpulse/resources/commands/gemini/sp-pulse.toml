@@ -2,18 +2,24 @@ description = "Initialize a new feature with SpecPulse framework (SDD compliant)
 prompt = """
 Initialize a new SpecPulse feature following Specification-Driven Development (SDD) principles.
 
-## CRITICAL SECURITY NOTE
-**NEVER edit files in these protected directories:**
-- templates/ - Template files (spec.md, plan.md, task.md)
-- scripts/ - Shell scripts (sp-pulse-*.sh)
-- commands/ - AI command definitions
-- .claude/ and .gemini/ - AI configuration files
+## CRITICAL: LLM Workflow Rules
 
-**ONLY create and edit files in:**
-- specs/ - Feature specifications
-- plans/ - Implementation plans
-- tasks/ - Task breakdowns
-- memory/ - Project context (context.md, decisions.md)
+**PRIMARY WORKFLOW: Use CLI when available**
+- Always prefer `specpulse feature init` CLI command first
+- Use Bash tool ONLY for CLI commands, not for file editing
+- Only use Read/Write/Edit tools when CLI doesn't provide functionality
+
+**PROTECTED DIRECTORIES (NEVER EDIT):**
+- templates/ - Template files
+- .specpulse/ - Internal config
+- specpulse/ - Package code
+- .claude/ and .gemini/ - AI configuration
+
+**ALLOWED DIRECT EDITS (When NO CLI exists):**
+- specs/ - Feature specifications (create/edit spec files)
+- plans/ - Implementation plans (create/edit plan files)
+- tasks/ - Task breakdowns (create/edit task files)
+- memory/ - Project context (update context.md, decisions.md)
 
 ## Command: /sp-pulse {{args}}
 
@@ -24,13 +30,12 @@ When called, perform the following steps:
    - Optional ID: second argument (if provided)
    - Sanitize feature name (alphanumeric, hyphens only)
 
-2. **Create feature using SpecPulse CLI**:
-   - !{bash specpulse --no-color context set current.feature "{{feature_name}}"}
-   - !{bash specpulse --no-color context set current.feature_id "{{feature_id}}"}
-   - !{bash specpulse --no-color context set current.branch "{{branch_name}}"}
-   - This creates the feature structure using CLI commands
+2. **Try CLI first (if feature init exists)**:
+   !{bash specpulse feature init {{feature_name}}}
 
-3. **Create feature structure**:
+   If this succeeds, STOP HERE. CLI handles everything.
+
+3. **If CLI doesn't exist, use File Operations**:
    - Generate feature ID (001, 002, etc.) or use provided ID
    - Create sanitized branch name: ID-feature-name
    - Create directories: specs/ID-feature/, plans/ID-feature/, tasks/ID-feature/
