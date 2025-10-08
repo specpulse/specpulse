@@ -40,13 +40,13 @@ classifiers = [
 ]
 
 dependencies = [
-    "pyyaml>=6.0",
-    "click>=8.0",
-    "rich>=13.0",
-    "jinja2>=3.0",
-    "gitpython>=3.1",
-    "toml>=0.10",
-    "packaging>=21.0",
+    "pyyaml>=6.0,<7.0",
+    "click>=8.0,<9.0",
+    "rich>=13.0,<14.0",
+    "jinja2>=3.0,<4.0",
+    "gitpython>=3.1,<4.0",
+    "toml>=0.10,<1.0",
+    "packaging>=21.0,<25.0",
 ]
 
 [project.optional-dependencies]
