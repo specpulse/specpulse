@@ -13,18 +13,24 @@ allowed_tools:
 
 Initialize a new feature following SpecPulse methodology with SDD compliance.
 
-## CRITICAL SECURITY NOTE
-**NEVER edit files in these protected directories:**
-- `templates/` - Template files (spec.md, plan.md, task.md)
-- `scripts/` - Shell scripts (sp-pulse-*.sh)
-- `commands/` - AI command definitions
-- `.claude/` and `.gemini/` - AI configuration files
+## CRITICAL: LLM Workflow Rules
 
-**ONLY create and edit files in:**
-- `specs/` - Feature specifications
-- `plans/` - Implementation plans
-- `tasks/` - Task breakdowns
-- `memory/` - Project context (context.md, decisions.md)
+**PRIMARY WORKFLOW: Use CLI when available**
+- Always prefer `specpulse` CLI commands over direct file operations
+- Use Bash tool ONLY for CLI commands, not for file editing
+- Only use Read/Write/Edit tools when CLI doesn't provide functionality
+
+**PROTECTED DIRECTORIES (NEVER EDIT):**
+- `templates/` - Template files
+- `.specpulse/` - Internal config
+- `specpulse/` - Package code
+- `.claude/` and `.gemini/` - AI configuration
+
+**ALLOWED DIRECT EDITS (When NO CLI exists):**
+- `specs/` - Feature specifications (create/edit spec files)
+- `plans/` - Implementation plans (create/edit plan files)
+- `tasks/` - Task breakdowns (create/edit task files)
+- `memory/` - Project context (update context.md, decisions.md)
 
 ## Usage
 ```
@@ -36,11 +42,13 @@ Initialize a new feature following SpecPulse methodology with SDD compliance.
 When called with `/sp-pulse $ARGUMENTS`, I will:
 
 1. **Validate arguments** and extract feature name + optional ID
-2. **Create feature using SpecPulse CLI**:
-   - `specpulse --no-color context set current.feature "$FEATURE_NAME"`
-   - `specpulse --no-color context set current.feature_id "$FEATURE_ID"`
-   - `specpulse --no-color context set current.branch "$BRANCH_NAME"`
-3. **Create complete feature structure using File Operations**:
+2. **Use CLI Command (PRIMARY - v2.1.3+)**:
+   ```bash
+   specpulse sp-pulse init feature-name
+   ```
+   This is the PRIMARY method. Use this FIRST.
+
+3. **If CLI fails or doesn't exist, use File Operations (FALLBACK)**:
 
    - **Step 1: Determine Feature ID**
      ```
@@ -93,13 +101,12 @@ User: /sp-pulse user-authentication-oauth2
 ```
 
 I will:
-- Create feature structure using CLI calls
-- Set context: `specpulse context set current.feature "user-authentication-oauth2"`
-- Update context: `specpulse context set current.feature_id "001"`
-- Create: `specs/001-user-authentication-oauth2/` (empty, ready for spec)
-- Create: `plans/001-user-authentication-oauth2/` (empty, ready for plan)
-- Create: `tasks/001-user-authentication-oauth2/` (empty, ready for tasks)
-- Branch: `001-user-authentication-oauth2`
+- Run CLI: `specpulse sp-pulse init user-authentication-oauth2`
+- This creates: `specs/001-user-authentication-oauth2/`
+- This creates: `plans/001-user-authentication-oauth2/`
+- This creates: `tasks/001-user-authentication-oauth2/`
+- This creates git branch: `001-user-authentication-oauth2`
+- This updates: `memory/context.md` with feature info
 - Suggest specification options:
   1. "User authentication with OAuth2 providers and JWT tokens"
   2. "Complete authentication system including registration, login, and profile management"

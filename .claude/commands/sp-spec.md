@@ -13,10 +13,23 @@ allowed_tools:
 
 Create, update, or validate feature specifications using SpecPulse methodology with AI-optimized templates.
 
-## CRITICAL: File Edit Restrictions
-- **NEVER EDIT**: templates/, scripts/, commands/, .claude/, .gemini/
-- **ONLY EDIT**: specs/, plans/, tasks/, memory/
-- Templates are COPIED to specs/ folder, then edited there
+## CRITICAL: LLM Workflow Rules
+
+**PRIMARY WORKFLOW: Use CLI when available**
+- Prefer `specpulse spec create/update/validate` when those commands exist
+- Use Bash tool ONLY for CLI commands, not for file editing
+- Only use Read/Write/Edit tools for specs/ files when CLI doesn't cover the operation
+
+**PROTECTED DIRECTORIES (NEVER EDIT):**
+- `templates/` - Template files
+- `.specpulse/` - Internal config
+- `specpulse/` - Package code
+- `.claude/` and `.gemini/` - AI configuration
+
+**WORKFLOW (v2.1.3+):**
+1. PRIMARY: Use `specpulse sp-spec create "description"`
+2. FALLBACK: If CLI fails, use File Operations
+3. Templates are READ from templates/, specs are CREATED/EDITED in specs/
 
 ## Usage
 ```
@@ -43,53 +56,39 @@ When called with `/sp-spec $ARGUMENTS`, I will:
    - If no action specified: Default to `create` with full arguments as description
 
 3. **For `/sp-spec create [description]` or `/sp-spec [description]`:**
-   - **CRITICAL NUMBERING LOGIC**:
-     - Check if `specs/XXX-feature/spec-001.md` exists
-     - If spec-001.md does NOT exist: Create spec-001.md with full content from template
-     - If spec-001.md EXISTS: Create spec-002.md (or next number) with new content
-     - NEVER leave spec-001.md as placeholder if it's the first spec
 
-   - **Step 1: Read Template**
+   - **PRIMARY METHOD (v2.1.3+): Use CLI**
+     ```bash
+     specpulse sp-spec create "description text here"
      ```
-     Read: templates/spec.md
-     ```
+     This creates the spec file with proper metadata and template.
+     Then YOU (AI) should:
+     1. Read the created spec file
+     2. Expand it with full specification details
+     3. Edit the file with expanded content
+     4. Mark uncertainties with `[NEEDS CLARIFICATION: question]`
 
-   - **Step 2: Create Spec File Using Write Tool**
-     ```
-     Write: specs/XXX-feature/spec-YYY.md
+   - **FALLBACK: File Operations (if CLI fails)**
+     - **Step 1: Read Template**
+       ```
+       Read: templates/spec.md
+       ```
+     - **Step 2: Create Spec File**
+       ```
+       Write: specs/XXX-feature/spec-YYY.md
+       (Include metadata, description, template)
+       ```
+     - **Step 3: Read Created File**
+     - **Step 4: EXPAND Specification**
+     - **Step 5: Write Expanded Content Back**
+       ```
+       Edit: specs/XXX-feature/spec-YYY.md
+       ```
 
-     Content should include:
-     - Metadata section with feature ID, date, version
-     - User's description
-     - Full template content for LLM expansion
-     - [NEEDS CLARIFICATION] markers for uncertainties
+   - **Validation (Optional)**
+     ```bash
+     specpulse sp-spec validate 001
      ```
-
-   - **Step 3: Read Created File**
-     ```
-     Read: specs/XXX-feature/spec-YYY.md
-     ```
-
-   - **Step 4: EXPAND Specification**
-     - Parse the description to identify:
-       * Functional requirements (Must/Should/Could/Won't have)
-       * User stories with testable acceptance criteria
-       * Technical specifications and constraints
-       * Success metrics and out-of-scope items
-     - Fill in ALL template sections with complete details
-     - Mark any uncertainties with `[NEEDS CLARIFICATION: specific question]`
-
-   - **Step 5: Write Expanded Content Back**
-     ```
-     Edit: specs/XXX-feature/spec-YYY.md
-     (Replace template placeholders with full specification)
-     ```
-
-   - **Step 6: Validate (Optional)**
-     ```
-     Bash: specpulse validate spec
-     ```
-     Note: Validation is optional - only if user requests it
 
 4. **For `/sp-spec update`:**
    - **Show existing spec files**: List all spec-XXX.md files in current feature directory

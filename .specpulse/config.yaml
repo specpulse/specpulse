@@ -23,7 +23,7 @@ integrations:
     auto_commit: true
     commit_template: '[SpecPulse] {action}: {description}'
 project:
-  created: '2025-10-08T18:28:00.666251'
+  created: '2025-10-08T19:18:15.659455'
   name: SpecPulse
   type: web
 templates:
@@ -48,7 +48,7 @@ validation:
     - dependencies
     - estimates
     - assignments
-version: 2.1.1
+version: 2.1.2
 workflow:
   stages:
   - draft
