@@ -109,7 +109,11 @@ When called with `/sp-plan $ARGUMENTS`, I will:
    b. **Ask user to select**: Which plan file to validate
    c. **Validation** using script:
      ```bash
-     bash scripts/sp-pulse-plan.sh "$FEATURE_DIR"
+     Read: templates/plan.md
+     Write: plans/XXX-feature/plan-YYY.md
+     (template content + user description)
+
+     Then READ and EXPAND with full implementation details
      ```
    d. Verify all SDD gates are addressed
    e. Check architectural decisions have proper documentation
