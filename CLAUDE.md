@@ -4,9 +4,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SpecPulse v2.1.0 is an AI-Enhanced Specification-Driven Development (SDD) Framework distributed as a Python CLI package. It enables specification-first development with AI assistance through Claude Code and Gemini CLI.
+SpecPulse v2.1.2 is an AI-Enhanced Specification-Driven Development (SDD) Framework distributed as a Python CLI package. It enables specification-first development with AI assistance through Claude Code and Gemini CLI.
 
-**Key Design Philosophy**: Dual-interface architecture where AI assistants primarily use **file operations** (Read/Write/Edit), and the CLI serves as an optional helper for terminal users.
+## 🔴 CRITICAL: LLM Workflow Rules (v2.1.2+)
+
+**PRIMARY WORKFLOW HIERARCHY:**
+
+1. **FIRST: Try CLI Command** (if exists)
+   ```bash
+   specpulse feature init <name>
+   specpulse spec create "<description>"
+   specpulse plan create "<description>"
+   specpulse task breakdown <plan-id>
+   specpulse validate <type>
+   ```
+
+2. **SECOND: File Operations** (if CLI doesn't exist or doesn't cover operation)
+   - READ templates from `templates/`
+   - WRITE/EDIT files in `specs/`, `plans/`, `tasks/`, `memory/`
+
+3. **NEVER: Direct edits to protected directories**
+   - ❌ `templates/` - Read-only template source
+   - ❌ `.specpulse/` - Internal configuration
+   - ❌ `specpulse/` - Package code
+   - ❌ `.claude/` and `.gemini/` - AI command definitions
+
+**Key Design Philosophy**: CLI-first architecture where AI assistants MUST try CLI commands before using file operations. The CLI handles metadata, validation, and structure creation. File operations are used ONLY when CLI doesn't provide the functionality.
 
 ## Essential Commands
 
@@ -52,22 +75,31 @@ specpulse feature init user-auth
 
 ## Architecture
 
-### Core Design Principle: File Operations > CLI Calls
+### Core Design Principle: CLI First > File Operations (v2.1.2+)
 
-**Critical Understanding**: In AI-assisted workflows, Claude Code should use **file operations** (Read, Write, Edit) rather than CLI commands. The CLI is an optional helper for terminal users.
+**Critical Understanding**: In AI-assisted workflows, Claude Code should ALWAYS try CLI commands FIRST. File operations are used ONLY when CLI doesn't exist or doesn't cover the specific operation.
 
-#### Workflow Pattern
+#### Workflow Pattern (v2.1.2+)
 ```
 User in Claude Code: /sp-spec OAuth2 login with JWT
     ↓
-Claude reads: templates/spec.md
+Step 1: Try CLI first
+    Bash: specpulse spec create "OAuth2 login with JWT"
     ↓
-Claude writes: specs/001-feature/spec-001.md (with metadata)
-    ↓
-Claude edits: specs/001-feature/spec-001.md (full expansion)
+Step 2: If CLI doesn't exist, use File Operations:
+    Claude reads: templates/spec.md
+    Claude writes: specs/001-feature/spec-001.md
+    Claude edits: specs/001-feature/spec-001.md (expand)
     ↓
 Complete specification ready
 ```
+
+**Why CLI First?**
+- CLI handles metadata automatically (timestamps, IDs, status)
+- CLI validates structure before creating files
+- CLI updates context.md consistently
+- CLI provides error handling and recovery
+- File Operations are fallback for flexibility
 
 ### Directory Structure
 
