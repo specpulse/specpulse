@@ -15,40 +15,21 @@ class SpecPulse:
     """Core SpecPulse functionality"""
     
     def __init__(self, project_path: Optional[Path] = None):
+        from ..utils.error_handler import ResourceError
+
         self.project_path = project_path or Path.cwd()
         self.config = self._load_config()
-        # Get resource directory path using package data
-        try:
-            # Use modern importlib.resources (Python 3.9+)
-            from importlib import resources
-            if hasattr(resources, 'files'):
-                self.resources_dir = Path(resources.files('specpulse').joinpath('resources'))
-            else:
-                # Fallback for older importlib.resources
-                import importlib.util
-                spec = importlib.util.find_spec('specpulse')
-                if spec and spec.origin:
-                    self.resources_dir = Path(spec.origin).parent.parent / "resources"
-                else:
-                    raise ImportError("Cannot find specpulse package")
-        except:
-            try:
-                # Fallback to pkg_resources for older Python versions
-                import pkg_resources
-                self.resources_dir = Path(pkg_resources.resource_filename('specpulse', 'resources'))
-            except:
-                # Final fallback to development path
-                self.resources_dir = Path(__file__).parent.parent / "resources"
 
-        # Ensure resources directory exists
-        if not self.resources_dir.exists():
-            # Try project root templates
-            project_root = Path(__file__).parent.parent.parent
-            fallback_resources = project_root / "templates"
-            if fallback_resources.exists():
-                self.resources_dir = project_root
-            else:
-                raise FileNotFoundError(f"Resources directory not found: {self.resources_dir}")
+        # Simplified resource loading with specific error handling
+        try:
+            from importlib.resources import files
+            resource_anchor = files('specpulse')
+            self.resources_dir = Path(str(resource_anchor / 'resources'))
+        except (ImportError, TypeError, AttributeError) as e:
+            # Development mode fallback
+            self.resources_dir = Path(__file__).parent.parent / "resources"
+            if not self.resources_dir.exists():
+                raise ResourceError("resources", self.resources_dir) from e
 
         # Set templates directory
         self.templates_dir = self.resources_dir / "templates"

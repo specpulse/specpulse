@@ -100,7 +100,7 @@ class SpecPulseCLI:
     def init(self, project_name: Optional[str] = None,
              here: bool = False,
              ai: str = "claude",
-             template: str = "web"):
+             template: str = "web") -> None:
         """Initialize SpecPulse in an existing or new project"""
 
         try:

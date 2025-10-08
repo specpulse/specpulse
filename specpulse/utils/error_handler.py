@@ -117,6 +117,26 @@ class GitError(SpecPulseError):
         self.operation = operation
 
 
+class ResourceError(SpecPulseError):
+    """Resource loading errors with specific recovery"""
+
+    def __init__(self, resource_type: str, resource_path: Path):
+        suggestions = [
+            f"Reinstall SpecPulse: pip install --force-reinstall specpulse",
+            f"Check package integrity: pip check specpulse",
+            f"Verify resource exists: {resource_path}",
+            f"Try development install: pip install -e .",
+        ]
+        super().__init__(
+            message=f"Failed to load {resource_type} from {resource_path}",
+            severity=ErrorSeverity.CRITICAL,
+            recovery_suggestions=suggestions,
+            technical_details=f"Resource path: {resource_path}"
+        )
+        self.resource_type = resource_type
+        self.resource_path = resource_path
+
+
 class ErrorHandler:
     """Enhanced error handler for SpecPulse CLI"""
 
@@ -146,11 +166,8 @@ class ErrorHandler:
         from .console import Console
         console = Console()
 
-        # Print error header
-        try:
-            console.error(f"❌ {error.message}")
-        except UnicodeEncodeError:
-            console.error(f"X {error.message}")
+        # Print error header (console now handles emoji fallback automatically)
+        console.error(f"❌ {error.message}")
 
         if context:
             console.info(f"📍 Context: {context}")
