@@ -1,4 +1,4 @@
-# SpecPulse v2.1.0
+# SpecPulse v2.1.2
 
 <div align="center">
 
@@ -26,13 +26,15 @@ SpecPulse is a **CLI-first, AI-enhanced framework** for Specification-Driven Dev
 3. **CLI-Driven**: Pure Python CLI - no scripts, fully cross-platform
 4. **LLM-Friendly**: Generates files optimized for AI assistants to expand
 
-### 🚀 v2.1.0 Highlights
+### 🚀 v2.1.2 Highlights
 
-- ✅ **No Scripts**: Eliminated bash/PowerShell scripts - pure Python CLI
-- ✅ **Smaller Projects**: ~50KB less per project (no scripts folder)
-- ✅ **Faster**: ~3x faster execution (no shell overhead)
-- ✅ **Cross-Platform**: Works identically on Windows, macOS, Linux
-- ✅ **LLM-Optimized**: Files designed for AI expansion
+- ✅ **CLI-First Architecture**: LLM MUST use `specpulse` CLI before file operations
+- ✅ **Protected Directories**: Templates, configs, and package code cannot be modified by LLM
+- ✅ **Enhanced Logging**: File-based logging with rotation (10MB, 5 backups)
+- ✅ **Config Validation**: Automatic validation for `.specpulse/config.yaml`
+- ✅ **Faster Performance**: Template caching with @lru_cache (2-3x faster)
+- ✅ **Better Testing**: Organized into unit/integration/performance folders
+- ✅ **Cross-Platform Unicode**: Emoji auto-detection for Windows/macOS/Linux
 
 ---
 
@@ -111,11 +113,14 @@ Use custom slash commands for AI-assisted development:
 
 ### 🎯 Core Features
 
+- **CLI-First Architecture**: LLM uses CLI commands before file operations (v2.1.2+)
 - **Feature Management**: Initialize and switch between features
 - **Specification Management**: Create, validate, and version specifications
 - **Plan Generation**: AI-assisted implementation planning
 - **Task Breakdown**: Convert plans into actionable tasks
 - **Execution Tracking**: Track task progress and completion
+- **Logging System**: File-based logs with rotation (v2.1.2+)
+- **Config Validation**: Automatic .specpulse/config.yaml validation (v2.1.2+)
 - **Memory System**: Project context and decision tracking
 - **AI Integration**: Works with Claude Code and Gemini CLI
 
@@ -138,69 +143,96 @@ Choose the right level of detail for your project:
 
 ## 💻 CLI Commands
 
-**Two Ways to Use SpecPulse:**
+**Two Ways to Use SpecPulse (v2.1.2+):**
 
-1. **Inside AI Assistant (Primary)** - LLM uses file operations
+1. **Inside AI Assistant (Primary)** - LLM uses CLI commands first, then file operations
 2. **Terminal (Optional)** - Direct CLI commands for manual use
+
+**🔴 CRITICAL: LLM Workflow Hierarchy (v2.1.2+)**
+
+LLM must follow this order:
+1. ✅ **FIRST**: Try `specpulse` CLI command (if exists)
+2. ✅ **SECOND**: Use File Operations (Read/Write/Edit) if CLI doesn't exist
+3. ❌ **NEVER**: Edit templates/, .specpulse/, specpulse/, .claude/, .gemini/
 
 ### Feature Management
 
 ```bash
-# Terminal use (optional - for manual workflow)
+# Terminal use
 specpulse feature init <name>           # Initialize new feature
 specpulse feature continue <name>       # Switch to existing feature
 
-# Inside Claude/Gemini (primary - LLM does this automatically)
+# Inside Claude/Gemini (v2.1.2+ workflow)
 /sp-pulse user-authentication
-# → LLM uses mkdir, Write, Edit tools to create structure
+# Step 1 (LLM MUST try first):
+#   Bash: specpulse feature init user-authentication
+# Step 2 (if CLI doesn't exist):
+#   Use mkdir, Write, Edit tools to create structure
 ```
 
 ### Specification Management
 
 ```bash
-# Terminal use (optional)
+# Terminal use
 specpulse spec create <description>     # Create specification
 specpulse spec update <id> <desc>       # Update specification
 specpulse spec validate                 # Validate specifications
 specpulse spec progress <feature-id>    # Show completion progress
 
-# Inside Claude/Gemini (primary)
+# Inside Claude/Gemini (v2.1.2+ workflow)
 /sp-spec OAuth2 login with JWT
-# → LLM uses Read (template) → Write (file) → Edit (expand)
+# Step 1 (LLM MUST try first):
+#   Bash: specpulse spec create "OAuth2 login with JWT"
+# Step 2 (if CLI doesn't exist):
+#   Read: templates/spec.md
+#   Write: specs/001-feature/spec-001.md
+#   Edit: specs/001-feature/spec-001.md (expand)
 ```
 
 ### Plan Management
 
 ```bash
-# Terminal use (optional)
+# Terminal use
 specpulse plan create <description>     # Create implementation plan
 specpulse plan update <id> <desc>       # Update plan
 
-# Inside Claude/Gemini (primary - LLM file operations)
+# Inside Claude/Gemini (v2.1.2+ workflow)
 /sp-plan generate
+# Step 1 (LLM MUST try first):
+#   Bash: specpulse plan create "Implementation plan"
+# Step 2 (if CLI doesn't exist):
+#   Read: templates/plan.md
+#   Write: plans/001-feature/plan-001.md
 ```
 
 ### Task Management
 
 ```bash
-# Terminal use (optional)
+# Terminal use
 specpulse task create <description>     # Create task
 specpulse task breakdown <plan-id>      # Generate tasks from plan
 specpulse task update <id> <desc>       # Update task
 
-# Inside Claude/Gemini (primary - LLM file operations)
+# Inside Claude/Gemini (v2.1.2+ workflow)
 /sp-task breakdown
+# Step 1 (LLM MUST try first):
+#   Bash: specpulse task breakdown 001
+# Step 2 (if CLI doesn't exist):
+#   Read: templates/task.md
+#   Write: tasks/001-feature/tasks-001.md
 ```
 
 ### Execution Tracking
 
 ```bash
-# Terminal use (optional)
+# Terminal use
 specpulse execute start <task-id>       # Mark task as started
 specpulse execute done <task-id>        # Mark task as completed
 
-# Inside Claude/Gemini (primary - LLM edits task metadata)
+# Inside Claude/Gemini (v2.1.2+ workflow)
 /sp-execute
+# LLM reads tasks, executes them, updates status via Edit tool
+# No CLI for execute yet - uses File Operations
 ```
 
 ### Project Management (Terminal Only)
@@ -218,29 +250,43 @@ specpulse ai suggest                    # Get AI recommendations
 
 ---
 
-## 🤖 AI Integration
+## 🤖 AI Integration (v2.1.2 CLI-First Architecture)
 
 SpecPulse works seamlessly with AI assistants while maintaining **privacy-first design** (no external API calls).
 
-### How It Works
+### How It Works (v2.1.2+)
 
 ```
 User in Claude Code / Gemini CLI
     ↓
 Custom Slash Commands (/sp-pulse, /sp-spec, etc.)
     ↓
-LLM Uses File Operations (Read, Write, Edit)
+LLM FOLLOWS WORKFLOW HIERARCHY:
     ↓
+Step 1: Try CLI First (PRIMARY)
+    Bash: specpulse spec create "description"
+    ↓
+    If successful → DONE ✅
+    If not exists → Continue to Step 2
+    ↓
+Step 2: File Operations (FALLBACK)
     1. Read template (templates/spec.md)
     2. Write file (specs/001-feature/spec-001.md)
     3. Read created file
     4. Expand with AI intelligence
-    5. Write expanded content back
+    5. Edit file with expanded content
     ↓
 Complete Specifications, Plans, Tasks
 ```
 
-**Note**: CLI commands (`specpulse spec create`) are **optional helpers** for terminal use. LLM primarily uses **file operations** (Read/Write/Edit) for better control.
+**🔴 CRITICAL (v2.1.2+)**: CLI commands are **PRIMARY**, not optional. LLM MUST try CLI first. File operations are **FALLBACK** when CLI doesn't exist or doesn't cover the operation.
+
+**Why CLI-First?**
+- ✅ Metadata handled automatically (IDs, timestamps, status)
+- ✅ Validation before file creation
+- ✅ Context updates consistent
+- ✅ Error handling built-in
+- ✅ Protects templates and configs from accidental edits
 
 ### AI Commands
 
@@ -318,7 +364,12 @@ my-project/
 └── tasks/               # Task breakdowns (created on-demand)
 ```
 
-**Note**: No `scripts/` folder! v2.1.0 uses pure CLI.
+**Note**: No `scripts/` folder! v2.1.0+ uses pure Python CLI.
+
+**v2.1.2 Additions**:
+- `.specpulse/logs/` - Application logs with rotation
+- Enhanced config validation
+- CLI-first workflow enforcement
 
 ---
 
@@ -345,9 +396,28 @@ specpulse --version
 
 ---
 
-## 🔄 Migration from v2.0.0
+## 🔄 Migration to v2.1.2
 
-v2.1.0 is backward compatible with v2.0.0 projects:
+### From v2.1.0 or v2.1.1
+
+```bash
+# 1. Upgrade SpecPulse
+pip install --upgrade specpulse
+
+# 2. That's it! No breaking changes
+```
+
+**What's New in v2.1.2:**
+- ✅ CLI-first workflow (LLM uses CLI before file operations)
+- ✅ Logging infrastructure (automatic)
+- ✅ Config validation (automatic)
+- ✅ Template caching (automatic performance boost)
+- ✅ Better test organization (transparent to users)
+- ✅ Enhanced error messages
+
+**No Breaking Changes** - Direct upgrade compatible
+
+### From v2.0.0
 
 ```bash
 # 1. Upgrade SpecPulse
@@ -356,12 +426,13 @@ pip install --upgrade specpulse
 # 2. Delete old scripts (safe to remove)
 rm -rf scripts/
 
-# 3. That's it! Slash commands now use CLI
+# 3. That's it! v2.1.2 is fully compatible
 ```
 
-**Breaking Changes:**
-- ⚠️ Scripts removed (replaced with CLI commands)
-- ✅ All slash commands updated automatically
+**Major Changes:**
+- ⚠️ Scripts removed in v2.1.0 (replaced with CLI)
+- ✅ CLI-first workflow in v2.1.2 (enhanced automation)
+- ✅ All slash commands work identically
 - ✅ No data migration needed
 - ✅ Existing specs, plans, tasks remain compatible
 
@@ -449,7 +520,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Special thanks to:
 - The SpecPulse community for feedback and contributions
 - Claude Code and Gemini CLI teams for AI assistant platforms
-- Everyone who helped shape v2.1.0's architecture
+- Everyone who helped shape v2.1.0's architecture and v2.1.2's CLI-first workflow
 
 ---
 
@@ -499,6 +570,6 @@ specpulse init my-project --ai claude
 
 **Made with ❤️ for developers who value specifications**
 
-[⬆ Back to Top](#specpulse-v210)
+[⬆ Back to Top](#specpulse-v212)
 
 </div>
