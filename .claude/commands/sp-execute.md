@@ -49,16 +49,27 @@ When called with `/sp-execute $ARGUMENTS`, I will:
    specpulse --no-color spec progress [feature-id]
    ```
 
-2. **Analyze task status** from script output:
-   - Identify next task to execute
-   - Check if decomposed (service-specific tasks)
-   - Calculate overall progress
+2. **Read Task File**:
+   ```
+   Read: tasks/XXX-feature/task-YYY.md
+   ```
 
-3. **Execute task implementation**:
-   - Read task description from task file
-   - Implement the solution
+3. **Mark Task as Started**:
+   ```
+   Edit: tasks/XXX-feature/task-YYY.md
+   (Update metadata: STATUS: in_progress, add timestamp)
+   ```
+
+4. **Execute Task Implementation**:
+   - Implement the solution based on task description
    - Test if applicable
-   - Mark task as completed in task file
+   - Document any decisions or changes
+
+5. **Mark Task as Completed**:
+   ```
+   Edit: tasks/XXX-feature/task-YYY.md
+   (Update metadata: STATUS: completed, add completion timestamp)
+   ```
 
 4. **Continue immediately**:
    - NO PAUSE for confirmation

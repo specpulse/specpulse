@@ -58,18 +58,31 @@ When called with `/sp-task $ARGUMENTS`, I will:
       specpulse --no-color validate task --verbose
       ```
    
-   d. **Read implementation plan** from selected plan file
-   
-   e. **Generate AI-optimized tasks** by COPYING template from templates/task.md to tasks/XXX-feature/:
-      - **IMPORTANT**: Can EDIT files in tasks/ folder, but NEVER modify templates/, scripts/, or commands/ folders
-      ```markdown
-      # Task List: {{ feature_name }}
-      ## Metadata
-      - **Total Tasks**: {{ task_count }}
-      - **Estimated Duration**: {{ total_duration }}
-      - **Plan Reference**: plan-{{ plan_version }}.md
-      - **Task Version**: {{ task_version }}
+   d. **Read implementation plan** from selected plan file:
       ```
+      Read: plans/XXX-feature/plan-YYY.md
+      ```
+
+   e. **Generate AI-optimized tasks using File Operations**:
+      - **Step 1: Read Task Template**
+        ```
+        Read: templates/task.md
+        ```
+
+      - **Step 2: Parse Plan and Create Task Files**
+        ```
+        For each phase/component in plan:
+          Write: tasks/XXX-feature/task-001.md
+          Write: tasks/XXX-feature/task-002.md
+          ... (one file per task)
+
+        Content includes:
+          - Metadata (feature ID, task number, status: pending)
+          - Task description from plan
+          - Template structure for expansion
+        ```
+
+      - **IMPORTANT**: Can EDIT files in tasks/ folder, but NEVER modify templates/ or commands/ folders
 
    f. **Generate structured task categories based on architecture**:
       - **For decomposed services**:
@@ -115,7 +128,7 @@ When called with `/sp-task $ARGUMENTS`, I will:
    b. **Ask user to select**: Which task file to update
    c. **Analysis** using script:
      ```bash
-     bash scripts/sp-pulse-task.sh "$FEATURE_DIR"
+     specpulse task breakdown "$PLAN_ID"
      ```
    d. **Parse current tasks** from selected file with comprehensive status:
      - Total tasks, completed, pending, blocked
@@ -249,7 +262,7 @@ User: /sp-task execute AUTH-T001
 I will:
 - Run: Cross-platform detection and execution
   ```bash
-  bash scripts/sp-pulse-task.sh "$FEATURE_DIR"
+  specpulse task breakdown "$PLAN_ID"
   ```
 - Create: AI-optimized task structure with template variables
 - Output: `TOTAL_TASKS=25, PARALLEL_TASKS=8, STATUS=generated`
@@ -274,7 +287,7 @@ I will:
 - Validate: SDD gates compliance and task readiness
 - Execute: Cross-platform task execution
   ```bash
-  bash scripts/sp-pulse-task.sh "$FEATURE_DIR" "execute:$TASK_ID"
+  specpulse task breakdown "$PLAN_ID" "execute:$TASK_ID"
   ```
 - Track: Results and update progress automatically
 
