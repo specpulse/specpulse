@@ -40,7 +40,10 @@ SpecPulse is a **CLI-first, AI-enhanced framework** for Specification-Driven Dev
 
 ```bash
 # Install from PyPI
-pip install specpulse==2.1.0
+pip install specpulse
+
+# Or install specific version
+pip install specpulse==2.1.2
 
 # Or upgrade from previous version
 pip install --upgrade specpulse
@@ -483,10 +486,10 @@ Special thanks to:
 
 ---
 
-**🎉 Start building better software today with SpecPulse v2.1.0!**
+**🎉 Start building better software today with SpecPulse v2.1.2!**
 
 ```bash
-pip install specpulse==2.1.0
+pip install specpulse
 specpulse init my-project --ai claude
 ```
 

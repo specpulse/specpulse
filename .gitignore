@@ -150,6 +150,7 @@ ehthumbs.db
 
 # SpecPulse specific
 .specpulse/cache/
+.specpulse/logs/
 *.tmp
 *.bak
 *~

@@ -1167,18 +1167,6 @@ project/
                 return content
         return ""
 
-    def get_decomposition_template(self, template_name: str) -> str:
-        """Get decomposition template"""
-        template_path = self.templates_dir / "decomposition" / template_name
-        if template_path.exists():
-            with open(template_path, 'r', encoding='utf-8') as f:
-                return f.read()
-        # Try to get from resources
-        resource_path = self.resources_dir / "templates" / "decomposition" / template_name
-        if resource_path.exists():
-            with open(resource_path, 'r', encoding='utf-8') as f:
-                return f.read()
-        return ""
 
     def get_microservice_template(self) -> str:
         """Get microservice template"""
