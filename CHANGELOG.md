@@ -7,9 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.2.0] - 2025-10-14
+## [2.2.1] - 2025-10-14
+
+### 🔧 Hotfix Release - Import Error Fix
+
+**UPGRADE**: Use `pip install --upgrade specpulse` to get this hotfix
+
+#### Fixed
+
+- **CRITICAL**: Fixed missing `List` import in `service_container.py`
+  - v2.2.0 had `NameError: name 'List' is not defined` when loading module
+  - Added `List` to typing imports
+  - Package now loads correctly
+
+#### Changed
+
+- Updated `specpulse/_version.py`: `2.2.0` → `2.2.1`
+
+#### Technical Details
+
+The v2.2.0 release had an oversight where `List` was used in type hints but not imported from `typing`. This caused a `NameError` when attempting to import the package, making v2.2.0 unusable.
+
+This hotfix adds the missing import and publishes a working version.
+
+**Affected**: v2.2.0 only
+**Fixed in**: v2.2.1
+**Impact**: All v2.2.0 features now working correctly
+
+---
+
+## [2.2.0] - 2025-10-14 ⚠️ BROKEN - DO NOT USE
 
 ### 🔴 CRITICAL SECURITY FIXES + MAJOR ARCHITECTURE UPDATE
+
+**⚠️ WARNING**: v2.2.0 has an import bug. Use v2.2.1 instead.
 
 **UPGRADE URGENCY**: 🔴 CRITICAL (if from v2.1.3 or earlier)
 

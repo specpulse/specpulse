@@ -1,4 +1,4 @@
-# SpecPulse v2.2.0
+# SpecPulse v2.2.1
 
 <div align="center">
 
@@ -14,9 +14,16 @@
 
 ---
 
-## 🔥 What's New in v2.2.0
+## 🔥 What's New in v2.2.1
 
-### 🔐 Critical Security Fixes (URGENT - Upgrade Immediately)
+**Current Version**: v2.2.1 (Hotfix for v2.2.0 import error)
+
+### 🔧 v2.2.1 Hotfix (2025-10-14)
+
+- 🐛 **Fixed**: Missing `List` import in `service_container.py`
+- ✅ **Status**: Fully working, install with `pip install specpulse`
+
+### 🔐 Critical Security Fixes in v2.2.0 (URGENT - Upgrade Immediately)
 
 - 🛡️ **2 CRITICAL vulnerabilities FIXED** (CVEs: 9.1 & 9.8)
 - ✅ **Path Traversal Protection** - PathValidator blocks all directory escapes
@@ -65,7 +72,7 @@ SpecPulse is a **secure, fast, and clean** CLI framework for Specification-Drive
 pip install specpulse
 
 # Or install specific version
-pip install specpulse==2.2.0
+pip install specpulse==2.2.1
 
 # Upgrade from previous version (CRITICAL if from v2.1.3 or earlier)
 pip install --upgrade specpulse
@@ -609,7 +616,7 @@ Special thanks to:
 
 ---
 
-**🎉 Start building better, faster, and more secure software with SpecPulse v2.2.0!**
+**🎉 Start building better, faster, and more secure software with SpecPulse v2.2.1!**
 
 ```bash
 pip install specpulse
@@ -635,8 +642,8 @@ specpulse sp-pulse init my-feature
 
 **Made with ❤️ and 🔐 for developers who value specifications and security**
 
-**SpecPulse v2.2.0** - Secure, Fast, Clean
+**SpecPulse v2.2.1** - Secure, Fast, Clean
 
-[⬆ Back to Top](#specpulse-v220)
+[⬆ Back to Top](#specpulse-v221)
 
 </div>
