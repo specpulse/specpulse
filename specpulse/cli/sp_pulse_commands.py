@@ -10,7 +10,8 @@ import yaml
 import re
 
 from ..utils.console import Console
-from ..utils.git_utils import GitUtils
+from ..utils.git_utils import GitUtils, GitSecurityError
+from ..utils.path_validator import PathValidator, SecurityError
 from ..utils.error_handler import (
     ErrorHandler, ValidationError, ProjectStructureError,
     GitError
@@ -40,14 +41,18 @@ class SpPulseCommands:
             bool: True if successful, False otherwise
         """
         try:
-            # Validate and sanitize feature name
-            sanitized_name = self._sanitize_feature_name(feature_name)
-            if not sanitized_name:
+            # SECURITY: Validate feature name using PathValidator
+            try:
+                validated_name = PathValidator.validate_feature_name(feature_name)
+            except (ValueError, SecurityError) as e:
                 raise ValidationError(
-                    f"Invalid feature name: {feature_name}",
+                    f"Invalid feature name: {feature_name}. {str(e)}",
                     validation_type="feature_name",
-                    missing_items=["Valid characters: letters, numbers, hyphens"]
+                    missing_items=["Valid characters: alphanumeric, hyphen, underscore"]
                 )
+
+            # Sanitize for consistency (lowercase, clean format)
+            sanitized_name = self._sanitize_feature_name(validated_name)
 
             # Determine feature ID
             if not feature_id:
@@ -81,11 +86,12 @@ class SpPulseCommands:
             if GitUtils.is_git_installed() and self.git.is_git_repo():
                 try:
                     branch_name = feature_dir_name
+                    # SECURITY: GitUtils now validates branch names internally
                     if self.git.create_branch(branch_name):
                         self.console.success(f"Created and switched to branch: {branch_name}")
                     else:
                         self.console.warning(f"Branch {branch_name} already exists, switched to it")
-                except GitError as e:
+                except (GitError, GitSecurityError) as e:
                     self.console.warning(f"Git branch creation skipped: {str(e)}")
 
             # Display suggestions
@@ -129,9 +135,10 @@ class SpPulseCommands:
             # Switch git branch if available
             if GitUtils.is_git_installed() and self.git.is_git_repo():
                 try:
+                    # SECURITY: GitUtils now validates branch names internally
                     if self.git.checkout_branch(feature_dir_name):
                         self.console.success(f"Switched to branch: {feature_dir_name}")
-                except GitError as e:
+                except (GitError, GitSecurityError) as e:
                     self.console.warning(f"Could not switch branch: {str(e)}")
 
             # Display feature status
@@ -239,9 +246,15 @@ class SpPulseCommands:
             ]
 
             for dir_path in directories:
-                if dir_path.exists():
-                    shutil.rmtree(dir_path)
-                    self.console.info(f"Deleted: {dir_path.relative_to(self.project_root)}")
+                # SECURITY: Validate path is within project before deletion
+                try:
+                    safe_path = PathValidator.validate_file_path(self.project_root, dir_path)
+                    if safe_path.exists():
+                        shutil.rmtree(safe_path)
+                        self.console.info(f"Deleted: {safe_path.relative_to(self.project_root)}")
+                except SecurityError as e:
+                    self.console.error(f"Security violation: {str(e)}")
+                    return False
 
             # Note: Git branch deletion skipped (manual operation recommended)
             # User should manually delete branch if needed: git branch -D <branch-name>

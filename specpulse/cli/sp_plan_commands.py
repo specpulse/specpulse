@@ -10,6 +10,7 @@ import yaml
 import re
 
 from ..utils.console import Console
+from ..utils.path_validator import PathValidator, SecurityError
 from ..utils.error_handler import (
     ErrorHandler, ValidationError, TemplateError
 )
@@ -92,10 +93,16 @@ STATUS: draft
 """
             content = metadata + content
 
-            # Write plan file
-            plan_path.write_text(content, encoding='utf-8')
+            # SECURITY: Validate plan file path before writing
+            try:
+                safe_plan_path = PathValidator.validate_file_path(self.project_root, plan_path)
+            except SecurityError as e:
+                raise ValidationError(f"Security violation: {str(e)}")
 
-            self.console.success(f"Created: {plan_path.relative_to(self.project_root)}")
+            # Write plan file
+            safe_plan_path.write_text(content, encoding='utf-8')
+
+            self.console.success(f"Created: {safe_plan_path.relative_to(self.project_root)}")
             self.console.info(f"\nNext steps:")
             self.console.info(f"1. Edit the plan: {plan_path.relative_to(self.project_root)}")
             self.console.info(f"2. Expand with AI (Claude/Gemini): /sp-plan expand")
@@ -121,6 +128,12 @@ STATUS: draft
             bool: True if successful, False otherwise
         """
         try:
+            # SECURITY: Validate plan ID format
+            try:
+                PathValidator.validate_spec_id(plan_id)  # Reuse spec_id validation (3-digit format)
+            except ValueError as e:
+                raise ValidationError(f"Invalid plan ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
@@ -178,6 +191,13 @@ STATUS: draft
             bool: True if validation passes, False otherwise
         """
         try:
+            # SECURITY: Validate plan ID if provided
+            if plan_id:
+                try:
+                    PathValidator.validate_spec_id(plan_id)
+                except ValueError as e:
+                    raise ValidationError(f"Invalid plan ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
@@ -316,6 +336,12 @@ STATUS: draft
             bool: True if successful, False otherwise
         """
         try:
+            # SECURITY: Validate plan ID
+            try:
+                PathValidator.validate_spec_id(plan_id)
+            except ValueError as e:
+                raise ValidationError(f"Invalid plan ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
@@ -351,6 +377,12 @@ STATUS: draft
             bool: True if successful, False otherwise
         """
         try:
+            # SECURITY: Validate plan ID
+            try:
+                PathValidator.validate_spec_id(plan_id)
+            except ValueError as e:
+                raise ValidationError(f"Invalid plan ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
@@ -413,6 +445,12 @@ STATUS: draft
             bool: True if successful, False otherwise
         """
         try:
+            # SECURITY: Validate plan ID
+            try:
+                PathValidator.validate_spec_id(plan_id)
+            except ValueError as e:
+                raise ValidationError(f"Invalid plan ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:

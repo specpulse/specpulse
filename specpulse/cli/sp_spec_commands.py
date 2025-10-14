@@ -10,6 +10,7 @@ import yaml
 import re
 
 from ..utils.console import Console
+from ..utils.path_validator import PathValidator, SecurityError
 from ..utils.error_handler import (
     ErrorHandler, ValidationError, TemplateError
 )
@@ -85,10 +86,16 @@ STATUS: draft
 """
             content = metadata + content
 
-            # Write spec file
-            spec_path.write_text(content, encoding='utf-8')
+            # SECURITY: Validate spec file path before writing
+            try:
+                safe_spec_path = PathValidator.validate_file_path(self.project_root, spec_path)
+            except SecurityError as e:
+                raise ValidationError(f"Security violation: {str(e)}")
 
-            self.console.success(f"Created: {spec_path.relative_to(self.project_root)}")
+            # Write spec file
+            safe_spec_path.write_text(content, encoding='utf-8')
+
+            self.console.success(f"Created: {safe_spec_path.relative_to(self.project_root)}")
             self.console.info(f"\nNext steps:")
             self.console.info(f"1. Edit the specification: {spec_path.relative_to(self.project_root)}")
             self.console.info(f"2. Expand with AI (Claude/Gemini): /sp-spec expand")
@@ -113,6 +120,12 @@ STATUS: draft
             bool: True if successful, False otherwise
         """
         try:
+            # SECURITY: Validate spec ID format
+            try:
+                PathValidator.validate_spec_id(spec_id)
+            except ValueError as e:
+                raise ValidationError(f"Invalid spec ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
@@ -120,6 +133,14 @@ STATUS: draft
                 return False
 
             spec_path = self.project_root / "specs" / feature_dir.name / f"spec-{spec_id}.md"
+
+            # SECURITY: Validate file path
+            try:
+                safe_spec_path = PathValidator.validate_file_path(self.project_root, spec_path)
+            except SecurityError as e:
+                raise ValidationError(f"Security violation: {str(e)}")
+
+            spec_path = safe_spec_path
 
             if not spec_path.exists():
                 self.console.error(f"Specification not found: spec-{spec_id}.md")
@@ -170,6 +191,13 @@ STATUS: draft
             bool: True if validation passes, False otherwise
         """
         try:
+            # SECURITY: Validate spec ID if provided
+            if spec_id:
+                try:
+                    PathValidator.validate_spec_id(spec_id)
+                except ValueError as e:
+                    raise ValidationError(f"Invalid spec ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
@@ -254,6 +282,12 @@ STATUS: draft
             bool: True if successful, False otherwise
         """
         try:
+            # SECURITY: Validate spec ID
+            try:
+                PathValidator.validate_spec_id(spec_id)
+            except ValueError as e:
+                raise ValidationError(f"Invalid spec ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
@@ -355,6 +389,12 @@ STATUS: draft
             bool: True if successful, False otherwise
         """
         try:
+            # SECURITY: Validate spec ID
+            try:
+                PathValidator.validate_spec_id(spec_id)
+            except ValueError as e:
+                raise ValidationError(f"Invalid spec ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
@@ -390,6 +430,12 @@ STATUS: draft
             bool: True if successful, False otherwise
         """
         try:
+            # SECURITY: Validate spec ID
+            try:
+                PathValidator.validate_spec_id(spec_id)
+            except ValueError as e:
+                raise ValidationError(f"Invalid spec ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:

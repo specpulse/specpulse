@@ -10,6 +10,7 @@ import yaml
 import re
 
 from ..utils.console import Console
+from ..utils.path_validator import PathValidator, SecurityError
 from ..utils.error_handler import (
     ErrorHandler, ValidationError, TemplateError
 )
@@ -39,6 +40,12 @@ class SpTaskCommands:
             bool: True if successful, False otherwise
         """
         try:
+            # SECURITY: Validate plan ID format
+            try:
+                PathValidator.validate_spec_id(plan_id)  # 3-digit format
+            except ValueError as e:
+                raise ValidationError(f"Invalid plan ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
@@ -104,10 +111,16 @@ PROGRESS: 0
 """
             content = plan_reference + content
 
-            # Write task file
-            task_path.write_text(content, encoding='utf-8')
+            # SECURITY: Validate task file path before writing
+            try:
+                safe_task_path = PathValidator.validate_file_path(self.project_root, task_path)
+            except SecurityError as e:
+                raise ValidationError(f"Security violation: {str(e)}")
 
-            self.console.success(f"Created: {task_path.relative_to(self.project_root)}")
+            # Write task file
+            safe_task_path.write_text(content, encoding='utf-8')
+
+            self.console.success(f"Created: {safe_task_path.relative_to(self.project_root)}")
             self.console.info(f"\nNext steps:")
             self.console.info(f"1. Edit the task breakdown: {task_path.relative_to(self.project_root)}")
             self.console.info(f"2. Expand with AI (Claude/Gemini): /sp-task expand")
@@ -185,6 +198,12 @@ PROGRESS: 0
             bool: True if successful, False otherwise
         """
         try:
+            # SECURITY: Validate task ID format
+            try:
+                PathValidator.validate_spec_id(task_id)  # 3-digit format
+            except ValueError as e:
+                raise ValidationError(f"Invalid task ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
@@ -234,6 +253,12 @@ PROGRESS: 0
             bool: True if successful, False otherwise
         """
         try:
+            # SECURITY: Validate task ID format
+            try:
+                PathValidator.validate_spec_id(task_id)
+            except ValueError as e:
+                raise ValidationError(f"Invalid task ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
@@ -291,6 +316,12 @@ PROGRESS: 0
             bool: True if successful, False otherwise
         """
         try:
+            # SECURITY: Validate task ID format
+            try:
+                PathValidator.validate_spec_id(task_id)
+            except ValueError as e:
+                raise ValidationError(f"Invalid task ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
@@ -405,6 +436,12 @@ PROGRESS: 0
             bool: True if successful, False otherwise
         """
         try:
+            # SECURITY: Validate task ID format
+            try:
+                PathValidator.validate_spec_id(task_id)
+            except ValueError as e:
+                raise ValidationError(f"Invalid task ID: {str(e)}")
+
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
