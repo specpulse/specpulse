@@ -231,16 +231,26 @@ class FeatureIDGenerator:
             # Open lock file
             self._lock_fd = self.lock_file.open('w')
 
-            # Try to acquire lock (non-blocking would require LK_NBLCK)
-            # msvcrt.locking is blocking, so we use short timeout
-            msvcrt.locking(self._lock_fd.fileno(), msvcrt.LK_NBLCK, 1)
+            # Try to acquire lock (non-blocking)
+            try:
+                msvcrt.locking(self._lock_fd.fileno(), msvcrt.LK_NBLCK, 1)
+                return True
+            except (IOError, OSError):
+                # Lock is held by another process
+                if hasattr(self, '_lock_fd') and self._lock_fd:
+                    self._lock_fd.close()
+                    delattr(self, '_lock_fd')
+                return False
 
-            return True
-
-        except (IOError, OSError):
-            # Lock is held by another process
-            if hasattr(self, '_lock_fd'):
-                self._lock_fd.close()
+        except Exception as e:
+            # Any other error
+            if hasattr(self, '_lock_fd') and self._lock_fd:
+                try:
+                    self._lock_fd.close()
+                except:
+                    pass
+                if hasattr(self, '_lock_fd'):
+                    delattr(self, '_lock_fd')
             return False
 
     def _release_lock(self):
