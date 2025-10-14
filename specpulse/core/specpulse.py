@@ -9,6 +9,10 @@ from functools import lru_cache
 import yaml
 import json
 import os
+import logging
+
+# Configure logger for template loading warnings
+logger = logging.getLogger(__name__)
 
 
 
@@ -50,10 +54,36 @@ class SpecPulse:
     def get_spec_template(self) -> str:
         """Get specification template from file (cached)"""
         template_path = self.resources_dir / "templates" / "spec.md"
+
+        if not template_path.exists():
+            # Template file missing - log warning and notify user
+            logger.warning(
+                f"Template file not found: {template_path}. "
+                "Using embedded fallback template. "
+                "Run 'specpulse doctor' to check template files."
+            )
+            # Also try to notify user via console (if available)
+            try:
+                from ..utils.console import Console
+                console = Console()
+                console.warning(
+                    f"⚠️  Template file missing: spec.md\n"
+                    f"   Using default embedded template.\n"
+                    f"   Run 'specpulse doctor' to restore template files."
+                )
+            except:
+                pass  # Console may not be available in all contexts
+
         if template_path.exists():
-            with open(template_path, 'r', encoding='utf-8') as f:
-                return f.read()
-        # Fallback to embedded template if file not found
+            try:
+                with open(template_path, 'r', encoding='utf-8') as f:
+                    return f.read()
+            except Exception as e:
+                logger.error(f"Failed to read template file: {e}")
+                # Fall through to embedded template
+
+        # Fallback to embedded template if file not found or read failed
+        logger.info("Using embedded spec template as fallback")
         return """<!-- SpecPulse Specification Template v1.0 -->
 <!-- AI Instructions: Fill this template based on user description -->
 
@@ -135,10 +165,30 @@ FR-001: [Requirement]
     def get_plan_template(self) -> str:
         """Get implementation plan template from file (cached)"""
         template_path = self.resources_dir / "templates" / "plan.md"
+
+        if not template_path.exists():
+            logger.warning(
+                f"Template file not found: {template_path}. "
+                "Using embedded fallback template."
+            )
+            try:
+                from ..utils.console import Console
+                console = Console()
+                console.warning(
+                    f"⚠️  Template file missing: plan.md\n"
+                    f"   Using default embedded template."
+                )
+            except:
+                pass
+
         if template_path.exists():
-            with open(template_path, 'r', encoding='utf-8') as f:
-                return f.read()
-        # Fallback to embedded template if file not found
+            try:
+                with open(template_path, 'r', encoding='utf-8') as f:
+                    return f.read()
+            except Exception as e:
+                logger.error(f"Failed to read plan template: {e}")
+
+        logger.info("Using embedded plan template as fallback")
         return """<!-- SpecPulse Implementation Plan Template v1.0 -->
 <!-- AI Instructions: Generate plan from specification -->
 
@@ -336,10 +386,30 @@ indexes:
     def get_task_template(self) -> str:
         """Get task list template from file (cached)"""
         template_path = self.resources_dir / "templates" / "task.md"
+
+        if not template_path.exists():
+            logger.warning(
+                f"Template file not found: {template_path}. "
+                "Using embedded fallback template."
+            )
+            try:
+                from ..utils.console import Console
+                console = Console()
+                console.warning(
+                    f"⚠️  Template file missing: task.md\n"
+                    f"   Using default embedded template."
+                )
+            except:
+                pass
+
         if template_path.exists():
-            with open(template_path, 'r', encoding='utf-8') as f:
-                return f.read()
-        # Fallback to embedded template if file not found
+            try:
+                with open(template_path, 'r', encoding='utf-8') as f:
+                    return f.read()
+            except Exception as e:
+                logger.error(f"Failed to read task template: {e}")
+
+        logger.info("Using embedded task template as fallback")
         return """<!-- SpecPulse Task List Template v1.0 -->
 <!-- AI Instructions: Generate from implementation plan -->
 

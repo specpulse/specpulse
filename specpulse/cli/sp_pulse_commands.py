@@ -17,6 +17,7 @@ from ..utils.error_handler import (
     GitError
 )
 from ..core.memory_manager import MemoryManager
+from ..core.feature_id_generator import FeatureIDGenerator
 
 
 class SpPulseCommands:
@@ -28,6 +29,7 @@ class SpPulseCommands:
         self.memory_manager = MemoryManager(project_root)
         self.git = GitUtils(project_root)
         self.error_handler = ErrorHandler()
+        self.id_generator = FeatureIDGenerator(project_root)  # Thread-safe ID generation
 
     def init_feature(self, feature_name: str, feature_id: Optional[str] = None) -> bool:
         """
@@ -54,9 +56,10 @@ class SpPulseCommands:
             # Sanitize for consistency (lowercase, clean format)
             sanitized_name = self._sanitize_feature_name(validated_name)
 
-            # Determine feature ID
+            # Determine feature ID (THREAD-SAFE)
             if not feature_id:
-                feature_id = self._get_next_feature_id()
+                # Use thread-safe ID generator instead of directory scanning
+                feature_id = self.id_generator.get_next_id()
 
             # Create feature directory name
             feature_dir_name = f"{feature_id}-{sanitized_name}"
@@ -281,27 +284,20 @@ class SpPulseCommands:
         return sanitized
 
     def _get_next_feature_id(self) -> str:
-        """Get next available feature ID"""
-        specs_dir = self.project_root / "specs"
+        """
+        Get next available feature ID (DEPRECATED - use id_generator instead).
 
-        if not specs_dir.exists():
-            return "001"
+        This method is deprecated in favor of FeatureIDGenerator which provides
+        thread-safe, race-condition-free ID generation.
 
-        # Find all existing feature directories
-        existing_ids = []
-        for item in specs_dir.iterdir():
-            if item.is_dir() and re.match(r'^\d{3}-', item.name):
-                feature_id = item.name.split('-')[0]
-                try:
-                    existing_ids.append(int(feature_id))
-                except ValueError:
-                    continue
+        MIGRATION NOTE: This method is kept for backward compatibility but
+        should not be used for new code. Use self.id_generator.get_next_id() instead.
 
-        if not existing_ids:
-            return "001"
-
-        next_id = max(existing_ids) + 1
-        return f"{next_id:03d}"
+        Returns:
+            Next feature ID as 3-digit string
+        """
+        # Delegate to thread-safe generator
+        return self.id_generator.get_next_id()
 
     def _update_context(self, feature_id: str, feature_name: str, feature_dir_name: str):
         """Update memory/context.md with current feature"""
