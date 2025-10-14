@@ -2,11 +2,7 @@
 
 <div align="center">
 
-[![PyPI](https://img.shields.io/pypi/v/specpulse.svg)](https://pypi.org/project/specpulse/)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Downloads](https://img.shields.io/pypi/dm/specpulse)](https://pypi.org/project/specpulse/)
-[![Security](https://img.shields.io/badge/security-hardened-green.svg)](SECURITY.md)
+[![PyPI](https://img.shields.io/pypi/v/specpulse.svg)](https://pypi.org/project/specpulse/) [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Downloads](https://img.shields.io/pypi/dm/specpulse)](https://pypi.org/project/specpulse/) [![Security](https://img.shields.io/badge/security-hardened-green.svg)](SECURITY.md)
 
 **AI-Enhanced Specification-Driven Development Framework**
 
