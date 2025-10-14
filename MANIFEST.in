@@ -1,15 +1,26 @@
+# Include all resource files
 include README.md
 include LICENSE
-include pyproject.toml
-include requirements.txt
-recursive-include specpulse/resources *.md *.toml *.yaml
-recursive-include specpulse/resources/templates *
-recursive-include specpulse/resources/memory *
-recursive-include specpulse/resources/commands *
-global-exclude __pycache__
-global-exclude *.py[co]
-global-exclude .DS_Store
-global-exclude *.pyc
-global-exclude *.pyo
-global-exclude *.swp
-global-exclude *~
+include CHANGELOG.md
+include SECURITY.md
+include ARCHITECTURE.md
+include RELEASE_NOTES_v2.2.0.md
+
+# Include all template files
+recursive-include specpulse/resources/templates *.md
+recursive-include specpulse/resources/templates/decomposition *.md *.yaml *.ts
+
+# Include all command files  
+recursive-include specpulse/resources/commands *.md *.toml
+
+# Include memory templates
+recursive-include specpulse/resources/memory *.md
+
+# Include validation files
+include specpulse/resources/validation_rules.yaml
+include specpulse/resources/validation_examples.yaml
+
+# Exclude test and development files
+recursive-exclude tests *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
