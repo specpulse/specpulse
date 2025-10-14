@@ -13,7 +13,7 @@ Usage:
     >>> template_provider = container.resolve(ITemplateProvider)
 """
 
-from typing import Any, Callable, Dict, Optional, Type, TypeVar
+from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
 import threading
 import logging
 
