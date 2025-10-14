@@ -1,4 +1,4 @@
-# SpecPulse v2.2.2
+# SpecPulse v2.2.3
 
 <div align="center">
 
@@ -14,11 +14,18 @@
 
 ---
 
-## 🔥 What's New in v2.2.2
+## 🔥 What's New in v2.2.3
 
-**Current Version**: v2.2.2 (Stable Release with Comprehensive Test Suite)
+**Current Version**: v2.2.3 (Stable - Template Files Included)
 
-### ✨ v2.2.2 Release (2025-10-14)
+### 🔧 v2.2.3 Release (2025-10-14)
+
+- 🐛 **CRITICAL FIX**: Template files now included in package distribution
+- ✅ **Fixed**: `pyproject.toml` package-data now includes `resources/templates/*.md`
+- ✅ **No More Warnings**: Templates load from files instead of embedded fallbacks
+- 📦 **Complete Package**: All resource files properly bundled
+
+### ✨ v2.2.2 Release (included in v2.2.3)
 
 - 🧪 **NEW**: 47-test comprehensive validation suite
 - ✅ **91.5% Test Pass Rate** - All critical tests passing
@@ -80,7 +87,7 @@ SpecPulse is a **secure, fast, and clean** CLI framework for Specification-Drive
 pip install specpulse
 
 # Or install specific version
-pip install specpulse==2.2.2
+pip install specpulse==2.2.3
 
 # Upgrade from previous version (CRITICAL if from v2.1.3 or earlier)
 pip install --upgrade specpulse
@@ -624,7 +631,7 @@ Special thanks to:
 
 ---
 
-**🎉 Start building better, faster, and more secure software with SpecPulse v2.2.2!**
+**🎉 Start building better, faster, and more secure software with SpecPulse v2.2.3!**
 
 ```bash
 pip install specpulse
@@ -650,8 +657,8 @@ specpulse sp-pulse init my-feature
 
 **Made with ❤️ and 🔐 for developers who value specifications and security**
 
-**SpecPulse v2.2.2** - Secure, Fast, Clean, Tested
+**SpecPulse v2.2.3** - Secure, Fast, Clean, Tested, Complete
 
-[⬆ Back to Top](#specpulse-v222)
+[⬆ Back to Top](#specpulse-v223)
 
 </div>

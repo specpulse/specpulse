@@ -84,6 +84,8 @@ packages = [
     "specpulse.resources.commands.claude",
     "specpulse.resources.commands.gemini",
     "specpulse.resources.memory",
+    "specpulse.resources.templates",
+    "specpulse.resources.templates.decomposition",
 ]
 
 [tool.setuptools.package-data]
@@ -93,6 +95,10 @@ specpulse = [
     "resources/commands/claude/**/*.md",
     "resources/commands/gemini/*.toml",
     "resources/commands/gemini/**/*.toml",
+    "resources/templates/*.md",
+    "resources/templates/decomposition/*.md",
+    "resources/templates/decomposition/*.yaml",
+    "resources/templates/decomposition/*.ts",
     "resources/validation_rules.yaml",
     "resources/validation_examples.yaml",
 ]

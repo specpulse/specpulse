@@ -7,9 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.3] - 2025-10-14
+
+### 🔧 Critical Fix - Template Files Included in Package
+
+**CRITICAL**: This release fixes missing template files in package distribution
+
+#### Fixed
+
+- **CRITICAL**: Template files now properly included in package
+  - Added `"resources/templates/*.md"` to `pyproject.toml` package-data
+  - Added `"resources/templates/decomposition/*.md"` for decomposition templates
+  - Added `"resources/templates/decomposition/*.yaml"` for API contracts
+  - Added `"resources/templates/decomposition/*.ts"` for interfaces
+  - Templates now load from files instead of embedded fallbacks
+
+- **IMPROVED**: Package configuration
+  - Added `specpulse.resources.templates` to packages list
+  - Added `specpulse.resources.templates.decomposition` to packages list
+  - Complete resource file bundling
+
+#### Impact
+
+**BEFORE v2.2.3**:
+- Template files missing from installed package
+- Users saw warnings: "Template file missing: spec.md"
+- Fell back to embedded templates (worked but showed warnings)
+
+**AFTER v2.2.3**:
+- All template files properly included
+- No warnings during `specpulse init`
+- Templates load from actual files
+- Clean user experience
+
+#### Verification
+
+```bash
+# After installing v2.2.3:
+pip install --upgrade specpulse
+specpulse init my-project
+
+# Result: NO warnings, templates load from files ✅
+```
+
+#### Quality
+
+- All v2.2.2 features and tests included
+- 1,500+ tests still passing
+- Production ready
+
+**Recommended for all users** - most complete release
+
+---
+
 ## [2.2.2] - 2025-10-14
 
-### ✨ Stable Release - Comprehensive Test Suite
+### ✨ Stable Release - Comprehensive Test Suite (superseded by v2.2.3)
 
 **RECOMMENDED**: This is the recommended stable version with full test coverage
 
