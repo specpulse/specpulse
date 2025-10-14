@@ -7,9 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.4] - 2025-10-14
+
+### ✅ Critical Fix - Template Files Verified Working
+
+**RECOMMENDED**: This is the recommended stable version - all template files working
+
+#### Fixed
+
+- **VERIFIED**: Template files now properly bundled and loading correctly
+  - Added `__init__.py` to `specpulse/resources/templates/`
+  - Added `__init__.py` to `specpulse/resources/templates/decomposition/`
+  - Created `MANIFEST.in` for explicit file inclusion
+  - Templates recognized as proper Python packages
+
+- **TESTED**: Local installation verified
+  - Templates load from actual files (no embedded fallbacks)
+  - No warnings during `specpulse init`
+  - Clean user experience confirmed
+
+#### What This Fixes
+
+**Issue**: v2.2.0-2.2.3 had template files in source but they weren't properly bundled in the wheel/sdist packages due to missing `__init__.py` files.
+
+**Solution**: Added `__init__.py` files to make templates/ a proper Python package, plus `MANIFEST.in` for explicit inclusion.
+
+**Result**: Users now get actual template files, not embedded fallbacks.
+
+#### Verification
+
+```bash
+pip install --upgrade specpulse  # Gets v2.2.4
+specpulse init my-project
+# Result: NO template warnings! ✅
+```
+
+**This is the MOST STABLE and COMPLETE release** - recommended for all users.
+
+---
+
 ## [2.2.3] - 2025-10-14
 
-### 🔧 Critical Fix - Template Files Included in Package
+### 🔧 Critical Fix - Template Files Config (superseded by v2.2.4)
 
 **CRITICAL**: This release fixes missing template files in package distribution
 
