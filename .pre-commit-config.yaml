@@ -1,0 +1,98 @@
+# SpecPulse Security Pre-Commit Hooks
+#
+# These hooks prevent security regressions by checking for:
+# - shell=True in subprocess calls (command injection risk)
+# - yaml.load() instead of yaml.safe_load() (arbitrary code execution risk)
+# - Missing path validation on user inputs
+#
+# Install: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # Security checks (local scripts)
+  - repo: local
+    hooks:
+      - id: check-shell-true
+        name: Prevent shell=True in subprocess
+        entry: bash -c 'if grep -r "shell=True" specpulse/; then echo "ERROR: shell=True detected in subprocess call. Use list form instead."; exit 1; fi'
+        language: system
+        pass_filenames: false
+        stages: [commit]
+
+      - id: check-yaml-safe-load
+        name: Enforce yaml.safe_load
+        entry: bash -c 'if grep -rE "yaml\\.load\\([^)]*\\)" specpulse/ | grep -v "yaml.safe_load"; then echo "ERROR: yaml.load() detected. Use yaml.safe_load() instead."; exit 1; fi'
+        language: system
+        pass_filenames: false
+        stages: [commit]
+
+      - id: check-path-validation
+        name: Ensure path validation on user input
+        entry: python scripts/check_path_validation.py
+        language: system
+        pass_filenames: false
+        stages: [commit]
+
+      - id: check-sql-injection
+        name: Check for SQL injection risks
+        entry: bash -c 'if grep -rE "execute\\([^)]*%|execute\\([^)]*\\+" specpulse/; then echo "WARNING: Potential SQL injection detected. Use parameterized queries."; exit 1; fi'
+        language: system
+        pass_filenames: false
+        stages: [commit]
+
+  # Python code quality
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        name: Format Python code with Black
+        args: [--line-length=100]
+        language_version: python3
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        name: Lint Python code with flake8
+        args: [--max-line-length=100, --extend-ignore=E203,W503]
+        additional_dependencies: [flake8-docstrings]
+
+  # Security scanning
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.6
+    hooks:
+      - id: bandit
+        name: Security scan with Bandit
+        args: [-c, pyproject.toml]
+        additional_dependencies: ["bandit[toml]"]
+
+  # YAML validation
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+        name: Validate YAML syntax
+      - id: check-json
+        name: Validate JSON syntax
+      - id: check-toml
+        name: Validate TOML syntax
+      - id: end-of-file-fixer
+        name: Fix end of file
+      - id: trailing-whitespace
+        name: Remove trailing whitespace
+      - id: check-added-large-files
+        name: Prevent large files (>500KB)
+        args: ['--maxkb=500']
+      - id: detect-private-key
+        name: Detect private keys
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+
+  # Type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        name: Type check with mypy
+        additional_dependencies: [types-all]
+        args: [--ignore-missing-imports, --python-version=3.11]

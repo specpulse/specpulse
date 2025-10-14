@@ -1,5 +1,12 @@
 """
 Git utilities for SpecPulse
+
+SECURITY: All git operations use secure subprocess calls with:
+- List form (no shell interpretation)
+- Input validation for branch names and commit messages
+- No shell=True usage
+
+All user-provided inputs are validated before git operations.
 """
 
 import subprocess
@@ -8,11 +15,134 @@ from pathlib import Path
 from typing import Optional, List, Tuple
 
 
+class GitSecurityError(Exception):
+    """Raised when git operation has security concerns"""
+    pass
+
+
 class GitUtils:
-    """Git operations utility class"""
-    
+    """
+    Git operations utility class with security validation.
+
+    All git commands use secure subprocess calls (no shell=True).
+    All user inputs are validated before git operations.
+    """
+
+    # Security constraints for git operations
+    VALID_BRANCH_NAME = re.compile(r'^[a-zA-Z0-9\-_/]+$')
+    MAX_BRANCH_NAME_LENGTH = 255
+    MAX_COMMIT_MESSAGE_LENGTH = 5000
+    MAX_TAG_NAME_LENGTH = 255
+
     def __init__(self, repo_path: Optional[Path] = None):
         self.repo_path = repo_path or Path.cwd()
+
+    @staticmethod
+    def _validate_branch_name(branch_name: str) -> str:
+        """
+        Validate git branch name for security.
+
+        Args:
+            branch_name: Branch name to validate
+
+        Returns:
+            Validated branch name
+
+        Raises:
+            GitSecurityError: If branch name is invalid
+        """
+        if not branch_name:
+            raise GitSecurityError("Branch name cannot be empty")
+
+        if len(branch_name) > GitUtils.MAX_BRANCH_NAME_LENGTH:
+            raise GitSecurityError(
+                f"Branch name too long: {len(branch_name)} chars "
+                f"(max {GitUtils.MAX_BRANCH_NAME_LENGTH})"
+            )
+
+        # Check for command injection patterns
+        dangerous_chars = [';', '&', '|', '$', '`', '(', ')', '<', '>', '\n', '\r']
+        for char in dangerous_chars:
+            if char in branch_name:
+                raise GitSecurityError(
+                    f"Branch name contains forbidden character: '{char}'"
+                )
+
+        # Validate character set (allow slashes for feature branches)
+        if not GitUtils.VALID_BRANCH_NAME.match(branch_name):
+            raise GitSecurityError(
+                f"Branch name contains invalid characters: '{branch_name}'. "
+                "Only alphanumeric, hyphen, underscore, and forward slash allowed."
+            )
+
+        return branch_name
+
+    @staticmethod
+    def _validate_commit_message(message: str) -> str:
+        """
+        Validate commit message for security.
+
+        Args:
+            message: Commit message to validate
+
+        Returns:
+            Validated message
+
+        Raises:
+            GitSecurityError: If message is invalid
+        """
+        if not message:
+            raise GitSecurityError("Commit message cannot be empty")
+
+        if len(message) > GitUtils.MAX_COMMIT_MESSAGE_LENGTH:
+            raise GitSecurityError(
+                f"Commit message too long: {len(message)} chars "
+                f"(max {GitUtils.MAX_COMMIT_MESSAGE_LENGTH})"
+            )
+
+        # Check for command injection attempts in commit message
+        # Git commit messages are passed via -m flag, so shell metacharacters
+        # won't be interpreted, but we still validate for safety
+        dangerous_patterns = ['$(', '`', '\x00']  # Null bytes and command substitution
+        for pattern in dangerous_patterns:
+            if pattern in message:
+                raise GitSecurityError(
+                    f"Commit message contains forbidden pattern: '{pattern}'"
+                )
+
+        return message
+
+    @staticmethod
+    def _validate_tag_name(tag_name: str) -> str:
+        """
+        Validate git tag name for security.
+
+        Args:
+            tag_name: Tag name to validate
+
+        Returns:
+            Validated tag name
+
+        Raises:
+            GitSecurityError: If tag name is invalid
+        """
+        if not tag_name:
+            raise GitSecurityError("Tag name cannot be empty")
+
+        if len(tag_name) > GitUtils.MAX_TAG_NAME_LENGTH:
+            raise GitSecurityError(
+                f"Tag name too long: {len(tag_name)} chars "
+                f"(max {GitUtils.MAX_TAG_NAME_LENGTH})"
+            )
+
+        # Tags should be simple names (no slashes unlike branches)
+        if not re.match(r'^[a-zA-Z0-9\-_.]+$', tag_name):
+            raise GitSecurityError(
+                f"Tag name contains invalid characters: '{tag_name}'. "
+                "Only alphanumeric, hyphen, underscore, and dot allowed."
+            )
+
+        return tag_name
     
     def _run_git_command(self, *args) -> Tuple[bool, str]:
         """Run a git command and return success status and output"""
@@ -66,13 +196,39 @@ class GitUtils:
         return output if success else None
     
     def create_branch(self, branch_name: str) -> bool:
-        """Create and checkout a new branch"""
-        success, _ = self._run_git_command("checkout", "-b", branch_name)
+        """
+        Create and checkout a new branch (with security validation).
+
+        Args:
+            branch_name: Name of branch to create
+
+        Returns:
+            True if successful, False otherwise
+
+        Raises:
+            GitSecurityError: If branch name is invalid/malicious
+        """
+        # SECURITY: Validate branch name before git operation
+        validated_name = self._validate_branch_name(branch_name)
+        success, _ = self._run_git_command("checkout", "-b", validated_name)
         return success
     
     def checkout_branch(self, branch_name: str) -> bool:
-        """Checkout an existing branch"""
-        success, _ = self._run_git_command("checkout", branch_name)
+        """
+        Checkout an existing branch (with security validation).
+
+        Args:
+            branch_name: Name of branch to checkout
+
+        Returns:
+            True if successful, False otherwise
+
+        Raises:
+            GitSecurityError: If branch name is invalid/malicious
+        """
+        # SECURITY: Validate branch name before git operation
+        validated_name = self._validate_branch_name(branch_name)
+        success, _ = self._run_git_command("checkout", validated_name)
         return success
     
     def get_branches(self) -> List[str]:
@@ -99,8 +255,21 @@ class GitUtils:
         return success
     
     def commit(self, message: str) -> bool:
-        """Create a commit with message"""
-        success, _ = self._run_git_command("commit", "-m", message)
+        """
+        Create a commit with message (with security validation).
+
+        Args:
+            message: Commit message
+
+        Returns:
+            True if successful, False otherwise
+
+        Raises:
+            GitSecurityError: If commit message is invalid/malicious
+        """
+        # SECURITY: Validate commit message before git operation
+        validated_message = self._validate_commit_message(message)
+        success, _ = self._run_git_command("commit", "-m", validated_message)
         return success
     
     def get_status(self) -> Optional[str]:
@@ -175,13 +344,30 @@ class GitUtils:
         return output if success else None
     
     def tag(self, tag_name: str, message: Optional[str] = None) -> bool:
-        """Create a tag"""
+        """
+        Create a tag (with security validation).
+
+        Args:
+            tag_name: Name of tag
+            message: Optional tag message
+
+        Returns:
+            True if successful, False otherwise
+
+        Raises:
+            GitSecurityError: If tag name or message is invalid/malicious
+        """
+        # SECURITY: Validate tag name before git operation
+        validated_tag = self._validate_tag_name(tag_name)
+
         args = ["tag"]
         if message:
-            args.extend(["-a", tag_name, "-m", message])
+            # SECURITY: Validate tag message
+            validated_message = self._validate_commit_message(message)
+            args.extend(["-a", validated_tag, "-m", validated_message])
         else:
-            args.append(tag_name)
-        
+            args.append(validated_tag)
+
         success, _ = self._run_git_command(*args)
         return success
     
@@ -216,22 +402,74 @@ class GitUtils:
         return success
 
     def merge(self, branch: str) -> bool:
-        """Merge branch into current branch"""
-        success, _ = self._run_git_command("merge", branch)
+        """
+        Merge branch into current branch (with security validation).
+
+        Args:
+            branch: Name of branch to merge
+
+        Returns:
+            True if successful, False otherwise
+
+        Raises:
+            GitSecurityError: If branch name is invalid/malicious
+        """
+        # SECURITY: Validate branch name before git operation
+        validated_branch = self._validate_branch_name(branch)
+        success, _ = self._run_git_command("merge", validated_branch)
         return success
 
     def create_branch(self, branch_name: str) -> bool:
-        """Create and checkout a new branch"""
-        success, _ = self._run_git_command("checkout", "-b", branch_name)
+        """
+        Create and checkout a new branch (with security validation).
+
+        Args:
+            branch_name: Name of branch to create
+
+        Returns:
+            True if successful, False otherwise
+
+        Raises:
+            GitSecurityError: If branch name is invalid/malicious
+        """
+        # SECURITY: Validate branch name before git operation
+        validated_name = self._validate_branch_name(branch_name)
+        success, _ = self._run_git_command("checkout", "-b", validated_name)
         return success
 
     def checkout_branch(self, branch_name: str) -> bool:
-        """Checkout an existing branch"""
-        success, _ = self._run_git_command("checkout", branch_name)
+        """
+        Checkout an existing branch (with security validation).
+
+        Args:
+            branch_name: Name of branch to checkout
+
+        Returns:
+            True if successful, False otherwise
+
+        Raises:
+            GitSecurityError: If branch name is invalid/malicious
+        """
+        # SECURITY: Validate branch name before git operation
+        validated_name = self._validate_branch_name(branch_name)
+        success, _ = self._run_git_command("checkout", validated_name)
         return success
 
     def branch_exists(self, branch_name: str) -> bool:
-        """Check if branch exists"""
-        success, output = self._run_git_command("branch", "--list", branch_name)
-        return success and branch_name in output
+        """
+        Check if branch exists (with security validation).
+
+        Args:
+            branch_name: Name of branch to check
+
+        Returns:
+            True if exists, False otherwise
+
+        Raises:
+            GitSecurityError: If branch name is invalid/malicious
+        """
+        # SECURITY: Validate branch name before git operation
+        validated_name = self._validate_branch_name(branch_name)
+        success, output = self._run_git_command("branch", "--list", validated_name)
+        return success and validated_name in output
 
