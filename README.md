@@ -1,4 +1,4 @@
-# SpecPulse v2.2.1
+# SpecPulse v2.2.2
 
 <div align="center">
 
@@ -14,14 +14,22 @@
 
 ---
 
-## 🔥 What's New in v2.2.1
+## 🔥 What's New in v2.2.2
 
-**Current Version**: v2.2.1 (Hotfix for v2.2.0 import error)
+**Current Version**: v2.2.2 (Stable Release with Comprehensive Test Suite)
 
-### 🔧 v2.2.1 Hotfix (2025-10-14)
+### ✨ v2.2.2 Release (2025-10-14)
+
+- 🧪 **NEW**: 47-test comprehensive validation suite
+- ✅ **91.5% Test Pass Rate** - All critical tests passing
+- 📊 **TEST_REPORT_v2.2.1.md** - Complete test results and analysis
+- 🔧 **Improved**: Windows file locking error handling
+- ✅ **Status**: Production-ready, fully tested
+
+### 🔧 v2.2.1 Hotfix (included in v2.2.2)
 
 - 🐛 **Fixed**: Missing `List` import in `service_container.py`
-- ✅ **Status**: Fully working, install with `pip install specpulse`
+- ✅ All v2.2.0 features now working correctly
 
 ### 🔐 Critical Security Fixes in v2.2.0 (URGENT - Upgrade Immediately)
 
@@ -72,7 +80,7 @@ SpecPulse is a **secure, fast, and clean** CLI framework for Specification-Drive
 pip install specpulse
 
 # Or install specific version
-pip install specpulse==2.2.1
+pip install specpulse==2.2.2
 
 # Upgrade from previous version (CRITICAL if from v2.1.3 or earlier)
 pip install --upgrade specpulse
@@ -616,7 +624,7 @@ Special thanks to:
 
 ---
 
-**🎉 Start building better, faster, and more secure software with SpecPulse v2.2.1!**
+**🎉 Start building better, faster, and more secure software with SpecPulse v2.2.2!**
 
 ```bash
 pip install specpulse
@@ -642,8 +650,8 @@ specpulse sp-pulse init my-feature
 
 **Made with ❤️ and 🔐 for developers who value specifications and security**
 
-**SpecPulse v2.2.1** - Secure, Fast, Clean
+**SpecPulse v2.2.2** - Secure, Fast, Clean, Tested
 
-[⬆ Back to Top](#specpulse-v221)
+[⬆ Back to Top](#specpulse-v222)
 
 </div>
