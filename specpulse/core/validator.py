@@ -1,5 +1,8 @@
 """
 SpecPulse Validator - Enhanced with comprehensive validation rules
+
+This is the main validator that orchestrates specialized validators
+for different aspects of the project (specs, plans, SDD compliance).
 """
 
 from pathlib import Path
@@ -18,6 +21,11 @@ from .validation_rules import (
     validation_rules_registry, ValidationResult, ValidationSeverity,
     ValidationCategory
 )
+
+# Import specialized validators (v2.2.5+)
+from .validators.spec_validator import SpecValidator
+from .validators.plan_validator import PlanValidator
+from .validators.sdd_validator import SddValidator
 
 
 @dataclass
@@ -101,6 +109,11 @@ class Validator:
         self.constitution = None
         self.phase_gates = []
         self.rules_registry = validation_rules_registry
+
+        # Initialize specialized validators (v2.2.5+)
+        self.spec_validator = SpecValidator(project_root)
+        self.plan_validator = PlanValidator(project_root)
+        self.sdd_validator = SddValidator(project_root)
 
         if project_root:
             self._load_constitution(project_root)

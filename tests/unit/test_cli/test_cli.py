@@ -9,7 +9,7 @@ import tempfile
 import shutil
 import os
 
-from specpulse.cli.main import SpecPulseCLI
+from specpulse.cli.handlers.command_handler import CommandHandler as SpecPulseCLI
 
 
 class TestSpecPulseCLI:

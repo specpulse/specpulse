@@ -11,11 +11,30 @@ from dataclasses import dataclass, asdict
 import re
 import yaml
 
+# Template validation patterns for security
+DANGEROUS_TEMPLATE_PATTERNS = [
+    r'config\s*\.',                               # config attribute access
+    r'env\s*\.',                                   # environment variable access
+    r'request\s*\.',                               # request object access
+    r'__\w+',                                      # dunder methods
+    r'\.eval\s*\(',                               # eval method calls
+    r'\.exec\s*\(',                               # exec method calls
+    r'\.open\s*\(',                               # file open calls
+    r'\.subprocess\s*\.',                          # subprocess access
+    r'\.os\s*\.',                                  # os module access
+    r'\.sys\s*\.',                                 # sys module access
+    r'range\s*\(',                                 # range function (DoS)
+    r'lipsum\s*\(',                                # lipsum function (DoS)
+    r'cycler\s*\(',                                # cycler function
+    r'joiner\s*\(',                                # joiner function
+]
+
 from ..utils.error_handler import (
     TemplateError, ValidationError, ErrorSeverity,
     validate_templates, suggest_recovery_for_error
 )
 from ..utils.console import Console
+from ..utils.template_validator import TemplateValidator, ValidationResult
 
 
 @dataclass
@@ -48,6 +67,51 @@ class TemplateValidationResult:
     suggestions: List[str]
 
 
+def validate_template_security(content: str) -> Tuple[bool, List[str]]:
+    """
+    Validate template content for security vulnerabilities.
+
+    Args:
+        content: Template content to validate
+
+    Returns:
+        Tuple of (is_safe, list_of_vulnerabilities)
+    """
+    vulnerabilities = []
+
+    # Check dangerous patterns
+    for pattern in DANGEROUS_TEMPLATE_PATTERNS:
+        if re.search(pattern, content, re.IGNORECASE | re.MULTILINE | re.DOTALL):
+            vulnerabilities.append(f"Dangerous template pattern detected: {pattern}")
+
+    # Check for excessive template complexity (DoS protection)
+    lines = content.split('\n')
+    if len(lines) > 1000:
+        vulnerabilities.append("Template too large (potential DoS vector)")
+
+    # Check for excessive variable usage
+    var_count = len(re.findall(r'\{\{\s*\w+[\w\.]*\s*\}\}', content))
+    if var_count > 200:
+        vulnerabilities.append("Too many template variables (performance concern)")
+
+    # Check for deep nesting using character count
+    # Simple heuristic: count opening tags and closing tags
+    opening_blocks = len(re.findall(r'\{\%\s*(if|for|block|macro|filter|with)', content))
+    closing_blocks = len(re.findall(r'\{\%\s*end(if|for|block|macro|filter|with)?', content))
+
+    # Estimate maximum nesting depth
+    estimated_depth = max(0, opening_blocks - closing_blocks)
+
+    # Also check for obvious deeply nested patterns
+    if re.search(r'(\{\%\s*if.*\%\}){11,}', content) or opening_blocks > 10:
+        vulnerabilities.append("Template nesting too deep (performance concern)")
+    elif estimated_depth > 10:
+        vulnerabilities.append("Template nesting too deep (performance concern)")
+
+    is_safe = len(vulnerabilities) == 0
+    return is_safe, vulnerabilities
+
+
 class TemplateManager:
     """Enhanced template management system"""
 
@@ -65,6 +129,9 @@ class TemplateManager:
 
         # Initialize template registry
         self.registry = self._load_registry()
+
+        # Initialize advanced template validator
+        self.validator = TemplateValidator(strict_mode=False)
 
         # Standard template variables
         self.standard_variables = {
@@ -200,15 +267,40 @@ class TemplateManager:
             )
 
         content = template_path.read_text(encoding='utf-8')
+
+        # Use the advanced template validator
+        validation_result = self.validator.validate_template(content, template_path)
+
+        # Convert ValidationResult to the expected format
         errors = []
         warnings = []
         suggestions = []
 
-        # Extract template variables
-        variables = self._extract_variables(content)
+        # Process validation issues
+        for issue in validation_result.issues:
+            message = issue.message
+            if issue.line_number:
+                message = f"Line {issue.line_number}: {message}"
+
+            if issue.severity.value in ['critical', 'error']:
+                errors.append(message)
+            elif issue.severity.value == 'warning':
+                warnings.append(message)
+            else:  # info
+                suggestions.append(message)
+
+            # Add specific suggestions from issues
+            if issue.suggestion:
+                suggestions.append(issue.suggestion)
+
+        # Add general suggestions from validation
+        suggestions.extend(validation_result.suggestions)
+
+        # Legacy variable extraction for compatibility
+        variables = validation_result.variables
         category = self._get_template_category(template_path)
 
-        # Check for required variables
+        # Check for required variables using legacy method for compatibility
         if category in self.standard_variables:
             standard_vars = set(self.standard_variables[category])
             missing_vars = standard_vars - variables
@@ -221,20 +313,18 @@ class TemplateManager:
             if extra_vars:
                 warnings.append(f"Extra variables not in standard set: {', '.join(extra_vars)}")
 
-        # Validate Jinja2 syntax
+        # Legacy validation for backward compatibility
+        # Validate Jinja2 syntax with secure environment
         try:
-            from jinja2 import Environment, meta
-            env = Environment()
+            from jinja2.sandbox import SandboxedEnvironment
+            from jinja2 import meta
+
+            # Use SandboxedEnvironment with autoescape for security
+            env = SandboxedEnvironment(autoescape=True)
             env.parse(content)
         except Exception as e:
             errors.append(f"Jinja2 syntax error: {e}")
             suggestions.append("Check template syntax and variable formatting")
-
-        # Check for template structure
-        if not content.strip():
-            errors.append("Template is empty")
-        elif len(content) < 100:
-            warnings.append("Template seems too short")
 
         # Check for required sections based on category
         required_sections = {
@@ -375,9 +465,23 @@ class TemplateManager:
                 category = self._get_template_category(template_path)
                 sample_data = self._get_sample_data(category)
 
-            # Render template with sample data
-            from jinja2 import Environment, BaseLoader
-            env = Environment(loader=BaseLoader())
+            # Validate template with advanced validator before rendering
+            validation_result = self.validator.validate_template(content, template_path)
+            if not validation_result.is_safe:
+                error_messages = [issue.message for issue in validation_result.critical_issues + validation_result.error_issues]
+                raise TemplateError(f"Template contains security vulnerabilities: {'; '.join(error_messages)}")
+
+            # Additional legacy security check for backward compatibility
+            is_safe, vulnerabilities = validate_template_security(content)
+            if not is_safe:
+                raise TemplateError(f"Template contains security vulnerabilities: {'; '.join(vulnerabilities)}")
+
+            # Render template with sample data using secure environment
+            from jinja2.sandbox import SandboxedEnvironment
+            from jinja2 import BaseLoader
+
+            # Use SandboxedEnvironment with autoescape for maximum security
+            env = SandboxedEnvironment(autoescape=True, loader=BaseLoader())
             template = env.from_string(content)
             rendered = template.render(**sample_data)
 

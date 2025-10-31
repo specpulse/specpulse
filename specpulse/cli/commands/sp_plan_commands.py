@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-sp-spec Commands - Specification Management
+sp-plan Commands - Implementation Plan Management
 """
 
 from pathlib import Path
@@ -9,18 +9,18 @@ from typing import Optional, Dict, List
 import yaml
 import re
 
-from ..utils.console import Console
-from ..utils.path_validator import PathValidator, SecurityError
-from ..utils.error_handler import (
+from ...utils.console import Console
+from ...utils.path_validator import PathValidator, SecurityError
+from ...utils.error_handler import (
     ErrorHandler, ValidationError, TemplateError
 )
-from ..core.template_manager import TemplateManager
-from ..core.validator import Validator
-from ..core.specpulse import SpecPulse
+from ...core.template_manager import TemplateManager
+from ...core.validator import Validator
+from ...core.specpulse import SpecPulse
 
 
-class SpSpecCommands:
-    """Handler for sp-spec CLI commands"""
+class SpPlanCommands:
+    """Handler for sp-plan CLI commands"""
 
     def __init__(self, console: Console, project_root: Path):
         self.console = console
@@ -32,10 +32,10 @@ class SpSpecCommands:
 
     def create(self, description: str, feature_name: Optional[str] = None) -> bool:
         """
-        Create a new specification
+        Create a new implementation plan
 
         Args:
-            description: Specification description
+            description: Plan description
             feature_name: Optional feature name/ID, auto-detects from context if not provided
 
         Returns:
@@ -46,21 +46,28 @@ class SpSpecCommands:
             feature_dir = self._get_current_feature(feature_name)
 
             if not feature_dir:
-                self.console.error("No active feature found. Run 'specpulse sp-pulse <name>' first")
+                self.console.error("No active feature found. Run 'specpulse sp-pulse init <name>' first")
                 return False
 
             feature_dir_name = feature_dir.name
+            plans_dir = self.project_root / "plans" / feature_dir_name
+
+            # Determine next plan number
+            plan_number = self._get_next_plan_number(plans_dir)
+            plan_filename = f"plan-{plan_number:03d}.md"
+            plan_path = plans_dir / plan_filename
+
+            self.console.header(f"Creating Implementation Plan: {plan_filename}", style="bright_cyan")
+
+            # Check if spec exists
             specs_dir = self.project_root / "specs" / feature_dir_name
+            spec_files = list(specs_dir.glob("spec-*.md"))
 
-            # Determine next spec number
-            spec_number = self._get_next_spec_number(specs_dir)
-            spec_filename = f"spec-{spec_number:03d}.md"
-            spec_path = specs_dir / spec_filename
-
-            self.console.header(f"Creating Specification: {spec_filename}", style="bright_cyan")
+            if not spec_files:
+                self.console.warning("No specification found. Consider creating a spec first with 'specpulse sp-spec create'")
 
             # Read template
-            template_content = self.specpulse.get_spec_template()
+            template_content = self.specpulse.get_plan_template()
 
             # Prepare metadata
             timestamp = datetime.now().strftime("%Y-%m-%d")
@@ -70,7 +77,7 @@ class SpSpecCommands:
             content = template_content
             content = content.replace("{{ feature_name }}", feature_dir_name)
             content = content.replace("{{ feature_id }}", feature_id)
-            content = content.replace("{{ spec_id }}", f"{spec_number:03d}")
+            content = content.replace("{{ plan_id }}", f"{plan_number:03d}")
             content = content.replace("{{ date }}", timestamp)
             content = content.replace("{{ description }}", description)
 
@@ -78,7 +85,7 @@ class SpSpecCommands:
             metadata = f"""<!-- SPECPULSE_METADATA
 FEATURE_DIR: {feature_dir_name}
 FEATURE_ID: {feature_id}
-SPEC_ID: {spec_number:03d}
+PLAN_ID: {plan_number:03d}
 CREATED: {datetime.now().isoformat()}
 STATUS: draft
 -->
@@ -86,33 +93,34 @@ STATUS: draft
 """
             content = metadata + content
 
-            # SECURITY: Validate spec file path before writing
+            # SECURITY: Validate plan file path before writing
             try:
-                safe_spec_path = PathValidator.validate_file_path(self.project_root, spec_path)
+                safe_plan_path = PathValidator.validate_file_path(self.project_root, plan_path)
             except SecurityError as e:
                 raise ValidationError(f"Security violation: {str(e)}")
 
-            # Write spec file
-            safe_spec_path.write_text(content, encoding='utf-8')
+            # Write plan file
+            safe_plan_path.write_text(content, encoding='utf-8')
 
-            self.console.success(f"Created: {safe_spec_path.relative_to(self.project_root)}")
+            self.console.success(f"Created: {safe_plan_path.relative_to(self.project_root)}")
             self.console.info(f"\nNext steps:")
-            self.console.info(f"1. Edit the specification: {spec_path.relative_to(self.project_root)}")
-            self.console.info(f"2. Expand with AI (Claude/Gemini): /sp-spec expand")
-            self.console.info(f"3. Validate: specpulse sp-spec validate {spec_number:03d}")
+            self.console.info(f"1. Edit the plan: {plan_path.relative_to(self.project_root)}")
+            self.console.info(f"2. Expand with AI (Claude/Gemini): /sp-plan expand")
+            self.console.info(f"3. Validate: specpulse sp-plan validate {plan_number:03d}")
+            self.console.info(f"4. Create tasks: specpulse sp-task breakdown {plan_number:03d}")
 
             return True
 
         except Exception as e:
-            self.console.error(f"Failed to create specification: {str(e)}")
+            self.console.error(f"Failed to create plan: {str(e)}")
             return False
 
-    def update(self, spec_id: str, changes: str, feature_name: Optional[str] = None) -> bool:
+    def update(self, plan_id: str, changes: str, feature_name: Optional[str] = None) -> bool:
         """
-        Update an existing specification
+        Update an existing plan
 
         Args:
-            spec_id: Specification ID (e.g., "001")
+            plan_id: Plan ID (e.g., "001")
             changes: Description of changes to make
             feature_name: Optional feature name/ID
 
@@ -120,11 +128,11 @@ STATUS: draft
             bool: True if successful, False otherwise
         """
         try:
-            # SECURITY: Validate spec ID format
+            # SECURITY: Validate plan ID format
             try:
-                PathValidator.validate_spec_id(spec_id)
+                PathValidator.validate_spec_id(plan_id)  # Reuse spec_id validation (3-digit format)
             except ValueError as e:
-                raise ValidationError(f"Invalid spec ID: {str(e)}")
+                raise ValidationError(f"Invalid plan ID: {str(e)}")
 
             feature_dir = self._get_current_feature(feature_name)
 
@@ -132,24 +140,16 @@ STATUS: draft
                 self.console.error("No active feature found")
                 return False
 
-            spec_path = self.project_root / "specs" / feature_dir.name / f"spec-{spec_id}.md"
+            plan_path = self.project_root / "plans" / feature_dir.name / f"plan-{plan_id}.md"
 
-            # SECURITY: Validate file path
-            try:
-                safe_spec_path = PathValidator.validate_file_path(self.project_root, spec_path)
-            except SecurityError as e:
-                raise ValidationError(f"Security violation: {str(e)}")
-
-            spec_path = safe_spec_path
-
-            if not spec_path.exists():
-                self.console.error(f"Specification not found: spec-{spec_id}.md")
+            if not plan_path.exists():
+                self.console.error(f"Plan not found: plan-{plan_id}.md")
                 return False
 
-            self.console.header(f"Updating Specification: spec-{spec_id}.md", style="bright_cyan")
+            self.console.header(f"Updating Plan: plan-{plan_id}.md", style="bright_cyan")
 
             # Read current content
-            content = spec_path.read_text(encoding='utf-8')
+            content = plan_path.read_text(encoding='utf-8')
 
             # Add update log
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -168,35 +168,35 @@ STATUS: draft
                 content
             )
 
-            spec_path.write_text(content, encoding='utf-8')
+            plan_path.write_text(content, encoding='utf-8')
 
-            self.console.success(f"Updated: {spec_path.relative_to(self.project_root)}")
+            self.console.success(f"Updated: {plan_path.relative_to(self.project_root)}")
             self.console.info(f"\nChanges logged: {changes}")
 
             return True
 
         except Exception as e:
-            self.console.error(f"Failed to update specification: {str(e)}")
+            self.console.error(f"Failed to update plan: {str(e)}")
             return False
 
-    def validate(self, spec_id: Optional[str] = None, feature_name: Optional[str] = None) -> bool:
+    def validate(self, plan_id: Optional[str] = None, feature_name: Optional[str] = None) -> bool:
         """
-        Validate specification(s)
+        Validate implementation plan(s)
 
         Args:
-            spec_id: Optional specific spec ID, validates all if not provided
+            plan_id: Optional specific plan ID, validates all if not provided
             feature_name: Optional feature name/ID
 
         Returns:
             bool: True if validation passes, False otherwise
         """
         try:
-            # SECURITY: Validate spec ID if provided
-            if spec_id:
+            # SECURITY: Validate plan ID if provided
+            if plan_id:
                 try:
-                    PathValidator.validate_spec_id(spec_id)
+                    PathValidator.validate_spec_id(plan_id)
                 except ValueError as e:
-                    raise ValidationError(f"Invalid spec ID: {str(e)}")
+                    raise ValidationError(f"Invalid plan ID: {str(e)}")
 
             feature_dir = self._get_current_feature(feature_name)
 
@@ -204,38 +204,38 @@ STATUS: draft
                 self.console.error("No active feature found")
                 return False
 
-            specs_dir = self.project_root / "specs" / feature_dir.name
+            plans_dir = self.project_root / "plans" / feature_dir.name
 
-            if spec_id:
-                # Validate specific spec
-                spec_path = specs_dir / f"spec-{spec_id}.md"
-                if not spec_path.exists():
-                    self.console.error(f"Specification not found: spec-{spec_id}.md")
+            if plan_id:
+                # Validate specific plan
+                plan_path = plans_dir / f"plan-{plan_id}.md"
+                if not plan_path.exists():
+                    self.console.error(f"Plan not found: plan-{plan_id}.md")
                     return False
 
-                specs_to_validate = [spec_path]
+                plans_to_validate = [plan_path]
             else:
-                # Validate all specs
-                specs_to_validate = list(specs_dir.glob("spec-*.md"))
+                # Validate all plans
+                plans_to_validate = list(plans_dir.glob("plan-*.md"))
 
-            if not specs_to_validate:
-                self.console.warning("No specifications found to validate")
+            if not plans_to_validate:
+                self.console.warning("No plans found to validate")
                 return False
 
-            self.console.header("Validating Specifications", style="bright_cyan")
+            self.console.header("Validating Plans", style="bright_cyan")
 
             all_valid = True
-            for spec_path in specs_to_validate:
-                self.console.info(f"\nValidating: {spec_path.name}")
+            for plan_path in plans_to_validate:
+                self.console.info(f"\nValidating: {plan_path.name}")
 
-                content = spec_path.read_text(encoding='utf-8')
+                content = plan_path.read_text(encoding='utf-8')
 
                 # Check required sections
                 required_sections = [
-                    "## Problem Statement",
-                    "## Requirements",
-                    "## User Stories",
-                    "## Acceptance Criteria"
+                    "## Architecture Overview",
+                    "## Technology Stack",
+                    "## Implementation Phases",
+                    "## Testing Strategy"
                 ]
 
                 missing_sections = []
@@ -260,72 +260,19 @@ STATUS: draft
                     self.console.success(f"  No clarifications needed")
 
             if all_valid:
-                self.console.success("\n✓ All specifications valid")
+                self.console.success("\n✓ All plans valid")
                 return True
             else:
-                self.console.warning("\n⚠ Some specifications need attention")
+                self.console.warning("\n⚠ Some plans need attention")
                 return False
 
         except Exception as e:
             self.console.error(f"Validation failed: {str(e)}")
             return False
 
-    def clarify(self, spec_id: str, feature_name: Optional[str] = None) -> bool:
+    def list_plans(self, feature_name: Optional[str] = None) -> bool:
         """
-        Show clarification markers in a specification
-
-        Args:
-            spec_id: Specification ID
-            feature_name: Optional feature name/ID
-
-        Returns:
-            bool: True if successful, False otherwise
-        """
-        try:
-            # SECURITY: Validate spec ID
-            try:
-                PathValidator.validate_spec_id(spec_id)
-            except ValueError as e:
-                raise ValidationError(f"Invalid spec ID: {str(e)}")
-
-            feature_dir = self._get_current_feature(feature_name)
-
-            if not feature_dir:
-                self.console.error("No active feature found")
-                return False
-
-            spec_path = self.project_root / "specs" / feature_dir.name / f"spec-{spec_id}.md"
-
-            if not spec_path.exists():
-                self.console.error(f"Specification not found: spec-{spec_id}.md")
-                return False
-
-            content = spec_path.read_text(encoding='utf-8')
-
-            # Find all clarification markers
-            clarifications = re.findall(r'\[NEEDS CLARIFICATION:([^\]]+)\]', content)
-
-            if not clarifications:
-                self.console.success("No clarifications needed - specification is complete!")
-                return True
-
-            self.console.header(f"Clarifications Needed: spec-{spec_id}.md", style="bright_yellow")
-
-            for i, clarification in enumerate(clarifications, 1):
-                self.console.warning(f"{i}. {clarification.strip()}")
-
-            self.console.info(f"\nTotal: {len(clarifications)} items need clarification")
-            self.console.info(f"\nTo address these, edit: {spec_path.relative_to(self.project_root)}")
-
-            return True
-
-        except Exception as e:
-            self.console.error(f"Failed to check clarifications: {str(e)}")
-            return False
-
-    def list_specs(self, feature_name: Optional[str] = None) -> bool:
-        """
-        List all specifications in current feature
+        List all plans in current feature
 
         Args:
             feature_name: Optional feature name/ID
@@ -340,18 +287,18 @@ STATUS: draft
                 self.console.error("No active feature found")
                 return False
 
-            specs_dir = self.project_root / "specs" / feature_dir.name
-            specs = sorted(specs_dir.glob("spec-*.md"))
+            plans_dir = self.project_root / "plans" / feature_dir.name
+            plans = sorted(plans_dir.glob("plan-*.md"))
 
-            if not specs:
-                self.console.warning(f"No specifications found in {feature_dir.name}")
+            if not plans:
+                self.console.warning(f"No plans found in {feature_dir.name}")
                 return False
 
-            self.console.header(f"Specifications in {feature_dir.name}", style="bright_cyan")
+            self.console.header(f"Plans in {feature_dir.name}", style="bright_cyan")
 
-            for spec_path in specs:
+            for plan_path in plans:
                 # Extract metadata
-                content = spec_path.read_text(encoding='utf-8')
+                content = plan_path.read_text(encoding='utf-8')
                 status = "draft"
                 created = "unknown"
 
@@ -369,31 +316,31 @@ STATUS: draft
                     except:
                         created = created_str
 
-                self.console.info(f"  • {spec_path.name} - Status: {status}, Created: {created}")
+                self.console.info(f"  • {plan_path.name} - Status: {status}, Created: {created}")
 
             return True
 
         except Exception as e:
-            self.console.error(f"Failed to list specifications: {str(e)}")
+            self.console.error(f"Failed to list plans: {str(e)}")
             return False
 
-    def show(self, spec_id: str, feature_name: Optional[str] = None) -> bool:
+    def show(self, plan_id: str, feature_name: Optional[str] = None) -> bool:
         """
-        Display specification content
+        Display plan content
 
         Args:
-            spec_id: Specification ID
+            plan_id: Plan ID
             feature_name: Optional feature name/ID
 
         Returns:
             bool: True if successful, False otherwise
         """
         try:
-            # SECURITY: Validate spec ID
+            # SECURITY: Validate plan ID
             try:
-                PathValidator.validate_spec_id(spec_id)
+                PathValidator.validate_spec_id(plan_id)
             except ValueError as e:
-                raise ValidationError(f"Invalid spec ID: {str(e)}")
+                raise ValidationError(f"Invalid plan ID: {str(e)}")
 
             feature_dir = self._get_current_feature(feature_name)
 
@@ -401,40 +348,40 @@ STATUS: draft
                 self.console.error("No active feature found")
                 return False
 
-            spec_path = self.project_root / "specs" / feature_dir.name / f"spec-{spec_id}.md"
+            plan_path = self.project_root / "plans" / feature_dir.name / f"plan-{plan_id}.md"
 
-            if not spec_path.exists():
-                self.console.error(f"Specification not found: spec-{spec_id}.md")
+            if not plan_path.exists():
+                self.console.error(f"Plan not found: plan-{plan_id}.md")
                 return False
 
-            content = spec_path.read_text(encoding='utf-8')
+            content = plan_path.read_text(encoding='utf-8')
 
-            self.console.header(f"Specification: spec-{spec_id}.md", style="bright_cyan")
+            self.console.header(f"Plan: plan-{plan_id}.md", style="bright_cyan")
             self.console.info(content)
 
             return True
 
         except Exception as e:
-            self.console.error(f"Failed to show specification: {str(e)}")
+            self.console.error(f"Failed to show plan: {str(e)}")
             return False
 
-    def progress(self, spec_id: str, feature_name: Optional[str] = None) -> bool:
+    def progress(self, plan_id: str, feature_name: Optional[str] = None) -> bool:
         """
-        Show specification completion progress
+        Show plan completion progress
 
         Args:
-            spec_id: Specification ID
+            plan_id: Plan ID
             feature_name: Optional feature name/ID
 
         Returns:
             bool: True if successful, False otherwise
         """
         try:
-            # SECURITY: Validate spec ID
+            # SECURITY: Validate plan ID
             try:
-                PathValidator.validate_spec_id(spec_id)
+                PathValidator.validate_spec_id(plan_id)
             except ValueError as e:
-                raise ValidationError(f"Invalid spec ID: {str(e)}")
+                raise ValidationError(f"Invalid plan ID: {str(e)}")
 
             feature_dir = self._get_current_feature(feature_name)
 
@@ -442,24 +389,24 @@ STATUS: draft
                 self.console.error("No active feature found")
                 return False
 
-            spec_path = self.project_root / "specs" / feature_dir.name / f"spec-{spec_id}.md"
+            plan_path = self.project_root / "plans" / feature_dir.name / f"plan-{plan_id}.md"
 
-            if not spec_path.exists():
-                self.console.error(f"Specification not found: spec-{spec_id}.md")
+            if not plan_path.exists():
+                self.console.error(f"Plan not found: plan-{plan_id}.md")
                 return False
 
-            content = spec_path.read_text(encoding='utf-8')
+            content = plan_path.read_text(encoding='utf-8')
 
-            self.console.header(f"Progress: spec-{spec_id}.md", style="bright_cyan")
+            self.console.header(f"Progress: plan-{plan_id}.md", style="bright_cyan")
 
             # Check required sections
             required_sections = {
-                "Problem Statement": "## Problem Statement" in content,
-                "Requirements": "## Requirements" in content,
-                "User Stories": "## User Stories" in content,
-                "Acceptance Criteria": "## Acceptance Criteria" in content,
-                "Technical Constraints": "## Technical Constraints" in content,
-                "Dependencies": "## Dependencies" in content
+                "Architecture Overview": "## Architecture Overview" in content,
+                "Technology Stack": "## Technology Stack" in content,
+                "Implementation Phases": "## Implementation Phases" in content,
+                "Testing Strategy": "## Testing Strategy" in content,
+                "API Contracts": "## API Contracts" in content,
+                "Data Models": "## Data Models" in content
             }
 
             completed = sum(required_sections.values())
@@ -484,6 +431,56 @@ STATUS: draft
 
         except Exception as e:
             self.console.error(f"Failed to show progress: {str(e)}")
+            return False
+
+    def phases(self, plan_id: str, feature_name: Optional[str] = None) -> bool:
+        """
+        Show implementation phases
+
+        Args:
+            plan_id: Plan ID
+            feature_name: Optional feature name/ID
+
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # SECURITY: Validate plan ID
+            try:
+                PathValidator.validate_spec_id(plan_id)
+            except ValueError as e:
+                raise ValidationError(f"Invalid plan ID: {str(e)}")
+
+            feature_dir = self._get_current_feature(feature_name)
+
+            if not feature_dir:
+                self.console.error("No active feature found")
+                return False
+
+            plan_path = self.project_root / "plans" / feature_dir.name / f"plan-{plan_id}.md"
+
+            if not plan_path.exists():
+                self.console.error(f"Plan not found: plan-{plan_id}.md")
+                return False
+
+            content = plan_path.read_text(encoding='utf-8')
+
+            self.console.header(f"Implementation Phases: plan-{plan_id}.md", style="bright_cyan")
+
+            # Extract phases
+            phase_pattern = r'### Phase \d+:([^\n]+)'
+            phases = re.findall(phase_pattern, content)
+
+            if phases:
+                for i, phase in enumerate(phases, 1):
+                    self.console.info(f"  Phase {i}: {phase.strip()}")
+            else:
+                self.console.warning("No phases found in plan")
+
+            return True
+
+        except Exception as e:
+            self.console.error(f"Failed to show phases: {str(e)}")
             return False
 
     # Helper methods
@@ -545,21 +542,21 @@ STATUS: draft
 
         return None
 
-    def _get_next_spec_number(self, specs_dir: Path) -> int:
-        """Get next available specification number"""
-        if not specs_dir.exists():
+    def _get_next_plan_number(self, plans_dir: Path) -> int:
+        """Get next available plan number"""
+        if not plans_dir.exists():
             return 1
 
-        existing_specs = list(specs_dir.glob("spec-*.md"))
+        existing_plans = list(plans_dir.glob("plan-*.md"))
 
-        if not existing_specs:
+        if not existing_plans:
             return 1
 
         max_number = 0
-        for spec_path in existing_specs:
-            match = re.match(r'spec-(\d{3})\.md', spec_path.name)
+        for plan_path in existing_plans:
+            match = re.match(r'plan-(\d{3})\.md', plan_path.name)
             if match:
-                spec_number = int(match.group(1))
-                max_number = max(max_number, spec_number)
+                plan_number = int(match.group(1))
+                max_number = max(max_number, plan_number)
 
         return max_number + 1
