@@ -1,0 +1,16 @@
+ai:
+  primary: claude
+conventions:
+  branch_naming: '{number:03d}-{feature-name}'
+  plan_naming: plan-{number:03d}.md
+  spec_naming: spec-{number:03d}.md
+  task_naming: task-{number:03d}.md
+project:
+  created: '2025-11-01T13:10:28.243100'
+  name: SpecPulse
+  type: web
+templates:
+  plan: templates/plan.md
+  spec: templates/spec.md
+  task: templates/task.md
+version: 2.3.0
