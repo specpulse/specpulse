@@ -50,7 +50,7 @@ When called with `/sp-plan $ARGUMENTS`, I will:
    - If `optimize`: Improve existing plan complexity
    - Otherwise: Generate new plan
 
-3. **For `/sp-plan`:**
+3. **For `/sp-plan generate` or `/sp-plan`:**
    a. **Check for decomposition**: Look for `.specpulse/specs/XXX-feature/decomposition/` directory
    b. **If decomposed**:
       - Read decomposition artifacts (microservices.md, api-contracts/, interfaces/)
@@ -64,7 +64,7 @@ When called with `/sp-plan $ARGUMENTS`, I will:
 
    d. **Validation** using CLI:
       ```bash
-      specpulse --no-color plan validate --verbose
+      specpulse --no-color validate plan --verbose
       ```
 
    e. **Run SDD Compliance Gates**:
@@ -180,7 +180,7 @@ When called with `/sp-plan $ARGUMENTS`, I will:
 
 ### Generate plan for decomposed spec
 ```
-User: /sp-plan
+User: /sp-plan generate
 ```
 Detecting decomposition in `specs/001-authentication/decomposition/`...
 I will create:
@@ -190,7 +190,7 @@ I will create:
 
 ### Generate plan for monolithic spec
 ```
-User: /sp-plan
+User: /sp-plan generate
 ```
 No decomposition found. Creating single plan:
 - `plans/001-authentication/plan-001.md`

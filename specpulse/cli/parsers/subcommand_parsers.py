@@ -31,8 +31,8 @@ Examples:
   specpulse feature init user-auth      Initialize a new feature
   specpulse spec create "OAuth2 auth"  Create a new specification
   specpulse plan create "Auth System"  Create an implementation plan
-  specpulse task breakdown 001        Break down specification into tasks
-  specpulse validate all                Validate all project components
+  specpulse task breakdown plan-001   Break down specification into tasks
+  specpulse doctor --fix               Validate all project components
         """,
     )
 

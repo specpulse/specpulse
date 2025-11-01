@@ -239,3 +239,48 @@ class FeatureCommands:
         # Count tasks
         tasks_count = len(list((self.tasks_dir / feature_dir.name).glob("task-*.md")))
         self.console.info(f"  Tasks: {tasks_count}")
+
+    def feature_list(self, **kwargs) -> bool:
+        """
+        List all features in the project with their status
+
+        Returns:
+            bool: Success status
+        """
+        try:
+            self.console.info("Available features:")
+
+            if not self.specs_dir.exists():
+                self.console.warning("  No features found (specs directory doesn't exist)")
+                return True
+
+            features = sorted([
+                d for d in self.specs_dir.iterdir()
+                if d.is_dir() and re.match(r'^\d{3}-', d.name)
+            ])
+
+            if not features:
+                self.console.warning("  No features found")
+                return True
+
+            for feature in features:
+                # Extract feature info
+                match = re.match(r'^(\d{3})-(.+)$', feature.name)
+                if match:
+                    feature_id = match.group(1)
+                    feature_name = match.group(2).replace('-', ' ').title()
+
+                    # Count files
+                    specs_count = len(list((self.specs_dir / feature.name).glob("spec-*.md")))
+                    plans_count = len(list((self.plans_dir / feature.name).glob("plan-*.md")))
+                    tasks_count = len(list((self.tasks_dir / feature.name).glob("task-*.md")))
+
+                    # Show status
+                    self.console.info(f"  {feature_id} - {feature_name}")
+                    self.console.info(f"    Specs: {specs_count}, Plans: {plans_count}, Tasks: {tasks_count}")
+
+            return True
+
+        except Exception as e:
+            self.console.error(f"Failed to list features: {e}")
+            return False

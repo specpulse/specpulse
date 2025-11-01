@@ -15,18 +15,10 @@ Create, update, or validate feature specifications using SpecPulse methodology w
 
 ## CRITICAL: LLM Workflow Rules
 
-**PRIMARY WORKFLOW: CLI First with Fallback**
-- Try CLI commands first: `specpulse spec create/update/validate`
-- If CLI fails, immediately use fallback procedures from CLI_FALLBACK_GUIDE.md
+**PRIMARY WORKFLOW: Use CLI when available**
+- Prefer `specpulse spec create/update/validate` when those commands exist
 - Use Bash tool ONLY for CLI commands, not for file editing
-- Only use Read/Write/Edit tools for specs/ files when CLI doesn't exist or fails
-- **ALWAYS log fallback usage**: `[FALLBACK] CLI failed, using manual procedure`
-
-**CLI Failure Detection:**
-- Exit code != 0
-- Error messages: "command not found", "No such file", "Permission denied"
-- Timeout > 30 seconds
-- Missing dependencies
+- Only use Read/Write/Edit tools for specs/ files when CLI doesn't cover the operation
 
 **PROTECTED DIRECTORIES (NEVER EDIT):**
 - `.specpulse/templates/` - Template files
@@ -36,12 +28,8 @@ Create, update, or validate feature specifications using SpecPulse methodology w
 
 **WORKFLOW:**
 1. Try `specpulse spec create "description"` first
-2. If CLI fails (non-zero exit code, timeout, error), immediately apply fallback:
-   - Log: `[FALLBACK] CLI command failed: specpulse spec create "description"`
-   - Apply manual directory and file creation from CLI_FALLBACK_GUIDE.md
-   - Continue with file operations using Read/Write/Edit
-3. Only use File Operations when CLI doesn't exist or fails repeatedly
-4. Templates are READ from .specpulse/templates/, then specs are CREATED/EDITED in .specpulse/specs/
+2. If CLI doesn't exist or doesn't cover your need, use File Operations
+3. Templates are READ from .specpulse/templates/, then specs are CREATED/EDITED in .specpulse/specs/
 
 ## Usage
 ```
@@ -112,9 +100,8 @@ When called with `/sp-spec $ARGUMENTS`, I will:
 
    - **Step 6: Validate (Optional)**
      ```
-     Bash: specpulse spec validate [spec-id]
+     Bash: specpulse validate spec
      ```
-     If CLI fails, use manual validation from CLI_FALLBACK_GUIDE.md
      Note: Validation is optional - only if user requests it
 
 4. **For `/sp-spec update`:**
@@ -140,9 +127,8 @@ When called with `/sp-spec $ARGUMENTS`, I will:
 
    - **Step 3: Run SpecPulse Validation (Optional)**
      ```
-     Bash: specpulse spec validate [spec-id]
+     Bash: specpulse validate spec
      ```
-     If CLI fails, use manual validation from CLI_FALLBACK_GUIDE.md
      Note: This is optional, manual checks are primary
 
    - **Step 4: Report Results**

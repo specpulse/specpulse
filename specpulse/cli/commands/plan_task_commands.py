@@ -343,6 +343,65 @@ Create: task-001.md, task-002.md, etc.
         matches = list(self.tasks_dir.glob(pattern))
         return matches[0] if matches else None
 
+    def task_list(self, **kwargs) -> bool:
+        """
+        List all tasks in the project with their status
+
+        Returns:
+            bool: Success status
+        """
+        try:
+            self.console.info("Available tasks:")
+
+            if not self.tasks_dir.exists():
+                self.console.warning("  No tasks found (tasks directory doesn't exist)")
+                return True
+
+            # Get all feature directories
+            features = sorted([
+                d for d in self.tasks_dir.iterdir()
+                if d.is_dir() and re.match(r'^\d{3}-', d.name)
+            ])
+
+            if not features:
+                self.console.warning("  No tasks found")
+                return True
+
+            total_tasks = 0
+            for feature in features:
+                # Extract feature info
+                match = re.match(r'^(\d{3})-(.+)$', feature.name)
+                if match:
+                    feature_id = match.group(1)
+                    feature_name = match.group(2).replace('-', ' ').title()
+
+                    # Count tasks
+                    task_files = list(feature.glob("task-*.md"))
+                    tasks_count = len(task_files)
+
+                    if tasks_count > 0:
+                        self.console.info(f"  {feature_id} - {feature_name}: {tasks_count} tasks")
+
+                        # Show individual tasks
+                        for task_file in sorted(task_files):
+                            task_match = re.search(r'task-(\d{3})\.md', task_file.name)
+                            if task_match:
+                                task_num = task_match.group(1)
+                                self.console.info(f"    - Task {task_num}: {task_file.name}")
+
+                        total_tasks += tasks_count
+
+            if total_tasks == 0:
+                self.console.warning("  No tasks found")
+            else:
+                self.console.info(f"\nTotal: {total_tasks} tasks")
+
+            return True
+
+        except Exception as e:
+            self.console.error(f"Failed to list tasks: {e}")
+            return False
+
 
 class ExecuteCommands:
     """Task execution tracking"""
@@ -427,3 +486,31 @@ class ExecuteCommands:
         pattern = f"{feature_id}*"
         matches = list(self.tasks_dir.glob(pattern))
         return matches[0] if matches else None
+
+    def execute_status(self, target: Optional[str] = None, **kwargs) -> bool:
+        """Show execution status of tasks"""
+        try:
+            self.console.info("Execution Status:")
+            if not self.tasks_dir.exists():
+                self.console.warning("  No tasks directory found")
+                return True
+            features = sorted([d for d in self.tasks_dir.iterdir() if d.is_dir() and re.match(r'^\d{3}-', d.name)])
+            if not features:
+                self.console.warning("  No tasks found")
+                return True
+            total_tasks = 0
+            for feature in features:
+                match = re.match(r'^(\d{3})-(.+)$', feature.name)
+                if match:
+                    feature_id = match.group(1)
+                    feature_name = match.group(2).replace('-', ' ').title()
+                    task_files = list(feature.glob("task-*.md"))
+                    if task_files:
+                        self.console.info(f"  {feature_id} - {feature_name}: {len(task_files)} tasks")
+                        total_tasks += len(task_files)
+            self.console.info(f"\nTotal: {total_tasks} tasks")
+            return True
+        except Exception as e:
+            self.console.error(f"Failed to show execution status: {e}")
+            return False
+

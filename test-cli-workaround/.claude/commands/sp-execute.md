@@ -46,9 +46,8 @@ When called with `/sp-execute $ARGUMENTS`, I will:
 1. **Check project status using CLI**:
    ```bash
    specpulse --no-color doctor
-   specpulse --no-color spec-progress [feature-id]
+   specpulse --no-color spec progress [feature-id]
    ```
-   If CLI fails, use manual status checking from CLI_FALLBACK_GUIDE.md
 
 2. **Read Task File**:
    ```
@@ -178,11 +177,9 @@ I will:
 If an error occurs during task execution:
 1. Mark task as blocked: `[!]`
 2. Note the error in task file
-3. Check if CLI failure caused the error
-4. If CLI failed, apply fallback procedures
-5. Skip to next available task
-6. Continue execution
-7. Report all blockers and fallback usage at the end
+3. Skip to next available task
+4. Continue execution
+5. Report all blockers at the end
 
 ## Progress Tracking
 

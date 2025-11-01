@@ -1,0 +1,120 @@
+description = "Create or manage feature specifications using AI-optimized templates"
+prompt = """
+## CRITICAL: LLM Workflow Rules (v2.1.3+)
+
+**PRIMARY WORKFLOW: Use CLI FIRST**
+- Use `specpulse sp-spec <action>` commands as PRIMARY method
+- CLI handles metadata, validation, and file structure automatically
+- Use File Operations ONLY if CLI fails or doesn't exist
+
+**PROTECTED DIRECTORIES (NEVER EDIT):**
+- .specpulse/templates/ - Template files
+- .specpulse/ - Internal config
+- specpulse/ - Package code
+- .claude/ and .gemini/ - AI configuration
+
+**WORKFLOW (v2.1.3+):**
+1. PRIMARY: Use `specpulse sp-spec create "description"`
+2. FALLBACK: If CLI fails, use File Operations
+3. Templates are READ from .specpulse/templates/, specs are CREATED/EDITED in .specpulse/.specpulse/specs/
+
+## Command: /sp-spec {{args}}
+
+Create, update, or validate feature specifications using SpecPulse methodology.
+
+Actions: create, update, validate, clarify (defaults to create)
+
+### Implementation Steps:
+
+1. **Detect current feature context**:
+   - Read .specpulse/memory/context.md for current feature metadata
+   - Use git branch name if available (e.g., 001-user-authentication)
+   - Fall back to most recently created feature directory
+   - If no context found, ask user to specify feature or run /sp-pulse first
+
+2. **Parse arguments** to determine action:
+   - If starts with 'create': Generate new specification
+   - If starts with 'update': Modify existing specification
+   - If starts with 'validate': Check specification completeness
+   - If starts with 'clarify': Address [NEEDS CLARIFICATION] markers
+   - Default to 'create' with full arguments as description
+
+3. **Run specification validation using CLI (optional)**:
+   !{bash specpulse validate spec}
+
+   Note: Validation is optional - manual checks are primary
+
+4. **For 'create' action**:
+
+   **PRIMARY METHOD (v2.1.3+): Use CLI**
+   !{bash specpulse sp-spec create "description text here"}
+
+   This creates the spec file with proper metadata and template.
+   Then YOU (AI) should:
+   1. Read the created spec file
+   2. Expand it with full specification details
+   3. Edit the file with expanded content
+   4. Mark uncertainties with [NEEDS CLARIFICATION: question]
+
+   **FALLBACK: File Operations (if CLI fails)**
+   - Read template from @{.specpulse/templates/spec.md}
+   - Parse description to identify requirements, user stories
+   - Fill template with AI-generated content
+   - Mark unclear items with [NEEDS CLARIFICATION]
+   - Create numbered spec file (spec-001.md, spec-002.md)
+   - Save to .specpulse/.specpulse/specs/XXX-feature/spec-XXX.md
+
+5. **Generate comprehensive specification**:
+   - Executive Summary
+   - Problem Statement
+   - Proposed Solution
+   - Functional Requirements (FR-001, FR-002, etc.)
+   - Non-Functional Requirements (performance, security, scalability)
+   - User Stories with acceptance criteria
+   - Technical Constraints
+   - Dependencies
+   - Risks and Mitigations
+   - Success Criteria
+   - Open Questions marked with [NEEDS CLARIFICATION]
+
+6. **For 'update' action**:
+   - Show list of existing spec files
+   - Ask user which spec file to update
+   - Read selected specification
+   - Ask for clarifications or changes
+   - Update content while preserving structure
+   - Remove resolved [NEEDS CLARIFICATION] markers
+
+7. **For 'validate' action**:
+   - Show list of existing spec files
+   - Run validation script
+   - Check all required sections are filled
+   - Count [NEEDS CLARIFICATION] markers
+   - Verify acceptance criteria are testable
+   - Report validation results
+
+8. **Update context and validate**:
+   - Update .specpulse/memory/context.md with specification status
+   - Check SDD compliance (Principle 1: Specification First)
+   - Validate all sections are filled
+   - Report any missing or incomplete sections
+
+### Example AI-Generated Content:
+For "User authentication with OAuth2":
+- FR-001: System SHALL support OAuth2 authentication with Google/GitHub
+- FR-002: System SHALL issue JWT tokens valid for 24 hours
+- NFR-001: Authentication response time < 200ms
+- User Story: As a user, I want to login with Google so that I don't need to remember another password
+
+### SDD Compliance Checklist:
+- [ ] Every requirement is testable (Principle 1)
+- [ ] User stories have clear acceptance criteria (Principle 1)
+- [ ] Dependencies are identified (Principle 4)
+- [ ] Success metrics defined (Principle 6)
+
+Examples:
+- /sp-spec user authentication with OAuth2 and email/password
+- /sp-spec update
+- /sp-spec validate
+- /sp-spec clarify
+"""
