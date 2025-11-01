@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.4.3] - 2025-11-01
+
+### 🐛 Patch Release - CLI Commands Documentation Fix
+
+**Upgrade Urgency:** 🟢 RECOMMENDED (for correct CLI usage)
+
+---
+
+### 🔧 Fixes
+
+- **FIXED**: Corrected CLI command documentation in README.md
+- **UPDATED**: Removed non-existent commands like `specpulse validate all`
+- **CORRECTED**: Updated to use `specpulse doctor --fix` for validation
+- **IMPROVED**: CLI command examples now reflect actual working commands
+
+### 📚 Documentation Changes
+
+- **README.md**: Fixed CLI command syntax and examples
+- **Examples**: Updated to show working validation commands
+- **Help Section**: Corrected command references
+
+### 🎯 Key Fixes
+
+- ✅ `specpulse validate all` → `specpulse doctor --fix`
+- ✅ Removed non-existent subcommands
+- ✅ Updated to reflect actual CLI structure
+- ✅ Fixed validation workflow examples
+
+---
+
 ## [2.4.2] - 2025-11-01
 
 ### 📚 Documentation Update - CLI-AI Balance Clarification

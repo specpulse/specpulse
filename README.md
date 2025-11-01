@@ -1,4 +1,4 @@
-# SpecPulse v2.4.2
+# SpecPulse v2.4.3
 
 <div align="center">
 
@@ -151,7 +151,7 @@ my-project/
 specpulse init <project-name>          # Initialize new project
 specpulse init --here --ai claude      # Add to existing project
 specpulse doctor                       # Health check
-specpulse validate all                 # Validate all components
+specpulse doctor                       # Check project health and validate
 ```
 
 ### Feature Development
@@ -166,8 +166,7 @@ specpulse feature list                 # List all features
 
 ```bash
 specpulse spec create "<description>"  # Create empty template (AI needed for content)
-specpulse spec validate [id]           # Validate spec(s)
-specpulse spec list                    # List all specs
+specpulse spec validate                 # Validate specs
 ```
 
 **Note**: `specpulse spec create` creates empty templates. Use AI commands (`/sp-spec`) to fill with detailed content.
@@ -177,7 +176,6 @@ specpulse spec list                    # List all specs
 ```bash
 specpulse plan create "<description>"  # Create empty plan template (AI needed for details)
 specpulse task breakdown <plan-id>     # Create empty task breakdown (AI needed for details)
-specpulse task list                    # List all tasks
 ```
 
 **Note**: CLI creates templates, but AI is essential for detailed planning and task breakdown.
@@ -581,7 +579,7 @@ specpulse plan create "OAuth2 implementation"
 specpulse task breakdown plan-001
 
 # 7. Validate everything
-specpulse validate all
+specpulse doctor --fix
 specpulse doctor
 ```
 
@@ -626,9 +624,8 @@ SpecPulse works identically on all platforms:
 
 ```bash
 specpulse --help                      # General help
-specpulse feature --help              # Feature commands help
-specpulse spec --help                 # Specification commands help
 specpulse doctor                      # Project health check
+specpulse doctor --fix                # Health check with auto-fix
 ```
 
 ---
@@ -683,7 +680,7 @@ specpulse doctor
 
 **Made with ❤️ for developers who value specifications and quality**
 
-**SpecPulse v2.4.2** - CLI-First • AI-Enhanced • Cross-Platform • Reliable
+**SpecPulse v2.4.3** - CLI-First • AI-Enhanced • Cross-Platform • Reliable
 
 [⭐ Star us on GitHub](https://github.com/specpulse/specpulse) | [📦 Install from PyPI](https://pypi.org/project/specpulse/)
 
