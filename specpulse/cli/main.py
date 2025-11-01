@@ -23,21 +23,14 @@ def main():
         if sys.platform == "win32":
             os.system('chcp 65001 > nul')
 
-        print("DEBUG: Starting SpecPulse CLI...")
-
         # Create argument parser
-        print("DEBUG: Creating argument parser...")
         from .parsers.subcommand_parsers import create_argument_parser
         parser = create_argument_parser()
-        print("DEBUG: Argument parser created")
 
         # Parse arguments
-        print("DEBUG: Parsing arguments...")
         args = parser.parse_args()
-        print("DEBUG: Arguments parsed")
 
         # Create command handler
-        print("DEBUG: Creating command handler...")
         handler = CommandHandler(
             no_color=args.no_color,
             verbose=args.verbose

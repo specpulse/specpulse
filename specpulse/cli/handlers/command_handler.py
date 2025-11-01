@@ -373,6 +373,67 @@ class CommandHandler:
         """Update SpecPulse to latest version"""
         return self.project_commands.update()
 
+    def sync(self, **kwargs) -> None:
+        """Synchronize project state with memory and Git repository"""
+        if not self.project_commands:
+            raise SpecPulseError("This command must be run from within a SpecPulse project directory")
+        # Implementation would go here
+        self.console.info("Sync command - implementation needed")
+        return True
+
+    def list_specs(self, **kwargs) -> None:
+        """List all specifications in the project with metadata"""
+        if not self.project_commands:
+            raise SpecPulseError("This command must be run from within a SpecPulse project directory")
+        # Implementation would go here
+        self.console.info("List specs command - implementation needed")
+        return True
+
+    def expand(self, feature_id: str, to_tier: str, show_diff: bool = False, verbose: bool = False, **kwargs) -> None:
+        """Expand specifications to the next tier or format"""
+        if not self.project_commands:
+            raise SpecPulseError("This command must be run from within a SpecPulse project directory")
+        # Implementation would go here
+        self.console.info(f"Expand command - implementation needed for {feature_id} to {to_tier}")
+        return True
+
+    def template(self, template_command: Optional[str] = None, **kwargs) -> None:
+        """Template management commands"""
+        if template_command == 'list':
+            category = kwargs.get('category', 'all')
+            self.console.info(f"Template list command - implementation needed for category: {category}")
+        elif template_command == 'validate':
+            template_name = kwargs.get('template_name')
+            fix = kwargs.get('fix', False)
+            self.console.info(f"Template validate command - implementation needed for: {template_name}")
+        elif template_command == 'preview':
+            template_name = kwargs.get('template_name')
+            self.console.info(f"Template preview command - implementation needed for: {template_name}")
+        else:
+            self.console.info("Template command - subcommand needed")
+        return True
+
+    def checkpoint(self, checkpoint_command: Optional[str] = None, **kwargs) -> None:
+        """Checkpoint management commands"""
+        if checkpoint_command == 'create':
+            feature_id = kwargs.get('feature_id')
+            description = kwargs.get('description')
+            self.console.info(f"Checkpoint create command - implementation needed for: {feature_id}")
+        elif checkpoint_command == 'list':
+            feature_id = kwargs.get('feature_id')
+            self.console.info(f"Checkpoint list command - implementation needed for: {feature_id}")
+        else:
+            self.console.info("Checkpoint command - subcommand needed")
+        return True
+
+    def spec_progress(self, feature_id: str, **kwargs) -> None:
+        """Show specification progress for a feature"""
+        if not self.project_commands:
+            raise SpecPulseError("This command must be run from within a SpecPulse project directory")
+        # Implementation would go here
+        self.console.info(f"Spec progress command - implementation needed for: {feature_id}")
+        return True
+
     def validate(self, component: str = "all", fix: bool = False, verbose: bool = False) -> None:
         """Validate project components"""
         if not self.validator:
