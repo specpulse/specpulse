@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.4.4] - 2025-11-01
+
+### 🐛 Patch Release - AI Command Documentation Fix
+
+**Upgrade Urgency:** 🟢 RECOMMENDED (for correct AI command usage)
+
+---
+
+### 🔧 Fixes
+
+- **FIXED**: Corrected AI command examples in README.md
+- **UPDATED**: Changed `/sp-plan generate` to `/sp-plan expand`
+- **CORRECTED**: AI command syntax to match actual working commands
+- **IMPROVED**: AI command examples now reflect actual working slash commands
+
+### 📚 Documentation Changes
+
+- **README.md**: Fixed AI slash command syntax
+- **Examples**: Updated to show working `/sp-plan expand` commands
+- **AI Commands**: Corrected all slash command references
+
+### 🎯 Key Fixes
+
+- ✅ `/sp-plan generate` → `/sp-plan expand`
+- ✅ All AI slash commands now use correct syntax
+- ✅ Updated workflow examples with proper commands
+- ✅ Fixed AI command consistency throughout README.md
+
+---
+
 ## [2.4.3] - 2025-11-01
 
 ### 🐛 Patch Release - CLI Commands Documentation Fix

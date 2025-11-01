@@ -1,4 +1,4 @@
-# SpecPulse v2.4.3
+# SpecPulse v2.4.4
 
 <div align="center">
 
@@ -67,7 +67,7 @@ In Claude Code or Gemini CLI:
 ```bash
 /sp-pulse payment-system          # Initialize feature
 /sp-spec create "Payment processing"  # Create specification
-/sp-plan generate                   # Generate implementation plan
+/sp-plan expand                     # Generate and expand implementation plan
 /sp-task breakdown                  # Break into tasks
 /sp-status                          # Check progress
 ```
@@ -203,7 +203,7 @@ specpulse task breakdown <plan-id>     # Create empty task breakdown (AI needed 
 ### Planning Commands (ESSENTIAL)
 
 ```bash
-/sp-plan generate                    # Generate detailed implementation plan
+/sp-plan expand                      # Generate and expand implementation plan
 /sp-plan validate <plan-id>         # Validate plan
 /sp-plan expand <plan-id>           # Expand plan with more implementation details
 ```
@@ -665,7 +665,7 @@ specpulse spec create "My first feature"
 # In Claude Code or Gemini CLI:
 # /sp-pulse my-new-feature
 # /sp-spec create "Detailed feature description"
-# /sp-plan generate
+# /sp-plan expand
 # /sp-execute all
 
 # Validate and enjoy
@@ -680,7 +680,7 @@ specpulse doctor
 
 **Made with ❤️ for developers who value specifications and quality**
 
-**SpecPulse v2.4.3** - CLI-First • AI-Enhanced • Cross-Platform • Reliable
+**SpecPulse v2.4.4** - CLI-First • AI-Enhanced • Cross-Platform • Reliable
 
 [⭐ Star us on GitHub](https://github.com/specpulse/specpulse) | [📦 Install from PyPI](https://pypi.org/project/specpulse/)
 
