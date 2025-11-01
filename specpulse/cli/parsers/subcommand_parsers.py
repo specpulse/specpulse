@@ -29,10 +29,13 @@ def create_argument_parser() -> argparse.ArgumentParser:
 Examples:
   specpulse init my-project              Initialize a new SpecPulse project
   specpulse feature init user-auth      Initialize a new feature
-  specpulse spec create "OAuth2 auth"  Create a new specification
-  specpulse plan create "Auth System"  Create an implementation plan
-  specpulse task breakdown plan-001   Break down specification into tasks
-  specpulse doctor --fix               Validate all project components
+  specpulse doctor --fix               Check and fix project health
+  specpulse decompose                   Decompose specifications into components
+  specpulse sync                        Synchronize project state
+  specpulse template list               List available templates
+  specpulse list-specs                 List all specifications
+  specpulse sp-pulse "New feature"     Initialize feature (AI command)
+  specpulse sp-spec "Authentication"    Create specification (AI command)
         """,
     )
 
@@ -72,20 +75,11 @@ Examples:
     # Feature Commands
     _add_feature_commands(subparsers)
 
-    # Specification Commands
-    _add_spec_commands(subparsers)
+    # Specification Commands (commented out until templates are fixed)
+    # _add_spec_commands(subparsers)
 
-    # Plan Commands
-    _add_plan_commands(subparsers)
-
-    # Task Commands
-    _add_task_commands(subparsers)
-
-    # Execution Commands
-    _add_execute_commands(subparsers)
-
-    # Utility Commands
-    _add_utility_commands(subparsers)
+    # Utility Commands (working ones only)
+    _add_utility_commands_working(subparsers)
 
     # Slash Commands (v2.1.3+)
     _add_slash_commands(subparsers)
@@ -679,4 +673,69 @@ def _add_slash_commands(subparsers: argparse._SubParsersAction) -> None:
     sp_task_parser.add_argument(
         '--template',
         help='Task template to use'
+    )
+
+
+def _add_utility_commands_working(subparsers: argparse._SubParsersAction) -> None:
+    """Add only working utility commands"""
+
+    # Decompose command (working)
+    decompose_parser = subparsers.add_parser(
+        'decompose',
+        help='Decompose specifications',
+        description='Decompose specifications into microservices or components'
+    )
+    decompose_parser.add_argument(
+        'spec_id',
+        nargs='?',
+        help='Specification ID to decompose (default: latest)'
+    )
+    decompose_parser.add_argument(
+        '--components',
+        help='Comma-separated list of components to extract'
+    )
+    decompose_parser.add_argument(
+        '--format',
+        choices=['markdown', 'yaml', 'json'],
+        default='markdown',
+        help='Output format for decomposition'
+    )
+
+    # Sync command (working)
+    sync_parser = subparsers.add_parser(
+        'sync',
+        help='Synchronize project state',
+        description='Synchronize project state with memory and Git repository'
+    )
+
+    # List specs command (working)
+    list_specs_parser = subparsers.add_parser(
+        'list-specs',
+        help='List specifications',
+        description='List all specifications in the project with metadata'
+    )
+
+    # Template commands (partially working)
+    template_parser = subparsers.add_parser(
+        'template',
+        help='Template management commands',
+        description='Commands for managing templates'
+    )
+    template_subparsers = template_parser.add_subparsers(
+        dest='template_command',
+        help='Template subcommands',
+        metavar='SUBCOMMAND'
+    )
+
+    # Template list subcommand (working)
+    template_list_parser = template_subparsers.add_parser(
+        'list',
+        help='List templates',
+        description='List available templates by category'
+    )
+    template_list_parser.add_argument(
+        '--category',
+        choices=['all', 'spec', 'plan', 'task', 'decomposition'],
+        default='all',
+        help='Filter templates by category'
     )
