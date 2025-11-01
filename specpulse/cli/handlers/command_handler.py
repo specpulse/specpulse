@@ -233,6 +233,14 @@ class CommandHandler:
             else:
                 raise SpecPulseError(f"Unknown command: {command_name}")
 
+        except (UnicodeEncodeError, UnicodeError) as e:
+            # Handle Unicode encoding issues
+            import traceback
+            self.console.error(f"Encoding error: {str(e)}")
+            if self.verbose:
+                traceback.print_exc()
+            self.console.info("Try setting UTF-8 encoding: chcp 65001 (Windows)")
+            sys.exit(1)
         except SpecPulseError:
             # Re-raise SpecPulse errors as-is
             raise

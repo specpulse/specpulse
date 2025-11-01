@@ -166,24 +166,24 @@ class ErrorHandler:
         from .console import Console
         console = Console()
 
-        # Print error header (console now handles emoji fallback automatically)
-        console.error(f"❌ {error.message}")
+        # Print error header
+        console.error(error.message)
 
         if context:
-            console.info(f"📍 Context: {context}")
+            console.info(f"Context: {context}")
 
         # Print recovery suggestions
         if error.recovery_suggestions:
-            console.warning("💡 Recovery suggestions:")
+            console.warning("Recovery suggestions:")
             for i, suggestion in enumerate(error.recovery_suggestions, 1):
                 console.info(f"   {i}. {suggestion}")
 
         # Print technical details if verbose
         if self.verbose and error.technical_details:
-            console.warning(f"🔧 Technical details: {error.technical_details}")
+            console.warning(f"Technical details: {error.technical_details}")
 
         # Suggest getting help
-        console.info("💬 Need more help? Run 'specpulse --help' or visit docs")
+        console.info("Need more help? Run 'specpulse --help' or visit docs")
 
         # Return appropriate exit code based on severity
         exit_codes = {
@@ -202,10 +202,10 @@ class ErrorHandler:
         console = Console()
 
         # Print error header
-        console.error(f"❌ Unexpected error: {str(error)}")
+        console.error(f"Unexpected error: {str(error)}")
 
         if context:
-            console.info(f"📍 Context: {context}")
+            console.info(f"Context: {context}")
 
         # Common recovery suggestions for unexpected errors
         suggestions = [
@@ -221,13 +221,13 @@ class ErrorHandler:
 
         # Print traceback if verbose
         if self.verbose:
-            console.warning("🔧 Full error traceback:")
+            console.warning("Full error traceback:")
             traceback_str = ''.join(traceback.format_exception(type(error), error, error.__traceback__))
             for line in traceback_str.split('\n'):
                 if line.strip():
                     console.info(f"   {line}")
 
-        console.info("💬 Need more help? Run 'specpulse --help' or visit docs")
+        console.info("Need more help? Run 'specpulse --help' or visit docs")
 
         return 2  # High severity exit code for unexpected errors
 

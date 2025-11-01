@@ -16,13 +16,13 @@
 
 **Example:**
 ```markdown
-# ✅ GOOD: Clear specification
+# [OK] GOOD: Clear specification
 ## User Authentication
 - Users can register with email and password
 - [NEEDS CLARIFICATION]: OAuth2 provider list
 - Password reset via email required
 
-# ❌ BAD: Vague specification
+# [X] BAD: Vague specification
 "Make a login system that works"
 ```
 
@@ -39,12 +39,12 @@
 
 **Example:**
 ```markdown
-# ✅ GOOD: Phased delivery
+# [OK] GOOD: Phased delivery
 Phase 1: Core authentication (Week 1)
 Phase 2: User profiles (Week 2)
 Phase 3: Role management (Week 3)
 
-# ❌ BAD: Everything at once
+# [X] BAD: Everything at once
 "Complete user management system in one sprint"
 ```
 
@@ -61,13 +61,13 @@ Phase 3: Role management (Week 3)
 
 **Example:**
 ```markdown
-# ✅ GOOD: Actionable task
+# [OK] GOOD: Actionable task
 T001: Implement user registration endpoint
 - Effort: 4 hours
 - Done: POST /api/users accepts and validates data
 - Test: Registration creates user in database
 
-# ❌ BAD: Vague task
+# [X] BAD: Vague task
 "Do user stuff"
 ```
 
@@ -84,13 +84,13 @@ T001: Implement user registration endpoint
 
 **Example:**
 ```markdown
-# ✅ GOOD: Traceable implementation
+# [OK] GOOD: Traceable implementation
 - Commit message: "Implement user auth (SPEC-001, T003)"
 - Code comment: "// Implements REQ-SEC-03: Password validation"
 - PR description: Links to spec-001.md#security
 - Task reference: T003 from task-001.md
 
-# ❌ BAD: No traceability
+# [X] BAD: No traceability
 - Commit: "Fixed stuff"
 - No spec references in code
 - No task linkage
@@ -109,12 +109,12 @@ T001: Implement user registration endpoint
 
 **Example:**
 ```markdown
-# ✅ GOOD: Regular validation
+# [OK] GOOD: Regular validation
 - After each task: Check against spec
 - Daily: Run acceptance tests
 - Weekly: Full spec review
 
-# ❌ BAD: No validation
+# [X] BAD: No validation
 "We'll check at the end of the project"
 ```
 
@@ -131,12 +131,12 @@ T001: Implement user registration endpoint
 
 **Example:**
 ```markdown
-# ✅ GOOD: Appropriate testing
+# [OK] GOOD: Appropriate testing
 - Unit tests for business logic
 - Integration tests for APIs
 - E2E tests for critical user flows
 
-# ❌ BAD: No testing strategy
+# [X] BAD: No testing strategy
 "We'll test manually"
 ```
 
@@ -153,13 +153,13 @@ T001: Implement user registration endpoint
 
 **Example:**
 ```markdown
-# ✅ GOOD: Documented decisions
+# [OK] GOOD: Documented decisions
 ADR-001: Choose PostgreSQL over MongoDB
 - Date: 2025-01-15
 - Rationale: Need ACID transactions
 - Trade-offs: Less flexible schema
 
-# ❌ BAD: No documentation
+# [X] BAD: No documentation
 "We just picked what we knew"
 ```
 
@@ -176,12 +176,12 @@ ADR-001: Choose PostgreSQL over MongoDB
 
 **Example:**
 ```markdown
-# ✅ GOOD: Learning from implementation
+# [OK] GOOD: Learning from implementation
 Spec v1: "Users login with email"
 Spec v2: "Added: Support for username login (user feedback)"
 Spec v3: "Added: MFA option (security review)"
 
-# ❌ BAD: Never updating specs
+# [X] BAD: Never updating specs
 "Original spec from 6 months ago"
 ```
 
@@ -198,12 +198,12 @@ Spec v3: "Added: MFA option (security review)"
 
 **Example:**
 ```markdown
-# ✅ GOOD: Clear communication
+# [OK] GOOD: Clear communication
 - Weekly spec reviews with team
 - Client approval before each phase
 - Documented change requests
 
-# ❌ BAD: Working in isolation
+# [X] BAD: Working in isolation
 "We'll show them when it's done"
 ```
 

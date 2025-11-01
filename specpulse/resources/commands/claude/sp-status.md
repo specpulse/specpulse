@@ -93,17 +93,17 @@ I will display:
 **Overall Progress**: 42%
 
 ### Active Features
-- [🔄] 001-user-authentication (65%)
-- [🔄] 002-payment-processing (23%)
+- [PROG] 001-user-authentication (65%)
+- [PROG] 002-payment-processing (23%)
 
 ### Completed Features  
-- [✅] 000-project-setup (100%)
+- [OK] 000-project-setup (100%)
 
 ### In Progress Features
-- [⏳] 003-user-profile (45%)
+- [WAIT] 003-user-profile (45%)
 
 ### Paused Features
-- [⏸️] 004-notifications (78%)
+- [PAUSED] 004-notifications (78%)
 
 ### Current Context
 **Active Feature**: 001-user-authentication

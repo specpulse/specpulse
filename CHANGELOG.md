@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.3.2] - 2025-11-01
+
+### 🔧 Critical Fix
+
+#### Version Import Fix
+- **FIXED**: Critical version import error preventing CLI functionality
+  - Enhanced version import with multiple fallback levels
+  - Added robust error handling for version detection
+  - Location: `specpulse/core/specpulse.py` (lines 18-26)
+  - Impact: Resolves CLI command failures across all environments
+
+#### Improved Error Handling
+- **ENHANCED**: Better fallback mechanism for version detection
+- **ENHANCED**: More robust import error handling
+- **ENHANCED**: Cross-environment compatibility improvements
+
+---
+
+## [2.3.1] - 2025-11-01
+
+### 🐛 Bug Fixes
+
+#### Fixed CLI Issues
+- **FIXED**: Missing `init` method in SpecPulse core class
+  - Added complete implementation of `init()` method to `specpulse/core/specpulse.py`
+  - Fixed project initialization workflow
+  - Location: `specpulse/core/specpulse.py` (lines 281-500)
+  - Impact: Resolves initialization failures
+
+#### Fixed Unicode Encoding Issues
+- **FIXED**: Unicode character encoding errors on Windows
+  - Replaced Unicode characters with ASCII equivalents throughout codebase
+  - Updated console error handling for better Windows compatibility
+  - Fixed characters: ❌ → [X], ✅ → [OK], 🔄 → [PROG], ⏳ → [WAIT], ⏸️ → [PAUSED]
+  - Location: Multiple resource files and error handlers
+  - Impact: Resolves Windows charmap encoding errors
+
+#### Fixed Version Import
+- **FIXED**: Version import issues in core modules
+  - Added proper version import with fallback mechanism
+  - Location: `specpulse/core/specpulse.py` (lines 18-23)
+  - Impact: Ensures correct version detection
+
+---
+
 ## [2.3.0] - 2025-10-31
 
 ### 🎉 MAJOR RELEASE - Security, Performance, and Architecture Transformation

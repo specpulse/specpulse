@@ -13,6 +13,17 @@ Architecture Pattern: Facade + Dependency Injection
 from pathlib import Path
 from typing import Dict, List, Optional
 import logging
+from datetime import datetime
+
+# Import version from the dedicated version file
+try:
+    from .. import __version__
+except ImportError:
+    try:
+        from specpulse._version import __version__
+    except ImportError:
+        # Fallback for development environment
+        __version__ = "2.3.2"
 
 from .template_provider import TemplateProvider
 from .memory_provider import MemoryProvider
@@ -273,6 +284,238 @@ class SpecPulse:
     def decompose_specification(self, spec_dir: Path, spec_content: str) -> Dict:
         """Decompose specification (delegated)"""
         return self.decomposition_service.decompose_specification(spec_dir, spec_content)
+
+    # ======================================================================
+    # PROJECT INITIALIZATION
+    # ======================================================================
+
+    def init(self, project_name: Optional[str] = None, here: bool = False,
+             ai_assistant: Optional[str] = None, template_source: str = 'local',
+             console=None) -> Dict:
+        """
+        Initialize a new SpecPulse project
+
+        Args:
+            project_name: Name of the project
+            here: Initialize in current directory
+            ai_assistant: AI assistant to configure (claude or gemini)
+            template_source: Template source (local or remote)
+            console: Console instance for output
+
+        Returns:
+            Dict with initialization result
+        """
+        import sys
+        import os
+
+        # Set UTF-8 encoding to avoid Windows charmap issues
+        if sys.platform == "win32":
+            os.system('chcp 65001 > nul')
+
+        from pathlib import Path
+        from datetime import datetime
+        import yaml
+        import re
+        from ..utils.error_handler import ValidationError, ProjectStructureError
+        from .. import __version__
+
+        try:
+            # Validate project name for invalid characters
+            if project_name and not here:
+                if not re.match(r'^[a-zA-Z0-9_-]+$', project_name):
+                    raise ValidationError(
+                        f"Project name contains invalid characters: {project_name}",
+                        validation_type="project_name",
+                        missing_items=["Valid characters: letters, numbers, underscore, hyphen"]
+                    )
+
+            if here:
+                project_path = Path.cwd()
+                project_name = project_path.name
+            else:
+                if not project_name:
+                    # If no project name, initialize in current directory
+                    project_path = Path.cwd()
+                    project_name = project_path.name
+                else:
+                    project_path = Path.cwd() / project_name
+                    if not project_path.exists():
+                        project_path.mkdir(parents=True)
+
+            # Validate project path
+            if not project_path.exists():
+                raise ProjectStructureError(
+                    f"Project path does not exist: {project_path}",
+                    missing_dirs=[str(project_path)]
+                )
+
+            # Create directory structure
+            directories = [
+                ".specpulse",
+                ".specpulse/cache",
+                ".claude",
+                ".claude/commands",
+                ".gemini",
+                ".gemini/commands",
+                "memory",
+                "specs",
+                "plans",
+                "tasks",
+                "templates",
+                "templates/decomposition"
+            ]
+
+            # Create directories
+            failed_dirs = []
+            for dir_name in directories:
+                try:
+                    dir_path = project_path / dir_name
+                    dir_path.mkdir(parents=True, exist_ok=True)
+                except Exception as e:
+                    failed_dirs.append(dir_name)
+
+            if failed_dirs:
+                raise ProjectStructureError(
+                    f"Failed to create {len(failed_dirs)} directories: {', '.join(failed_dirs)}",
+                    missing_dirs=failed_dirs
+                )
+
+            # Create config file
+            config = {
+                "version": __version__,
+                "project": {
+                    "name": project_name,
+                    "type": "web",
+                    "created": datetime.now().isoformat()
+                },
+                "ai": {
+                    "primary": ai_assistant or "claude"
+                },
+                "templates": {
+                    "spec": "templates/spec.md",
+                    "plan": "templates/plan.md",
+                    "task": "templates/task.md"
+                },
+                "conventions": {
+                    "branch_naming": "{number:03d}-{feature-name}",
+                    "spec_naming": "spec-{number:03d}.md",
+                    "plan_naming": "plan-{number:03d}.md",
+                    "task_naming": "task-{number:03d}.md"
+                }
+            }
+
+            config_path = project_path / ".specpulse" / "config.yaml"
+            with open(config_path, 'w') as f:
+                yaml.dump(config, f, default_flow_style=False)
+
+            # Copy templates from resources
+            self._copy_templates(project_path)
+
+            # Copy AI command files
+            self._copy_ai_commands(project_path, ai_assistant)
+
+            # Create initial memory files
+            self._create_initial_memory(project_path)
+
+            return {
+                "status": "success",
+                "project_path": str(project_path),
+                "project_name": project_name,
+                "directories_created": directories,
+                "ai_assistant": ai_assistant
+            }
+
+        except Exception as e:
+            return {
+                "status": "error",
+                "error": str(e)
+            }
+
+    def _copy_templates(self, project_path: Path) -> None:
+        """Copy template files from resources to project"""
+        import shutil
+
+        project_templates_dir = project_path / "templates"
+
+        # Copy core templates
+        core_templates = ["spec.md", "plan.md", "task.md"]
+        for template in core_templates:
+            src = self.templates_dir / template
+            dst = project_templates_dir / template
+            if src.exists():
+                shutil.copy2(src, dst)
+
+        # Copy decomposition templates
+        decomp_dir = project_templates_dir / "decomposition"
+        src_decomp = self.templates_dir / "decomposition"
+        if src_decomp.exists():
+            for template_file in src_decomp.glob("*.md"):
+                dst = decomp_dir / template_file.name
+                shutil.copy2(template_file, dst)
+
+    def _copy_ai_commands(self, project_path: Path, ai_assistant: Optional[str]) -> None:
+        """Copy AI command files based on chosen assistant"""
+        import shutil
+
+        commands_dir = self.resources_dir / "commands"
+
+        # Copy Claude commands
+        claude_commands = commands_dir / "claude"
+        if claude_commands.exists():
+            dst_claude = project_path / ".claude" / "commands"
+            for cmd_file in claude_commands.glob("*.md"):
+                shutil.copy2(cmd_file, dst_claude / cmd_file.name)
+
+        # Copy Gemini commands
+        gemini_commands = commands_dir / "gemini"
+        if gemini_commands.exists():
+            dst_gemini = project_path / ".gemini" / "commands"
+            for cmd_file in gemini_commands.glob("*.toml"):
+                shutil.copy2(cmd_file, dst_gemini / cmd_file.name)
+
+    def _create_initial_memory(self, project_path: Path) -> None:
+        """Create initial memory files"""
+        memory_dir = project_path / "memory"
+
+        # Create context.md
+        context_content = f"""# Project Context
+
+## Project: {project_path.name}
+- **Created**: {datetime.now().isoformat()}
+- **SpecPulse Version**: {__version__}
+- **AI Assistant**: Not configured
+
+## Active Feature: None
+No feature currently in progress.
+
+## Recent Activity
+Project initialized successfully.
+
+---
+*This file is automatically maintained by SpecPulse*
+"""
+
+        with open(memory_dir / "context.md", 'w', encoding='utf-8') as f:
+            f.write(context_content)
+
+        # Create decisions.md
+        decisions_content = """# Architectural Decisions
+
+No decisions recorded yet.
+
+## Decision Log Format
+- **AD-[number]**: [Decision Title] (Date)
+  - **Status**: [Proposed/Approved/Implemented/Deprecated]
+  - **Context**: Background and problem
+  - **Decision**: What was decided
+  - **Consequences**: Impact of this decision
+
+---
+*This file is automatically maintained by SpecPulse*
+"""
+
+        with open(memory_dir / "decisions.md", 'w', encoding='utf-8') as f:
+            f.write(decisions_content)
 
 
 __all__ = ['SpecPulse']

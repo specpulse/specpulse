@@ -33,14 +33,30 @@ class ProjectCommands:
             ai: AI assistant to configure (claude or gemini)
             template_source: Template source (local or remote)
         """
+        # Skip banner for now to avoid Unicode issues
+        # self.console.show_banner()
+        # self.console.pulse_animation("Initializing SpecPulse Framework", duration=1.0)
+
         # Delegate to SpecPulse.init()
-        return self.specpulse.init(
+        result = self.specpulse.init(
             project_name=project_name,
             here=here,
             ai_assistant=ai,
             template_source=template_source,
             console=self.console
         )
+
+        # Handle result with minimal output to avoid Unicode issues
+        if result.get("status") == "success":
+            print(f"Project initialized successfully!")
+            print(f"Project: {result['project_name']}")
+            print(f"Path: {result['project_path']}")
+            if result.get("ai_assistant"):
+                print(f"AI Assistant: {result['ai_assistant']}")
+            return result
+        else:
+            print(f"Initialization failed: {result.get('error', 'Unknown error')}")
+            return result
 
     def update(self, force: bool = False, **kwargs):
         """

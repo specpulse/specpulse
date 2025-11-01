@@ -1,4 +1,4 @@
-# SpecPulse v2.3.0
+# SpecPulse v2.3.2
 
 <div align="center">
 
@@ -14,9 +14,47 @@
 
 ---
 
+## 🎉 What's New in v2.3.2
+
+**Latest Release:** v2.3.2 (2025-11-01) - Critical Version Import Fix
+
+### Critical Fix
+
+🔧 **VERSION IMPORT FIX:**
+- Fixed critical version import error that prevented CLI from working
+- Added robust fallback mechanism for version detection
+- Enhanced import error handling with multiple fallback levels
+
+### What This Means
+
+- ✅ **CLI commands now work properly**
+- ✅ **Version detection is reliable across all environments**
+- ✅ **Robust error handling for version imports**
+
+---
+
+## 🎉 What's New in v2.3.1
+
+**Previous Release:** v2.3.1 (2025-11-01) - Bug Fixes for CLI and Unicode Encoding
+
+### Key Fixes
+
+🐛 **CRITICAL BUG FIXES:**
+- Fixed missing `init` method in SpecPulse core class
+- Resolved Unicode encoding errors on Windows systems
+- Fixed version import issues in core modules
+
+### What This Means
+
+- ✅ **CLI init command now works properly**
+- ✅ **Windows compatibility improved**
+- ✅ **Version detection working correctly**
+
+---
+
 ## 🎉 What's New in v2.3.0
 
-**Latest Release:** v2.3.0 (2025-10-31) - Major Security, Performance & Architecture Update
+**Previous Release:** v2.3.0 (2025-10-31) - Major Security, Performance & Architecture Update
 
 ### Key Highlights
 

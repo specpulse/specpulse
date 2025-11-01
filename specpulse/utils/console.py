@@ -57,7 +57,17 @@ class Console:
     ROCKET_FRAMES = [">>", ">>>", ">>>>", ">>>>>", "  >>>>>", "    >>>>>"]
     
     def __init__(self, no_color: bool = False, verbose: bool = False):
-        self.console = RichConsole(force_terminal=not no_color)
+        # Temporarily disable Rich console for debugging
+        try:
+            self.console = RichConsole(
+                force_terminal=not no_color,
+                legacy_windows=True,  # Better compatibility with Windows
+                no_color=no_color
+            )
+            self.use_rich = True
+        except Exception:
+            self.console = None
+            self.use_rich = False
         self.no_color = no_color
         self.verbose = verbose
     
@@ -95,10 +105,13 @@ class Console:
     def error(self, message: str, icon: str = "[X]"):
         """Print error message"""
         try:
-            self.console.print(f"{icon}  [bright_red]{message}[/bright_red]")
-        except (UnicodeEncodeError, Exception):
-            # Fallback for encoding issues and other console errors
-            print(f"{icon} {message}")
+            # Clean both icon and message to remove any Unicode characters
+            clean_icon = icon.encode('ascii', errors='ignore').decode('ascii')
+            clean_message = message.encode('ascii', errors='ignore').decode('ascii')
+            print(f"{clean_icon} {clean_message}")
+        except Exception:
+            # Ultimate fallback
+            print("[X] Error occurred")
     
     def header(self, message: str, style: str = "bright_cyan"):
         """Print a beautiful header"""

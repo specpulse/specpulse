@@ -17,13 +17,27 @@ from .parsers.subcommand_parsers import create_argument_parser
 def main():
     """Main entry point for SpecPulse CLI"""
     try:
+        # Debug: Set UTF-8 encoding first
+        import sys
+        import os
+        if sys.platform == "win32":
+            os.system('chcp 65001 > nul')
+
+        print("DEBUG: Starting SpecPulse CLI...")
+
         # Create argument parser
+        print("DEBUG: Creating argument parser...")
+        from .parsers.subcommand_parsers import create_argument_parser
         parser = create_argument_parser()
+        print("DEBUG: Argument parser created")
 
         # Parse arguments
+        print("DEBUG: Parsing arguments...")
         args = parser.parse_args()
+        print("DEBUG: Arguments parsed")
 
         # Create command handler
+        print("DEBUG: Creating command handler...")
         handler = CommandHandler(
             no_color=args.no_color,
             verbose=args.verbose
@@ -110,7 +124,10 @@ def main():
         # Re-raise SystemExit to maintain exit codes
         raise
     except Exception as e:
-        print(f"Error: {e}")
+        try:
+            sys.stdout.write(f"Error: {e}\n")
+        except UnicodeEncodeError:
+            sys.stdout.write("Error: Unicode encoding issue - try setting UTF-8 encoding (chcp 65001 on Windows)\n")
         sys.exit(1)
 
 

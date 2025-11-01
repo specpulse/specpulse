@@ -921,7 +921,7 @@ class Validator:
         content = Text()
 
         # Title (message) - bold red
-        content.append(f"❌ {example.message}\n\n", style="bold red")
+        content.append(f"[X] {example.message}\n\n", style="bold red")
 
         # What this means section - cyan
         content.append("What this means:\n", style="bold cyan")
@@ -981,7 +981,7 @@ class Validator:
             >>> plain_text = validator.format_enhanced_error_plain(example)
         """
         output = []
-        output.append(f"❌ {example.message}")
+        output.append(f"[X] {example.message}")
         output.append("")
         output.append("What this means:")
         output.append(f"  {example.meaning}")
