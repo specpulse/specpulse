@@ -1,4 +1,4 @@
-# SpecPulse v2.0.0 Troubleshooting Guide
+# SpecPulse v2.4.1 Troubleshooting Guide
 
 ## 📋 Table of Contents
 
@@ -22,13 +22,14 @@
 specpulse doctor
 
 # Show current status
-specpulse ai summary
+specpulse feature list
 
 # Validate core functionality
 specpulse validate all
 
-# Check AI integration
-specpulse ai context
+# Check CLI commands
+specpulse feature --help
+specpulse spec --help
 ```
 
 ---
@@ -54,13 +55,13 @@ specpulse --version
 2. **Reinstall SpecPulse:**
    ```bash
    pip uninstall specpulse
-   pip install specpulse==2.0.0
+   pip install specpulse==2.4.1
    ```
 
 3. **Check Python Environment:**
    ```bash
    python --version
-   # Should be 3.11+ for v2.0.0
+   # Should be 3.11+ for v2.4.1
    ```
 
 4. **Virtual Environment:**
@@ -74,8 +75,8 @@ specpulse --version
 
 **Issue:**
 ```bash
-pip install specpulse==2.0.0
-# ERROR: SpecPulse 2.0.0 requires Python 3.11+
+pip install specpulse==2.4.1
+# ERROR: SpecPulse 2.4.1 requires Python 3.11+
 ```
 
 **Solutions:**
@@ -93,7 +94,7 @@ pip install specpulse==2.0.0
 
 2. **Use System Python 3.12+ (if available):**
    ```bash
-   python3.12 -m pip install specpulse==2.0.0
+   python3.12 -m pip install specpulse==2.4.1
    ```
 
 ### Permission Issues
@@ -135,14 +136,14 @@ pip install --user specpulse==2.0.0
 # Use virtual environment
 python -m venv specpulse-env
 source specpulse-env/bin/activate
-pip install specpulse==2.0.0
+pip install specpulse==2.4.1
 ```
 
 ### Network Issues
 
 **Issue:**
 ```bash
-pip install specpulse==2.0.0
+pip install specpulse==2.4.1
 # ERROR: Could not find a version that satisfies the requirement
 ```
 
@@ -170,7 +171,7 @@ pip install specpulse==2.0.0
 
 ## 🤖 AI Integration Issues
 
-### AI Commands Not Found
+### Deprecated AI Commands
 
 **Issue:**
 ```bash
@@ -178,140 +179,184 @@ specpulse ai context
 # Error: Unknown command 'ai'
 ```
 
+**Explanation**: AI commands have been deprecated in v2.4.1 in favor of CLI-first architecture.
+
 **Solutions:**
 
-1. **Verify Version:**
+1. **Use Direct CLI Commands:**
+   ```bash
+   # Instead of: specpulse ai context
+   specpulse feature list
+   specpulse feature status 001-feature
+
+   # Instead of: specpulse ai suggest
+   specpulse feature init my-feature
+   specpulse spec create "My feature description"
+   ```
+
+2. **Use AI Assistant Slash Commands:**
+   ```bash
+   # In Claude Code or Gemini CLI:
+   /sp-pulse my-feature
+   /sp-spec create "My feature description"
+   /sp-plan generate
+   /sp-task breakdown
+   ```
+
+3. **Verify Version:**
    ```bash
    specpulse --version
-   # Should be 2.0.0
-   ```
-
-2. **Check Project Recognition:**
-   ```bash
-   cd your-project
-   ls -la .specpulse/
-   # Should see ai_state.json
-   ```
-
-3. **Force Context Refresh:**
-   ```bash
-   specpulse ai context --refresh
+   # Should be 2.4.1
    ```
 
 ### Context Detection Problems
 
 **Issue:**
 ```bash
-specpulse ai context
-# Shows "No current feature detected"
+specpulse feature continue my-feature
+# Error: Feature not found
 ```
 
 **Solutions:**
 
-1. **Check Git Status:**
+1. **Check Git Branch:**
    ```bash
    git status
    git branch --show-current
+   # Should be on a feature branch like 001-my-feature
    ```
 
-2. **Initialize Git if Needed:**
+2. **List Available Features:**
+   ```bash
+   specpulse feature list
+   # Shows all available features
+   ```
+
+3. **Initialize Git if Needed:**
    ```bash
    git init
    git add .
    git commit -m "Initial commit"
+   git checkout -b 001-my-feature
    ```
 
-3. **Check Project Structure:**
+4. **Check Project Structure:**
    ```bash
-   ls specs/ plans/ tasks/ memory/
+   ls .specpulse/specs/
+   ls .specpulse/plans/
+   ls .specpulse/tasks/
    ```
 
-4. **Manual Context Update:**
+5. **Manual Feature Creation:**
    ```bash
-   specpulse context set current_feature "my-feature"
+   specpulse feature init my-feature
    ```
 
-### AI Suggestions Not Working
+### AI Assistant Commands Not Working
 
 **Issue:**
 ```bash
-specpulse ai suggest
-# Shows generic or irrelevant suggestions
+# In Claude Code or Gemini CLI:
+/sp-spec create "My feature"
+# Error: Command not found or file not found
 ```
 
 **Solutions:**
 
-1. **Check Context:**
+1. **Initialize Project with AI Support:**
    ```bash
-   specpulse ai context
-   specpulse memory summary
+   specpulse init my-project --ai claude
+   # or
+   specpulse init my-project --ai gemini
    ```
 
-2. **Provide Specific Query:**
+2. **Check Command Files Exist:**
    ```bash
-   specpulse ai suggest --query "my specific authentication problem"
+   ls .claude/commands/
+   ls .gemini/commands/
+   # Should see sp-*.md or sp-*.toml files
    ```
 
-3. **Update Project Context:**
+3. **Reinitialize AI Commands:**
    ```bash
-   specpulse context set tech_stack.framework React
-   specpulse context set current_feature "user-authentication"
+   specpulse init --here --ai claude
    ```
 
-### Multi-LLM Issues
+4. **Check Project Structure:**
+   ```bash
+   ls .specpulse/templates/
+   # Templates must exist for slash commands to work
+   ```
+
+### AI Assistant Integration Issues
 
 **Issue:**
 ```bash
-specpulse ai switch claude
-# Error: Failed to switch to claude
+# Claude Code or Gemini CLI not recognizing SpecPulse context
 ```
 
 **Solutions:**
 
-1. **Check Available LLMs:**
+1. **Check AI Assistant Setup:**
    ```bash
-   specpulse ai summary
-   # Shows current active LLM
+   # Verify you're in a SpecPulse project
+   ls .specpulse/
+   ls .claude/  # For Claude
+   ls .gemini/  # For Gemini
    ```
 
-2. **Reset AI State:**
+2. **Reinitialize AI Integration:**
    ```bash
-   rm .specpulse/ai_state.json
-   specpulse ai context
+   specpulse init --here --ai claude
+   # or
+   specpulse init --here --ai gemini
    ```
 
-3. **Check LLM Configuration:**
+3. **Check Template Access:**
    ```bash
-   cat .specpulse/config.yaml
-   # Verify ai section exists and is correct
+   ls .specpulse/templates/
+   # AI assistants need access to templates
    ```
 
-### AI State Corruption
+4. **Verify Memory System:**
+   ```bash
+   ls .specpulse/memory/
+   # Context files should exist
+   ```
+
+### Project State Corruption
 
 **Issue:**
 ```bash
-specpulse ai summary
-# Error: Failed to load AI state
+specpulse doctor
+# Error: Failed to load project state
 ```
 
 **Solutions:**
 
-1. **Reset AI State:**
+1. **Check Project Structure:**
    ```bash
-   rm .specpulse/ai_state.json
-   specpulse ai context
+   ls -la .specpulse/
+   # Should have: specs/, plans/, tasks/, memory/, templates/
    ```
 
-2. **Check Permissions:**
+2. **Reset Memory System:**
+   ```bash
+   rm .specpulse/memory/context.md
+   specpulse feature init test-feature
+   specpulse feature delete test-feature --force
+   ```
+
+3. **Check Permissions:**
    ```bash
    ls -la .specpulse/
    chmod 755 .specpulse/
    ```
 
-3. **Verify Cache Directory:**
+4. **Verify Template Directory:**
    ```bash
-   mkdir -p .specpulse/ai_cache
-   chmod 755 .specpulse/ai_cache/
+   mkdir -p .specpulse/templates/
+   chmod 755 .specpulse/templates/
    ```
 
 ---
@@ -488,11 +533,11 @@ specpulse memory summary
 
 ## ⚡ Performance Issues
 
-### Slow Context Detection
+### Slow Command Execution
 
 **Issue:**
 ```bash
-specpulse ai context
+specpulse feature list
 # Takes >10 seconds to complete
 ```
 
@@ -500,21 +545,26 @@ specpulse ai context
 
 1. **Clean Old Data:**
    ```bash
-   specpulse memory cleanup --days 30
-   specpulse ai checkpoint cleanup --older-than-days 30
+   find .specpulse/ -name "*.md" -mtime +30 -delete
    ```
 
-2. **Optimize Cache:**
+2. **Optimize File System:**
    ```bash
-   export SPECPULSE_AI_CACHE_DIR="/tmp/specpulse-cache"
-   rm -rf /tmp/specpulse-cache
-   mkdir -p /tmp/specpulse-cache
+   # Check for large files
+   du -sh .specpulse/
+   find .specpulse/ -size +10M -delete
    ```
 
-3. **Reduce Scope:**
+3. **Use Verbose Mode for Debugging:**
    ```bash
-   specpulse ai context --refresh
-   specpulse ai suggest --query "next immediate steps"
+   export SPECPULSE_VERBOSE=1
+   specpulse feature list
+   ```
+
+4. **Check Git Performance:**
+   ```bash
+   git gc --prune=now
+   git status
    ```
 
 ### High Memory Usage
@@ -529,47 +579,48 @@ specpulse ai context
 
 1. **Regular Cleanup:**
    ```bash
-   specpulse memory cleanup --days 7
+   find .specpulse/ -name "*.md" -mtime +7 -delete
    ```
 
-2. **Adjust Retention Policy:**
-   ```yaml
-   # Edit .specpulse/config.yaml
-   ai:
-     cache_retention_days: 7
+2. **Check Directory Sizes:**
+   ```bash
+   du -sh .specpulse/*
+   # Identify large directories
    ```
 
 3. **Monitor Usage:**
    ```bash
-   specpulse memory summary
-   specpulse ai summary
+   specpulse doctor
+   du -sh .specpulse/
    ```
 
-### AI Response Slow
+### CLI Commands Slow
 
 **Issue:**
 ```bash
-specpulse ai suggest
-# AI suggestions take a long time to generate
+specpulse validate all
+# Validation takes a long time to complete
 ```
 
 **Solutions:**
 
-1. **Use Targeted Queries:**
+1. **Use Specific Validation:**
    ```bash
-   specpulse ai suggest --query "immediate next steps"
+   specpulse validate spec
+   specpulse validate plan
+   # Instead of validating everything at once
    ```
 
-2. **Switch Faster LLM:**
+2. **Enable Auto-Fix:**
    ```bash
-   specpulse ai switch gemini
-   # Gemini is faster for routine tasks
+   specpulse validate all --fix
+   # Auto-fix can speed up the process
    ```
 
-3. **Use Both for Complex Work:**
+3. **Check for Large Files:**
    ```bash
-   specpulse ai switch both
-   # Leverage both Claude and Gemini insights
+   find .specpulse/ -size +1M -ls
+   # Large files can slow down validation
    ```
 
 ---
@@ -587,7 +638,7 @@ specpulse ai context
 ```
 
 **Solutions:**
-- ✅ **Already Fixed**: v2.0.0 includes Unicode fixes
+- ✅ **Already Fixed**: v2.4.1 includes Unicode fixes
 - Use PowerShell instead of Command Prompt
 - Set console encoding: `chcp 65001`
 
@@ -690,16 +741,18 @@ Access denied errors during installation
 ### Self-Help System
 
 ```bash
-# Show available help topics
-specpulse help --list
+# Get general help
+specpulse --help
 
-# Get help on specific topics
-specpulse help ai_integration
-specpulse help troubleshooting
-specpulse help templates
+# Get help on specific commands
+specpulse feature --help
+specpulse spec --help
+specpulse plan --help
+specpulse task --help
+specpulse validate --help
 
-# Get contextual help
-specpulse ai suggest --query "help"
+# System diagnostics
+specpulse doctor
 ```
 
 ### Community Support
@@ -717,9 +770,10 @@ specpulse ai suggest --query "help"
 specpulse doctor
 # Shows system status and recommendations
 
-# Context-specific help
-specpulse ai suggest --query "installation issues"
-specpulse ai suggest --query "AI integration problems"
+# Command-specific help
+specpulse feature --help
+specpulse spec --help
+specpulse validate --help
 ```
 
 ### Bug Reporting
@@ -780,7 +834,7 @@ When reporting issues, include:
 4. **Package Reinstall:**
    ```bash
    pip uninstall specpulse
-   pip install specpulse==2.0.0
+   pip install specpulse==2.4.1
    ```
 
 ### Partial Rollback
@@ -830,4 +884,4 @@ When reporting issues, include:
 
 ---
 
-**🎉 With proper preparation and troubleshooting, your migration to SpecPulse v2.0.0 should be smooth and successful!**
+**🎉 With proper preparation and troubleshooting, your migration to SpecPulse v2.4.1 should be smooth and successful!**

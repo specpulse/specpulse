@@ -30,7 +30,7 @@ Apply these principles:
 - Minimal coupling between services
 
 Output structure:
-specs/XXX-feature/decomposition/
+.specpulse/specs/XXX-feature/decomposition/
 ├── microservices.md
 ├── api-contracts/
 ├── interfaces/

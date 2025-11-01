@@ -45,7 +45,7 @@ Implementation:
 Example Output:
 
 ✓ Specification Validation
-  File: specs/001-auth/spec-001.md
+  File: .specpulse/specs/001-auth/spec-001.md
   Status: Complete
   Sections: 12/12
   Clarifications: 0
@@ -55,7 +55,7 @@ Example Output:
 Or with issues:
 
 ✗ Specification Validation
-  File: specs/001-auth/spec-001.md
+  File: .specpulse/specs/001-auth/spec-001.md
   Status: Incomplete
 
   Missing:

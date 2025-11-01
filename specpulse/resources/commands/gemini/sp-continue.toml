@@ -6,7 +6,7 @@ Parse arguments to extract feature name or ID
 
 ## Feature Detection:
 1. Find feature directory using context detection:
-   - Search for matching feature directory (specs/*, plans/*, tasks/*)
+   - Search for matching feature directory (.specpulse/specs/*, .specpulse/plans/*, .specpulse/tasks/*)
    - Support partial matching (e.g., "auth" matches "001-user-authentication")
    - Support ID matching (e.g., "001" matches "001-user-authentication")
 
@@ -15,7 +15,7 @@ Parse arguments to extract feature name or ID
    - Verify feature structure is intact
    - Report if feature not found
 
-3. Update context in memory/context.md:
+3. Update context in .specpulse/memory/context.md:
    - Switch current feature to selected feature
    - Update timestamp and switch reason
    - Preserve previous context data
@@ -45,7 +45,7 @@ Parse arguments to extract feature name or ID
 ## Context Switching:
 1. Save previous context state
 2. Load new feature context
-3. Update memory/context.md
+3. Update .specpulse/memory/context.md
 4. Switch git branch if available
 5. Display feature status and next steps
 

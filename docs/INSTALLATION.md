@@ -1,4 +1,4 @@
-# SpecPulse v2.0.0 Installation Guide
+# SpecPulse v2.4.1 Installation Guide
 
 ## 📋 Table of Contents
 
@@ -41,10 +41,10 @@
 
 ```bash
 # Install SpecPulse
-pip install specpulse==2.0.0
+pip install specpulse==2.4.1
 
 # Or upgrade from previous version
-pip install --upgrade specpulse==2.0.0
+pip install --upgrade specpulse==2.4.1
 ```
 
 ### Method 2: Install from Source
@@ -69,7 +69,7 @@ conda create -n specpulse python=3.11
 conda activate specpulse
 
 # Install SpecPulse
-pip install specpulse==2.0.0
+pip install specpulse==2.4.1
 ```
 
 ### Method 4: Install with pipx (Recommended for isolated environments)
@@ -79,7 +79,7 @@ pip install specpulse==2.0.0
 pip install --user pipx
 
 # Install SpecPulse
-pipx install specpulse==2.0.0
+pipx install specpulse==2.4.1
 
 # Ensure pipx path is in your PATH
 pipx ensurepath
@@ -95,7 +95,7 @@ pipx ensurepath
 
 ```powershell
 # Install SpecPulse
-pip install specpulse==2.0.0
+pip install specpulse==2.4.1
 
 # Verify installation
 specpulse --version
@@ -105,7 +105,7 @@ specpulse --version
 
 ```cmd
 # Install SpecPulse
-pip install specpulse==2.0.0
+pip install specpulse==2.4.1
 
 # Verify installation
 specpulse --version
@@ -118,7 +118,7 @@ specpulse --version
 choco install specpulse
 
 # Or using pip
-pip install specpulse==2.0.0
+pip install specpulse==2.4.1
 ```
 
 ### macOS
@@ -140,7 +140,7 @@ specpulse --version
 
 ```bash
 # Install SpecPulse
-pip install specpulse==2.0.0
+pip install specpulse==2.4.1
 
 # Verify installation
 specpulse --version
@@ -187,7 +187,7 @@ specpulse --version
 pip install --user pipx
 
 # Install SpecPulse
-pipx install specpulse==2.0.0
+pipx install specpulse==2.4.1
 
 # Ensure pipx path is in PATH
 pipx ensurepath
@@ -204,7 +204,7 @@ pipx ensurepath
 specpulse --version
 
 # Expected output:
-# SpecPulse 2.0.0
+# SpecPulse 2.4.1
 
 # Show help
 specpulse --help
@@ -215,14 +215,20 @@ specpulse --help
 ### AI Integration Verification
 
 ```bash
-# Test AI commands
-specpulse ai --help
+# Test feature commands
+specpulse feature --help
 
-# Test context detection
-specpulse ai context
+# Test specification commands
+specpulse spec --help
 
-# Test AI suggestions
-specpulse ai suggest
+# Test plan commands
+specpulse plan --help
+
+# Test task commands
+specpulse task --help
+
+# Test validation commands
+specpulse validate --help
 ```
 
 ### Template System Verification
@@ -247,7 +253,8 @@ cd test-project
 # Verify project structure
 ls -la
 
-# Expected directories: specs, plans, tasks, memory, templates, .claude, .gemini
+# Expected directories: specs, plans, tasks, memory, templates
+# Expected AI command directories: .claude, .gemini (if AI assistants were specified)
 ```
 
 ---
@@ -346,7 +353,7 @@ specpulse init my-project --ai gemini
 # Check Python version
 python --version
 
-# Should show 3.11+ for SpecPulse 2.0.0
+# Should show 3.11+ for SpecPulse 2.4.1
 ```
 
 **Solution**: Upgrade Python or use pyenv to manage versions:
@@ -358,7 +365,7 @@ pyenv global 3.12.0
 
 # Verify installation
 python --version
-pip install specpulse==2.0.0
+pip install specpulse==2.4.1
 ```
 
 #### Permission Issues
@@ -378,7 +385,7 @@ sudo pip3 install specpulse==2.0.0
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 # Install SpecPulse
-pip install specpulse==2.0.0
+pip install specpulse==2.4.1
 ```
 
 #### Network Issues
@@ -399,7 +406,7 @@ python -m venv specpulse-env
 source specpulse-env/bin/activate  # Windows: specpulse-env\Scripts\activate
 
 # Install SpecPulse
-pip install specpulse==2.0.0
+pip install specpulse==2.4.1
 ```
 
 ### Post-Installation Issues
@@ -426,7 +433,7 @@ ls templates/
 
 # Reinstall if necessary
 pip uninstall specpulse
-pip install specpulse==2.0.0
+pip install specpulse==2.4.1
 ```
 
 #### AI Integration Issues
@@ -451,7 +458,7 @@ git commit -m "Initial commit"
 ### Windows
 
 - **PowerShell Recommended**: Use PowerShell instead of Command Prompt for better experience
-- **Unicode Support**: SpecPulse v2.0.0 fixes Unicode encoding issues on Windows
+- **Unicode Support**: SpecPulse v2.4.1 includes Unicode encoding fixes for Windows
 - **Path Length**: Be aware of Windows path length limitations (260 characters)
 - **Antivirus**: Some antivirus software may flag Python packages - add exceptions if needed
 
@@ -471,29 +478,30 @@ git commit -m "Initial commit"
 
 ## 🔄 Upgrading from Previous Versions
 
-### From v1.x to v2.0.0
+### From v1.x to v2.4.1
 
 ```bash
 # Backup existing projects (recommended)
 cp -r my-project my-project.backup
 
 # Upgrade SpecPulse
-pip install --upgrade specpulse==2.0.0
+pip install --upgrade specpulse==2.4.1
 
 # Verify upgrade
 specpulse --version
 
-# Test new AI features
-specpulse ai summary
+# Test new CLI features
+specpulse doctor
+specpulse feature --help
 ```
 
 ### Migration Checklist
 
 - [ ] Backup existing projects
 - [ ] Upgrade SpecPulse package
-- [ ] Test AI integration features
+- [ ] Test CLI integration features
 - [ ] Validate existing specifications
-- [ ] Update team on new AI commands
+- [ ] Update team on CLI-first workflow
 
 ---
 
@@ -506,11 +514,12 @@ After successful installation:
    specpulse init my-awesome-project --ai claude
    ```
 
-2. **Explore AI Features**:
+2. **Explore CLI Features**:
    ```bash
    cd my-awesome-project
-   specpulse ai context
-   specpulse ai suggest
+   specpulse feature init user-auth
+   specpulse spec create "User authentication with OAuth2"
+   specpulse doctor
    ```
 
 3. **Read the Documentation**:
@@ -548,4 +557,4 @@ systeminfo  # Windows
 
 ---
 
-**🎉 Congratulations! You have successfully installed SpecPulse v2.0.0.**
+**🎉 Congratulations! You have successfully installed SpecPulse v2.4.1.**

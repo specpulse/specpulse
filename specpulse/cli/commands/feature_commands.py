@@ -18,22 +18,26 @@ class FeatureCommands:
     def __init__(self, console, project_root: Path):
         self.console = console
         self.project_root = project_root
-        self.specs_dir = project_root / "specs"
-        self.plans_dir = project_root / "plans"
-        self.tasks_dir = project_root / "tasks"
-        self.memory_dir = project_root / "memory"
-        self.templates_dir = project_root / "templates"
+        # Import PathManager for centralized path management
+        from ...core.path_manager import PathManager
+        self.path_manager = PathManager(project_root, use_legacy_structure=False)
 
-    def feature_init(self, feature_name: str) -> bool:
+        self.specs_dir = self.path_manager.specs_dir
+        self.plans_dir = self.path_manager.plans_dir
+        self.tasks_dir = self.path_manager.tasks_dir
+        self.memory_dir = self.path_manager.memory_dir
+        self.templates_dir = self.path_manager.templates_dir
+
+    def feature_init(self, feature_name: str, **kwargs) -> bool:
         """
         Initialize a new feature with directory structure.
 
         Creates:
-        - specs/XXX-feature-name/
-        - plans/XXX-feature-name/
-        - tasks/XXX-feature-name/
+        - .specpulse/specs/XXX-feature-name/
+        - .specpulse/plans/XXX-feature-name/
+        - .specpulse/tasks/XXX-feature-name/
         Updates:
-        - memory/context.md
+        - .specpulse/memory/context.md
 
         Args:
             feature_name: Feature name (e.g., "user-authentication")
@@ -61,19 +65,19 @@ class FeatureCommands:
                 feature_dir.mkdir(parents=True, exist_ok=True)
                 dirs_created.append(str(feature_dir.relative_to(self.project_root)))
 
-            # Update memory/context.md
+            # Update .specpulse/memory/context.md
             self._update_context_for_feature(full_name, feature_id)
 
             # Display results
             self.console.success(f"Feature initialized: {full_name}")
             for dir_path in dirs_created:
                 self.console.info(f"  Created: {dir_path}/")
-            self.console.info(f"  Updated: memory/context.md")
+            self.console.info(f"  Updated: .specpulse/memory/context.md")
 
             # Next steps
             self.console.info("\nNext steps:")
             self.console.info(f"  1. Create specification: /sp-spec <description>")
-            self.console.info(f"  2. Or manually: specs/{full_name}/spec-001.md")
+            self.console.info(f"  2. Or manually: .specpulse/specs/{full_name}/spec-001.md")
 
             return True
 
@@ -81,7 +85,7 @@ class FeatureCommands:
             self.console.error(f"Feature initialization failed: {e}")
             return False
 
-    def feature_continue(self, feature_name: str) -> bool:
+    def feature_continue(self, feature_name: str, **kwargs) -> bool:
         """
         Switch context to an existing feature.
 
@@ -113,7 +117,7 @@ class FeatureCommands:
             self._update_context_for_feature(feature_dir.name, feature_id)
 
             self.console.success(f"Switched to feature: {feature_dir.name}")
-            self.console.info(f"  Context updated in: memory/context.md")
+            self.console.info(f"  Context updated in: .specpulse/memory/context.md")
 
             # Show feature status
             self._show_feature_status(feature_dir)
@@ -161,7 +165,7 @@ class FeatureCommands:
         return None
 
     def _update_context_for_feature(self, full_name: str, feature_id: int):
-        """Update memory/context.md with active feature"""
+        """Update .specpulse/memory/context.md with active feature"""
         context_file = self.memory_dir / "context.md"
 
         # Read current context

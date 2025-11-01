@@ -10,6 +10,7 @@ import sys
 
 from ...core.specpulse import SpecPulse
 from ...core.validator import Validator
+from ...core.path_manager import PathManager
 from ...utils.console import Console
 from ...utils.error_handler import SpecPulseError
 
@@ -21,6 +22,8 @@ class ProjectCommands:
         self.console = console
         self.project_root = project_root
         self.specpulse = SpecPulse()
+        # Initialize PathManager for directory structure handling
+        self.path_manager = PathManager(project_root, use_legacy_structure=False)
 
     def init(self, project_name: Optional[str] = None, here: bool = False,
              ai: Optional[str] = None, template_source: str = 'local', **kwargs):
@@ -147,20 +150,44 @@ class ProjectCommands:
 
     def _check_structure(self) -> bool:
         """Check project directory structure"""
-        required_dirs = ['specs', 'plans', 'tasks', 'memory', 'templates']
-        all_exist = all((self.project_root / d).exists() for d in required_dirs)
+        # Check if we have a .specpulse directory (new structure) or legacy structure
+        specpulse_dir = self.project_root / ".specpulse"
+        if specpulse_dir.exists():
+            # New structure - check .specpulse subdirectories
+            required_dirs = ['.specpulse/specs', '.specpulse/plans', '.specpulse/tasks', '.specpulse/memory', '.specpulse/templates']
+            all_exist = all((self.project_root / d).exists() for d in required_dirs)
 
-        if all_exist:
-            self.console.success("  [OK] All required directories exist")
+            if all_exist:
+                self.console.success("  [OK] All required directories exist (.specpulse structure)")
+            else:
+                missing = [d for d in required_dirs if not (self.project_root / d).exists()]
+                self.console.error(f"  [FAIL] Missing directories: {', '.join(missing)}")
+
+            return all_exist
         else:
-            missing = [d for d in required_dirs if not (self.project_root / d).exists()]
-            self.console.error(f"  [FAIL] Missing directories: {', '.join(missing)}")
+            # Legacy structure - check root-level directories
+            required_dirs = ['specs', 'plans', 'tasks', 'memory', 'templates']
+            all_exist = all((self.project_root / d).exists() for d in required_dirs)
 
-        return all_exist
+            if all_exist:
+                self.console.success("  [OK] All required directories exist (legacy structure)")
+            else:
+                missing = [d for d in required_dirs if not (self.project_root / d).exists()]
+                self.console.error(f"  [FAIL] Missing directories: {', '.join(missing)}")
+
+            return all_exist
 
     def _check_templates(self) -> bool:
         """Check template files"""
-        templates_dir = self.project_root / "templates"
+        # Check if we have .specpulse directory (new structure) or legacy structure
+        specpulse_dir = self.project_root / ".specpulse"
+        if specpulse_dir.exists():
+            # New structure - templates are in .specpulse/templates
+            templates_dir = self.project_root / ".specpulse" / "templates"
+        else:
+            # Legacy structure - templates are in root templates directory
+            templates_dir = self.project_root / "templates"
+
         if not templates_dir.exists():
             self.console.error("  [FAIL] Templates directory not found")
             return False
@@ -178,7 +205,15 @@ class ProjectCommands:
 
     def _check_memory(self) -> bool:
         """Check memory files"""
-        memory_dir = self.project_root / "memory"
+        # Check if we have .specpulse directory (new structure) or legacy structure
+        specpulse_dir = self.project_root / ".specpulse"
+        if specpulse_dir.exists():
+            # New structure - memory is in .specpulse/memory
+            memory_dir = self.project_root / ".specpulse" / "memory"
+        else:
+            # Legacy structure - memory is in root memory directory
+            memory_dir = self.project_root / "memory"
+
         context_file = memory_dir / "context.md"
 
         if context_file.exists():

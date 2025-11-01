@@ -349,20 +349,28 @@ class SpecPulse:
                     missing_dirs=[str(project_path)]
                 )
 
+            # Import PathManager for centralized directory management
+            from .path_manager import PathManager
+
+            # Create path manager instance
+            path_manager = PathManager(project_path, use_legacy_structure=False)
+
             # Create directory structure
             directories = [
-                ".specpulse",
-                ".specpulse/cache",
                 ".claude",
                 ".claude/commands",
                 ".gemini",
                 ".gemini/commands",
-                "memory",
-                "specs",
-                "plans",
-                "tasks",
-                "templates",
-                "templates/decomposition"
+                ".specpulse",
+                ".specpulse/cache",
+                ".specpulse/specs",
+                ".specpulse/plans",
+                ".specpulse/tasks",
+                ".specpulse/memory",
+                ".specpulse/templates",
+                ".specpulse/templates/decomposition",
+                ".specpulse/checkpoints",
+                ".specpulse/memory/notes"
             ]
 
             # Create directories
@@ -392,9 +400,9 @@ class SpecPulse:
                     "primary": ai_assistant or "claude"
                 },
                 "templates": {
-                    "spec": "templates/spec.md",
-                    "plan": "templates/plan.md",
-                    "task": "templates/task.md"
+                    "spec": ".specpulse/templates/spec.md",
+                    "plan": ".specpulse/templates/plan.md",
+                    "task": ".specpulse/templates/task.md"
                 },
                 "conventions": {
                     "branch_naming": "{number:03d}-{feature-name}",
@@ -435,7 +443,7 @@ class SpecPulse:
         """Copy template files from resources to project"""
         import shutil
 
-        project_templates_dir = project_path / "templates"
+        project_templates_dir = project_path / ".specpulse" / "templates"
 
         # Copy core templates
         core_templates = ["spec.md", "plan.md", "task.md"]
@@ -475,7 +483,7 @@ class SpecPulse:
 
     def _create_initial_memory(self, project_path: Path) -> None:
         """Create initial memory files"""
-        memory_dir = project_path / "memory"
+        memory_dir = project_path / ".specpulse" / "memory"
 
         # Create context.md
         context_content = f"""# Project Context

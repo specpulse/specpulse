@@ -172,7 +172,7 @@ class TestFilePathValidation:
         # Validate path within base
         result = PathValidator.validate_file_path(
             temp_base_dir,
-            "specs/001-feature/spec.md"
+            ".specpulse/specs/001-feature/spec.md"
         )
 
         # Should resolve to absolute path within base
@@ -198,7 +198,7 @@ class TestFilePathValidation:
         with pytest.raises(SecurityError, match="Path traversal"):
             PathValidator.validate_file_path(
                 temp_base_dir,
-                "specs/001-feature/../../../../etc/passwd"
+                ".specpulse/specs/001-feature/../../../../etc/passwd"
             )
 
     def test_symlink_escape(self, temp_base_dir):
@@ -333,8 +333,8 @@ class TestIsSafePath:
     def test_safe_paths(self):
         """Test that safe paths return True"""
         safe_paths = [
-            "specs/001-feature",
-            "plans/my-plan.md",
+            ".specpulse/specs/001-feature",
+            ".specpulse/plans/my-plan.md",
             "simple-name",
         ]
 
@@ -434,7 +434,7 @@ class TestPerformance:
         import time
 
         # Create many paths
-        paths = [f"specs/{i:03d}-feature/spec.md" for i in range(100)]
+        paths = [f".specpulse/specs/{i:03d}-feature/spec.md" for i in range(100)]
 
         start = time.time()
         for path in paths:

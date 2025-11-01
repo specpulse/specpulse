@@ -21,12 +21,12 @@ Generate implementation plans from specifications following SpecPulse methodolog
 - Only use Read/Write/Edit tools when CLI doesn't cover the operation
 
 **PROTECTED DIRECTORIES (NEVER EDIT):**
-- `templates/` - Template files
+- `.specpulse/templates/` - Template files
 - `.specpulse/` - Internal config
 - `specpulse/` - Package code
 - `.claude/` and `.gemini/` - AI configuration
-- **ONLY EDIT**: specs/, plans/, tasks/, memory/
-- Templates are COPIED to plans/ folder, then edited there
+- **ONLY EDIT**: .specpulse/specs/, .specpulse/plans/, .specpulse/tasks/, .specpulse/memory/
+- Templates are COPIED to .specpulse/plans/ folder, then edited there
 
 ## Usage
 ```
@@ -40,7 +40,7 @@ Actions: `generate`, `validate`, `optimize` (defaults to `generate`)
 When called with `/sp-plan $ARGUMENTS`, I will:
 
 1. **Detect current feature context**:
-   - Read `memory/context.md` for current feature metadata
+   - Read `.specpulse/memory/context.md` for current feature metadata
    - Use git branch name if available (e.g., `001-user-authentication`)
    - Fall back to most recently created feature directory
    - If no context found, ask user to specify feature or run `/sp-pulse` first
@@ -51,17 +51,17 @@ When called with `/sp-plan $ARGUMENTS`, I will:
    - Otherwise: Generate new plan
 
 3. **For `/sp-plan generate` or `/sp-plan`:**
-   a. **Check for decomposition**: Look for `specs/XXX-feature/decomposition/` directory
+   a. **Check for decomposition**: Look for `.specpulse/specs/XXX-feature/decomposition/` directory
    b. **If decomposed**:
       - Read decomposition artifacts (microservices.md, api-contracts/, interfaces/)
       - Generate separate plans for each service
       - Create integration plan for service coordination
-      - Structure: `plans/XXX-feature/service-A-plan.md`, `integration-plan.md`
+      - Structure: `.specpulse/plans/XXX-feature/service-A-plan.md`, `integration-plan.md`
    c. **If not decomposed**:
       - Show existing spec files and ask user to select
       - Generate single monolithic plan
    d. **Find and validate specification** from selected spec file
-   
+
    d. **Validation** using CLI:
       ```bash
       specpulse --no-color validate plan --verbose
@@ -74,7 +74,7 @@ When called with `/sp-plan $ARGUMENTS`, I will:
       - Quality Assurance: Testing strategy defined
       - Architecture Documentation: Decisions recorded
 
-   f. **Generate AI-optimized plan** by COPYING template from templates/plan.md to plans/XXX-feature/:
+   f. **Generate AI-optimized plan** by COPYING template from .specpulse/templates/plan.md to .specpulse/plans/XXX-feature/:
       ```markdown
       # Implementation Plan: {{ feature_name }}
       ## Specification Reference
@@ -107,20 +107,20 @@ When called with `/sp-plan $ARGUMENTS`, I will:
       - Track future enhancement opportunities
 
    i. **CRITICAL NUMBERING LOGIC**:
-      - Check if `plans/XXX-feature/plan-001.md` exists
+      - Check if `.specpulse/plans/XXX-feature/plan-001.md` exists
       - If plan-001.md does NOT exist: Create plan-001.md with full content from template
       - If plan-001.md EXISTS: Create plan-002.md (or next number) with new content
       - NEVER leave plan-001.md as placeholder if it's the first plan
-   j. **Write FULL plan content** to `plans/XXX-feature/plan-XXX.md`
-   k. **IMPORTANT**: Can EDIT files in plans/ folder, but NEVER modify templates/, scripts/, or commands/ folders
+   j. **Write FULL plan content** to `.specpulse/plans/XXX-feature/plan-XXX.md`
+   k. **IMPORTANT**: Can EDIT files in .specpulse/plans/ folder, but NEVER modify .specpulse/templates/, scripts/, or commands/ folders
 
 4. **For `/sp-plan validate`:**
    a. **Show existing plan files**: List all plan-XXX.md files in current feature directory
    b. **Ask user to select**: Which plan file to validate
    c. **Validation** using script:
      ```bash
-     Read: templates/plan.md
-     Write: plans/XXX-feature/plan-YYY.md
+     Read: .specpulse/templates/plan.md
+     Write: .specpulse/plans/XXX-feature/plan-YYY.md
      (template content + user description)
 
      Then READ and EXPAND with full implementation details

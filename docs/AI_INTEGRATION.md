@@ -1,4 +1,4 @@
-# SpecPulse v2.0.0 AI Integration Guide
+# SpecPulse v2.4.1 AI Integration Guide
 
 ## 📋 Table of Contents
 
@@ -19,7 +19,7 @@
 
 ## 🎯 Overview
 
-SpecPulse v2.0.0 introduces revolutionary AI integration that enhances your specification-driven development workflow while maintaining complete privacy and control. Unlike traditional AI tools that require external API calls, SpecPulse's AI integration works entirely offline, processing all logic locally on your machine.
+SpecPulse v2.4.1 introduces revolutionary AI integration that enhances your specification-driven development workflow while maintaining complete privacy and control. Unlike traditional AI tools that require external API calls, SpecPulse's AI integration works entirely offline, processing all logic locally on your machine.
 
 ### Key Principles
 
@@ -80,287 +80,218 @@ SpecPulse v2.0.0 introduces revolutionary AI integration that enhances your spec
 
 ---
 
-## 🤖 AI Commands
+## 🤖 AI Integration in v2.4.1
 
-### Core AI Commands
+### CLI-First Architecture (v2.1.2+)
 
-#### `specpulse ai context`
+**Critical Design Change**: SpecPulse v2.4.1 follows a CLI-first architecture where AI assistants should ALWAYS try CLI commands before using file operations.
 
-Show AI-detected project context and current state.
+#### **Primary Workflow Hierarchy**
 
+1. **FIRST: Try CLI Command** (if exists)
+   ```bash
+   specpulse feature init <name>
+   specpulse spec create "<description>"
+   specpulse plan create "<description>"
+   specpulse task breakdown <plan-id>
+   specpulse validate <type>
+   ```
+
+2. **SECOND: File Operations** (if CLI doesn't exist or doesn't cover operation)
+   - READ templates from `.specpulse/templates/`
+   - WRITE/EDIT files in `.specpulse/specs/`, `.specpulse/plans/`, `.specpulse/tasks/`, `.specpulse/memory/`
+
+3. **NEVER: Direct edits to protected directories**
+   - ❌ `.specpulse/templates/` - Read-only template source
+   - ❌ `.specpulse/` - Internal configuration
+   - ❌ `specpulse/` - Package code
+   - ❌ `.claude/` and `.gemini/` - AI command definitions
+
+### AI Assistant Integration
+
+#### **Claude Code Integration**
+
+Initialize project with Claude support:
 ```bash
-specpulse ai context
+specpulse init my-project --ai claude
 ```
 
-**Example Output:**
-```
-AI Context Detection
-
-Current Feature
-Feature: 003-user-authentication
-
-Git Context
-Branch: 003-validation-feedback-improvements
-
-Recent Activity
-Recent Specs:
-- specs/001-user-authentication/spec-001.md
-- specs/002-api-redesign/spec-001.md
-
-Recent Plans:
-- plans/001-user-authentication/plan-001.md
-```
-
-#### `specpulse ai suggest`
-
-Get AI-powered suggestions based on current project state.
-
+Use custom slash commands:
 ```bash
-specpulse ai suggest
+# Start new feature
+/sp-pulse user-authentication
+
+# Create specification
+/sp-spec create "user authentication with OAuth2"
+
+# Generate implementation plan
+/sp-plan generate
+
+# Create task breakdown
+/sp-task breakdown
+
+# Validate work
+/sp-spec validate
 ```
 
-**Example Output:**
-```
-AI-Powered Suggestions
+#### **Gemini CLI Integration**
 
-Next Steps
-1. Create specification with /sp-spec
-2. Consider security requirements for authentication
-3. Plan database migrations for PostgreSQL
-```
-
-#### `specpulse ai suggest --query <topic>`
-
-Get help with specific topics or questions.
-
+Initialize project with Gemini support:
 ```bash
-specpulse ai suggest --query "template selection"
-specpulse ai suggest --query "validation errors"
-specpulse ai suggest --query "project structure"
+specpulse init my-project --ai gemini
 ```
 
-**Example Output:**
-```
-Query: template selection
-
-Template Recommendations
-- spec-tier1-minimal (2-3 min, quick prototypes)
-- spec-tier2-standard (10-15 min, most features)
-- spec-tier3-complete (30-45 min, production features)
-```
-
-#### `specpulse ai switch <llm>`
-
-Switch between different AI assistants.
-
+Use custom commands:
 ```bash
-specpulse ai switch claude    # Use Claude Code
-specpulse ai switch gemini    # Use Gemini CLI
-specpulse ai switch both      # Use both simultaneously
-```
+# Start new feature
+/sp-pulse user-authentication
 
-**Example Output:**
-```
-Switched to CLAUDE
-Using both Claude and Gemini for enhanced capabilities
-```
+# Create specification
+/sp-spec create "user authentication with OAuth2"
 
-#### `specpulse ai checkpoint <description>`
+# Generate implementation plan
+/sp-plan generate
 
-Create AI workflow checkpoints to save and restore states.
+# Create task breakdown
+/sp-task breakdown
 
-```bash
-specpulse ai checkpoint "Before implementing user authentication"
-specpulse ai checkpoint "Major design decision completed"
-specpulse ai checkpoint "Before production deployment"
-```
-
-**Example Output:**
-```
-AI Workflow Checkpoint
-
-Checkpoint created: checkpoint-003
-Description: Before implementing user authentication
-```
-
-#### `specpulse ai summary`
-
-Show complete AI workflow summary with current status and suggestions.
-
-```bash
-specpulse ai summary
-```
-
-**Example Output:**
-```
-AI Workflow Summary
-
-Current Status
-Feature: 003-user-authentication
-Phase: Spec
-Active LLM: BOTH
-Progress: 0.0%
-
-Suggestions
-- Create specification with /sp-spec
-- Consider security requirements for authentication
-
-Recent Activity
-Last activity: 2025-10-07 15:30:45
-Checkpoints: 3
+# Validate work
+/sp-spec validate
 ```
 
 ---
 
-## 🧠 Smart Context Detection
+## 🧠 Context Detection & Memory Management
 
-### Context Sources
+### Git Integration
 
-SpecPulse automatically detects context from multiple sources:
-
-#### 1. Git Branch Analysis
+SpecPulse leverages git for context detection:
 
 ```bash
-# Example branch names and detected features
+# Feature branch naming automatically detected
 001-user-authentication      → Feature: 001-user-authentication
 002-api-redesign             → Feature: 002-api-redesign
-003-mobile-onboarding         → Feature: 003-mobile-onboarding
+003-mobile-onboarding        → Feature: 003-mobile-onboarding
 ```
 
-#### 2. Memory File Analysis
+### Memory System
+
+The memory system provides context-aware assistance:
+
+#### Memory Files Structure
+```
+.specpulse/memory/
+├── context.md          # Current project context
+├── decisions.md        # Architectural decisions
+├── patterns.md         # Reusable patterns
+└── knowledge.md        # Project knowledge base
+```
+
+#### Context Management
 
 ```yaml
-# memory/context.md content
+# .specpulse/memory/context.md
 current_feature: "003-user-authentication"
 tech_stack:
   frontend: "React"
-  backend: "Node.js"
+  backend: "FastAPI"
   database: "PostgreSQL"
-last_updated: "2025-10-07T15:30:00Z"
+last_updated: "2025-11-01T12:00:00Z"
 ```
 
-#### 3. Recent Activity Tracking
+### AI Context Detection (v2.4.1)
 
-- **Recent Specifications**: Analyzes newly created or modified spec files
-- **Recent Plans**: Tracks plan file activity
-- **Recent Tasks**: Monitors task list updates
-- **Template Usage**: Identifies which templates are being used
+While AI commands have been deprecated, context detection still works through:
 
-#### 4. Technology Stack Detection
+1. **Git Branch Analysis**: Automatic feature detection from branch names
+2. **Memory File Parsing**: Context extraction from memory files
+3. **Recent Activity Tracking**: Analysis of recent file modifications
+4. **Template Usage Pattern**: Understanding project workflow
 
-```json
-{
-  "project_type": "web",
-  "detected_technologies": ["React", "Node.js", "PostgreSQL"],
-  "inferred_patterns": ["REST API", "JWT Authentication"]
-}
-```
-
-### Context Features
-
-#### **Smart Feature Recognition**
-
-- **Branch Pattern Matching**: Automatically detects feature IDs from branch names
-- **Project Type Classification**: Identifies web, API, mobile, or other project types
-- **Technology Stack Inference**: Detects frameworks and tools being used
-- **Workflow Phase Detection**: Determines current development phase (spec, plan, task, etc.)
-
-#### **Dynamic Context Updates**
-
-- **Real-time Updates**: Context refreshes automatically as you work
-- **Manual Refresh**: Use `specpulse ai context --refresh` to force refresh
-- **Context Persistence**: Context is saved and restored across sessions
+**Note**: Context detection is now handled through CLI commands rather than dedicated AI commands.
 
 ---
 
-## 💡 AI-Powered Suggestions
+## 💡 Workflow Guidance & Templates
 
-### Suggestion Engine
+### Template System (v2.4.1)
 
-The AI suggestion engine analyzes your current project state and provides intelligent recommendations:
+SpecPulse provides intelligent template selection and workflow guidance:
 
-#### **Context-Aware Suggestions**
+#### **Template Tiers**
 
 ```bash
-# Different suggestions based on project state
-# Starting new feature:
-Suggestions:
-1. Create specification with /sp-spec
-2. Set up development environment
-3. Choose appropriate template tier
+# Quick prototypes and MVPs (2-3 min)
+spec-tier1-minimal
+- Basic problem statement
+- Simple acceptance criteria
+- Minimal requirements
 
-# After specification created:
-Suggestions:
-1. Validate specification with /sp-spec validate
-2. Create implementation plan with /sp-plan
-3. Set up task breakdown with /sp-task
+# Standard production features (10-15 min)
+spec-tier2-standard
+- Comprehensive requirements
+- Technical considerations
+- Security aspects
+- Performance requirements
 
-# During implementation:
-Suggestions:
-1. Track progress with /sp-task progress
-2. Add development notes for insights
-3. Create checkpoints before major changes
+# Enterprise-grade specifications (30-45 min)
+spec-tier3-complete
+- Full compliance requirements
+- Detailed technical specifications
+- Complete testing strategies
+- Deployment and maintenance procedures
 ```
 
-#### **Project-Specific Recommendations**
+#### **CLI-Based Template Selection**
 
 ```bash
-# Authentication projects:
-Suggestions:
-1. Consider security requirements
-2. Plan password policies
-3. Design session management
-4. Plan database migrations
+# Initialize with specific template
+specpulse init my-project --template web
 
-# API projects:
-Suggestions:
-1. Design API contracts
-2. Plan integration tests
-3. Consider rate limiting
-4. Document error handling
+# Change template after initialization
+specpulse template change spec-tier2-standard
 
-# Mobile projects:
-Suggestions:
-1. Consider offline functionality
-2. Plan responsive design
-3. Design navigation patterns
-4. Plan app store deployment
+# Expand template complexity
+specpulse spec expand 001-feature --to-tier complete
 ```
 
-#### **Technology-Specific Advice**
+### Feature Workflow
+
+#### **Standard Development Workflow**
 
 ```bash
-# React projects:
-Suggestions:
-1. Consider component architecture
-2. Plan state management
-3. Choose testing strategy
-4. Plan build optimization
+# 1. Initialize feature
+specpulse feature init user-authentication
 
-# Django projects:
-Suggestions:
-1. Design app structure
-2. Plan Django apps
-3. Consider database migrations
-4. Plan API versioning
+# 2. Create specification
+specpulse spec create "User authentication with OAuth2 and JWT tokens"
+
+# 3. Generate implementation plan
+specpulse plan create "Implement OAuth2 authentication flow with secure token management"
+
+# 4. Break down into tasks
+specpulse task breakdown <plan-id>
+
+# 5. Track progress
+specpulse task status
+
+# 6. Validate work
+specpulse validate spec
+specpulse validate plan
+specpulse validate task
 ```
 
-### Query-Based Assistance
-
-The AI system can provide targeted help for specific topics:
+#### **Context Switching**
 
 ```bash
-# Template selection help
-specpulse ai suggest --query "which template should I use"
+# Switch to existing feature
+specpulse feature continue 001-user-authentication
 
-# Validation help
-specpulse ai suggest --query "validation errors keep appearing"
+# Get feature summary
+specpulse feature status 001-user-authentication
 
-# Workflow guidance
-specpulse ai suggest --query "what should I work on next"
-
-# Project structure advice
-specpulse ai suggest --query "how should I organize my project"
+# List all features
+specpulse feature list
 ```
 
 ---
@@ -369,39 +300,47 @@ specpulse ai suggest --query "how should I organize my project"
 
 ### Supported AI Assistants
 
-#### Claude Code
+#### Claude Code Integration
 
 ```bash
-# Initialize with Claude support
+# Initialize project with Claude support
 specpulse init my-project --ai claude
 
-# Switch to Claude
-specpulse ai switch claude
-
-# Use both simultaneously
-specpulse ai switch both
+# Claude automatically creates custom slash commands:
+/sp-pulse    # Initialize new feature
+/sp-spec     # Create/update specifications
+/sp-plan     # Generate implementation plans
+/sp-task     # Break down into tasks
+/sp-execute  # Execute tasks continuously
+/sp-continue # Switch context to existing feature
+/sp-status   # Track progress across features
+/sp-decompose # Decompose specs into microservices
 ```
 
-**Features:**
+**Claude Strengths:**
 - Advanced reasoning capabilities
 - Better context understanding
 - Superior code analysis
 - Enhanced documentation generation
 
-#### Gemini CLI
+#### Gemini CLI Integration
 
 ```bash
-# Initialize with Gemini support
+# Initialize project with Gemini support
 specpulse init my-project --ai gemini
 
-# Switch to Gemini
-specpulse ai switch gemini
-
-# Use both simultaneously
-specpulse ai switch both
+# Gemini automatically creates custom commands:
+/sp-pulse    # Initialize new feature
+/sp-spec     # Create/update specifications
+/sp-plan     # Generate implementation plans
+/sp-task     # Break down into tasks
+/sp-execute  # Execute tasks continuously
+/sp-continue # Switch context to existing feature
+/sp-status   # Track progress across features
+/sp-decompose # Decompose specs into microservices
 ```
 
-**Features:**
+**Gemini Strengths:**
 - Fast response times
 - Good template filling
 - Efficient batch processing
@@ -409,156 +348,157 @@ specpulse ai switch both
 
 ### Multi-LLM Mode
 
-When using `specpulse ai switch both`, SpecPulse:
+When using both Claude and Gemini:
 
+```bash
+# Initialize with both AI assistants
+specpulse init my-project --ai both
+```
+
+**Benefits:**
 1. **Context Sharing**: Both LLMs access the same project context
 2. **Parallel Processing**: Can leverage strengths of both systems
 3. **Cross-Validation**: Different perspectives on the same problem
-4. **Enhanced Suggestions**: Combines insights from both AI systems
+4. **Enhanced Capabilities**: Combines insights from both AI systems
 
-### LLM Management
+### Command File Locations
 
-#### **Switching Between LLMs**
+**Claude Code Commands:** `.claude/commands/*.md`
+**Gemini CLI Commands:** `.gemini/commands/*.toml`
 
-```bash
-# Check current active LLM
-specpulse ai summary
-
-# Switch to different LLM
-specpulse ai switch gemini
-
-# Switch back to Claude
-specpulse ai switch claude
-```
-
-#### **LLM-Specific Features**
-
-- **Claude**: Better at complex reasoning and architectural decisions
-- **Gemini**: Faster at template filling and routine tasks
-- **Both**: Combines strengths of both systems
+Both sets of commands provide identical functionality but are formatted for their respective AI assistants.
 
 ---
 
-## 📸 AI Workflow Checkpoints
+## 📸 Memory & Checkpoint System
 
-### Checkpoint System Overview
+### Memory System (v2.4.1)
 
-AI workflow checkpoints allow you to save and restore specific states during your development process, providing safety nets and progress tracking.
+SpecPulse provides a structured memory system for tracking project knowledge and decisions:
 
-### Creating Checkpoints
+#### **Memory Files Structure**
+
+```
+.specpulse/memory/
+├── context.md          # Current project context and state
+├── decisions.md        # Architectural decisions and rationale
+├── patterns.md         # Reusable code patterns and approaches
+├── knowledge.md        # Project-specific knowledge base
+└── checkpoints/        # Workflow checkpoints and states
+```
+
+#### **Context Management**
+
+```yaml
+# .specpulse/memory/context.md
+current_feature: "001-user-authentication"
+project_info:
+  name: "My Project"
+  type: "web"
+  tech_stack:
+    frontend: "React"
+    backend: "FastAPI"
+    database: "PostgreSQL"
+
+workflow:
+  phase: "implementation"
+  last_command: "specpulse task breakdown"
+  progress: 45.0
+
+last_updated: "2025-11-01T12:00:00Z"
+```
+
+#### **Architectural Decisions**
+
+```markdown
+# .specpulse/memory/decisions.md
+## Decision: OAuth2 Implementation (2025-11-01)
+**Context**: User Authentication Feature
+**Decision**: Use OAuth2 with JWT tokens
+**Rationale**: Industry standard, secure, good library support
+**Alternatives Considered**: Basic auth, Session auth
+**Impact**: Enhanced security, better user experience
+```
+
+#### **Reusable Patterns**
+
+```markdown
+# .specpulse/memory/patterns.md
+## Repository Pattern
+**Usage**: Data access layer implementation
+**Benefits**: Centralized data operations, easier testing
+**Projects**: 001-user-authentication, 002-api-redesign
+**Example**:
+```python
+class UserRepository:
+    def __init__(self, db_session):
+        self.db = db_session
+
+    def create(self, user_data):
+        # Implementation
+        pass
+```
+
+### Workflow Checkpoints
+
+While dedicated checkpoint commands have been deprecated, the memory system provides similar functionality:
+
+#### **Manual Checkpoints via Memory**
 
 ```bash
-# Create automatic checkpoints
-# (Happens automatically before major operations)
+# Create decision checkpoint
+echo "## Decision: Major Architecture Change" >> .specpulse/memory/decisions.md
+echo "**Date**: $(date)" >> .specpulse/memory/decisions.md
+echo "**Context**: Refactoring authentication system" >> .specpulse/memory/decisions.md
 
-# Create manual checkpoints
-specpulse ai checkpoint "Before implementing user authentication"
-specpulse ai checkpoint "Major architecture decision made"
-specpulse ai checkpoint "Ready for code review"
+# Create progress checkpoint
+echo "## Progress Checkpoint" >> .specpulse/memory/context.md
+echo "**Date**: $(date)" >> .specpulse/memory/context.md
+echo "**Status**: Ready for testing phase" >> .specpulse/memory/context.md
 ```
 
-### Checkpoint Features
-
-#### **Automatic Checkpoints**
-
-- **Before Tier Expansion**: Saves state before expanding template complexity
-- **Before Major Changes**: Creates backups before significant modifications
-- **Before Validation**: Saves state before running validation operations
-- **Error Recovery**: Automatic checkpoints before potentially risky operations
-
-#### **Manual Checkpoints**
-
-- **Milestone Markers**: Mark important decision points
-- **Phase Transitions**: Save state between workflow phases
-- **Team Handoffs**: Create checkpoints before team member handoffs
-- **Risk Mitigation**: Save state before experimental changes
-
-#### **Checkpoint Content**
-
-Each checkpoint includes:
-
-```json
-{
-  "id": "checkpoint-003",
-  "timestamp": "2025-10-07T15:30:00Z",
-  "phase": "spec",
-  "feature_id": "001-user-authentication",
-  "description": "Before implementing user authentication",
-  "context": {
-    "current_feature": "001-user-authentication",
-    "branch_name": "001-user-authentication",
-    "recent_files": ["specs/001-user-authentication/spec-001.md"],
-    "suggestions": ["Create implementation plan", "Set up testing"],
-    "ai_state": {
-      "active_llm": "claude",
-      "last_command": "specpulse ai context",
-      "progress": 25.0
-    }
-  }
-}
-```
-
-### Checkpoint Management
-
-#### **Listing Checkpoints**
+#### **Git-Based Checkpoints**
 
 ```bash
-# List all checkpoints for a feature
-specpulse checkpoint list 001-user-authentication
+# Create git tag for milestone
+git tag -a milestone-001 -m "Feature 001 implementation complete"
+
+# Create branch for experimental changes
+git checkout -b experiment/new-approach
+
+# Return to safe point
+git checkout main
+git checkout milestone-001
 ```
-
-#### **Restoring Checkpoints**
-
-```bash
-# Restore to previous state
-specpulse checkpoint restore 001-user-authentication checkpoint-002
-
-# Force restore without confirmation
-specpulse checkpoint restore 001-user-authentication checkpoint-002 --force
-```
-
-#### **Cleanup Operations**
-
-```bash
-# Clean up old checkpoints
-specpulse checkpoint cleanup 001-user-authentication --older-than-days 30
-```
-
-### Checkpoint Benefits
-
-- **Risk Mitigation**: Safe experimentation with guaranteed recovery
-- **Progress Tracking**: Clear markers of important milestones
-- **Team Collaboration**: Easy handoff points between team members
-- **Learning & Review**: Save states for later analysis and learning
 
 ---
 
 ## 🔒 Privacy-First Design
 
-### Privacy Principles
+### Privacy Principles (v2.4.1)
 
-SpecPulse v2.0.0 is designed with privacy as a fundamental requirement:
+SpecPulse v2.4.1 maintains privacy as a fundamental requirement while providing enhanced AI integration:
 
 #### **No External API Calls**
 
-- ✅ **Local Processing**: All AI logic runs on your machine
+- ✅ **Local Processing**: All CLI logic runs on your machine
 - ✅ No data transmission: No information leaves your system
 - ✅ Offline Operation: Works without internet connectivity
 - ✅ Corporate Compliance: Meets enterprise security requirements
 
 #### **Data Privacy**
 
-- ✅ **Local Storage**: All data stored on your local filesystem
+- ✅ **Local Storage**: All data stored in `.specpulse/` directory
 - ✅ No Cloud Dependencies: No cloud storage required
 - ✅ **No Telemetry**: No usage data collected or transmitted
 - ✅ **User Control**: You have complete control over your data
 
-#### **AI Privacy**
+#### **AI Assistant Privacy**
 
 - ✅ **No External LLM Access**: SpecPulse never calls external AI APIs
-- ✅ **Local AI Logic**: All AI processing happens locally
+- ✅ **Local AI Integration**: AI assistants work through local CLI commands
 - ✅ **No Prompt Leakage**: AI prompts remain in your local environment
-- ✅ **Model Agnostic**: Works with any AI assistant without API dependencies
+- ✅ **Model Agnostic**: Works with Claude Code, Gemini CLI without API dependencies
 
 ### Security Benefits
 
@@ -598,124 +538,143 @@ SpecPulse v2.0.0 is designed with privacy as a fundamental requirement:
 
 ### Claude Code Integration
 
-#### Installation
+#### Initialization
 
 ```bash
 # Initialize project with Claude support
 specpulse init my-project --ai claude
 ```
 
-#### Custom Commands
+This creates `.claude/commands/` directory with custom slash commands:
 
-SpecPulse automatically creates custom Claude Code commands:
+#### **Claude Slash Commands**
 
 ```markdown
-# .claude/commands/sp-spec.md
-# /sp-spec Command
+# .claude/commands/sp-pulse.md
+/sp-pulse {{name}}
+Initialize new feature with full structure
 
-When called with `/sp-spec $ARGUMENTS`, I will:
-1. Detect current feature context
-2. Parse arguments to determine action
-3. Read template from templates/spec.md
-4. Generate specification using AI
-5. Save to specs/ directory
-6. Run validation
+# .claude/commands/sp-spec.md
+/sp-spec {{description}}
+Create or update feature specifications
+
+# .claude/commands/sp-plan.md
+/sp-plan {{description}}
+Generate implementation plans
+
+# .claude/commands/sp-task.md
+/sp-task {{plan_id}}
+Break down into tasks
+
+# .claude/commands/sp-execute.md
+/sp-execute {{feature_id}}
+Execute tasks continuously
+
+# .claude/commands/sp-continue.md
+/sp-continue {{feature_id}}
+Switch context to existing feature
+
+# .claude/commands/sp-status.md
+/sp-status
+Track progress across features
+
+# .claude/commands/sp-decompose.md
+/sp-decompose {{spec_id}}
+Decompose specs into microservices
 ```
 
-#### Usage in Claude Code
+#### **Claude Usage Pattern**
 
 ```bash
-# Start new feature
+# In Claude Code, use slash commands:
 /sp-pulse user-authentication
-
-# Create specification
-/sp-spec create user authentication with OAuth2
-
-# Generate implementation plan
-/sp-plan generate
-
-# Create task breakdown
-/sp-task breakdown
-
-# Validate work
-/sp-spec validate
+/sp-spec create "OAuth2 authentication with JWT tokens"
+/sp-plan generate "Secure authentication flow implementation"
+/sp-task breakdown plan-001
+/sp-status
 ```
 
 ### Gemini CLI Integration
 
-#### Installation
+#### Initialization
 
 ```bash
 # Initialize project with Gemini support
 specpulse init my-project --ai gemini
 ```
 
-#### Custom Commands
+This creates `.gemini/commands/` directory with custom commands:
 
-SpecPulse automatically creates custom Gemini CLI commands:
+#### **Gemini Command Files**
 
 ```toml
-# .gemini/commands/sp-spec.toml
-description = "Create or manage feature specifications"
-
+# .gemini/commands/sp-pulse.toml
+description = "Initialize new feature with full structure"
 prompt = """
-## Command: /sp-spec {{args}}
+## Command: /sp-pulse {{name}}
 
 When called, I will:
-1. Detect current feature context
-2. Parse arguments to determine action
-3. Read template from @{templates/spec.md}
-4. Generate specification using AI
-5. Save to specs/ directory
-6. Run validation
+1. Try CLI first: specpulse feature init {{name}}
+2. If CLI doesn't exist, use file operations:
+3. Read template from .specpulse/templates/
+4. Create feature directory structure
+5. Update context.md
+"""
+
+# .gemini/commands/sp-spec.toml
+description = "Create or update feature specifications"
+prompt = """
+## Command: /sp-spec {{description}}
+
+When called, I will:
+1. Try CLI first: specpulse spec create "{{description}}"
+2. If CLI doesn't exist, use file operations:
+3. Read template from .specpulse/templates/spec.md
+4. Write to .specpulse/specs/ directory
+5. Expand specification with AI
 """
 ```
 
-#### Usage in Gemini CLI
+#### **Gemini Usage Pattern**
 
-```toml
-# Start new feature
+```bash
+# In Gemini CLI, use custom commands:
 /sp-pulse user-authentication
-
-# Create specification
-/sp-spec create user authentication with OAuth2
-
-# Generate implementation plan
-/sp-plan generate
-
-# Create task breakdown
-/sp-task breakdown
-
-# Validate work
-/sp-spec validate
+/sp-spec create "OAuth2 authentication with JWT tokens"
+/sp-plan generate "Secure authentication flow implementation"
+/sp-task breakdown plan-001
+/sp-status
 ```
 
-### Integration Benefits
+### Integration Architecture
 
-#### **Seamless Workflow**
+#### **CLI-First Workflow Pattern**
 
-- **Context Awareness**: AI assistants automatically understand project context
-- **Template Access**: Direct access to project templates
-- **Validation Integration**: Can run validation commands directly
-- **Memory System**: Access to project memory and knowledge base
+```
+User Request: /sp-spec OAuth2 login with JWT
+    ↓
+Step 1: Try CLI first
+    Bash: specpulse spec create "OAuth2 login with JWT"
+    ↓
+Step 2: If CLI doesn't exist, use File Operations:
+    Claude reads: .specpulse/templates/spec.md
+    Claude writes: .specpulse/specs/001-feature/spec-001.md
+    Claude edits: .specpulse/specs/001-feature/spec-001.md (expand)
+    ↓
+Complete specification ready
+```
 
-#### **Enhanced Capabilities**
+#### **Why CLI First?**
 
-- **Smart Suggestions**: AI provides context-aware recommendations
-- **Progress Tracking**: Real-time workflow monitoring
-- **Error Prevention**: Early detection of potential issues
-- **Best Practices**: AI follows established patterns and conventions
-
-#### **Unified Experience**
-
-- **Consistent Interface**: Same commands across different AI assistants
-- **Shared Context**: All AI assistants access the same project information
-- **Synchronized State**: Changes are immediately available to all team members
-- **Version Control**: All work tracked through standard Git workflow
+- **Metadata Handling**: CLI manages timestamps, IDs, status automatically
+- **Structure Validation**: CLI validates before creating files
+- **Context Updates**: CLI updates context.md consistently
+- **Error Handling**: CLI provides recovery and validation
+- **File Operations**: Fallback for flexibility when CLI doesn't cover operation
 
 ---
 
-## ⚙️ Advanced Configuration
+## ⚙️ Configuration (v2.4.1)
 
 ### Environment Variables
 
@@ -723,175 +682,227 @@ When called, I will:
 # Set custom templates directory
 export SPECPULSE_TEMPLATES_DIR="/path/to/custom/templates"
 
-# Set custom memory directory
-export SPECPULSE_MEMORY_DIR="/path/to/custom/memory"
-
 # Enable verbose logging
 export SPECPULSE_VERBOSE=1
 
-# Set AI cache directory
-export SPECPULSE_AI_CACHE_DIR="/path/to/ai/cache"
+# Set custom editor
+export SPECPULSE_EDITOR="code"
 ```
 
-### Configuration Files
+### Project Configuration
 
-#### Project Configuration (`.specpulse/config.yaml`)
+SpecPulse v2.4.1 uses simplified configuration:
 
-```yaml
-ai:
-  primary: claude
-  context_detection:
-    enabled: true
-    auto_refresh: true
-    git_integration: true
+#### **No Configuration Required**
 
-  suggestions:
-    enabled: true
-    learning_mode: false
-    contextual: true
+SpecPulse works out of the box with sensible defaults. All configuration is handled through CLI commands.
 
-  multi_llm:
-    enabled: true
-    default_llm: claude
-    allow_both: true
+#### **Optional Settings**
 
-  privacy:
-    local_only: true
-    no_external_apis: true
-    cache_encryption: false
-```
-
-#### AI Configuration (`.specpulse/ai_state.json`)
-
-```json
-{
-  "current_phase": "spec",
-  "active_llm": "claude",
-  "last_command": "specpulse ai context",
-  "suggestions": [
-    "Create specification with /sp-spec",
-    "Consider security requirements",
-    "Plan database migrations"
-  ],
-  "checkpoints": [
-    {
-      "id": "checkpoint-001",
-      "timestamp": "2025-10-07T15:30:00Z",
-      "phase": "spec",
-      "description": "Starting user authentication"
-    }
-  ],
-  "progress": 25.0,
-  "last_activity": "2025-10-07T15:30:00Z"
-}
-```
-
-### Custom Templates
-
-#### Creating Custom Templates
+If needed, you can customize specific aspects:
 
 ```bash
-# Create custom template directory
-mkdir -p templates/custom
+# Set default template tier
+specpulse config set template_tier standard
 
-# Create custom specification template
-cat > templates/custom/my-spec.md << 'EOF'
----
-template: my-spec
-name: My Custom Specification
-tier: custom
-description: Custom specification for my team
-sections: [overview, requirements, acceptance]
----
+# Set default AI assistant
+specpulse config set ai_assistant claude
 
-# Specification: {{ feature_name }}
-## Overview
-{{ problem_statement }}
-
-## Requirements
-{{ functional_requirements }}
-
-## Acceptance Criteria
-{{ acceptance_criteria }}
-EOF
-
-# Validate custom template
-specpulse template validate my-spec
+# Enable/disable features
+specpulse config set auto_validate true
+specpulse config set git_integration true
 ```
 
-#### Template Inheritance
+### Memory System Configuration
+
+#### **Context File** (`.specpulse/memory/context.md`)
 
 ```yaml
-# templates/my-spec.yaml
-extends: spec-tier2-standard
-name: Enhanced Standard Template
-description: Standard template with custom sections
-additional_sections:
-  - compliance
-  - performance_requirements
-  - deployment_procedures
+current_feature: "001-user-authentication"
+project_info:
+  name: "My Project"
+  type: "web"
+  tech_stack:
+    frontend: "React"
+    backend: "FastAPI"
+    database: "PostgreSQL"
+
+workflow:
+  phase: "specification"
+  last_command: "specpulse spec create"
+  progress: 15.0
+
+last_updated: "2025-11-01T12:00:00Z"
 ```
 
-### Memory Configuration
+#### **Decisions File** (`.specpulse/memory/decisions.md`)
 
-#### Structured Memory System
+```markdown
+# Architectural Decisions
 
-```bash
-# Add architectural decision
-specpulse memory add-decision "OAuth2 Implementation" \
-  --rationale "Industry standard for secure authentication" \
-  --feature "001-user-auth"
-
-# Add code pattern
-specpulse memory add-pattern "Repository Pattern" \
-  --example "class UserRepository:" \
-  --features "001-user-auth,002-api"
-
-# Query memory by tag
-specpulse memory query --tag decision --feature "001-user-auth"
-specpulse memory query --tag pattern --recent 5
-```
-
-#### Memory Organization
-
-```yaml
-# memory/decisions.md
-## Architecture Decisions
-
-### Decision: OAuth2 Implementation (2025-10-07)
+## Decision: OAuth2 Implementation (2025-11-01)
 **Context**: User Authentication Feature
-**Rationale**: Industry standard for secure authentication
-**Alternatives Considered**: Basic auth, Session auth
-**Impact**: Security improvement, user experience
-
-# memory/patterns.md
-## Code Patterns
-
-### Repository Pattern (2025-10-07)
-**Usage**: Data access layer implementation
-**Features**: Centralized data operations, caching
-**Projects**: 001-user-auth, 002-api-redesign
+**Decision**: Use OAuth2 with JWT tokens
+**Rationale**: Industry standard, secure, good library support
+**Alternatives**: Basic auth, Session auth
+**Impact**: Enhanced security, better user experience
 ```
+
+### Template Customization
+
+#### **Copy and Modify Templates**
+
+```bash
+# Copy default template to customize
+cp .specpulse/templates/spec-tier2-standard.md .specpulse/templates/my-custom-spec.md
+
+# Edit the template
+vim .specpulse/templates/my-custom-spec.md
+
+# Use custom template
+specpulse spec create "My feature" --template my-custom-spec
+```
+
+#### **Template Variables**
+
+Templates support these variables:
+- `{{ feature_name }}` - Current feature name
+- `{{ feature_id }}` - Current feature ID
+- `{{ timestamp }}` - Current timestamp
+- `{{ author }}` - Git author name
+- `{{ project_name }}` - Project name
+
+### Directory Structure
+
+```
+.specpulse/
+├── templates/                 # Template files
+│   ├── spec-tier1-minimal.md
+│   ├── spec-tier2-standard.md
+│   ├── spec-tier3-complete.md
+│   ├── plan.md
+│   └── task.md
+├── memory/                   # Memory and context files
+│   ├── context.md
+│   ├── decisions.md
+│   ├── patterns.md
+│   └── knowledge.md
+├── specs/                    # Generated specifications
+├── plans/                    # Generated implementation plans
+├── tasks/                    # Generated task breakdowns
+└── context.md               # Project context file
+```
+
+### AI Command Files
+
+#### **Claude Code Commands** (`.claude/commands/`)
+
+All Claude commands instruct Claude to use **file operations**, not CLI commands:
+
+```markdown
+# .claude/commands/sp-spec.md
+When called with /sp-spec, I will:
+1. Read template from .specpulse/templates/spec.md
+2. Write new file to .specpulse/specs/001-feature/spec-XXX.md
+3. Edit that file to expand it with full specification
+4. Optionally run validation
+```
+
+#### **Gemini CLI Commands** (`.gemini/commands/`)
+
+All Gemini commands instruct Gemini to use **file operations**, not CLI commands:
+
+```toml
+# .gemini/commands/sp-spec.toml
+prompt = """
+## Command: /sp-spec {{args}}
+
+When called, I will:
+1. Read template from .specpulse/templates/spec.md
+2. Write new file to .specpulse/specs/001-feature/spec-XXX.md
+3. Edit that file to expand it with full specification
+4. Optionally run validation
+"""
+```
+
+**Important**: Never edit files in `.specpulse/templates/`, `.claude/`, `.gemini/`, or `specpulse/` folders.
 
 ---
 
-## 🐛 Troubleshooting
+## 🐛 Troubleshooting (v2.4.1)
 
-### Common AI Integration Issues
+### Common Issues
 
-#### Context Detection Problems
+#### CLI Commands Not Working
 
-**Issue**: AI context not detected correctly
-
-**Symptoms**:
-- `specpulse ai context` shows "No current feature detected"
-- Git branch names not recognized
-- Technology stack not inferred
+**Issue**: CLI commands fail with "command not found"
 
 **Solutions**:
 
 ```bash
-# Check Git status
+# Check installation
+pip show specpulse
+
+# Verify PATH
+which specpulse
+
+# Reinstall if needed
+pip uninstall specpulse
+pip install specpulse
+
+# Use development mode
+pip install -e .
+```
+
+#### AI Assistant Commands Not Found
+
+**Issue**: `/sp-*` commands not recognized
+
+**Solutions**:
+
+```bash
+# Initialize project with AI support
+specpulse init my-project --ai claude
+# or
+specpulse init my-project --ai gemini
+
+# Check command files exist
+ls .claude/commands/
+ls .gemini/commands/
+
+# Reinitialize commands
+specpulse init --here --ai claude
+```
+
+#### Template Loading Issues
+
+**Issue**: Templates not found or errors loading templates
+
+**Solutions**:
+
+```bash
+# Check template directory
+ls .specpulse/templates/
+
+# Verify template files exist
+ls .specpulse/templates/spec-*.md
+
+# Reinitialize project
+rm -rf .specpulse/
+specpulse init --here
+
+# Use development installation
+pip install -e .
+```
+
+#### Git Integration Problems
+
+**Issue**: Git branches not detected or git errors
+
+**Solutions**:
+
+```bash
+# Check git status
 git status
 git branch --show-current
 
@@ -900,352 +911,350 @@ git init
 git add .
 git commit -m "Initial commit"
 
-# Check project structure
-ls -la
-ls specs/ plans/ tasks/ memory/
-
-# Refresh context manually
-specpulse ai context --refresh
+# Create feature branch
+git checkout -b 001-my-feature
 ```
 
-#### AI Suggestions Not Working
+### Memory System Issues
 
-**Issue**: AI suggestions are generic or irrelevant
+#### Context Not Updating
 
-**Symptoms**:
-- Suggestions don't match project context
-- Recommendations seem generic
-- No project-specific advice
+**Issue**: Project context not reflecting current state
 
 **Solutions**:
 
 ```bash
-# Check project context
-specpulse ai context
+# Check context file
+cat .specpulse/memory/context.md
 
-# Verify recent activity
-specpulse memory summary
+# Update context manually
+echo "current_feature: 001-my-feature" >> .specpulse/memory/context.md
 
-# Provide specific query
-specpulse ai suggest --query "my specific problem"
-
-# Update project context if needed
-specpulse context set tech_stack.framework React
+# Use feature commands
+specpulse feature continue 001-my-feature
 ```
 
-#### Multi-LLM Issues
+#### Memory Files Missing
 
-**Issue**: LLM switching doesn't work properly
-
-**Symptoms**:
-- `specpulse ai switch claude` fails
-- Both mode doesn't activate
-- AI assistant not recognized
+**Issue**: Memory files not created or corrupted
 
 **Solutions**:
 
 ```bash
-# Check available LLMs
-specpulse ai summary
+# Check memory directory
+ls .specpulse/memory/
 
-# Verify AI state
-cat .specpulse/ai_state.json
+# Create memory files manually
+mkdir -p .specpulse/memory/
+echo "# Context" > .specpulse/memory/context.md
+echo "# Decisions" > .specpulse/memory/decisions.md
+echo "# Patterns" > .specpulse/memory/patterns.md
+```
 
-# Reset AI state if needed
-rm .specpulse/ai_state.json
-specpulse ai context
+### Platform-Specific Issues
+
+#### Windows Issues
+
+**Issue**: Path separator problems or encoding issues
+
+**Solutions**:
+
+```bash
+# Use PowerShell instead of Command Prompt
+# Set UTF-8 encoding
+chcp 65001
+
+# Use forward slashes in paths
+# SpecPulse handles path conversion automatically
+```
+
+#### Linux/macOS Issues
+
+**Issue**: Permission errors or Python environment issues
+
+**Solutions**:
+
+```bash
+# Use virtual environment
+python -m venv specpulse-env
+source specpulse-env/bin/activate
+pip install specpulse
+
+# Install for user only
+pip install --user specpulse
+
+# Check Python version (requires 3.11+)
+python --version
 ```
 
 ### Performance Issues
 
-#### Slow Context Detection
+#### Slow Operations
 
-**Issue**: Context detection takes too long
-
-**Symptoms**:
-- `specpulse ai context` takes >10 seconds
-- AI suggestions are delayed
-- Workflow feels sluggish
+**Issue**: Commands taking too long to execute
 
 **Solutions**:
 
 ```bash
-# Clean up old memory entries
-specpulse memory cleanup --days 30
+# Clean up old files
+find .specpulse/ -name "*.md" -mtime +30 -delete
 
-# Optimize AI cache
-export SPECPULSE_AI_CACHE_DIR="/tmp/specpulse-cache"
-rm -rf /tmp/specpulse-cache
+# Use verbose mode to debug
+export SPECPULSE_VERBOSE=1
+specpulse feature list
 
-# Use targeted context refresh
-specpulse ai context --refresh
+# Check for large files
+du -sh .specpulse/
 ```
 
-#### Memory Usage High
+### Getting Help
 
-**Issue**: Memory consumption is excessive
-
-**Solutions**:
+#### Command Help
 
 ```bash
-# Check memory usage
-specpulse memory summary
+# Get general help
+specpulse --help
 
-# Clean up old entries
-specpulse memory cleanup --days 7
+# Get specific command help
+specpulse feature --help
+specpulse spec --help
+specpulse plan --help
 
-# Adjust retention policy
-# Edit .specpulse/config.yaml
+# Check version
+specpulse --version
 ```
 
-### Template Issues
-
-#### Template Loading Problems
-
-**Issue**: Templates not found or corrupted
-
-**Solutions**:
+#### System Diagnostics
 
 ```bash
-# Validate templates
-specpulse template validate
+# Run system check
+specpulse doctor
 
-# Restore from backup
-specpulse template restore
+# Check all configurations
+specpulse config show
 
-# Reinstall templates
-pip uninstall specpulse
-pip install specpulse==2.0.0
-```
-
-#### Template Inheritance Issues
-
-**Issue**: Custom templates don't inherit properly
-
-**Solutions**:
-
-```bash
-# Check template registry
-cat .specpulse/template_registry.json
-
-# Validate inheritance
-specpulse template validate my-custom-template
-
-# Fix template metadata
-# Edit templates/my-custom-template.yaml
-```
-
-### System Compatibility
-
-#### Windows-Specific Issues
-
-**Issue**: Unicode errors on Windows
-
-**Symptoms**:
-- Error messages with character encoding
-- Console output garbled
-- File encoding problems
-
-**Solutions**:
-- ✅ **Already Fixed**: v2.0.0 includes Unicode fixes
-- Use PowerShell instead of Command Prompt
-- Set console encoding: `chcp 65001`
-
-#### Linux-Specific Issues
-
-**Issue**: Permission errors on Linux
-
-**Solutions**:
-
-```bash
-# Install for user only
-pip install --user specpulse==2.0.0
-
-# Add to PATH
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-
-# Use virtual environment
-python -m venv specpulse-env
-source specpulse-env/bin/activate
-pip install specpulse==2.0.0
+# Validate project structure
+specpulse validate all
 ```
 
 ---
 
-## 📋 Best Practices
+## 📋 Best Practices (v2.4.1)
 
-### AI Integration Best Practices
+### CLI-First Workflow Best Practices
 
-#### 1. Initialize Projects Correctly
+#### 1. Always Try CLI Commands First
 
 ```bash
-# Choose appropriate AI assistant for your team
-specpulse init my-project --ai claude    # For reasoning-heavy projects
-specpulse init my-project --ai gemini    # For template-heavy projects
-specpulse init my-project --ai both       # For maximum capability
+# CORRECT: Try CLI command first
+specpulse spec create "User authentication with OAuth2"
+
+# INCORRECT: Direct file operations (CLI exists)
+# Reading/writing files directly when CLI command is available
 ```
 
-#### 2. Use Context Effectively
+#### 2. Use File Operations as Fallback
 
 ```bash
-# Always check context before major decisions
-specpulse ai context
-
-# Get suggestions when unsure what to do next
-specpulse ai suggest
-
-# Use targeted queries for specific help
-specpulse ai suggest --query "validation approach"
+# When CLI doesn't exist or doesn't cover operation:
+# 1. Read template from .specpulse/templates/
+# 2. Write/EDIT files in appropriate directories
+# 3. Never edit protected directories
 ```
 
-#### 3. Leverage Checkpoints
+#### 3. Follow the Workflow Hierarchy
+
+1. **FIRST**: Try CLI command (if exists)
+2. **SECOND**: File operations (if CLI doesn't exist)
+3. **NEVER**: Direct edits to protected directories
+
+### Project Initialization Best Practices
+
+#### Choose Right AI Assistant
 
 ```bash
-# Create checkpoints before major changes
-specpulse ai checkpoint "Before implementing authentication"
+# For reasoning-heavy projects
+specpulse init my-project --ai claude
 
-# Create checkpoints for team handoffs
-specpulse ai checkpoint "Before code review"
+# For template-heavy projects
+specpulse init my-project --ai gemini
 
-# Create checkpoints before risky experiments
-specpulse ai checkpoint "Before major refactoring"
+# For maximum capability
+specpulse init my-project --ai both
 ```
 
-#### 4. Multi-LLM Strategy
+#### Initialize in Existing Directory
 
 ```bash
-# Use Claude for complex reasoning
-specpulse ai switch claude
-/sp-spec create complex architectural decision
+# Initialize in current directory
+specpulse init --here --ai claude
 
-# Use Gemini for routine tasks
-specpulse ai switch gemini
-/sp-plan generate from specification
-
-# Use both for comprehensive work
-specpulse ai switch both
-# Get multiple perspectives on complex problems
+# Initialize new directory
+specpulse init my-project --ai claude
+cd my-project
 ```
 
-### Template Best Practices
+### Feature Development Best Practices
 
-#### 1. Choose Appropriate Template Tier
+#### Use Feature Branch Naming
 
 ```bash
-# Quick prototypes and MVPs
-specpulse init my-project --template web
-# Use spec-tier1-minimal template
+# Create properly named feature branches
+git checkout -b 001-user-authentication
+git checkout -b 002-api-redesign
+git checkout -b 003-mobile-onboarding
 
-# Most production features
-specpulse init my-project --template api
-# Use spec-tier2-standard template
-
-# Enterprise-grade specifications
-specpulse init my-project --template mobile
-# Use spec-tier3-complete template
+# SpecPulse automatically detects feature from branch name
 ```
 
-#### 2. Expand Iteratively
+#### Follow Standard Workflow
 
 ```bash
-# Start minimal
-# (spec-tier1-minimal template)
+# 1. Initialize feature
+specpulse feature init user-authentication
 
-# Expand when ready
-specpulse expand 001-feature --to-tier standard
+# 2. Create specification
+specpulse spec create "OAuth2 authentication with JWT tokens"
 
-# Expand further when needed
-specpulse expand 001-feature --to-tier complete
+# 3. Generate implementation plan
+specpulse plan create "Secure authentication flow"
+
+# 4. Break down into tasks
+specpulse task breakdown <plan-id>
+
+# 5. Validate work
+specpulse validate all
 ```
 
-#### 3. Customize When Needed
+#### Context Switching
 
 ```bash
-# Create custom template
-cp templates/spec-tier2-standard.md templates/my-custom-template.md
+# Switch to existing feature
+specpulse feature continue 001-user-authentication
 
-# Modify for your needs
-vim templates/my-custom-template.md
+# Get feature status
+specpulse feature status 001-user-authentication
 
-# Register custom template
-# Update .specpulse/template_registry.json
+# List all features
+specpulse feature list
+```
+
+### Template Usage Best Practices
+
+#### Choose Appropriate Template Tier
+
+```bash
+# Quick prototypes (2-3 min)
+spec-tier1-minimal
+
+# Standard production features (10-15 min)
+spec-tier2-standard
+
+# Enterprise specifications (30-45 min)
+spec-tier3-complete
+```
+
+#### Customize Templates Properly
+
+```bash
+# Copy template to customize (never edit original)
+cp .specpulse/templates/spec-tier2-standard.md .specpulse/templates/my-custom.md
+
+# Edit your copy
+vim .specpulse/templates/my-custom.md
+
+# Use custom template
+specpulse spec create "My feature" --template my-custom
 ```
 
 ### Memory Management Best Practices
 
-#### 1. Capture Decisions
+#### Maintain Context Files
 
 ```bash
-# Add architectural decisions immediately
-specpulse memory add-decision "Use OAuth2 for authentication"
-specpulse memory add-decision "Choose PostgreSQL for primary database"
+# Keep context.md updated
+echo "current_feature: 001-user-auth" >> .specpulse/memory/context.md
 
-# Add with rationale
-specpulse memory add-decision "OAuth2 Implementation" \
-  --rationale "Industry standard with good library support"
+# Document architectural decisions
+echo "## Decision: Use OAuth2" >> .specpulse/memory/decisions.md
+
+# Track reusable patterns
+echo "## Repository Pattern" >> .specpulse/memory/patterns.md
 ```
 
-#### 2. Document Patterns
+#### Use Git for Checkpoints
 
 ```bash
-# Add code patterns for reuse
-specpulse memory add-pattern "Repository Pattern" \
-  --example "class UserRepository:" \
-  --features "001-user-auth"
+# Create milestone tags
+git tag -a milestone-001 -m "Feature 001 complete"
+
+# Create experimental branches
+git checkout -b experiment/new-approach
+
+# Return to safe points
+git checkout main
+git checkout milestone-001
 ```
 
-#### 3. Query Knowledge
+### AI Assistant Integration Best Practices
+
+#### Claude Code Usage
 
 ```bash
-# Find past decisions
-specpulse memory search "authentication"
-
-# Get recent patterns
-specpulse memory query --tag pattern --recent 5
-
-# Get feature-specific knowledge
-specpulse memory relevant 001-user-auth
+# Use slash commands in Claude Code
+/sp-pulse user-authentication
+/sp-spec create "OAuth2 authentication"
+/sp-plan generate
+/sp-task breakdown
+/sp-status
 ```
 
-### Workflow Best Practices
-
-#### 1. Start with Context
+#### Gemini CLI Usage
 
 ```bash
-# Always begin with context awareness
-specpulse ai context
-specpulse ai suggest
+# Use custom commands in Gemini CLI
+/sp-pulse user-authentication
+/sp-spec create "OAuth2 authentication"
+/sp-plan generate
+/sp-task breakdown
+/sp-status
 ```
 
-#### 2. Validate Frequently
+### Validation Best Practices
+
+#### Validate Frequently
 
 ```bash
 # Validate specifications
-specpulse validate spec --fix
+specpulse validate spec
+
+# Validate plans
+specpulse validate plan
 
 # Validate all components
-specpulse validate all --fix
-
-# Validate before major changes
 specpulse validate all
+
+# Auto-fix issues when possible
+specpulse validate all --fix
 ```
 
-#### 3. Track Progress
+### Troubleshooting Best Practices
+
+#### Use System Commands
 
 ```bash
-# Monitor specification progress
-specpulse spec progress 001-feature
+# Check system health
+specpulse doctor
 
-# Show workflow summary
-specpulse ai summary
-```
+# Get help
+specpulse --help
+specpulse feature --help
 
-#### 4. Save State Regularly
+# Validate project
+specpulse validate all
 
-```bash
-# Create checkpoints before major operations
-specpulse ai checkpoint "Before implementation"
-specpulse ai checkpoint "Before deployment"
+# Use verbose mode for debugging
+export SPECPULSE_VERBOSE=1
 ```
 
 ---
@@ -1256,30 +1265,72 @@ specpulse ai checkpoint "Before deployment"
 
 - [Installation Guide](INSTALLATION.md) - Detailed installation instructions
 - [Migration Guide](MIGRATION.md) - Upgrading from previous versions
+- [Migration Guide v2.2.0](MIGRATION_v2.2.0.md) - Specific migration for v2.2.0
 - [Troubleshooting Guide](TROUBLESHOOTING.md) - Common issues and solutions
-- [API Reference](docs/API_REFERENCE.md) - Complete command reference
+
+### Getting Help
+
+```bash
+# Get general help
+specpulse --help
+
+# Get specific command help
+specpulse feature --help
+specpulse spec --help
+specpulse plan --help
+specpulse task --help
+
+# Check system health
+specpulse doctor
+
+# Validate project structure
+specpulse validate all
+```
+
+### Command Reference
+
+#### **Feature Commands**
+```bash
+specpulse feature init <name>           # Initialize new feature
+specpulse feature continue <feature_id> # Switch to existing feature
+specpulse feature list                  # List all features
+specpulse feature status <feature_id>   # Get feature status
+```
+
+#### **Specification Commands**
+```bash
+specpulse spec create "<description>"   # Create specification
+specpulse spec list                    # List specifications
+specpulse spec validate <spec_id>      # Validate specification
+```
+
+#### **Plan Commands**
+```bash
+specpulse plan create "<description>"   # Create implementation plan
+specpulse plan list                    # List plans
+specpulse plan validate <plan_id>      # Validate plan
+```
+
+#### **Task Commands**
+```bash
+specpulse task breakdown <plan_id>     # Break plan into tasks
+specpulse task list                    # List tasks
+specpulse task status <task_id>        # Get task status
+```
+
+#### **Validation Commands**
+```bash
+specpulse validate spec                # Validate specifications
+specpulse validate plan                # Validate plans
+specpulse validate task                # Validate tasks
+specpulse validate all                 # Validate everything
+```
 
 ### Community Resources
 
 - **GitHub Issues**: [github.com/specpulse/specpulse/issues](https://github.com/specpulse/specpulse/issues)
 - **GitHub Discussions**: [github.com/specpulse/specpulse/discussions](https://github.com/specpulse/specpulse/discussions)
-- **GitHub Wiki**: [github.com/specpulse/specpulse/wiki](https://github.com/specpulse/specpulse/wiki)
 - **GitHub Releases**: [github.com/specpulse/specpulse/releases](https://github.com/specpulse/specpulse/releases)
-
-### Getting Help
-
-```bash
-# Show available help topics
-specpulse help --list
-
-# Get help on specific topics
-specpulse help ai_integration
-specpulse help workflow
-specpulse help templates
-
-# Get contextual help
-specpulse ai suggest --query "help"
-```
 
 ### Reporting Issues
 
@@ -1290,10 +1341,25 @@ When reporting issues, please include:
 3. **Steps to Reproduce**: Clear steps to reproduce the issue
 4. **Expected vs Actual**: What you expected vs what actually happened
 
-### Contributing
+### Quick Debug Commands
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and development setup instructions.
+```bash
+# Check version
+specpulse --version
+
+# Enable verbose logging
+export SPECPULSE_VERBOSE=1
+
+# Check installation
+pip show specpulse
+
+# Validate everything
+specpulse validate all
+
+# System diagnostics
+specpulse doctor
+```
 
 ---
 
-**🎉 Congratulations! You now have a complete understanding of SpecPulse v2.0.0's AI integration capabilities. Build better software, faster, with intelligent AI assistance!**
+**🎉 Congratulations! You now have a complete understanding of SpecPulse v2.4.1's AI integration capabilities. Build better software, faster, with intelligent AI assistance while maintaining complete privacy and control!**

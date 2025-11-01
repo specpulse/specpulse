@@ -11,7 +11,7 @@ Usage: /sp-clarify [spec-id]
 Implementation:
 
 1. Detect target specification:
-   - Read memory/context.md for current feature
+   - Read .specpulse/memory/context.md for current feature
    - If spec ID provided, use that spec
    - Otherwise, use most recent spec
 

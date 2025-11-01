@@ -21,7 +21,7 @@ Create, update, or validate feature specifications using SpecPulse methodology w
 - Only use Read/Write/Edit tools for specs/ files when CLI doesn't cover the operation
 
 **PROTECTED DIRECTORIES (NEVER EDIT):**
-- `templates/` - Template files
+- `.specpulse/templates/` - Template files
 - `.specpulse/` - Internal config
 - `specpulse/` - Package code
 - `.claude/` and `.gemini/` - AI configuration
@@ -29,7 +29,7 @@ Create, update, or validate feature specifications using SpecPulse methodology w
 **WORKFLOW:**
 1. Try `specpulse spec create "description"` first
 2. If CLI doesn't exist or doesn't cover your need, use File Operations
-3. Templates are READ from templates/, then specs are CREATED/EDITED in specs/
+3. Templates are READ from .specpulse/templates/, then specs are CREATED/EDITED in .specpulse/specs/
 
 ## Usage
 ```
@@ -43,7 +43,7 @@ Actions: `create`, `update`, `validate`, `clarify` (defaults to `create`)
 When called with `/sp-spec $ARGUMENTS`, I will:
 
 1. **Detect current feature context**:
-   - Read `memory/context.md` for current feature metadata
+   - Read `.specpulse/memory/context.md` for current feature metadata
    - Use git branch name if available (e.g., `001-user-authentication`)
    - Fall back to most recently created feature directory
    - If no context found, ask user to specify feature or run `/sp-pulse` first
@@ -57,19 +57,19 @@ When called with `/sp-spec $ARGUMENTS`, I will:
 
 3. **For `/sp-spec create [description]` or `/sp-spec [description]`:**
    - **CRITICAL NUMBERING LOGIC**:
-     - Check if `specs/XXX-feature/spec-001.md` exists
+     - Check if `.specpulse/specs/XXX-feature/spec-001.md` exists
      - If spec-001.md does NOT exist: Create spec-001.md with full content from template
      - If spec-001.md EXISTS: Create spec-002.md (or next number) with new content
      - NEVER leave spec-001.md as placeholder if it's the first spec
 
    - **Step 1: Read Template**
      ```
-     Read: templates/spec.md
+     Read: .specpulse/templates/spec.md
      ```
 
    - **Step 2: Create Spec File Using Write Tool**
      ```
-     Write: specs/XXX-feature/spec-YYY.md
+     Write: .specpulse/specs/XXX-feature/spec-YYY.md
 
      Content should include:
      - Metadata section with feature ID, date, version
@@ -80,7 +80,7 @@ When called with `/sp-spec $ARGUMENTS`, I will:
 
    - **Step 3: Read Created File**
      ```
-     Read: specs/XXX-feature/spec-YYY.md
+     Read: .specpulse/specs/XXX-feature/spec-YYY.md
      ```
 
    - **Step 4: EXPAND Specification**
@@ -94,7 +94,7 @@ When called with `/sp-spec $ARGUMENTS`, I will:
 
    - **Step 5: Write Expanded Content Back**
      ```
-     Edit: specs/XXX-feature/spec-YYY.md
+     Edit: .specpulse/specs/XXX-feature/spec-YYY.md
      (Replace template placeholders with full specification)
      ```
 
@@ -116,7 +116,7 @@ When called with `/sp-spec $ARGUMENTS`, I will:
 5. **For `/sp-spec validate`:**
    - **Step 1: Read Spec File**
      ```
-     Read: specs/XXX-feature/spec-YYY.md
+     Read: .specpulse/specs/XXX-feature/spec-YYY.md
      ```
 
    - **Step 2: Manual Validation Checks**
@@ -170,7 +170,7 @@ User: /sp-spec validate
 ```
 I will run enhanced validation with detailed reporting:
 ```
-SPEC_FILE=specs/001-user-authentication/spec.md
+SPEC_FILE=.specpulse/specs/001-user-authentication/spec.md
 CLARIFICATIONS_NEEDED=3
 MISSING_SECTIONS=0
 STATUS=validation_complete
@@ -222,6 +222,6 @@ The AI-optimized specification template includes:
 - **Script execution** with Bash support
 - **Template variable processing** for AI optimization
 - **Automated validation** with detailed reporting
-- **Context-aware operation** using memory/context.md
+- **Context-aware operation** using .specpulse/memory/context.md
 - **Progress tracking** with todo list integration
 - **Cross-platform operation** with Bash

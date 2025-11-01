@@ -65,7 +65,9 @@ pip install --upgrade specpulse
 
 # Verify version
 specpulse --version
-# Should show: SpecPulse v2.2.0
+# Should show: SpecPulse v2.4.1 (or later)
+# Note: This guide covers v2.1.3 → v2.2.0 migration
+# For v2.2.0 → v2.4.1, see MIGRATION.md
 ```
 
 ### Step 3: Initialize Feature Counter (One-Time)
@@ -307,7 +309,7 @@ We will provide **12 months notice** before any breaking changes.
 
 After upgrading, verify:
 
-- [ ] `specpulse --version` shows 2.2.0
+- [ ] `specpulse --version` shows 2.4.1 (or later)
 - [ ] `specpulse sp-pulse init test` creates feature successfully
 - [ ] `specpulse sp-spec create "test"` creates spec successfully
 - [ ] No error messages during normal operations

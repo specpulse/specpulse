@@ -10,16 +10,16 @@ Initialize a new SpecPulse feature following Specification-Driven Development (S
 - Use File Operations ONLY if CLI fails or doesn't exist
 
 **PROTECTED DIRECTORIES (NEVER EDIT):**
-- templates/ - Template files
+- .specpulse/templates/ - Template files
 - .specpulse/ - Internal config
 - specpulse/ - Package code
 - .claude/ and .gemini/ - AI configuration
 
 **ALLOWED DIRECT EDITS (When NO CLI exists):**
-- specs/ - Feature specifications (create/edit spec files)
-- plans/ - Implementation plans (create/edit plan files)
-- tasks/ - Task breakdowns (create/edit task files)
-- memory/ - Project context (update context.md, decisions.md)
+- .specpulse/.specpulse/specs/ - Feature specifications (create/edit spec files)
+- .specpulse/.specpulse/plans/ - Implementation plans (create/edit plan files)
+- .specpulse/.specpulse/tasks/ - Task breakdowns (create/edit task files)
+- .specpulse/memory/ - Project context (update context.md, decisions.md)
 
 ## Command: /sp-pulse {{args}}
 
@@ -39,9 +39,9 @@ When called, perform the following steps:
 3. **If CLI fails or doesn't exist, use File Operations (FALLBACK)**:
    - Generate feature ID (001, 002, etc.) or use provided ID
    - Create sanitized branch name: ID-feature-name
-   - Create directories: specs/ID-feature/, plans/ID-feature/, tasks/ID-feature/
+   - Create directories: .specpulse/.specpulse/specs/ID-feature/, .specpulse/.specpulse/plans/ID-feature/, .specpulse/.specpulse/tasks/ID-feature/
    - Copy AI-optimized templates to feature directories
-   - Update memory/context.md with current feature metadata
+   - Update .specpulse/memory/context.md with current feature metadata
    - Create and switch to git branch if in git repository
 
 4. **Suggest specification creation**:
@@ -56,7 +56,7 @@ When called, perform the following steps:
 5. **Validate structure** and report comprehensive status:
    - Feature ID: 001
    - Branch name: 001-user-authentication
-   - Created paths: specs/001-user-authentication/, plans/001-user-authentication/, tasks/001-user-authentication/
+   - Created paths: .specpulse/.specpulse/specs/001-user-authentication/, .specpulse/.specpulse/plans/001-user-authentication/, .specpulse/.specpulse/tasks/001-user-authentication/
    - Status: ready_for_spec
    - Next step: Use /sp-spec to create specification
 
@@ -82,7 +82,7 @@ After /sp-pulse, the workflow continues:
 
 ## Context Detection
 The system automatically detects current feature from:
-- memory/context.md for current feature
+- .specpulse/memory/context.md for current feature
 - Git branch name if available
 - Most recently created feature directory
 - Explicit specification in commands

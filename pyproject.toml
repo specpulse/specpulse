@@ -93,6 +93,11 @@ packages = [
 [tool.setuptools.package-data]
 specpulse = [
     "resources/memory/*.md",
+    "resources/templates/*.md",
+    "resources/templates/**/*.md",
+    "resources/templates/**/*.yaml",
+    "resources/templates/**/*.yml",
+    "resources/templates/**/*.ts",
     "resources/commands/claude/*.md",
     "resources/commands/claude/**/*.md",
     "resources/commands/gemini/*.toml",

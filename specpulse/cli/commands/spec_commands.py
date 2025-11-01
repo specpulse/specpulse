@@ -14,11 +14,15 @@ class SpecCommands:
     def __init__(self, console, project_root: Path):
         self.console = console
         self.project_root = project_root
-        self.specs_dir = project_root / "specs"
-        self.templates_dir = project_root / "templates"
-        self.memory_dir = project_root / "memory"
+        # Import PathManager for centralized path management
+        from ...core.path_manager import PathManager
+        self.path_manager = PathManager(project_root, use_legacy_structure=False)
 
-    def spec_create(self, description: str, feature_id: Optional[str] = None) -> bool:
+        self.specs_dir = self.path_manager.specs_dir
+        self.templates_dir = self.path_manager.templates_dir
+        self.memory_dir = self.path_manager.memory_dir
+
+    def spec_create(self, description: str, feature_id: Optional[str] = None, **kwargs) -> bool:
         """
         Create a new specification.
 
@@ -88,7 +92,7 @@ class SpecCommands:
             self.console.error(f"Spec creation failed: {e}")
             return False
 
-    def spec_update(self, spec_id: str, description: str, feature_id: Optional[str] = None) -> bool:
+    def spec_update(self, spec_id: str, description: str, feature_id: Optional[str] = None, **kwargs) -> bool:
         """
         Update existing specification (add metadata for LLM).
 
@@ -145,7 +149,7 @@ class SpecCommands:
             self.console.error(f"Spec update failed: {e}")
             return False
 
-    def spec_validate(self, spec_id: Optional[str] = None, feature_id: Optional[str] = None) -> bool:
+    def spec_validate(self, spec_id: Optional[str] = None, feature_id: Optional[str] = None, **kwargs) -> bool:
         """
         Validate specification (calls existing validator).
 

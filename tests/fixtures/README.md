@@ -5,7 +5,7 @@ This directory contains test fixtures for validating v1.7.0 features.
 ## Files
 
 ### context.md
-Sample memory/context.md file with tagged entries:
+Sample .specpulse/memory/context.md file with tagged entries:
 - 1 current entry
 - 3 decisions (DEC-001, DEC-002, DEC-003)
 - 2 patterns (PATTERN-001, PATTERN-002)

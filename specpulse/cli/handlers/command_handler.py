@@ -129,8 +129,11 @@ class CommandHandler:
         """Check if the given path is a SpecPulse project"""
         try:
             from ...utils.error_handler import validate_project_directory
-            return validate_project_directory(path)
-        except Exception:
+            validate_project_directory(path)
+            return True
+        except Exception as e:
+            if self.verbose:
+                self.console.warning(f"Project validation failed: {e}")
             return False
 
     def execute_command(self, command_name: str, **kwargs) -> Any:
@@ -159,7 +162,22 @@ class CommandHandler:
                         "This command must be run from within a SpecPulse project directory",
                         "Run 'specpulse init' to create a new project or navigate to an existing one"
                     )
-                return getattr(self.feature_commands, command_name)(**kwargs)
+                # Handle subcommands: feature <subcommand>
+                feature_subcommand = kwargs.get('feature_command')
+                if feature_subcommand:
+                    method_name = f"feature_{feature_subcommand}"
+                    if hasattr(self.feature_commands, method_name):
+                        return getattr(self.feature_commands, method_name)(**kwargs)
+                    else:
+                        raise SpecPulseError(f"Unknown feature command: {feature_subcommand}")
+                else:
+                    # Default to feature_init if no subcommand specified
+                    # Remove command-specific kwargs that aren't part of method signature
+                    method_kwargs = {k: v for k, v in kwargs.items() if k not in ['verbose', 'no_color']}
+                    if 'feature_name' in method_kwargs:
+                        return self.feature_commands.feature_init(method_kwargs['feature_name'])
+                    else:
+                        raise SpecPulseError("Feature command requires a subcommand or feature name")
 
             elif command_name in ['spec', 's']:
                 if not self.spec_commands:
@@ -167,7 +185,24 @@ class CommandHandler:
                         "This command must be run from within a SpecPulse project directory",
                         "Run 'specpulse init' to create a new project or navigate to an existing one"
                     )
-                return getattr(self.spec_commands, command_name)(**kwargs)
+                # Handle subcommands: spec <subcommand>
+                spec_subcommand = kwargs.get('spec_command')
+                if spec_subcommand:
+                    method_name = f"spec_{spec_subcommand}"
+                    if hasattr(self.spec_commands, method_name):
+                        return getattr(self.spec_commands, method_name)(**kwargs)
+                    else:
+                        raise SpecPulseError(f"Unknown spec command: {spec_subcommand}")
+                else:
+                    # Default to spec_create if no subcommand specified
+                    # Remove command-specific kwargs that aren't part of method signature
+                    method_kwargs = {k: v for k, v in kwargs.items() if k not in ['verbose', 'no_color']}
+                    if 'spec_description' in method_kwargs:
+                        return self.spec_commands.spec_create(method_kwargs['spec_description'])
+                    elif 'description' in method_kwargs:
+                        return self.spec_commands.spec_create(method_kwargs['description'])
+                    else:
+                        raise SpecPulseError("Spec command requires a subcommand or description")
 
             elif command_name in ['plan', 'p']:
                 if not self.plan_commands:

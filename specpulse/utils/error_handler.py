@@ -301,6 +301,25 @@ def handle_specpulse_error(error: Exception, context: Optional[str] = None, verb
 def validate_project_directory(path: Path) -> None:
     """Validate that the given path is a valid SpecPulse project"""
 
+    # Check for new structure (v2.2.0+)
+    specpulse_dir = path / ".specpulse"
+    if specpulse_dir.exists():
+        required_dirs = ['.specpulse/specs', '.specpulse/plans', '.specpulse/tasks', '.specpulse/memory', '.specpulse/templates']
+        missing_dirs = []
+
+        for dir_name in required_dirs:
+            dir_path = path / dir_name
+            if not dir_path.exists() or not dir_path.is_dir():
+                missing_dirs.append(dir_name)
+
+        if missing_dirs:
+            raise ProjectStructureError(
+                f"Invalid SpecPulse project directory: {path}",
+                missing_dirs=missing_dirs
+            )
+        return
+
+    # Check for legacy structure (pre-v2.2.0)
     required_dirs = ['specs', 'plans', 'tasks', 'memory', 'templates']
     missing_dirs = []
 

@@ -8,7 +8,7 @@ prompt = """
 - Use File Operations ONLY if CLI fails or doesn't exist
 
 **PROTECTED DIRECTORIES (NEVER EDIT):**
-- templates/ - Template files
+- .specpulse/templates/ - Template files
 - .specpulse/ - Internal config
 - specpulse/ - Package code
 - .claude/ and .gemini/ - AI configuration
@@ -16,7 +16,7 @@ prompt = """
 **WORKFLOW (v2.1.3+):**
 1. PRIMARY: Use `specpulse sp-spec create "description"`
 2. FALLBACK: If CLI fails, use File Operations
-3. Templates are READ from templates/, specs are CREATED/EDITED in specs/
+3. Templates are READ from .specpulse/templates/, specs are CREATED/EDITED in .specpulse/.specpulse/specs/
 
 ## Command: /sp-spec {{args}}
 
@@ -27,7 +27,7 @@ Actions: create, update, validate, clarify (defaults to create)
 ### Implementation Steps:
 
 1. **Detect current feature context**:
-   - Read memory/context.md for current feature metadata
+   - Read .specpulse/memory/context.md for current feature metadata
    - Use git branch name if available (e.g., 001-user-authentication)
    - Fall back to most recently created feature directory
    - If no context found, ask user to specify feature or run /sp-pulse first
@@ -57,12 +57,12 @@ Actions: create, update, validate, clarify (defaults to create)
    4. Mark uncertainties with [NEEDS CLARIFICATION: question]
 
    **FALLBACK: File Operations (if CLI fails)**
-   - Read template from @{templates/spec.md}
+   - Read template from @{.specpulse/templates/spec.md}
    - Parse description to identify requirements, user stories
    - Fill template with AI-generated content
    - Mark unclear items with [NEEDS CLARIFICATION]
    - Create numbered spec file (spec-001.md, spec-002.md)
-   - Save to specs/XXX-feature/spec-XXX.md
+   - Save to .specpulse/.specpulse/specs/XXX-feature/spec-XXX.md
 
 5. **Generate comprehensive specification**:
    - Executive Summary
@@ -94,7 +94,7 @@ Actions: create, update, validate, clarify (defaults to create)
    - Report validation results
 
 8. **Update context and validate**:
-   - Update memory/context.md with specification status
+   - Update .specpulse/memory/context.md with specification status
    - Check SDD compliance (Principle 1: Specification First)
    - Validate all sections are filled
    - Report any missing or incomplete sections

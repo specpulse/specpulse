@@ -69,7 +69,11 @@ class MemoryManager:
 
     def __init__(self, project_root: Path):
         self.project_root = project_root
-        self.memory_dir = project_root / "memory"
+        # Import PathManager for centralized path management
+        from .path_manager import PathManager
+        self.path_manager = PathManager(project_root, use_legacy_structure=False)
+
+        self.memory_dir = self.path_manager.memory_dir
         self.context_file = self.memory_dir / "context.md"
         self.decisions_file = self.memory_dir / "decisions.md"
         self.memory_index = self.memory_dir / ".memory_index.json"

@@ -1,10 +1,111 @@
 # SpecPulse Migration Guide
 
-## v2.0.0 → v2.1.0 (Current)
+## v2.1.2 → v2.4.1 (Current)
 
 ### 📋 Overview
 
-SpecPulse v2.1.0 eliminates bash/PowerShell scripts and moves all functionality to pure Python CLI. This is a **backward compatible** upgrade with optional cleanup.
+SpecPulse v2.4.1 introduces the CLI-First Architecture, a fundamental shift in how AI assistants interact with SpecPulse. This is a **backward compatible** upgrade that improves performance and maintains all existing functionality.
+
+### 🔧 Key Changes in v2.4.1
+
+**Major Architectural Change:**
+- ✅ **CLI-First Architecture**: AI assistants must try CLI commands before file operations
+- ✅ **Deprecated AI Commands**: `specpulse ai *` commands removed in favor of direct CLI usage
+- ✅ **Enhanced Validation**: Improved validation system with auto-fix capabilities
+- ✅ **Better Error Handling**: More informative error messages and recovery suggestions
+- ✅ **Performance Improvements**: Faster command execution and reduced overhead
+
+**What Stayed the Same:**
+- ✅ All existing specs, plans, tasks remain compatible
+- ✅ Templates unchanged
+- ✅ Memory system unchanged
+- ✅ AI assistant integration (Claude/Gemini) unchanged
+- ✅ Slash commands work the same way
+
+---
+
+### 🚀 Migration Steps to v2.4.1
+
+#### Step 1: Upgrade SpecPulse
+
+```bash
+# Upgrade to latest version
+pip install --upgrade specpulse
+
+# Verify version
+specpulse --version
+# Should show: 2.4.1
+```
+
+#### Step 2: Update Workflow (Optional)
+
+For **existing projects**, the workflow remains the same but AI assistants should now follow the CLI-first approach:
+
+**Old Workflow (AI commands):**
+```bash
+# Deprecated - no longer needed
+specpulse ai context
+specpulse ai suggest
+```
+
+**New Workflow (Direct CLI):**
+```bash
+# Use CLI commands directly
+specpulse feature init my-feature
+specpulse spec create "My feature description"
+specpulse plan create "Implementation plan"
+specpulse task breakdown <plan-id>
+```
+
+#### Step 3: Test New Features
+
+```bash
+# Test enhanced validation
+specpulse validate all --fix
+
+# Test improved error handling
+specpulse doctor
+
+# Test new CLI capabilities
+specpulse feature --help
+```
+
+**That's it!** No data migration needed - all existing files remain compatible.
+
+---
+
+### 📊 CLI-First Architecture
+
+**The New Workflow Pattern:**
+
+```
+User Request: /sp-spec OAuth2 login with JWT
+    ↓
+Step 1: Try CLI first
+    Bash: specpulse spec create "OAuth2 login with JWT"
+    ↓
+Step 2: If CLI doesn't exist, use File Operations:
+    Claude reads: .specpulse/templates/spec.md
+    Claude writes: .specpulse/specs/001-feature/spec-001.md
+    Claude edits: .specpulse/specs/001-feature/spec-001.md (expand)
+    ↓
+Complete specification ready
+```
+
+**Why CLI First?**
+- **Metadata Handling**: CLI manages timestamps, IDs, status automatically
+- **Structure Validation**: CLI validates before creating files
+- **Context Updates**: CLI updates context.md consistently
+- **Error Handling**: CLI provides recovery and validation
+- **File Operations**: Fallback for flexibility when CLI doesn't cover operation
+
+---
+
+## v2.0.0 → v2.1.2
+
+### 📋 Overview
+
+SpecPulse v2.1.0 eliminated bash/PowerShell scripts and moved all functionality to pure Python CLI. This was a **backward compatible** upgrade with optional cleanup.
 
 ### 🔧 Key Changes in v2.1.0
 
@@ -262,21 +363,24 @@ See [CHANGELOG.md](../CHANGELOG.md) for v2.0.0 migration details.
 
 ## ✅ Post-Migration Checklist
 
-After upgrading to v2.1.0:
+After upgrading to v2.4.1:
 
-- [ ] `specpulse --version` shows 2.1.0
-- [ ] `scripts/` folder removed from projects (optional)
+- [ ] `specpulse --version` shows 2.4.1
 - [ ] `specpulse feature init` works
 - [ ] `specpulse spec create` works
+- [ ] `specpulse plan create` works
+- [ ] `specpulse task breakdown` works
+- [ ] `specpulse validate all --fix` works
+- [ ] `specpulse doctor` shows no errors
 - [ ] Slash commands work in Claude Code/Gemini
 - [ ] Existing specs/plans/tasks still accessible
-- [ ] No errors in `specpulse doctor`
+- [ ] CLI-first workflow understood by team
 
 ---
 
 **🎉 Migration Complete!**
 
-Enjoy faster, cleaner, cross-platform SpecPulse v2.1.0!
+Enjoy faster, cleaner, CLI-first SpecPulse v2.4.1!
 
 ```bash
 specpulse feature init my-new-feature

@@ -24,12 +24,12 @@ class ScriptGenerator:
         return """#!/bin/bash
 # SpecPulse Feature Initialization
 FEATURE_NAME="$1"
-FEATURE_NUM=$(find specs -maxdepth 1 -type d -name "[0-9][0-9][0-9]-*" | wc -l)
+FEATURE_NUM=$(find .specpulse/specs -maxdepth 1 -type d -name "[0-9][0-9][0-9]-*" | wc -l)
 FEATURE_NUM=$((FEATURE_NUM + 1))
 FEATURE_ID=$(printf "%03d" $FEATURE_NUM)
-mkdir -p "specs/${FEATURE_ID}-${FEATURE_NAME}"
-mkdir -p "plans/${FEATURE_ID}-${FEATURE_NAME}"
-mkdir -p "tasks/${FEATURE_ID}-${FEATURE_NAME}"
+mkdir -p ".specpulse/specs/${FEATURE_ID}-${FEATURE_NAME}"
+mkdir -p ".specpulse/plans/${FEATURE_ID}-${FEATURE_NAME}"
+mkdir -p ".specpulse/tasks/${FEATURE_ID}-${FEATURE_NAME}"
 """
 
     def get_spec_script(self) -> str:

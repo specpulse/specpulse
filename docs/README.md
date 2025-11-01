@@ -1,6 +1,6 @@
 # SpecPulse Documentation
 
-Welcome to the SpecPulse documentation! This directory contains comprehensive guides for using SpecPulse v2.1.0.
+Welcome to the SpecPulse documentation! This directory contains comprehensive guides for using SpecPulse v2.4.1.
 
 ---
 
@@ -15,6 +15,7 @@ Welcome to the SpecPulse documentation! This directory contains comprehensive gu
 
 - **[AI Integration Guide](AI_INTEGRATION.md)** - How SpecPulse works with Claude Code and Gemini CLI
 - **[Migration Guide](MIGRATION.md)** - Upgrading from previous versions
+- **[Migration Guide v2.2.0](MIGRATION_v2.2.0.md)** - Specific migration for v2.2.0
 
 ### Troubleshooting
 
@@ -69,7 +70,8 @@ Covers:
 **File**: `MIGRATION.md`
 
 Covers:
-- v2.0.0 → v2.1.0 migration
+- v2.1.2 → v2.4.1 migration (CLI-First Architecture)
+- v2.0.0 → v2.1.2 migration (script elimination)
 - Breaking changes
 - Command mapping
 - Rollback procedures
@@ -88,9 +90,33 @@ Covers:
 
 ---
 
-## 🚀 What's New in v2.1.0
+## 🚀 What's New in v2.4.1
 
 ### Major Changes
+
+✅ **CLI-First Architecture (v2.1.2+)**
+- AI assistants must try CLI commands before file operations
+- Deprecated AI commands (`specpulse ai *`)
+- Enhanced performance and reliability
+
+✅ **Enhanced Validation System (v2.2.0)**
+- Auto-fix capabilities
+- Parallel processing for large projects
+- Comprehensive security improvements
+
+✅ **Performance Improvements**
+- Thread-safe feature IDs
+- 3-5x faster validation
+- TTL template caching
+- Better memory management
+
+✅ **Architecture Improvements**
+- Service-oriented design
+- Dependency injection
+- Clean code principles
+- Better testability
+
+### Historical Changes (v2.1.0)
 
 ✅ **Scripts Eliminated**
 - No more bash/PowerShell scripts
@@ -104,20 +130,19 @@ Covers:
 - `specpulse task create/breakdown/update`
 - `specpulse execute start/done`
 
-✅ **Smaller, Faster**
-- ~50KB smaller projects (no scripts folder)
-- ~3x faster execution (no shell overhead)
-
 ### Migration Summary
 
 ```bash
-# Upgrade
+# Upgrade to latest
 pip install --upgrade specpulse
 
-# Remove old scripts (optional)
+# For v2.0.0 → v2.1.0: Remove old scripts (optional)
 rm -rf scripts/
 
-# Done! Everything works the same (but faster)
+# For v2.1.2 → v2.4.1: No changes needed
+# CLI-first workflow is automatic
+
+# Done! Everything works (much faster and more reliable)
 ```
 
 See [Migration Guide](MIGRATION.md) for details.
@@ -140,9 +165,20 @@ SpecPulse enforces a specification-first approach:
 ```
 User → Claude Code/Gemini → SpecPulse CLI → LLM-Friendly Files
                 ↓
-           AI expands files with full details
+           AI expands files with full details (CLI-first approach)
                 ↓
         Complete specs, plans, tasks
+```
+
+**CLI-First Pattern (v2.1.2+)**:
+```
+User Request: /sp-spec OAuth2 login
+    ↓
+Step 1: Try CLI first
+    Bash: specpulse spec create "OAuth2 login"
+    ↓
+Step 2: If CLI doesn't exist, use File Operations
+    Claude reads template, writes file, expands content
 ```
 
 ### Privacy-First Design
@@ -283,23 +319,24 @@ All SpecPulse documentation follows these standards:
 - ✅ **Clear Examples**: Every concept includes code examples
 - ✅ **Step-by-Step**: Guides are sequential and complete
 - ✅ **Platform-Agnostic**: Works on Windows, macOS, Linux
-- ✅ **Version-Specific**: Clearly marked for v2.1.0
+- ✅ **Version-Specific**: Clearly marked for v2.4.1
 - ✅ **Tested**: All examples are tested and verified
 
 ---
 
 ## 🔄 Documentation Updates
 
-**Last Updated**: 2025-10-07
-**Version**: v2.1.0
+**Last Updated**: 2025-11-01
+**Version**: v2.4.1
 **Status**: Current and Complete
 
 ### Recent Changes
 
-- ✅ Updated for v2.1.0 (script elimination)
-- ✅ New CLI command documentation
-- ✅ Migration guide for v2.0.0 → v2.1.0
-- ✅ Removed outdated script references
+- ✅ Updated for v2.4.1 (CLI-First Architecture)
+- ✅ Enhanced AI integration documentation
+- ✅ New validation system coverage
+- ✅ Performance improvements documentation
+- ✅ Updated migration guides for all versions
 
 ---
 

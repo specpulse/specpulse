@@ -14,10 +14,14 @@ class PlanCommands:
     def __init__(self, console, project_root: Path):
         self.console = console
         self.project_root = project_root
-        self.plans_dir = project_root / "plans"
-        self.specs_dir = project_root / "specs"
-        self.templates_dir = project_root / "templates"
-        self.memory_dir = project_root / "memory"
+        # Import PathManager for centralized path management
+        from ...core.path_manager import PathManager
+        self.path_manager = PathManager(project_root, use_legacy_structure=False)
+
+        self.plans_dir = self.path_manager.plans_dir
+        self.specs_dir = self.path_manager.specs_dir
+        self.templates_dir = self.path_manager.templates_dir
+        self.memory_dir = self.path_manager.memory_dir
 
     def plan_create(self, description: str, feature_id: Optional[str] = None) -> bool:
         """Create implementation plan"""
@@ -153,10 +157,14 @@ class TaskCommands:
     def __init__(self, console, project_root: Path):
         self.console = console
         self.project_root = project_root
-        self.tasks_dir = project_root / "tasks"
-        self.plans_dir = project_root / "plans"
-        self.templates_dir = project_root / "templates"
-        self.memory_dir = project_root / "memory"
+        # Import PathManager for centralized path management
+        from ...core.path_manager import PathManager
+        self.path_manager = PathManager(project_root, use_legacy_structure=False)
+
+        self.tasks_dir = self.path_manager.tasks_dir
+        self.plans_dir = self.path_manager.plans_dir
+        self.templates_dir = self.path_manager.templates_dir
+        self.memory_dir = self.path_manager.memory_dir
 
     def task_create(self, description: str, feature_id: Optional[str] = None) -> bool:
         """Create new task"""

@@ -20,11 +20,11 @@ SpecPulse v2.1.2 is an AI-Enhanced Specification-Driven Development (SDD) Framew
    ```
 
 2. **SECOND: File Operations** (if CLI doesn't exist or doesn't cover operation)
-   - READ templates from `templates/`
-   - WRITE/EDIT files in `specs/`, `plans/`, `tasks/`, `memory/`
+   - READ templates from `.specpulse/templates/`
+   - WRITE/EDIT files in `.specpulse/specs/`, `.specpulse/plans/`, `.specpulse/tasks/`, `.specpulse/memory/`
 
 3. **NEVER: Direct edits to protected directories**
-   - ❌ `templates/` - Read-only template source
+   - ❌ `.specpulse/templates/` - Read-only template source
    - ❌ `.specpulse/` - Internal configuration
    - ❌ `specpulse/` - Package code
    - ❌ `.claude/` and `.gemini/` - AI command definitions
@@ -87,9 +87,9 @@ Step 1: Try CLI first
     Bash: specpulse spec create "OAuth2 login with JWT"
     ↓
 Step 2: If CLI doesn't exist, use File Operations:
-    Claude reads: templates/spec.md
-    Claude writes: specs/001-feature/spec-001.md
-    Claude edits: specs/001-feature/spec-001.md (expand)
+    Claude reads: .specpulse/templates/spec.md
+    Claude writes: .specpulse/specs/001-feature/spec-001.md
+    Claude edits: .specpulse/specs/001-feature/spec-001.md (expand)
     ↓
 Complete specification ready
 ```
@@ -126,8 +126,8 @@ specpulse/
 │   ├── commands/
 │   │   ├── claude/*.md    # Claude Code slash commands
 │   │   └── gemini/*.toml  # Gemini CLI commands
-│   ├── templates/         # Specification templates (spec.md, plan.md, task.md)
-│   └── memory/            # Memory templates
+│   ├── .specpulse/templates/         # Specification templates (spec.md, plan.md, task.md)
+│   └── .specpulse/memory/            # Memory templates
 └── models/                # Data models
     └── project_context.py # Project context model
 ```
@@ -185,12 +185,12 @@ The project includes 8 custom slash commands in `.claude/commands/` and `.gemini
 
 ### Example: How /sp-spec Works
 
-1. Claude reads `templates/spec.md`
-2. Claude writes new file to `specs/001-feature/spec-XXX.md`
+1. Claude reads `.specpulse/templates/spec.md`
+2. Claude writes new file to `.specpulse/specs/001-feature/spec-XXX.md`
 3. Claude edits that file to expand it with full specification
 4. Optionally: Run `specpulse validate spec` for verification
 
-**Never** edit files in `templates/`, `.claude/`, `.gemini/`, or `scripts/` folders.
+**Never** edit files in `.specpulse/templates/`, `.claude/`, `.gemini/`, or `scripts/` folders.
 
 ## Testing Strategy
 
@@ -304,7 +304,7 @@ Templates use:
 
 The `core/ai_integration.py` module provides:
 - Auto-detect current feature from git branch
-- Parse `memory/context.md` for active feature
+- Parse `.specpulse/memory/context.md` for active feature
 - Suggest next steps based on project state
 
 ## Common Development Patterns

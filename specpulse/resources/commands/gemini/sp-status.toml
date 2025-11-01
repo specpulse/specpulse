@@ -3,7 +3,7 @@ prompt = """
 Handle the /sp-status command with arguments: {{args}}
 
 First, detect current feature context:
-- Read memory/context.md for current feature metadata
+- Read .specpulse/memory/context.md for current feature metadata
 - Use git branch name if available (e.g., 001-user-authentication)
 - Fall back to most recently created feature directory
 - If no context found, work with all features
@@ -13,7 +13,7 @@ Parse arguments to determine scope:
 - Otherwise: Show overview of all features
 
 ## For /sp-status (all features overview):
-1. Scan all feature directories (specs/*, plans/*, tasks/*)
+1. Scan all feature directories (.specpulse/specs/*, .specpulse/plans/*, .specpulse/tasks/*)
 2. Count features by status: active, completed, in_progress, paused
 3. Calculate overall project progress
 4. Show summary statistics:

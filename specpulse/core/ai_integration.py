@@ -49,9 +49,13 @@ class AIIntegration:
         self.error_handler = ErrorHandler()
         self.specpulse = SpecPulse()
 
+        # Import PathManager for centralized path management
+        from .path_manager import PathManager
+        self.path_manager = PathManager(project_root, use_legacy_structure=False)
+
         # AI integration paths
         self.ai_state_file = project_root / ".specpulse" / "ai_state.json"
-        self.context_file = project_root / "memory" / "context.md"
+        self.context_file = self.path_manager.memory_dir / "context.md"
         self.ai_cache = project_root / ".specpulse" / "ai_cache"
 
         # Ensure directories exist
@@ -148,8 +152,8 @@ class AIIntegration:
                 pass
 
         # Detect recent specs and plans
-        specs_dir = self.project_root / "specs"
-        plans_dir = self.project_root / "plans"
+        specs_dir = self.path_manager.specs_dir
+        plans_dir = self.path_manager.plans_dir
 
         if specs_dir.exists():
             for spec_file in sorted(specs_dir.glob("**/*.md"), reverse=True)[:5]:
