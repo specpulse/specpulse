@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.4.2] - 2025-11-01
+
+### 📚 Documentation Update - CLI-AI Balance Clarification
+
+**Upgrade Urgency:** 🟢 OPTIONAL (documentation only, no code changes)
+
+---
+
+### ✨ Improvements
+
+- **UPDATED**: Comprehensive README.md with clear CLI-AI partnership explanation
+- **ENHANCED**: Detailed Custom Commands Architecture documentation
+- **IMPROVED**: Cross-platform guarantees and platform-specific examples
+- **CLARIFIED**: Critical balance rules for CLI-first approach
+- **ADDED**: Complete /sp-execute command documentation
+- **ENHANCED**: Platform-specific handling for Windows, macOS, Linux
+
+### 📚 Documentation Changes
+
+- **README.md**: Complete rewrite with focus on CLI-AI essential partnership
+- **AI_INTEGRATION.md**: Updated to reflect CLI-First Architecture (v2.4.1+)
+- **INSTALLATION.md**: Updated version references and CLI-first workflow
+- **MIGRATION.md**: Added v2.1.2 → v2.4.1 migration guide
+- **TROUBLESHOOTING.md**: Updated for deprecated AI commands and CLI-first workflow
+
+### 🎯 Key Highlights
+
+- **CLI First Principle**: Custom commands always try CLI commands first
+- **Cross-Platform Guarantee**: Works identically on Windows, macOS, Linux
+- **Unicode Safe**: No encoding issues on any platform
+- **Critical Balance**: CLI creates structure, AI provides content
+- **Never Fail CLI**: CLI commands guaranteed to work with valid input
+
+---
+
 ## [2.4.1] - 2025-11-01
 
 ### 🐛 Patch Release - Doctor Command Fix
