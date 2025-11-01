@@ -78,8 +78,9 @@ class ProjectCommands:
             self.console.warning("Could not check for updates (network issue)")
             return
 
-        if compare_versions(latest, __version__) > 0:
-            message = get_update_message(__version__, latest)
+        is_outdated, is_major = compare_versions(latest, __version__)
+        if is_outdated:
+            message = get_update_message(__version__, latest, is_major)
             self.console.info(message)
 
             if force or self.console.confirm("Update now?"):

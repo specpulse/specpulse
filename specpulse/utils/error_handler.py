@@ -215,7 +215,7 @@ class ErrorHandler:
             "Report this issue if it persists"
         ]
 
-        console.warning("💡 Recovery suggestions:")
+        console.warning("Recovery suggestions:")
         for i, suggestion in enumerate(suggestions, 1):
             console.info(f"   {i}. {suggestion}")
 

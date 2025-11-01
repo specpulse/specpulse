@@ -118,8 +118,9 @@ class CommandHandler:
             latest = check_pypi_version(timeout=1)
             if latest:
                 from ... import __version__
-                if compare_versions(latest, __version__) > 0:
-                    message = get_update_message(__version__, latest)
+                is_outdated, is_major = compare_versions(latest, __version__)
+                if is_outdated:
+                    message = get_update_message(__version__, latest, is_major)
                     self.console.info(message)
         except Exception:
             # Version check should never block CLI functionality
@@ -368,7 +369,7 @@ class CommandHandler:
             raise SpecPulseError(f"Command '{command_name}' failed: {str(e)}")
 
     # Core functionality methods (moved from main CLI class)
-    def update(self) -> None:
+    def update(self, **kwargs) -> None:
         """Update SpecPulse to latest version"""
         return self.project_commands.update()
 
