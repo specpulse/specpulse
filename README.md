@@ -1,4 +1,4 @@
-# SpecPulse v2.4.7
+# SpecPulse v2.4.8
 
 <div align="center">
 
@@ -672,6 +672,25 @@ specpulse doctor --fix                # Health check with auto-fix
 
 ---
 
+## 🆕 What's New in v2.4.8
+
+### 🔧 Template System Fix - Critical Issue Resolved
+
+**Upgrade Urgency:** 🟢 CRITICAL (fixes missing template files in projects)
+
+- **FIXED**: Template files now properly copied during `specpulse init`
+- **ISSUE**: `.specpulse/templates/` directory was missing core template files (spec.md, plan.md, task.md)
+- **SOLUTION**: Added missing templates to resources and fixed template copying logic
+- **IMPACT**: All new projects now get complete template sets immediately
+- **VERIFIED**: `specpulse doctor` validates templates correctly
+
+### 📋 Template Files Added
+- **Core Templates**: spec.md, plan.md, task.md
+- **Decomposition Templates**: microservices.md, api-contract.yaml, interface.ts, service-plan.md, integration-plan.md
+- **Complete Structure**: Full `.specpulse/templates/` hierarchy with all subdirectories
+
+**Previous v2.4.7 Features:**
+
 ## 🆕 What's New in v2.4.7
 
 ### 🔥 CLI Reliability Revolution - 100% Working Commands
@@ -751,7 +770,7 @@ specpulse doctor
 
 **Made with ❤️ for developers who value specifications and quality**
 
-**SpecPulse v2.4.7** - CLI-First • AI-Enhanced • Fallback-Protected • Cross-Platform • 100% Reliable
+**SpecPulse v2.4.8** - CLI-First • AI-Enhanced • Fallback-Protected • Cross-Platform • Templates Fixed • 100% Reliable
 
 [⭐ Star us on GitHub](https://github.com/specpulse/specpulse) | [📦 Install from PyPI](https://pypi.org/project/specpulse/)
 

@@ -1,0 +1,22 @@
+openapi: 3.0.0
+info:
+  title: {{service_name}} API
+  version: 1.0.0
+  description: API contract for {{service_name}}
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
+paths:
+  /{{resource}}:
+    get:
+      summary: Get all {{resource}}
+      responses:
+        '200':
+          description: Successful response
+    post:
+      summary: Create new {{resource}}
+      responses:
+        '201':
+          description: Created
