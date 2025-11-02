@@ -44,14 +44,14 @@ When called, perform the following steps:
    - Update .specpulse/memory/context.md with current feature metadata
    - Create and switch to git branch if in git repository
 
-4. **Suggest specification creation**:
-   - Provide user with 2-3 AI-generated specification suggestions
-   - Ask user to choose one or create custom specification
-   - Guide user to use /sp-spec command after making selection
-   - Example suggestions for "user-authentication":
-     1. "User authentication with OAuth2 providers and JWT tokens"
-     2. "Complete authentication system including registration, login, and profile management"
-     3. "OAuth2 integration with social login providers"
+4. **Intelligent specification suggestions**:
+   - Analyze feature name to infer project type and complexity
+   - Generate 3 context-aware specification suggestions:
+     1. **Core specification** (2-4 hours development time): Essential functionality only
+     2. **Standard specification** (8-12 hours development time): Comprehensive with detailed requirements
+     3. **Complete specification** (16-24 hours development time): Full-featured solution with advanced aspects
+   - Include project type detection and complexity assessment
+   - Guide user to /sp-spec command after selection
 
 5. **Validate structure** and report comprehensive status:
    - Feature ID: 001

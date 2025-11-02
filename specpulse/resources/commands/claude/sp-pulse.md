@@ -76,10 +76,14 @@ When called with `/sp-pulse $ARGUMENTS`, I will:
      git checkout -b 001-feature-name
      ```
 
-4. **Suggest specification creation**:
-   - Provide user with 2-3 AI-generated specification suggestions
-   - Ask user to choose one or create custom specification
-   - Guide user to use `/sp-spec` command after making selection
+4. **Intelligent specification suggestions**:
+   - Analyze feature name to infer project type and complexity
+   - Generate 3 context-aware specification suggestions:
+     1. **Core specification** (essential functionality only)
+     2. **Standard specification** (comprehensive with detailed requirements)
+     3. **Complete specification** (full-featured with all aspects)
+   - Show estimated development time for each option
+   - Guide user to `/sp-spec [chosen-option]` after selection
 
 5. **Validate structure** and report comprehensive status
 
@@ -108,13 +112,15 @@ I will:
 - Create: `plans/001-user-authentication-oauth2/` (empty, ready for plan)
 - Create: `tasks/001-user-authentication-oauth2/` (empty, ready for tasks)
 - Branch: `001-user-authentication-oauth2`
-- Suggest specification options:
-  1. "User authentication with OAuth2 providers and JWT tokens"
-  2. "Complete authentication system including registration, login, and profile management"
-  3. "OAuth2 integration with social login providers"
-- Ask: "Which specification would you like to use? (Choose 1-3 or provide your own)"
-- Guide: "After choosing, use `/sp-spec [your choice]` to create the specification"
-- Status: `STATUS=ready_for_spec, BRANCH_NAME=001-user-authentication-oauth2`
+- **Context-aware specification suggestions** based on feature analysis:
+  - **Core Specification** (2-4 hours development time): Essential functionality with basic requirements
+  - **Standard Specification** (8-12 hours development time): Comprehensive features with detailed requirements and technical specifications
+  - **Complete Specification** (16-24 hours development time): Full-featured solution with advanced requirements, security considerations, and scalability planning
+- **Project type detection**: Web app, API, mobile app, database system, etc.
+- **Complexity assessment**: Simple, moderate, or complex based on feature name
+- Ask: "Which specification approach would you like? (core/standard/complete or custom description)"
+- Guide: "After choosing, use `/sp-spec [your-option]` to create the specification"
+- Status: `STATUS=ready_for_spec, BRANCH_NAME=001-user-authentication-oauth2, PROJECT_TYPE=detected`
 
 ## Error Handling
 
