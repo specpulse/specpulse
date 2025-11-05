@@ -26,7 +26,7 @@ setup(
     version=get_version(),
     author="SpecPulse",
     author_email="",
-    description="SpecPulse v2.1.3 - AI-Enhanced Specification-Driven Development Framework",
+    description="SpecPulse v2.5.0 - AI-Enhanced Specification-Driven Development Framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/specpulse",
