@@ -287,7 +287,7 @@ class MemoryManager:
 ### {entry.action.replace('_', ' ').title()} - {entry.timestamp[:10]}
 - **Feature**: {entry.feature_name or 'N/A'}
 - **ID**: {entry.feature_id or 'N/A'}
-- **Impact**: {entryimpact}
+- **Impact**: {entry.impact}
 - **Category**: {entry.category}
 - **Details**: {json.dumps(entry.details, indent=2) if entry.details else 'None'}
 """

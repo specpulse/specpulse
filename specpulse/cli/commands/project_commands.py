@@ -80,7 +80,7 @@ class ProjectCommands:
 
         is_outdated, is_major = compare_versions(latest, __version__)
         if is_outdated:
-            message = get_update_message(__version__, latest, is_major)
+            message, color = get_update_message(__version__, latest, is_major)
             self.console.info(message)
 
             if force or self.console.confirm("Update now?"):

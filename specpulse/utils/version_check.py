@@ -66,7 +66,7 @@ def compare_versions(current: str, latest: str) -> Tuple[bool, bool]:
         return False, False
 
 
-def get_update_message(current: str, latest: str, is_major: bool) -> str:
+def get_update_message(current: str, latest: str, is_major: bool) -> Tuple[str, str]:
     """
     Generate update notification message
 
@@ -76,7 +76,7 @@ def get_update_message(current: str, latest: str, is_major: bool) -> str:
         is_major: Whether this is a major update
 
     Returns:
-        Formatted update message
+        Tuple of (formatted update message, color string)
     """
     # Determine update type
     curr_parts = current.split('.')
