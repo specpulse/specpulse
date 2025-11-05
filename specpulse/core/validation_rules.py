@@ -468,13 +468,14 @@ class TaskFormatRule(TaskValidationRule):
         # Check for tasks without proper numbering
         invalid_tasks = re.finditer(r'^### (?!T\d{3}:).*', content, re.MULTILINE)
         for match in invalid_tasks:
+            line_num = content[:match.start()].count('\n') + 1
             results.append(ValidationResult(
                 status="invalid_task_format",
                 message=f"Invalid task format: {match.group()}",
                 severity=self.severity,
                 category=ValidationCategory.FORMATTING,
                 suggestion="Use format: ### T001: Task Name",
-                location=f"{file_path}:{content[:match.start()].count('\n') + 1}",
+                location=f"{file_path}:{line_num}",
                 auto_fixable=self.auto_fixable,
                 fix_action="fix_task_format"
             ))
