@@ -419,42 +419,6 @@ class GitUtils:
         success, _ = self._run_git_command("merge", validated_branch)
         return success
 
-    def create_branch(self, branch_name: str) -> bool:
-        """
-        Create and checkout a new branch (with security validation).
-
-        Args:
-            branch_name: Name of branch to create
-
-        Returns:
-            True if successful, False otherwise
-
-        Raises:
-            GitSecurityError: If branch name is invalid/malicious
-        """
-        # SECURITY: Validate branch name before git operation
-        validated_name = self._validate_branch_name(branch_name)
-        success, _ = self._run_git_command("checkout", "-b", validated_name)
-        return success
-
-    def checkout_branch(self, branch_name: str) -> bool:
-        """
-        Checkout an existing branch (with security validation).
-
-        Args:
-            branch_name: Name of branch to checkout
-
-        Returns:
-            True if successful, False otherwise
-
-        Raises:
-            GitSecurityError: If branch name is invalid/malicious
-        """
-        # SECURITY: Validate branch name before git operation
-        validated_name = self._validate_branch_name(branch_name)
-        success, _ = self._run_git_command("checkout", validated_name)
-        return success
-
     def branch_exists(self, branch_name: str) -> bool:
         """
         Check if branch exists (with security validation).

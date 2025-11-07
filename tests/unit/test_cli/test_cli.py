@@ -27,14 +27,14 @@ class TestSpecPulseCLI:
 
     def test_cli_initialization(self):
         """Test CLI initialization"""
-        cli = SpecPulseCLI(no_color=True, verbose=False)
+        cli = CommandHandler(no_color=True, verbose=False)
         assert cli.console is not None
         assert cli.specpulse is not None
 
     @patch('specpulse.cli.main.Console')
     def test_cli_initialization_with_console(self, mock_console_class):
         """Test CLI initialization with console parameters"""
-        cli = SpecPulseCLI(no_color=False, verbose=True)
+        cli = CommandHandler(no_color=False, verbose=True)
         mock_console_class.assert_called_once_with(no_color=False, verbose=True)
 
     def test_init_new_project(self):
@@ -42,7 +42,7 @@ class TestSpecPulseCLI:
         with tempfile.TemporaryDirectory() as tmpdir:
             project_path = Path(tmpdir) / "test-project"
 
-            cli = SpecPulseCLI(no_color=True)
+            cli = CommandHandler(no_color=True)
             cli._create_memory_files = MagicMock()
             cli._create_templates = MagicMock()
             cli._create_scripts = MagicMock()
@@ -71,7 +71,7 @@ class TestSpecPulseCLI:
         """Test init with existing project"""
         mock_exists.return_value = True
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         result = cli.init("existing-project")
 
         # Should return True for successful initialization (even for existing project)
@@ -86,7 +86,7 @@ class TestSpecPulseCLI:
         mock_cwd.return_value = self.project_path
         mock_exists.return_value = False
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli._create_memory_files = MagicMock()
         cli._create_templates = MagicMock()
         cli._create_scripts = MagicMock()
@@ -101,7 +101,7 @@ class TestSpecPulseCLI:
 
     def test_create_manifest(self):
         """Test manifest creation"""
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
 
         cli._create_manifest(self.project_path, "test-project")
 
@@ -119,7 +119,7 @@ class TestSpecPulseCLI:
         mock_validator.validate_all.return_value = []
         mock_validator_class.return_value = mock_validator
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         result = cli.validate()
 
         assert result is True
@@ -134,7 +134,7 @@ class TestSpecPulseCLI:
         ]
         mock_validator_class.return_value = mock_validator
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         result = cli.validate()
 
         assert result is False
@@ -149,7 +149,7 @@ class TestSpecPulseCLI:
         spec_dir.mkdir(parents=True)
         (spec_dir / "spec.md").write_text("# Feature Spec")
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
 
         # Mock the decompose method since it may not exist
         with patch.object(cli, 'decompose', return_value=True) as mock_decompose:
@@ -163,7 +163,7 @@ class TestSpecPulseCLI:
         """Test decompose with missing spec"""
         mock_cwd.return_value = self.project_path
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         result = cli.decompose("999")
 
         assert result is False
@@ -179,7 +179,7 @@ class TestSpecPulseCLI:
         (specs_dir / "001-auth").mkdir()
         (specs_dir / "002-payments").mkdir()
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.list_specs()
 
         # Should not raise exception
@@ -189,7 +189,7 @@ class TestSpecPulseCLI:
         """Test listing specs with no specs directory"""
         mock_cwd.return_value = self.project_path
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.list_specs()
 
         # Should handle gracefully
@@ -220,7 +220,7 @@ project_type: "test"
 status: "active"
 """)
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         result = cli.doctor()
 
         # Doctor should complete (may have warnings but should not crash)
@@ -232,14 +232,14 @@ status: "active"
         """Test doctor with missing directories"""
         mock_cwd.return_value = self.project_path
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         result = cli.doctor()
 
         assert result is False
 
     def test_update(self):
         """Test update command"""
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         result = cli.update()
 
         # Update should complete successfully
@@ -248,7 +248,7 @@ status: "active"
     def test_update_failure(self):
         """Test update command failure"""
         # Just test that update command exists and returns boolean
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         result = cli.update()
 
         # Update should return some boolean result
@@ -270,7 +270,7 @@ status: "active"
         memory_dir.mkdir()
         (memory_dir / "context.md").write_text("# Context")
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         result = cli.sync()
 
         assert result is True
@@ -285,7 +285,7 @@ status: "active"
         mock_git.is_repo.return_value = False
         mock_git_utils_class.return_value = mock_git
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         result = cli.sync()
 
         # Sync should complete even without git (creates directory structure)
@@ -304,7 +304,7 @@ status: "active"
         (templates_dir / "plan.md").write_text("# Implementation Plan: [FEATURE_NAME]")
         (templates_dir / "task.md").write_text("# Task List: [FEATURE_NAME]")
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.specpulse.resources_dir = resources_dir
 
         project_templates = self.project_path / "templates"
@@ -335,7 +335,7 @@ status: "active"
         (memory_dir / "context.md").write_text("# Context")
         (memory_dir / "decisions.md").write_text("# Decisions")
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.specpulse.resources_dir = resources_dir
 
         project_memory = self.project_path / "memory"
@@ -355,7 +355,7 @@ status: "active"
 
     def test_create_ai_commands(self):
         """Test AI command creation"""
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
 
         # Mock SpecPulse methods
         cli.specpulse.generate_claude_commands = MagicMock(return_value=[

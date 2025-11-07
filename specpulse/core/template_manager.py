@@ -239,7 +239,7 @@ class TemplateManager:
                     return "plan"
                 elif "Task Breakdown:" in content:
                     return "task"
-            except:
+            except Exception:
                 pass
             return "unknown"
 

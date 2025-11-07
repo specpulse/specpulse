@@ -13,7 +13,7 @@ from unittest.mock import patch
 from specpulse.core.template_manager import TemplateManager
 from specpulse.core.memory_manager import MemoryManager
 from specpulse.core.validator import Validator
-from specpulse.cli.main import SpecPulseCLI
+from specpulse.cli.handlers.command_handler import CommandHandler
 
 
 class TestPerformance:
@@ -33,7 +33,7 @@ class TestPerformance:
         """Test SpecPulse CLI initialization performance"""
         start_time = time.time()
 
-        cli = SpecPulseCLI(no_color=True, verbose=False)
+        cli = CommandHandler(no_color=True, verbose=False)
 
         end_time = time.time()
         initialization_time = end_time - start_time
@@ -45,7 +45,7 @@ class TestPerformance:
 
     def test_project_initialization_performance(self):
         """Test project initialization performance"""
-        cli = SpecPulseCLI(no_color=True, verbose=False)
+        cli = CommandHandler(no_color=True, verbose=False)
 
         start_time = time.time()
         success = cli.init("perf-test", here=True)
@@ -60,7 +60,7 @@ class TestPerformance:
     def test_template_validation_performance(self):
         """Test template validation performance with many templates"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("perf-templates", here=True)
 
         template_manager = TemplateManager(self.project_path)
@@ -100,7 +100,7 @@ class TestPerformance:
     def test_memory_operations_performance(self):
         """Test memory system performance with many entries"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("perf-memory", here=True)
 
         memory_manager = MemoryManager(self.project_path)
@@ -138,7 +138,7 @@ class TestPerformance:
     def test_validation_system_performance(self):
         """Test validation system performance"""
         # Initialize project with many files
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("perf-validation", here=True)
 
         validator = Validator(self.project_path)
@@ -241,7 +241,7 @@ Implementation plan for feature {i+1}
     def test_large_project_simulation_performance(self):
         """Test performance with simulated large project"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("perf-large", here=True)
 
         template_manager = TemplateManager(self.project_path)
@@ -311,7 +311,7 @@ Implementation plan for feature {i+1}
     def test_memory_cleanup_performance(self):
         """Test memory cleanup performance with many entries"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("perf-cleanup", here=True)
 
         memory_manager = MemoryManager(self.project_path)
@@ -353,7 +353,7 @@ Implementation plan for feature {i+1}
     def test_concurrent_operations_performance(self):
         """Test performance with concurrent operations"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("perf-concurrent", here=True)
 
         template_manager = TemplateManager(self.project_path)
@@ -414,7 +414,7 @@ Implementation plan for feature {i+1}
     def test_memory_export_performance(self):
         """Test memory export performance with large dataset"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("perf-export", here=True)
 
         memory_manager = MemoryManager(self.project_path)

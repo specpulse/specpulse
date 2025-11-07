@@ -109,7 +109,7 @@ class SpecPulse:
             try:
                 with open(config_path, 'r') as f:
                     return yaml.safe_load(f) or {}
-            except:
+            except Exception:
                 return {}
         return {}
 
