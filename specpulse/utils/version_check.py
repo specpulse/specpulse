@@ -62,7 +62,7 @@ def compare_versions(current: str, latest: str) -> Tuple[bool, bool]:
                 is_major = True
 
         return is_outdated, is_major
-    except:
+    except Exception:
         return False, False
 
 
@@ -136,6 +136,6 @@ def should_check_version() -> bool:
         # Update timestamp
         cache_file.touch()
         return True
-    except:
+    except Exception:
         # If anything fails, don't check
         return False

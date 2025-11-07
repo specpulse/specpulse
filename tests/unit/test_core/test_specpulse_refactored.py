@@ -13,7 +13,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import Mock
 
-from specpulse.core.specpulse_refactored import SpecPulse
+from specpulse.core.specpulse import SpecPulse
 from specpulse.core.service_container import ServiceContainer
 from specpulse.core.interfaces import ITemplateProvider
 

@@ -366,7 +366,7 @@ STATUS: draft
                     try:
                         created_dt = datetime.fromisoformat(created_str)
                         created = created_dt.strftime("%Y-%m-%d")
-                    except:
+                    except Exception:
                         created = created_str
 
                 self.console.info(f"  • {spec_path.name} - Status: {status}, Created: {created}")

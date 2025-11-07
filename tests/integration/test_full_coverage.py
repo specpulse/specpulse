@@ -11,7 +11,7 @@ import shutil
 
 from specpulse.core.specpulse import SpecPulse
 from specpulse.core.validator import Validator
-from specpulse.cli.main import SpecPulseCLI
+from specpulse.cli.handlers.command_handler import CommandHandler
 from specpulse.utils.console import Console
 from specpulse.utils.git_utils import GitUtils
 from specpulse.utils.version_check import check_pypi_version, compare_versions, get_update_message
@@ -133,24 +133,24 @@ class TestCLIFullCoverage:
     def test_cli_init(self, mock_should_check):
         """Test CLI initialization"""
         mock_should_check.return_value = False
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         assert cli is not None
 
     def test_create_scripts(self):
         """Test script creation"""
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli._create_scripts(self.project_path)
         # Scripts should be created
 
     def test_create_ai_commands(self):
         """Test AI command creation"""
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli._create_ai_commands(self.project_path, "claude")
         # Commands should be created
 
     def test_create_manifest(self):
         """Test manifest creation"""
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli._create_manifest(self.project_path, "test-project")
         manifest_file = self.project_path / "PULSE.md"
         # Manifest should be created

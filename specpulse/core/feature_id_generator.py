@@ -247,7 +247,7 @@ class FeatureIDGenerator:
             if hasattr(self, '_lock_fd') and self._lock_fd:
                 try:
                     self._lock_fd.close()
-                except:
+                except Exception:
                     pass
                 if hasattr(self, '_lock_fd'):
                     delattr(self, '_lock_fd')

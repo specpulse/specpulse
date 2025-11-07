@@ -67,40 +67,6 @@ def main():
             if result is not None and hasattr(result, '__str__'):
                 print(result)
         elif hasattr(args, 'checkpoint_command') and args.checkpoint_command:
-            result = handler.execute_command('checkpoint', **vars(args))
-            if result is not None and hasattr(result, '__str__'):
-                print(result)
-        elif hasattr(args, 'feature_command') and args.feature_command:
-            # Handle subcommands like 'init', 'continue', 'list'
-            result = handler.execute_command('feature', **vars(args))
-            if result is not None and hasattr(result, '__str__'):
-                print(result)
-        elif hasattr(args, 'spec_command') and args.spec_command:
-            # Handle spec subcommands
-            result = handler.execute_command('spec', **vars(args))
-            if result is not None and hasattr(result, '__str__'):
-                print(result)
-        elif hasattr(args, 'plan_command') and args.plan_command:
-            # Handle plan subcommands
-            result = handler.execute_command('plan', **vars(args))
-            if result is not None and hasattr(result, '__str__'):
-                print(result)
-        elif hasattr(args, 'task_command') and args.task_command:
-            # Handle task subcommands
-            result = handler.execute_command('task', **vars(args))
-            if result is not None and hasattr(result, '__str__'):
-                print(result)
-        elif hasattr(args, 'execute_command') and args.execute_command:
-            # Handle execute subcommands
-            result = handler.execute_command('execute', **vars(args))
-            if result is not None and hasattr(result, '__str__'):
-                print(result)
-        elif hasattr(args, 'template_command') and args.template_command:
-            # Handle template subcommands
-            result = handler.execute_command('template', **vars(args))
-            if result is not None and hasattr(result, '__str__'):
-                print(result)
-        elif hasattr(args, 'checkpoint_command') and args.checkpoint_command:
             # Handle checkpoint subcommands
             result = handler.execute_command('checkpoint', **vars(args))
             if result is not None and hasattr(result, '__str__'):

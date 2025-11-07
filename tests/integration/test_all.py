@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 from specpulse import __version__
 from specpulse.core.specpulse import SpecPulse
 from specpulse.core.validator import Validator
-from specpulse.cli.main import SpecPulseCLI
+from specpulse.cli.handlers.command_handler import CommandHandler
 from specpulse.utils.console import Console
 from specpulse.utils.git_utils import GitUtils
 from specpulse.utils.version_check import (
@@ -300,7 +300,7 @@ class TestCLICore:
     def test_cli_init(self, mock_should):
         """Test CLI initialization"""
         mock_should.return_value = False
-        cli = SpecPulseCLI(no_color=True, verbose=False)
+        cli = CommandHandler(no_color=True, verbose=False)
         assert cli.console is not None
         assert cli.specpulse is not None
 
@@ -315,14 +315,14 @@ class TestCLICore:
         mock_compare.return_value = (True, True)
         mock_msg.return_value = "Update available"
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         assert cli is not None
 
     @patch('specpulse.cli.main.should_check_version')
     def test_cli_init_project(self, mock_should):
         """Test project initialization"""
         mock_should.return_value = False
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
 
         with patch('shutil.copy2'):
             result = cli.init("test-project")
@@ -333,7 +333,7 @@ class TestCLICore:
     def test_cli_init_invalid_name(self, mock_should):
         """Test init with invalid name"""
         mock_should.return_value = False
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
 
         result = cli.init("invalid@name!")
         assert result is False
@@ -347,7 +347,7 @@ class TestCLICore:
 
         (self.project_path / "specs").mkdir()
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         result = cli.validate()
         assert isinstance(result, bool)
 
@@ -358,7 +358,7 @@ class TestCLICore:
         mock_should.return_value = False
         mock_run.return_value.returncode = 0
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         result = cli.update()
         assert result is True
 

@@ -13,7 +13,7 @@ import sys
 import os
 from datetime import datetime, timedelta
 
-from specpulse.cli.main import SpecPulseCLI
+from specpulse.cli.handlers.command_handler import CommandHandler
 from specpulse.core.template_manager import TemplateManager
 from specpulse.core.memory_manager import MemoryManager
 from specpulse.core.validator import Validator
@@ -41,7 +41,7 @@ class TestIntegration:
     def test_complete_workflow_initialization_to_validation(self):
         """Test complete workflow from initialization to validation"""
         # 1. Initialize project
-        cli = SpecPulseCLI(no_color=True, verbose=False)
+        cli = CommandHandler(no_color=True, verbose=False)
         success = cli.init("test-project", here=True)
         assert success
 
@@ -75,7 +75,7 @@ class TestIntegration:
     def test_spec_to_plan_to_task_workflow(self):
         """Test specification to plan to task workflow"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("test-workflow", here=True)
 
         # Create spec directory and file
@@ -204,7 +204,7 @@ graph TD
     def test_template_and_memory_integration(self):
         """Test integration between template and memory systems"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("integration-test", here=True)
 
         template_manager = TemplateManager(self.project_path)
@@ -267,7 +267,7 @@ graph TD
     def test_cli_memory_commands_integration(self):
         """Test CLI memory commands integration"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("memory-test", here=True)
 
         # Memory manager should be initialized since we're in a project
@@ -305,7 +305,7 @@ graph TD
     def test_cli_template_commands_integration(self):
         """Test CLI template commands integration"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("template-test", here=True)
 
         # Template manager should be initialized
@@ -351,7 +351,7 @@ This is a test template for {{ feature_name }}.
 
     def test_error_handling_integration(self):
         """Test error handling across the system"""
-        cli = SpecPulseCLI(no_color=True, verbose=True)
+        cli = CommandHandler(no_color=True, verbose=True)
 
         # Test initialization in non-existent directory
         non_existent = Path("/tmp/non_existent_path_12345")
@@ -370,7 +370,7 @@ This is a test template for {{ feature_name }}.
     def test_validation_integration_with_errors(self):
         """Test validation system with intentional errors"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True, verbose=True)
+        cli = CommandHandler(no_color=True, verbose=True)
         cli.init("validation-test", here=True)
 
         # Create invalid specification file
@@ -428,7 +428,7 @@ class TestAICommandIntegration:
     def test_ai_command_directory_structure(self):
         """Test AI command directory structure creation"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("ai-commands-test", here=True)
 
         # Check AI command directories are created
@@ -452,7 +452,7 @@ class TestAICommandIntegration:
     def test_script_system_integration(self):
         """Test script system integration"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("script-test", here=True)
 
         # Check script files are created
@@ -473,7 +473,7 @@ class TestAICommandIntegration:
     def test_memory_ai_tracking(self):
         """Test memory system AI tracking capabilities"""
         # Initialize project
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
         cli.init("ai-memory-test", here=True)
 
         memory_manager = MemoryManager(self.project_path)
@@ -513,7 +513,7 @@ class TestAICommandIntegration:
     def test_tiered_template_workflow(self):
         """Test full workflow: minimal → standard → complete."""
         # 1. Initialize project
-        cli = SpecPulseCLI(no_color=True, verbose=False)
+        cli = CommandHandler(no_color=True, verbose=False)
         cli.init("test-project", here=True)
 
         # 2. Create minimal spec manually
@@ -591,7 +591,7 @@ Users need to pay for premium features to access exclusive content
     def test_tiered_template_cli_workflow(self):
         """Test tiered templates via CLI."""
         # 1. Initialize project
-        cli = SpecPulseCLI(no_color=True, verbose=False)
+        cli = CommandHandler(no_color=True, verbose=False)
         cli.init("test-project", here=True)
 
         # 2. Create minimal spec

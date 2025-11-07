@@ -17,7 +17,8 @@ import requests
 from specpulse import __version__
 from specpulse.core.specpulse import SpecPulse
 from specpulse.core.validator import Validator
-from specpulse.cli.main import SpecPulseCLI, main
+from specpulse.cli.handlers.command_handler import CommandHandler
+from specpulse.cli.main import main
 from specpulse.utils.console import Console
 from specpulse.utils.git_utils import GitUtils
 from specpulse.utils.version_check import (
@@ -300,7 +301,7 @@ class TestCompleteCLI:
         mock_compare.return_value = (True, True)
         mock_msg.return_value = "Update available"
 
-        cli = SpecPulseCLI(no_color=True, verbose=False)
+        cli = CommandHandler(no_color=True, verbose=False)
         assert cli is not None
 
     @patch('specpulse.cli.main.should_check_version')
@@ -308,7 +309,7 @@ class TestCompleteCLI:
         """Test CLI private methods"""
         mock_should.return_value = False
 
-        cli = SpecPulseCLI(no_color=True)
+        cli = CommandHandler(no_color=True)
 
         # Test _create_memory_files
         memory_dir = self.project_path / "memory"

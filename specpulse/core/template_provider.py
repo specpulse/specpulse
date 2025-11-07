@@ -205,7 +205,7 @@ class TemplateProvider:
                     f"   Using default embedded template.\n"
                     f"   Run 'specpulse doctor' to restore files."
                 )
-            except:
+            except Exception:
                 pass
 
             return fallback

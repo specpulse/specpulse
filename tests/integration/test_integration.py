@@ -10,7 +10,7 @@ import yaml
 
 from specpulse.core.specpulse import SpecPulse
 from specpulse.core.validator import Validator
-from specpulse.cli.main import SpecPulseCLI
+from specpulse.cli.handlers.command_handler import CommandHandler
 
 
 class TestIntegration:
