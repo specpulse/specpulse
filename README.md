@@ -1,4 +1,4 @@
-# SpecPulse v2.5.0
+# SpecPulse v2.6.0
 
 <div align="center">
 
@@ -9,6 +9,26 @@
 *Build better software with specifications first, enhanced by AI*
 
 </div>
+
+---
+
+## ✨ What's New in v2.6.0
+
+### 🔒 Security & Stability Enhancement
+- **🛡️ Comprehensive Security Analysis**: Complete security validation and risk assessment
+- **🤖 AI Integration Safety**: Validated AI command safety and CLI coordination
+- **🔧 Enhanced Memory Management**: Thread-safe operations and context isolation
+- **📋 Improved Error Handling**: Better recovery suggestions and context-aware reporting
+- **🚀 Performance Optimizations**: Faster CLI execution and reduced memory usage
+
+### Key Improvements
+- ✅ **Validated**: All 10 AI slash commands tested and verified
+- ✅ **Enhanced**: Fallback systems for offline work
+- ✅ **Secured**: Core system files protected from AI modifications
+- ✅ **Stabilized**: Concurrent access handling for multi-user scenarios
+- ✅ **Documented**: Complete security and stability analysis
+
+> **Upgrade Recommendation**: v2.6.0 is a **recommended** update for enhanced security and stability
 
 ---
 
