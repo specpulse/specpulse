@@ -1,5 +1,5 @@
 """
-Path Manager for SpecPulse v2.1.2
+Path Manager for SpecPulse v2.6.0
 
 Centralized path management for all SpecPulse directories.
 This class provides a single source of truth for all path resolutions,
@@ -11,8 +11,14 @@ New Structure (v2.2.0+):
 - .specpulse/tasks/
 - .specpulse/memory/
 - .specpulse/templates/
+- .specpulse/cache/
+- .specpulse/checkpoints/
+- .specpulse/docs/
 - .claude/ (root)
 - .gemini/ (root)
+
+IMPORTANT: All SpecPulse operations MUST stay within .specpulse directory.
+No SpecPulse-generated files should be created in the root project directory.
 """
 
 from pathlib import Path
@@ -64,6 +70,8 @@ class PathManager:
         self.memory_dir = self.specpulse_dir / "memory"
         self.templates_dir = self.specpulse_dir / "templates"
         self.notes_dir = self.memory_dir / "notes"
+        self.docs_dir = self.specpulse_dir / "docs"
+        self.template_backups_dir = self.specpulse_dir / "template_backups"
 
     def _init_legacy_paths(self):
         """Initialize legacy structure paths for backward compatibility."""
@@ -90,6 +98,8 @@ class PathManager:
             'notes': self.notes_dir,
             'cache': self.cache_dir,
             'checkpoints': self.checkpoints_dir,
+            'docs': self.docs_dir,
+            'template_backups': self.template_backups_dir,
             'claude': self.claude_dir,
             'gemini': self.gemini_dir,
             'specpulse': self.specpulse_dir,
@@ -277,6 +287,116 @@ class PathManager:
         # Implementation would go here for actual migration
         # This is a placeholder for the migration logic
         raise NotImplementedError("Migration functionality not yet implemented")
+
+    def validate_specpulse_path(self, file_path: Path) -> bool:
+        """
+        Validate that a path is within .specpulse directory for security.
+
+        Args:
+            file_path: Path to validate
+
+        Returns:
+            True if path is valid (within .specpulse), False otherwise
+        """
+        try:
+            # Convert to absolute paths
+            abs_file_path = file_path.resolve()
+            abs_specpulse_dir = self.specpulse_dir.resolve()
+
+            # Check if the file path is within .specpulse directory
+            return abs_file_path.is_relative_to(abs_specpulse_dir)
+        except (OSError, ValueError):
+            return False
+
+    def enforce_specpulse_rules(self) -> Dict[str, Any]:
+        """
+        Enforce SpecPulse directory rules and return validation results.
+
+        Returns:
+            Dictionary with validation results and warnings
+        """
+        results = {
+            'valid': True,
+            'warnings': [],
+            'errors': [],
+            'structure_type': 'new' if not self.use_legacy_structure else 'legacy'
+        }
+
+        # Check if using legacy structure
+        if self.use_legacy_structure:
+            results['warnings'].append(
+                "Using legacy directory structure. Consider migrating to .specpulse/ structure."
+            )
+
+        # Validate that all SpecPulse directories are within .specpulse
+        if not self.use_legacy_structure:
+            for dir_name, dir_path in self.get_all_directories().items():
+                if dir_name in ['claude', 'gemini']:
+                    continue  # AI dirs can be at root
+
+                if not self.validate_specpulse_path(dir_path):
+                    results['valid'] = False
+                    results['errors'].append(
+                        f"Directory '{dir_name}' is outside .specpulse: {dir_path}"
+                    )
+
+        return results
+
+    def get_safe_output_path(self, file_type: str, feature_id: str = None,
+                           feature_name: str = None, filename: str = None) -> Path:
+        """
+        Get a safe output path that always stays within .specpulse directory.
+
+        Args:
+            file_type: Type of file ('spec', 'plan', 'task', 'memory', 'cache')
+            feature_id: Feature ID (for spec/plan/task files)
+            feature_name: Feature name (for spec/plan/task files)
+            filename: Filename (optional, will be generated if not provided)
+
+        Returns:
+            Safe Path within .specpulse directory
+        """
+        if self.use_legacy_structure:
+            # Fallback to legacy paths but warn
+            import warnings
+            warnings.warn("Using legacy structure - paths may not be confined to .specpulse")
+
+        if file_type == 'spec' and feature_id and feature_name:
+            if filename:
+                return self.get_feature_dir(feature_id, feature_name, 'specs') / filename
+            else:
+                spec_num = 1  # Default, should be calculated
+                return self.get_spec_file(feature_id, feature_name, spec_num)
+
+        elif file_type == 'plan' and feature_id and feature_name:
+            if filename:
+                return self.get_feature_dir(feature_id, feature_name, 'plans') / filename
+            else:
+                plan_num = 1  # Default, should be calculated
+                return self.get_plan_file(feature_id, feature_name, plan_num)
+
+        elif file_type == 'task' and feature_id and feature_name:
+            if filename:
+                return self.get_feature_dir(feature_id, feature_name, 'tasks') / filename
+            else:
+                task_num = 1  # Default, should be calculated
+                return self.get_task_file(feature_id, feature_name, task_num)
+
+        elif file_type == 'memory':
+            return self.memory_dir / (filename or "context.md")
+
+        elif file_type == 'cache':
+            return self.cache_dir / (filename or "default.cache")
+
+        elif file_type == 'docs':
+            return self.docs_dir / (filename or "readme.md")
+
+        elif file_type == 'template_backup':
+            return self.template_backups_dir / (filename or "backup.md")
+
+        else:
+            # Default to .specpulse root for unknown types
+            return self.specpulse_dir / (filename or "output.md")
 
     def to_dict(self) -> Dict[str, Any]:
         """

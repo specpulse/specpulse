@@ -30,12 +30,14 @@ Examples:
   specpulse init my-project              Initialize a new SpecPulse project
   specpulse feature init user-auth      Initialize a new feature
   specpulse doctor --fix               Check and fix project health
-  specpulse decompose                   Decompose specifications into components
-  specpulse sync                        Synchronize project state
   specpulse template list               List available templates
   specpulse list-specs                 List all specifications
-  specpulse sp-pulse "New feature"     Initialize feature (AI command)
-  specpulse sp-spec "Authentication"    Create specification (AI command)
+
+  AI Commands (for Claude/Gemini integration):
+  specpulse sp-pulse "New feature"     Initialize feature
+  specpulse sp-spec "Authentication"    Create specification
+  specpulse sp-plan "Implement auth"    Create implementation plan
+  specpulse sp-task breakdown 001      Break down into tasks
         """,
     )
 
@@ -679,40 +681,17 @@ def _add_slash_commands(subparsers: argparse._SubParsersAction) -> None:
 def _add_utility_commands_working(subparsers: argparse._SubParsersAction) -> None:
     """Add only working utility commands"""
 
-    # Decompose command (working)
-    decompose_parser = subparsers.add_parser(
-        'decompose',
-        help='Decompose specifications',
-        description='Decompose specifications into microservices or components'
-    )
-    decompose_parser.add_argument(
-        'spec_id',
-        nargs='?',
-        help='Specification ID to decompose (default: latest)'
-    )
-    decompose_parser.add_argument(
-        '--components',
-        help='Comma-separated list of components to extract'
-    )
-    decompose_parser.add_argument(
-        '--format',
-        choices=['markdown', 'yaml', 'json'],
-        default='markdown',
-        help='Output format for decomposition'
-    )
-
-    # Sync command (working)
-    sync_parser = subparsers.add_parser(
-        'sync',
-        help='Synchronize project state',
-        description='Synchronize project state with memory and Git repository'
-    )
-
     # List specs command (working)
     list_specs_parser = subparsers.add_parser(
         'list-specs',
-        help='List specifications',
-        description='List all specifications in the project with metadata'
+        help='List all specifications',
+        description='List all specifications in the project with their status'
+    )
+    list_specs_parser.add_argument(
+        '--format',
+        choices=['table', 'json', 'markdown'],
+        default='table',
+        help='Output format for the list'
     )
 
     # Template commands (partially working)

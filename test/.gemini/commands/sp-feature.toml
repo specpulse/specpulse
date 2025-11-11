@@ -1,0 +1,41 @@
+description = "Initialize a new feature (alias for sp-pulse)"
+prompt = """
+Initialize a new SpecPulse feature (alias for /sp-pulse command).
+
+## Command: /sp-feature {{args}}
+
+This is an alias for /sp-pulse and follows the exact same implementation:
+
+1. **CLI First Approach**: Use specpulse feature init as primary method
+2. **Fallback Support**: Manual directory creation if CLI fails
+3. **Smart Suggestions**: Generate 3 context-aware specification options
+4. **Project Setup**: Complete feature directory structure
+5. **Context Management**: Update project context and git integration
+
+## Specification Options
+
+Provides intelligent specification suggestions based on feature analysis:
+- **Core Specification** (2-4 hours): Essential functionality
+- **Standard Specification** (8-12 hours): Comprehensive features
+- **Complete Specification** (16-24 hours): Full-featured solution
+
+## Usage Examples
+
+/sp-feature user-dashboard
+/sp-feature payment-api
+/sp-feature notification-system
+
+## Integration Workflow
+
+After initialization:
+1. Use /sp-spec to create specification
+2. Use /sp-plan to generate implementation plan
+3. Use /sp-task to create task breakdown
+
+## Documentation
+
+Complete fallback procedures: .specpulse/docs/AI_FALLBACK_GUIDE.md
+Integration guide: .specpulse/docs/AI_INTEGRATION.md
+
+Alias for sp-pulse command - SpecPulse v2.4.9
+"""

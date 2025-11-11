@@ -1,4 +1,4 @@
-# SpecPulse v2.6.0
+# SpecPulse v2.6.1
 
 <div align="center">
 
@@ -12,23 +12,30 @@
 
 ---
 
-## ✨ What's New in v2.6.0
+## ✨ What's New in v2.6.1
 
-### 🔒 Security & Stability Enhancement
-- **🛡️ Comprehensive Security Analysis**: Complete security validation and risk assessment
-- **🤖 AI Integration Safety**: Validated AI command safety and CLI coordination
-- **🔧 Enhanced Memory Management**: Thread-safe operations and context isolation
-- **📋 Improved Error Handling**: Better recovery suggestions and context-aware reporting
-- **🚀 Performance Optimizations**: Faster CLI execution and reduced memory usage
+### 🧪 Testing Infrastructure Enhancement
+- **🧪 Comprehensive Test Suite**: 200+ new test cases across all major components
+- **🔒 Security Testing**: Template injection validation and path traversal prevention
+- **⚡ Performance Benchmarks**: Automated performance regression detection
+- **🔧 Quality Assurance**: Enhanced error handling and edge case testing
+- **📊 Coverage Analysis**: Improved test coverage for critical components
+- **✅ Testing Architecture**: Complete test infrastructure with fixtures and utilities
+- **🧪 Validation Testing**: Security validation, template management, CLI functionality
+- **🔍 Integration Testing**: End-to-end workflow validation and component interaction
 
 ### Key Improvements
 - ✅ **Validated**: All 10 AI slash commands tested and verified
 - ✅ **Enhanced**: Fallback systems for offline work
+- ✅ **Tested**: 200+ comprehensive test scenarios
+- ✅ **Secured**: Template injection and path traversal protection
+- ✅ **Optimized**: Performance benchmarking and regression prevention
+- ✅ **Stabilized**: Thread-safe operations and error handling
 - ✅ **Secured**: Core system files protected from AI modifications
 - ✅ **Stabilized**: Concurrent access handling for multi-user scenarios
 - ✅ **Documented**: Complete security and stability analysis
 
-> **Upgrade Recommendation**: v2.6.0 is a **recommended** update for enhanced security and stability
+> **Upgrade Recommendation**: v2.6.1 is a **recommended** update for enhanced testing infrastructure and stability
 
 ---
 

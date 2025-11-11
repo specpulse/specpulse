@@ -389,49 +389,15 @@ class CommandHandler:
         self.console.info("List specs command - implementation needed")
         return True
 
-    def expand(self, feature_id: str, to_tier: str, show_diff: bool = False, verbose: bool = False, **kwargs) -> None:
-        """Expand specifications to the next tier or format"""
-        if not self.project_commands:
-            raise SpecPulseError("This command must be run from within a SpecPulse project directory")
-        # Implementation would go here
-        self.console.info(f"Expand command - implementation needed for {feature_id} to {to_tier}")
-        return True
-
     def template(self, template_command: Optional[str] = None, **kwargs) -> None:
         """Template management commands"""
         if template_command == 'list':
             category = kwargs.get('category', 'all')
             self.console.info(f"Template list command - implementation needed for category: {category}")
-        elif template_command == 'validate':
-            template_name = kwargs.get('template_name')
-            fix = kwargs.get('fix', False)
-            self.console.info(f"Template validate command - implementation needed for: {template_name}")
-        elif template_command == 'preview':
-            template_name = kwargs.get('template_name')
-            self.console.info(f"Template preview command - implementation needed for: {template_name}")
+        elif template_command:
+            self.console.warning(f"Template command '{template_command}' not implemented. Use AI commands for template operations.")
         else:
             self.console.info("Template command - subcommand needed")
-        return True
-
-    def checkpoint(self, checkpoint_command: Optional[str] = None, **kwargs) -> None:
-        """Checkpoint management commands"""
-        if checkpoint_command == 'create':
-            feature_id = kwargs.get('feature_id')
-            description = kwargs.get('description')
-            self.console.info(f"Checkpoint create command - implementation needed for: {feature_id}")
-        elif checkpoint_command == 'list':
-            feature_id = kwargs.get('feature_id')
-            self.console.info(f"Checkpoint list command - implementation needed for: {feature_id}")
-        else:
-            self.console.info("Checkpoint command - subcommand needed")
-        return True
-
-    def spec_progress(self, feature_id: str, **kwargs) -> None:
-        """Show specification progress for a feature"""
-        if not self.project_commands:
-            raise SpecPulseError("This command must be run from within a SpecPulse project directory")
-        # Implementation would go here
-        self.console.info(f"Spec progress command - implementation needed for: {feature_id}")
         return True
 
     def validate(self, component: str = "all", fix: bool = False, verbose: bool = False) -> None:
@@ -471,32 +437,7 @@ class CommandHandler:
             )
         return self.template_manager.validate_template(template_name, fix=fix)
 
-    def decompose(self, spec_id: Optional[str] = None,
-                   components: Optional[str] = None,
-                   output_format: str = "markdown", **kwargs) -> None:
-        """Decompose specifications into components"""
-        if not self.specpulse:
-            raise SpecPulseError(
-                "This command must be run from within a SpecPulse project directory",
-                "Run 'specpulse init' to create a new project or navigate to an existing one"
-            )
-        self.console.info(f"Decomposing specification {spec_id or 'latest'}...")
-        self.console.info(f"Components: {components or 'all'}")
-        self.console.info(f"Output format: {output_format}")
-        self.console.warning("Decomposition feature not yet implemented")
-        return True
-
-    def sync(self, **kwargs) -> None:
-        """Synchronize project state with memory"""
-        if not self.memory_manager:
-            raise SpecPulseError(
-                "This command must be run from within a SpecPulse project directory",
-                "Run 'specpulse init' to create a new project or navigate to an existing one"
-            )
-        self.console.info("Synchronizing project state...")
-        self.console.warning("Sync feature not yet implemented")
-        return True
-
+    
     def list_specs(self, **kwargs) -> None:
         """List all specifications"""
         if not self.memory_manager:
@@ -521,15 +462,6 @@ class CommandHandler:
         else:
             self.console.warning("  No specs directory found")
         return True
-
-    def expand(self, feature_id: str, to_tier: str, show_diff: bool = False) -> None:
-        """Expand specification to next tier"""
-        if not self.specpulse:
-            raise SpecPulseError(
-                "This command must be run from within a SpecPulse project directory",
-                "Run 'specpulse init' to create a new project or navigate to an existing one"
-            )
-        return self.specpulse.expand_spec(feature_id, to_tier, show_diff, self.console)
 
     # Additional methods can be added here as needed
     # This keeps the main class focused on initialization and routing

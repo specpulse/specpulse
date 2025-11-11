@@ -446,6 +446,7 @@ class SpecPulse:
     def _copy_templates(self, project_path: Path) -> None:
         """Copy template files from resources to project"""
         import shutil
+        import json
 
         project_templates_dir = project_path / ".specpulse" / "templates"
 
@@ -461,9 +462,33 @@ class SpecPulse:
         decomp_dir = project_templates_dir / "decomposition"
         src_decomp = self.templates_dir / "decomposition"
         if src_decomp.exists():
-            for template_file in src_decomp.glob("*.md"):
+            for template_file in src_decomp.glob("*"):
                 dst = decomp_dir / template_file.name
                 shutil.copy2(template_file, dst)
+
+        # Create template registry
+        template_registry = {
+            "version": "2.6.0",
+            "created": datetime.now().isoformat(),
+            "templates": {
+                "core": {
+                    "spec": "templates/spec.md",
+                    "plan": "templates/plan.md",
+                    "task": "templates/task.md"
+                },
+                "decomposition": {
+                    "microservices": "templates/decomposition/microservices.md",
+                    "api_contract": "templates/decomposition/api-contract.yaml",
+                    "interface": "templates/decomposition/interface.ts",
+                    "service_plan": "templates/decomposition/service-plan.md",
+                    "integration_plan": "templates/decomposition/integration-plan.md"
+                }
+            }
+        }
+
+        registry_path = project_path / ".specpulse" / "template_registry.json"
+        with open(registry_path, 'w', encoding='utf-8') as f:
+            json.dump(template_registry, f, indent=2, ensure_ascii=False)
 
     def _copy_ai_commands(self, project_path: Path, ai_assistant: Optional[str]) -> None:
         """Copy AI command files based on chosen assistant"""
@@ -1160,10 +1185,22 @@ specpulse --help
 
     def _create_initial_memory(self, project_path: Path) -> None:
         """Create initial memory files"""
+        import shutil
         memory_dir = project_path / ".specpulse" / "memory"
 
-        # Create context.md
-        context_content = f"""# Project Context
+        # Copy memory resource files
+        memory_resources_dir = self.resources_dir / "memory"
+        if memory_resources_dir.exists():
+            for memory_file in ["constitution.md", "decisions.md", "README.md"]:
+                src = memory_resources_dir / memory_file
+                dst = memory_dir / memory_file
+                if src.exists():
+                    shutil.copy2(src, dst)
+
+        # Create context.md if not copied
+        context_file = memory_dir / "context.md"
+        if not context_file.exists():
+            context_content = f"""# Project Context
 
 ## Project: {project_path.name}
 - **Created**: {datetime.now().isoformat()}
@@ -1180,27 +1217,16 @@ Project initialized successfully.
 *This file is automatically maintained by SpecPulse*
 """
 
-        with open(memory_dir / "context.md", 'w', encoding='utf-8') as f:
-            f.write(context_content)
+            with open(context_file, 'w', encoding='utf-8') as f:
+                f.write(context_content)
 
-        # Create decisions.md
-        decisions_content = """# Architectural Decisions
-
-No decisions recorded yet.
-
-## Decision Log Format
-- **AD-[number]**: [Decision Title] (Date)
-  - **Status**: [Proposed/Approved/Implemented/Deprecated]
-  - **Context**: Background and problem
-  - **Decision**: What was decided
-  - **Consequences**: Impact of this decision
-
----
-*This file is automatically maintained by SpecPulse*
-"""
-
-        with open(memory_dir / "decisions.md", 'w', encoding='utf-8') as f:
-            f.write(decisions_content)
+        # Copy validation files to .specpulse
+        validation_files = ["validation_rules.yaml", "validation_examples.yaml"]
+        for validation_file in validation_files:
+            src = self.resources_dir / validation_file
+            dst = project_path / ".specpulse" / validation_file
+            if src.exists():
+                shutil.copy2(src, dst)
 
 
 __all__ = ['SpecPulse']
