@@ -1,4 +1,4 @@
-# SpecPulse v2.6.1
+# SpecPulse v2.6.2
 
 <div align="center">
 
@@ -12,22 +12,35 @@
 
 ---
 
-## ✨ What's New in v2.6.1
+## ✨ What's New in v2.6.2
 
-### 🧪 Testing Infrastructure Enhancement
-- **🧪 Comprehensive Test Suite**: 200+ new test cases across all major components
-- **🔒 Security Testing**: Template injection validation and path traversal prevention
-- **⚡ Performance Benchmarks**: Automated performance regression detection
+### 🖥️ Task Monitoring System Enhancement
+- **🖥️ Complete Task Monitor**: Advanced task monitoring and progress tracking system
+- **📊 Real-time Progress Analytics**: Comprehensive progress visualization and metrics
+- **🔄 CLI Integration**: Seamless monitoring commands integrated into SpecPulse CLI
+- **💾 Data Persistence**: Atomic file operations with backup and recovery mechanisms
+- **🔍 Performance Analytics**: Task execution time tracking and bottleneck identification
+- **📋 History Tracking**: Complete audit trail of task state changes and transitions
+- **⚡ Concurrent Access**: Thread-safe operations for multi-user environments
+- **🛡️ Data Integrity**: Comprehensive validation and corruption recovery systems
+
+### 🧪 Enhanced Testing Infrastructure
+- **🧪 Comprehensive Monitor Tests**: 100+ new test cases for monitoring system
+- **🔒 Security Validation**: Template injection and path traversal security testing
+- **⚡ Performance Benchmarks**: Automated monitoring performance regression detection
 - **🔧 Quality Assurance**: Enhanced error handling and edge case testing
-- **📊 Coverage Analysis**: Improved test coverage for critical components
+- **📊 Coverage Analysis**: Improved test coverage for critical monitoring components
 - **✅ Testing Architecture**: Complete test infrastructure with fixtures and utilities
 - **🧪 Validation Testing**: Security validation, template management, CLI functionality
 - **🔍 Integration Testing**: End-to-end workflow validation and component interaction
 
 ### Key Improvements
+- ✅ **Enhanced**: Complete task monitoring system with real-time analytics
+- ✅ **Integrated**: Monitoring commands seamlessly integrated into CLI workflow
+- ✅ **Secured**: Atomic data operations with backup and corruption recovery
 - ✅ **Validated**: All 10 AI slash commands tested and verified
 - ✅ **Enhanced**: Fallback systems for offline work
-- ✅ **Tested**: 200+ comprehensive test scenarios
+- ✅ **Tested**: 300+ comprehensive test scenarios including monitoring
 - ✅ **Secured**: Template injection and path traversal protection
 - ✅ **Optimized**: Performance benchmarking and regression prevention
 - ✅ **Stabilized**: Thread-safe operations and error handling
@@ -35,7 +48,7 @@
 - ✅ **Stabilized**: Concurrent access handling for multi-user scenarios
 - ✅ **Documented**: Complete security and stability analysis
 
-> **Upgrade Recommendation**: v2.6.1 is a **recommended** update for enhanced testing infrastructure and stability
+> **Upgrade Recommendation**: v2.6.2 is a **recommended** update for enhanced monitoring capabilities and stability
 
 ---
 
@@ -249,6 +262,17 @@ specpulse plan validate [plan-id]          # Validate implementation plans
 specpulse plan list                       # List implementation plans
 specpulse task breakdown <plan-id>        # Create empty task breakdown (AI needed for details)
 specpulse task list                       # List all tasks
+```
+
+### Task Monitoring (NEW)
+
+```bash
+specpulse monitor status [feature-id]     # Show current task status and progress
+specpulse monitor progress [feature-id]  # Show detailed progress analytics
+specpulse monitor history [feature-id]   # Show task state change history
+specpulse monitor validate               # Validate monitoring data integrity
+specpulse monitor reset [feature-id]     # Reset monitoring data (--confirm required)
+specpulse monitor sync [direction]       # Sync task states (full/to_files/from_files)
 ```
 
 **Note**: CLI creates templates, but AI is essential for detailed planning and task breakdown.
