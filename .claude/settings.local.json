@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(specpulse:*)"
-    ],
-    "deny": [],
-    "ask": []
-  }
-}
