@@ -80,6 +80,9 @@ Examples:
     # Specification Commands (commented out until templates are fixed)
     # _add_spec_commands(subparsers)
 
+    # Monitor Commands (new)
+    _add_monitor_commands(subparsers)
+
     # Utility Commands (working ones only)
     _add_utility_commands_working(subparsers)
 
@@ -87,6 +90,111 @@ Examples:
     _add_slash_commands(subparsers)
 
     return parser
+
+
+def _add_monitor_commands(subparsers: argparse._SubParsersAction) -> None:
+    """Add task monitoring commands"""
+
+    # Monitor command group
+    monitor_parser = subparsers.add_parser(
+        'monitor',
+        help='Task monitoring and progress tracking commands',
+        description='Monitor task progress and track development status'
+    )
+    monitor_subparsers = monitor_parser.add_subparsers(
+        dest='monitor_command',
+        help='Monitor subcommands',
+        metavar='SUBCOMMAND'
+    )
+
+    # Monitor status command
+    status_parser = monitor_subparsers.add_parser(
+        'status',
+        help='Show current task status and progress',
+        description='Display current task status with progress indicators'
+    )
+    status_parser.add_argument(
+        '--feature', '-f',
+        help='Feature ID to monitor (auto-discovered if not specified)'
+    )
+    status_parser.add_argument(
+        '--verbose', '-v',
+        action='store_true',
+        help='Show detailed task information'
+    )
+
+    # Monitor progress command
+    progress_parser = monitor_subparsers.add_parser(
+        'progress',
+        help='Show detailed progress analytics',
+        description='Display detailed progress analytics with historical data'
+    )
+    progress_parser.add_argument(
+        '--feature', '-f',
+        help='Feature ID to analyze (auto-discovered if not specified)'
+    )
+    progress_parser.add_argument(
+        '--detailed', '-d',
+        action='store_true',
+        help='Show detailed analytics and trends'
+    )
+
+    # Monitor history command
+    history_parser = monitor_subparsers.add_parser(
+        'history',
+        help='Show historical task state changes',
+        description='Display historical changes in task states'
+    )
+    history_parser.add_argument(
+        '--feature', '-f',
+        help='Feature ID to show history for (auto-discovered if not specified)'
+    )
+    history_parser.add_argument(
+        '--limit', '-l',
+        type=int,
+        default=20,
+        help='Maximum number of history entries to show (default: 20)'
+    )
+
+    # Monitor reset command
+    reset_parser = monitor_subparsers.add_parser(
+        'reset',
+        help='Reset monitoring data for a feature',
+        description='Reset all monitoring data for a specific feature'
+    )
+    reset_parser.add_argument(
+        '--feature', '-f',
+        help='Feature ID to reset (auto-discovered if not specified)'
+    )
+    reset_parser.add_argument(
+        '--confirm',
+        action='store_true',
+        help='Confirm the reset operation'
+    )
+
+    # Monitor validate command
+    validate_parser = monitor_subparsers.add_parser(
+        'validate',
+        help='Validate monitoring data integrity',
+        description='Check integrity of monitoring data and report issues'
+    )
+
+    # Monitor sync command
+    sync_parser = monitor_subparsers.add_parser(
+        'sync',
+        help='Synchronize task states between monitor and task files',
+        description='Sync task states between monitoring system and markdown task files'
+    )
+    sync_parser.add_argument(
+        '--feature', '-f',
+        help='Feature ID to sync (auto-discovered if not specified)'
+    )
+    sync_parser.add_argument(
+        '--direction',
+        choices=['full', 'to_files', 'from_files'],
+        default='full',
+        help='Sync direction: full (bidirectional), to_files (monitor→files), from_files (files→monitor)'
+    )
 
 
 def _add_project_commands(subparsers: argparse._SubParsersAction) -> None:
