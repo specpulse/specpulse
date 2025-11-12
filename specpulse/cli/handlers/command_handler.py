@@ -18,6 +18,7 @@ from ..commands.sp_pulse_commands import SpPulseCommands
 from ..commands.sp_spec_commands import SpSpecCommands
 from ..commands.sp_plan_commands import SpPlanCommands
 from ..commands.sp_task_commands import SpTaskCommands
+from ..monitor import MonitorCommands
 
 from ...core.specpulse import SpecPulse
 from ...core.validator import Validator
@@ -95,6 +96,9 @@ class CommandHandler:
             self.sp_spec_commands = SpSpecCommands(self.console, project_root)
             self.sp_plan_commands = SpPlanCommands(self.console, project_root)
             self.sp_task_commands = SpTaskCommands(self.console, project_root)
+
+            # Monitor commands
+            self.monitor_commands = MonitorCommands(project_root, self.verbose, self.console.no_color)
         else:
             # Set to None for non-project contexts
             self.feature_commands = None
@@ -106,6 +110,7 @@ class CommandHandler:
             self.sp_spec_commands = None
             self.sp_plan_commands = None
             self.sp_task_commands = None
+            self.monitor_commands = None
 
     def _check_for_updates(self) -> None:
         """Check for available updates on PyPI (non-blocking)"""
@@ -236,6 +241,51 @@ class CommandHandler:
                         return self.plan_commands.plan_create(method_kwargs['description'])
                     else:
                         raise SpecPulseError("Plan command requires a subcommand or description")
+
+            elif command_name == 'monitor':
+                if not self.monitor_commands:
+                    raise SpecPulseError(
+                        "This command must be run from within a SpecPulse project directory",
+                        "Run 'specpulse init' to create a new project or navigate to an existing one"
+                    )
+                # Handle subcommands: monitor <subcommand>
+                monitor_subcommand = kwargs.get('monitor_command')
+                if monitor_subcommand:
+                    if monitor_subcommand == 'status':
+                        return self.monitor_commands.status(
+                            feature_id=kwargs.get('feature'),
+                            verbose_mode=kwargs.get('verbose', False)
+                        )
+                    elif monitor_subcommand == 'progress':
+                        return self.monitor_commands.progress(
+                            feature_id=kwargs.get('feature'),
+                            detailed=kwargs.get('detailed', False)
+                        )
+                    elif monitor_subcommand == 'history':
+                        return self.monitor_commands.history(
+                            feature_id=kwargs.get('feature'),
+                            limit=kwargs.get('limit', 20)
+                        )
+                    elif monitor_subcommand == 'reset':
+                        return self.monitor_commands.reset(
+                            feature_id=kwargs.get('feature'),
+                            confirm=kwargs.get('confirm', False)
+                        )
+                    elif monitor_subcommand == 'validate':
+                        return self.monitor_commands.validate()
+                    elif monitor_subcommand == 'sync':
+                        return self.monitor_commands.sync(
+                            feature_id=kwargs.get('feature'),
+                            direction=kwargs.get('direction', 'full')
+                        )
+                    else:
+                        raise SpecPulseError(f"Unknown monitor command: {monitor_subcommand}")
+                else:
+                    # Default to monitor status
+                    return self.monitor_commands.status(
+                        feature_id=kwargs.get('feature'),
+                        verbose_mode=kwargs.get('verbose', False)
+                    )
 
             elif command_name in ['task', 't']:
                 if not self.task_commands:

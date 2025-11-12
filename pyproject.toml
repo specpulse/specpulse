@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "specpulse"
 dynamic = ["version"]
-description = "SpecPulse v2.4.7 - AI-Enhanced Specification-Driven Development Framework with 100% CLI Reliability"
+description = "SpecPulse v2.6.2 - AI-Enhanced Specification-Driven Development Framework with Advanced Task Monitoring and Real-time Analytics"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
@@ -23,7 +23,11 @@ keywords = [
     "gemini",
     "automation",
     "framework",
-    "cli"
+    "cli",
+    "monitoring",
+    "task-tracking",
+    "progress-analytics",
+    "real-time"
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -88,6 +92,7 @@ packages = [
     "specpulse.resources.commands.claude",
     "specpulse.resources.commands.gemini",
     "specpulse.resources.memory",
+    "specpulse.monitor",
 ]
 
 [tool.setuptools.package-data]
