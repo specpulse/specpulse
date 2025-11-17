@@ -129,8 +129,14 @@ class SpPulseCommands:
             self.console.header(f"Switching to Feature: {feature_dir_name}", style="bright_cyan")
 
             # Extract feature ID from directory name (e.g., "001-user-auth" -> "001")
-            feature_id = feature_dir_name.split("-")[0]
-            feature_name_clean = "-".join(feature_dir_name.split("-")[1:])
+            parts = feature_dir_name.split("-", 1)
+            if len(parts) >= 2:
+                feature_id = parts[0]
+                feature_name_clean = parts[1]
+            else:
+                # Malformed feature directory name
+                feature_id = parts[0] if parts else ""
+                feature_name_clean = ""
 
             # Update context
             self._update_context(feature_id, feature_name_clean, feature_dir_name)
@@ -371,8 +377,9 @@ class SpPulseCommands:
         features = []
         for item in specs_dir.iterdir():
             if item.is_dir() and re.match(r'^\d{3}-', item.name):
-                feature_id = item.name.split('-')[0]
-                feature_name = "-".join(item.name.split('-')[1:])
+                parts = item.name.split('-', 1)
+                feature_id = parts[0] if parts else ""
+                feature_name = parts[1] if len(parts) >= 2 else ""
 
                 # Count artifacts
                 specs_count = len(list((self.project_root / "specs" / item.name).glob("*.md")))

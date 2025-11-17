@@ -339,10 +339,17 @@ class CheckpointManager:
                     break
             if in_frontmatter:
                 if line.startswith("tier:"):
-                    tier = line.split(":", 1)[1].strip()
+                    try:
+                        parts = line.split(":", 1)
+                        if len(parts) == 2:
+                            tier = parts[1].strip()
+                    except (ValueError, IndexError):
+                        pass
                 elif line.startswith("progress:"):
                     try:
-                        progress = float(line.split(":", 1)[1].strip())
+                        parts = line.split(":", 1)
+                        if len(parts) == 2:
+                            progress = float(parts[1].strip())
                     except (ValueError, IndexError):
                         progress = 0.0
 
