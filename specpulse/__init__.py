@@ -11,4 +11,4 @@ __url__ = "https://github.com/specpulse"
 from .core.specpulse import SpecPulse
 # from .cli.main import main  # We'll use the refactored main
 
-__all__ = ["SpecPulse", "main"]
+__all__ = ["SpecPulse", "main", "__version__"]

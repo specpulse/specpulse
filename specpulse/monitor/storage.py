@@ -93,12 +93,9 @@ class StateStorage:
             with os.fdopen(temp_fd, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False, sort_keys=True)
 
-            # On Windows, we need to remove the target file first if it exists
-            if file_path.exists():
-                file_path.unlink()
-
-            # Atomic rename
-            os.rename(temp_path, file_path)
+            # Use os.replace() for truly atomic replacement on all platforms
+            # os.replace() handles Windows' requirement to remove existing files atomically
+            os.replace(temp_path, file_path)
 
         except Exception:
             # Clean up temp file if something went wrong

@@ -84,12 +84,22 @@ def get_update_message(current: str, latest: str, is_major: bool) -> Tuple[str, 
 
     update_type = "patch"
     if len(curr_parts) >= 2 and len(latest_parts) >= 2:
-        if curr_parts[0] != latest_parts[0]:
-            update_type = "major"
-        elif curr_parts[1] != latest_parts[1]:
-            update_type = "minor"
-        else:
-            update_type = "patch"
+        try:
+            # Compare as integers to avoid "10" < "2" alphabetically
+            if int(curr_parts[0]) != int(latest_parts[0]):
+                update_type = "major"
+            elif int(curr_parts[1]) != int(latest_parts[1]):
+                update_type = "minor"
+            else:
+                update_type = "patch"
+        except (ValueError, TypeError):
+            # Fall back to string comparison if version parts aren't integers
+            if curr_parts[0] != latest_parts[0]:
+                update_type = "major"
+            elif curr_parts[1] != latest_parts[1]:
+                update_type = "minor"
+            else:
+                update_type = "patch"
 
     if is_major:
         urgency = f"[!] MAJOR ({update_type} update)"
