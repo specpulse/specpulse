@@ -318,8 +318,11 @@ class IncrementalBuilder:
                 else:
                     break
             if in_frontmatter and line.startswith("tier:"):
-                tier = line.split(":", 1)[1].strip()
-                return tier
+                # BUG-007 FIX: Add explicit bounds check for defensive programming
+                parts = line.split(":", 1)
+                if len(parts) >= 2:
+                    tier = parts[1].strip()
+                    return tier
 
         # Default to complete if no tier found
         return "complete"

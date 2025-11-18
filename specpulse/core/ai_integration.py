@@ -125,8 +125,15 @@ class AIIntegration:
                     feature_id = match.group(1)
                     feature_name = match.group(2).replace('-', ' ')
                     context.current_feature = f"{feature_id}-{feature_name}"
-        except Exception:
-            pass
+        except (subprocess.SubprocessError, FileNotFoundError) as e:
+            # Expected errors - git not available or not a repository
+            # BUG-008 FIX: Log instead of silent pass
+            error_handler = ErrorHandler()
+            error_handler.log_warning(f"Git context detection failed: {e}")
+        except Exception as e:
+            # Unexpected errors - log for debugging
+            error_handler = ErrorHandler()
+            error_handler.log_error(f"Unexpected error in git detection: {e}")
 
         # Detect from memory/context.md
         if self.context_file.exists():
@@ -148,8 +155,15 @@ class AIIntegration:
                         if ':' in line:
                             key, value = line.split(':', 1)
                             context.tech_stack[key.strip()] = value.strip()
-            except Exception:
-                pass
+            except (IOError, ValueError) as e:
+                # Expected errors - file read or parse errors
+                # BUG-008 FIX: Log instead of silent pass
+                error_handler = ErrorHandler()
+                error_handler.log_warning(f"Context file parse error: {e}")
+            except Exception as e:
+                # Unexpected errors - log for debugging
+                error_handler = ErrorHandler()
+                error_handler.log_error(f"Unexpected error parsing context file: {e}")
 
         # Detect recent specs and plans
         specs_dir = self.path_manager.specs_dir

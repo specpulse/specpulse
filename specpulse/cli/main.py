@@ -18,7 +18,7 @@ def main():
     """Main entry point for SpecPulse CLI"""
     try:
         # Debug: Set UTF-8 encoding first
-        import sys
+        # BUG-005 FIX: Removed duplicate sys import (already imported at module level line 10)
         import os
         if sys.platform == "win32":
             os.system('chcp 65001 > nul')

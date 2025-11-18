@@ -260,13 +260,20 @@ class StateStorage:
 
     def load_history(self, feature_id: str, limit: Optional[int] = None) -> List[TaskHistory]:
         """Load history entries for a feature."""
+        # BUG-006 FIX: Validate feature_id is not empty to prevent returning all entries
+        if not feature_id or not feature_id.strip():
+            return []
+
         with self._file_lock('history'):
             data = self._read_json_file(self.history_file)
+
+            # Extract feature prefix safely
+            feature_prefix = feature_id.split("-")[0] if "-" in feature_id else feature_id
 
             history_entries = [
                 TaskHistory.from_dict(entry)
                 for entry in data.get("history", [])
-                if entry.get("task_id", "").startswith(feature_id.split("-")[0])
+                if feature_prefix and entry.get("task_id", "").startswith(feature_prefix)
             ]
 
             # Sort by timestamp (newest first)
