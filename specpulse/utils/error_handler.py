@@ -137,6 +137,27 @@ class ResourceError(SpecPulseError):
         self.resource_path = resource_path
 
 
+class DependencyError(SpecPulseError):
+    """Dependency injection and service container errors"""
+
+    def __init__(self, message: str, service_name: Optional[str] = None):
+        suggestions = [
+            "Check service registration in service container",
+            "Verify all dependencies are properly injected",
+            "Ensure service initialization order is correct"
+        ]
+        if service_name:
+            suggestions.insert(0, f"Register missing service: {service_name}")
+
+        super().__init__(
+            message=message,
+            severity=ErrorSeverity.HIGH,
+            recovery_suggestions=suggestions,
+            technical_details=f"Dependency error for service: {service_name or 'unknown'}"
+        )
+        self.service_name = service_name
+
+
 class ErrorHandler:
     """Enhanced error handler for SpecPulse CLI"""
 

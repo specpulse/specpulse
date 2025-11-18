@@ -169,7 +169,7 @@ class TestCommandHandlerComplete:
             with pytest.raises(SpecPulseError):
                 handler.execute_command('init', project_name='test')
 
-    @pytest.mark_unit
+    @pytest.mark.unit
     def test_command_handler_execute_command_with_command_exception(self):
         """Test command execution with unexpected exception"""
         mock_handler = Mock()
@@ -199,7 +199,7 @@ class TestCommandHandlerComplete:
             assert result["status"] == "success"
             mock_handler.feature_commands.init.assert_called_once_with(feature_name='test')
 
-    @pytest.mark_unit
+    @pytest.mark.unit
     def test_command_handler_template_command_routing(self, temp_project_dir):
         """Test template command routing"""
         mock_handler = Mock()
@@ -261,7 +261,7 @@ class TestCommandHandlerComplete:
         assert handler.verbose is True
         assert handler.error_handler.verbose is True
 
-    @pytest.mark_unit
+    @pytest.mark.unit
     def test_command_handler_no_color_mode(self):
         """Test no-color mode handling"""
         handler = CommandHandler(no_color=True)
@@ -269,7 +269,7 @@ class TestCommandHandlerComplete:
         assert handler.console is not None
         # Console should be created with no_color option
 
-    @pytest.mark_unit
+    @pytest.mark.unit
     def test_command_handler_component_isolation(self):
         """Test component isolation in handler"""
         with patch('specpulse.cli.handlers.command_handler.CommandHandler._initialize_components') as mock_init:
@@ -281,7 +281,7 @@ class TestCommandHandlerComplete:
             assert handler.validator is not None
             assert handler.project_root is not None
 
-    @pytest.mark_unit
+    @pytest.mark.unit
     def test_command_handler_service_injection(self, temp_project_dir):
         """Test service injection patterns"""
         # Create custom service container
@@ -299,7 +299,7 @@ class TestCommandHandlerComplete:
                 assert handler.specpulse is not None
                 assert handler.validator is not None
 
-    @pytest_mark.unit
+    @pytest.mark.unit
     def test_command_handler_error_recovery_suggestions(self, temp_project_dir):
         """Test error recovery suggestions"""
         with patch('specpulse.cli.handlers.command_handler.CommandHandler._initialize_components') as mock_init:
@@ -331,7 +331,7 @@ class TestCommandHandlerComplete:
                     # Should set UTF-8 encoding on Windows
                     mock_system.assert_called_with('chcp 65001 > nul')
 
-    @pytest.mark_unit
+    @pytest.mark.unit
     def test_command_handler_command_validation(self):
         """Test command validation"""
         mock_handler = Mock()
@@ -344,7 +344,7 @@ class TestCommandHandlerComplete:
             with pytest.raises(Exception):
                 handler.execute_command('nonexistent_command')
 
-    @pytest.mark_unit
+    @pytest.mark.unit
     def test_command_handler_argument_parsing_integration(self, temp_project_dir):
         """Test integration with argument parsing"""
         mock_args = Mock()
@@ -363,7 +363,7 @@ class TestCommandHandlerComplete:
 
                 mock_execute.assert_called_once()
 
-    @pytest.mark_unit
+    @pytest.mark.unit
     def test_command_handler_multiple_command_support(self, temp_project_dir):
         """Test multiple command types support"""
         mock_handler = Mock()
@@ -431,7 +431,7 @@ class TestCommandHandlerComplete:
                 assert result["status"] == "success"
                 assert "Stateless operation" in result["message"]
 
-    @pytest.mark_unit
+    @pytest.mark.unit
     def test_command_handler_error_context_preservation(self):
         """Test error context preservation"""
         with patch('specpulse.cli.handlers.command_handler.CommandHandler._initialize_components') as mock_init:
