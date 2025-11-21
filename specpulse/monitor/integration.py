@@ -16,6 +16,7 @@ from .models import TaskInfo, TaskState, TaskHistory
 from .storage import StateStorage
 from .state_manager import TaskStateManager
 from .calculator import ProgressCalculator
+from ..utils.error_handler import ErrorHandler
 
 
 class WorkflowIntegration:
@@ -27,6 +28,7 @@ class WorkflowIntegration:
         self.storage = StateStorage(project_path)
         self.state_manager = TaskStateManager(self.storage, self.storage.config)
         self.calculator = ProgressCalculator()
+        self.error_handler = ErrorHandler()
         self._current_feature: Optional[str] = None
         self._current_task: Optional[str] = None
 
@@ -46,8 +48,8 @@ class WorkflowIntegration:
                         parts = feature_line.split()
                         if parts:
                             return parts[0].replace(":", "").strip()
-        except Exception:
-            pass
+        except Exception as e:
+            self.error_handler.log_warning(f"Failed to read active feature from context: {e}")
 
         return None
 
@@ -69,7 +71,8 @@ class WorkflowIntegration:
                 })
 
             return success
-        except Exception:
+        except Exception as e:
+            self.error_handler.log_error(f"Failed to start task monitoring for {feature_id}/{task_id}: {e}")
             return False
 
     def complete_task_monitoring(self, feature_id: str, task_id: str,
@@ -96,7 +99,8 @@ class WorkflowIntegration:
                 self._current_task = None
 
             return success
-        except Exception:
+        except Exception as e:
+            self.error_handler.log_error(f"Failed to complete task monitoring for {feature_id}/{task_id}: {e}")
             return False
 
     def block_task_monitoring(self, feature_id: str, task_id: str, error_message: str) -> bool:
@@ -119,7 +123,8 @@ class WorkflowIntegration:
                 self._current_task = None
 
             return success
-        except Exception:
+        except Exception as e:
+            self.error_handler.log_error(f"Failed to block task for {feature_id}/{task_id}: {e}")
             return False
 
     def _update_project_progress(self, feature_id: str) -> None:
@@ -128,8 +133,9 @@ class WorkflowIntegration:
             tasks = self.state_manager.get_tasks(feature_id)
             progress = self.calculator.calculate_progress(tasks, feature_id)
             self.storage.save_progress(progress)
-        except Exception:
-            pass  # Don't let progress updates fail task execution
+        except Exception as e:
+            # Don't let progress updates fail task execution, but log the error
+            self.error_handler.log_warning(f"Failed to update project progress for {feature_id}: {e}")
 
     def _log_workflow_event(self, event_type: str, data: Dict[str, Any]) -> None:
         """Log workflow events for debugging and auditing."""
@@ -158,8 +164,9 @@ class WorkflowIntegration:
             # Write back
             with open(log_file, 'w', encoding='utf-8') as f:
                 json.dump(log_data, f, indent=2, ensure_ascii=False)
-        except Exception:
-            pass  # Don't let logging fail task execution
+        except Exception as e:
+            # Don't let logging fail task execution, but log the error
+            self.error_handler.log_warning(f"Failed to log workflow event {event_type}: {e}")
 
     def cleanup_old_logs(self, days: int = 30) -> None:
         """Clean up old workflow logs."""
@@ -180,8 +187,8 @@ class WorkflowIntegration:
 
                 with open(log_file, 'w', encoding='utf-8') as f:
                     json.dump(log_data, f, indent=2, ensure_ascii=False)
-        except Exception:
-            pass
+        except Exception as e:
+            self.error_handler.log_warning(f"Failed to cleanup old logs: {e}")
 
 
 class MonitoringHooks:
@@ -299,8 +306,10 @@ def auto_integrate_sp_execute():
         # Hook into command execution if possible
         # This would typically be called during SpecPulse initialization
         pass  # Implementation depends on SpecPulse architecture
-    except Exception:
-        pass  # Don't let integration failures break SpecPulse
+    except Exception as e:
+        # Don't let integration failures break SpecPulse, but log the error
+        error_handler = ErrorHandler()
+        error_handler.log_warning(f"Failed to auto-integrate sp-execute: {e}")
 
 
 def initialize_monitoring_integration(project_path: Path) -> bool:
@@ -323,5 +332,7 @@ def initialize_monitoring_integration(project_path: Path) -> bool:
         })
 
         return True
-    except Exception:
+    except Exception as e:
+        error_handler = ErrorHandler()
+        error_handler.log_error(f"Failed to initialize monitoring integration: {e}")
         return False

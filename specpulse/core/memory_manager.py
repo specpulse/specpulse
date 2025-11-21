@@ -76,8 +76,8 @@ class MemoryManager:
         self.memory_dir = self.path_manager.memory_dir
         self.context_file = self.memory_dir / "context.md"
         self.decisions_file = self.memory_dir / "decisions.md"
-        self.memory_index = self.memory_dir / ".memory_index.json"
-        self.memory_stats = self.memory_dir / ".memory_stats.json"
+        self.memory_index_path = self.memory_dir / ".memory_index.json"
+        self.memory_stats_path = self.memory_dir / ".memory_stats.json"
 
         self.console = Console()
 
@@ -164,12 +164,16 @@ class MemoryManager:
 
     def _load_memory_index(self) -> Dict:
         """Load memory index from file"""
-        if self.memory_index.exists():
+        if self.memory_index_path.exists():
             try:
-                with open(self.memory_index, 'r', encoding='utf-8') as f:
+                with open(self.memory_index_path, 'r', encoding='utf-8') as f:
                     return json.load(f)
-            except (json.JSONDecodeError, IOError):
-                pass
+            except json.JSONDecodeError as e:
+                # BUG-011 fix: Log corrupted JSON files
+                self.console.warning(f"Corrupted memory index file, reinitializing: {e}")
+            except IOError as e:
+                # Log file read errors
+                self.console.warning(f"Failed to read memory index: {e}")
 
         return {
             "version": "1.0.0",
@@ -186,20 +190,27 @@ class MemoryManager:
         """Save memory index to file"""
         self.memory_index["last_updated"] = datetime.now().isoformat()
         try:
-            with open(self.memory_index, 'w', encoding='utf-8') as f:
+            with open(self.memory_index_path, 'w', encoding='utf-8') as f:
                 json.dump(self.memory_index, f, indent=2, ensure_ascii=False)
         except IOError as e:
             raise ValidationError(f"Failed to save memory index: {e}")
 
     def _load_memory_stats(self) -> MemoryStats:
         """Load memory statistics"""
-        if self.memory_stats.exists():
+        if self.memory_stats_path.exists():
             try:
-                with open(self.memory_stats, 'r', encoding='utf-8') as f:
+                with open(self.memory_stats_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     return MemoryStats(**data)
-            except (json.JSONDecodeError, IOError, TypeError):
-                pass
+            except json.JSONDecodeError as e:
+                # BUG-011 fix: Log corrupted JSON files
+                self.console.warning(f"Corrupted memory stats file, recalculating: {e}")
+            except IOError as e:
+                # Log file read errors
+                self.console.warning(f"Failed to read memory stats: {e}")
+            except TypeError as e:
+                # Log data structure errors
+                self.console.warning(f"Invalid memory stats format, recalculating: {e}")
 
         # Calculate initial stats
         return self._calculate_memory_stats()
@@ -207,7 +218,7 @@ class MemoryManager:
     def _save_memory_stats(self):
         """Save memory statistics"""
         try:
-            with open(self.memory_stats, 'w', encoding='utf-8') as f:
+            with open(self.memory_stats_path, 'w', encoding='utf-8') as f:
                 json.dump(asdict(self.memory_stats), f, indent=2)
         except IOError as e:
             raise ValidationError(f"Failed to save memory stats: {e}")
@@ -539,7 +550,7 @@ class MemoryManager:
         issues = []
 
         # Check required files
-        required_files = [self.context_file, self.decisions_file, self.memory_index]
+        required_files = [self.context_file, self.decisions_file, self.memory_index_path]
         for file_path in required_files:
             if not file_path.exists():
                 issues.append(f"Missing required file: {file_path}")

@@ -117,23 +117,23 @@ class AIIntegration:
             )
             if result.returncode == 0:
                 branch_name = result.stdout.strip()
-                context.branch_name = branch_name
 
-                # Extract feature ID from branch name
-                match = re.match(r'(\d{3})-(.+)', branch_name)
-                if match:
-                    feature_id = match.group(1)
-                    feature_name = match.group(2).replace('-', ' ')
-                    context.current_feature = f"{feature_id}-{feature_name}"
+                # Only process non-empty branch names
+                if branch_name:
+                    context.branch_name = branch_name
+
+                    # Extract feature ID from branch name
+                    match = re.match(r'(\d{3})-(.+)', branch_name)
+                    if match:
+                        feature_id = match.group(1)
+                        feature_name = match.group(2).replace('-', ' ')
+                        context.current_feature = f"{feature_id}-{feature_name}"
         except (subprocess.SubprocessError, FileNotFoundError) as e:
             # Expected errors - git not available or not a repository
-            # BUG-008 FIX: Log instead of silent pass
-            error_handler = ErrorHandler()
-            error_handler.log_warning(f"Git context detection failed: {e}")
+            self.error_handler.log_warning(f"Git context detection failed: {e}")
         except Exception as e:
             # Unexpected errors - log for debugging
-            error_handler = ErrorHandler()
-            error_handler.log_error(f"Unexpected error in git detection: {e}")
+            self.error_handler.log_error(f"Unexpected error in git detection: {e}")
 
         # Detect from memory/context.md
         if self.context_file.exists():
@@ -157,13 +157,10 @@ class AIIntegration:
                             context.tech_stack[key.strip()] = value.strip()
             except (IOError, ValueError) as e:
                 # Expected errors - file read or parse errors
-                # BUG-008 FIX: Log instead of silent pass
-                error_handler = ErrorHandler()
-                error_handler.log_warning(f"Context file parse error: {e}")
+                self.error_handler.log_warning(f"Context file parse error: {e}")
             except Exception as e:
                 # Unexpected errors - log for debugging
-                error_handler = ErrorHandler()
-                error_handler.log_error(f"Unexpected error parsing context file: {e}")
+                self.error_handler.log_error(f"Unexpected error parsing context file: {e}")
 
         # Detect recent specs and plans
         specs_dir = self.path_manager.specs_dir
