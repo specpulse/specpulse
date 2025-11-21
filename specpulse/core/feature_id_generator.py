@@ -201,56 +201,60 @@ class FeatureIDGenerator:
 
     def _acquire_lock_unix(self) -> bool:
         """Acquire lock on Unix systems (fcntl)"""
+        lock_fd = None
         try:
             import fcntl
 
             # Open lock file
-            self._lock_fd = self.lock_file.open('w')
+            lock_fd = self.lock_file.open('w')
 
             # Try to acquire exclusive lock (non-blocking)
-            fcntl.flock(self._lock_fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-
-            return True
-
-        except BlockingIOError:
-            # Lock is held by another process
-            if hasattr(self, '_lock_fd'):
-                self._lock_fd.close()
-            return False
+            try:
+                fcntl.flock(lock_fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                # Success - store the file descriptor
+                self._lock_fd = lock_fd
+                return True
+            except BlockingIOError:
+                # Lock is held by another process - close and return False
+                lock_fd.close()
+                return False
 
         except Exception:
-            if hasattr(self, '_lock_fd'):
-                self._lock_fd.close()
+            # Any other error - ensure file is closed
+            if lock_fd is not None:
+                try:
+                    lock_fd.close()
+                except Exception:
+                    pass
             return False
 
     def _acquire_lock_windows(self) -> bool:
         """Acquire lock on Windows systems (msvcrt)"""
+        lock_fd = None
         try:
             import msvcrt
 
             # Open lock file
-            self._lock_fd = self.lock_file.open('w')
+            lock_fd = self.lock_file.open('w')
 
             # Try to acquire lock (non-blocking)
             try:
-                msvcrt.locking(self._lock_fd.fileno(), msvcrt.LK_NBLCK, 1)
+                msvcrt.locking(lock_fd.fileno(), msvcrt.LK_NBLCK, 1)
+                # Success - store the file descriptor
+                self._lock_fd = lock_fd
                 return True
             except (IOError, OSError):
-                # Lock is held by another process
-                if hasattr(self, '_lock_fd') and self._lock_fd:
-                    self._lock_fd.close()
-                    delattr(self, '_lock_fd')
+                # Lock is held by another process - close and return False
+                lock_fd.close()
                 return False
 
-        except Exception as e:
-            # Any other error
-            if hasattr(self, '_lock_fd') and self._lock_fd:
+        except Exception:
+            # Any other error - ensure file is closed
+            if lock_fd is not None:
                 try:
-                    self._lock_fd.close()
+                    lock_fd.close()
                 except Exception:
                     pass
-                if hasattr(self, '_lock_fd'):
-                    delattr(self, '_lock_fd')
             return False
 
     def _release_lock(self):
