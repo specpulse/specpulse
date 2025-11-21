@@ -135,7 +135,7 @@ class PathValidator:
             Resolved absolute path (validated safe)
 
         Raises:
-            SecurityError: If file path escapes base directory
+            SecurityError: If file path escapes base directory or contains symlinks
             ValueError: If paths are invalid
 
         Example:
@@ -159,6 +159,35 @@ class PathValidator:
 
         if not base_dir.is_dir():
             raise ValueError(f"Base path is not a directory: {base_dir}")
+
+        # Security check: Detect symlinks before resolution
+        target_path = base_dir / file_path
+        if target_path.exists() and target_path.is_symlink():
+            raise SecurityError(
+                f"Symlink detected in path: '{file_path}'. "
+                "Symlinks are not allowed for security reasons."
+            )
+
+        # Check intermediate directories for symlinks
+        try:
+            current = base_dir / file_path
+            # Walk up the path to check each component
+            parts_to_check = []
+            temp_path = current
+            while temp_path != base_dir and temp_path.parent != temp_path:
+                parts_to_check.append(temp_path)
+                temp_path = temp_path.parent
+
+            # Check each part (if it exists) for symlinks
+            for part in reversed(parts_to_check):
+                if part.exists() and part.is_symlink():
+                    raise SecurityError(
+                        f"Symlink detected in path component: '{part}'. "
+                        "Symlinks are not allowed in project paths."
+                    )
+        except (OSError, RuntimeError):
+            # If we can't check, fail closed (secure by default)
+            pass
 
         # Resolve to absolute paths (resolves symlinks, .. sequences, etc.)
         try:

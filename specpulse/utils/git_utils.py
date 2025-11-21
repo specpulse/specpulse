@@ -145,7 +145,7 @@ class GitUtils:
         return tag_name
     
     def _run_git_command(self, *args) -> Tuple[bool, str]:
-        """Run a git command and return success status and output"""
+        """Run a git command and return success status and detailed output"""
         try:
             result = subprocess.run(
                 ["git"] + list(args),
@@ -156,9 +156,30 @@ class GitUtils:
             )
             return True, result.stdout.strip()
         except subprocess.CalledProcessError as e:
-            return False, e.stderr.strip()
+            # Enhanced error reporting with full context
+            error_details = [
+                f"Git command failed (exit code: {e.returncode})",
+                f"Command: git {' '.join(args)}",
+                f"Working directory: {self.repo_path}",
+                f"Stderr: {e.stderr.strip() if e.stderr else '(empty)'}",
+                f"Stdout: {e.stdout.strip() if e.stdout else '(empty)'}"
+            ]
+            return False, "\n".join(error_details)
         except FileNotFoundError:
-            return False, "Git is not installed or not in PATH"
+            error_details = [
+                "Git is not installed or not in PATH",
+                f"Command attempted: git {' '.join(args)}",
+                "Please install Git: https://git-scm.com/downloads"
+            ]
+            return False, "\n".join(error_details)
+        except Exception as e:
+            # Catch-all for unexpected errors
+            error_details = [
+                f"Unexpected error running git command: {type(e).__name__}",
+                f"Command: git {' '.join(args)}",
+                f"Error: {str(e)}"
+            ]
+            return False, "\n".join(error_details)
     
     @staticmethod
     def check_git_installed() -> bool:
