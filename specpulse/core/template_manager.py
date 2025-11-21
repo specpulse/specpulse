@@ -102,8 +102,8 @@ def validate_template_security(content: str) -> Tuple[bool, List[str]]:
     # Estimate maximum nesting depth
     estimated_depth = max(0, opening_blocks - closing_blocks)
 
-    # Also check for obvious deeply nested patterns
-    if re.search(r'(\{\%\s*if.*\%\}){11,}', content) or opening_blocks > 10:
+    # Check for deep nesting (BUG-010 fix: avoid ReDoS with simpler check)
+    if opening_blocks > 10:
         vulnerabilities.append("Template nesting too deep (performance concern)")
     elif estimated_depth > 10:
         vulnerabilities.append("Template nesting too deep (performance concern)")
@@ -468,6 +468,12 @@ class TemplateManager:
         try:
             if not template_path.exists():
                 raise TemplateError(f"Template not found: {template_path}")
+
+            # Check file size BEFORE reading to prevent DoS (BUG-008 fix)
+            file_size = template_path.stat().st_size
+            max_size = 1024 * 1024  # 1MB limit
+            if file_size > max_size:
+                raise TemplateError(f"Template file too large: {file_size} bytes (max: {max_size})")
 
             content = template_path.read_text(encoding='utf-8')
 

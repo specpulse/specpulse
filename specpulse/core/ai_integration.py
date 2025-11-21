@@ -117,14 +117,17 @@ class AIIntegration:
             )
             if result.returncode == 0:
                 branch_name = result.stdout.strip()
-                context.branch_name = branch_name
 
-                # Extract feature ID from branch name
-                match = re.match(r'(\d{3})-(.+)', branch_name)
-                if match:
-                    feature_id = match.group(1)
-                    feature_name = match.group(2).replace('-', ' ')
-                    context.current_feature = f"{feature_id}-{feature_name}"
+                # Only process non-empty branch names
+                if branch_name:
+                    context.branch_name = branch_name
+
+                    # Extract feature ID from branch name
+                    match = re.match(r'(\d{3})-(.+)', branch_name)
+                    if match:
+                        feature_id = match.group(1)
+                        feature_name = match.group(2).replace('-', ' ')
+                        context.current_feature = f"{feature_id}-{feature_name}"
         except (subprocess.SubprocessError, FileNotFoundError) as e:
             # Expected errors - git not available or not a repository
             self.error_handler.log_warning(f"Git context detection failed: {e}")

@@ -168,8 +168,12 @@ class MemoryManager:
             try:
                 with open(self.memory_index_path, 'r', encoding='utf-8') as f:
                     return json.load(f)
-            except (json.JSONDecodeError, IOError):
-                pass
+            except json.JSONDecodeError as e:
+                # BUG-011 fix: Log corrupted JSON files
+                self.console.warning(f"Corrupted memory index file, reinitializing: {e}")
+            except IOError as e:
+                # Log file read errors
+                self.console.warning(f"Failed to read memory index: {e}")
 
         return {
             "version": "1.0.0",
@@ -198,8 +202,15 @@ class MemoryManager:
                 with open(self.memory_stats_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     return MemoryStats(**data)
-            except (json.JSONDecodeError, IOError, TypeError):
-                pass
+            except json.JSONDecodeError as e:
+                # BUG-011 fix: Log corrupted JSON files
+                self.console.warning(f"Corrupted memory stats file, recalculating: {e}")
+            except IOError as e:
+                # Log file read errors
+                self.console.warning(f"Failed to read memory stats: {e}")
+            except TypeError as e:
+                # Log data structure errors
+                self.console.warning(f"Invalid memory stats format, recalculating: {e}")
 
         # Calculate initial stats
         return self._calculate_memory_stats()
