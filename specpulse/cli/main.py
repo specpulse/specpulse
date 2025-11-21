@@ -17,14 +17,18 @@ from .parsers.subcommand_parsers import create_argument_parser
 def main():
     """Main entry point for SpecPulse CLI"""
     try:
-        # Debug: Set UTF-8 encoding first
-        # BUG-005 FIX: Removed duplicate sys import (already imported at module level line 10)
-        import os
+        # Set UTF-8 encoding for Windows compatibility
+        # Security fix: Replaced os.system() with Python native encoding
         if sys.platform == "win32":
-            os.system('chcp 65001 > nul')
+            try:
+                sys.stdout.reconfigure(encoding='utf-8')
+                sys.stderr.reconfigure(encoding='utf-8')
+            except (AttributeError, OSError):
+                # Fallback for older Python or restricted environments
+                import subprocess
+                subprocess.run(["chcp", "65001"], capture_output=True, shell=False, timeout=2)
 
-        # Create argument parser
-        from .parsers.subcommand_parsers import create_argument_parser
+        # Create argument parser (removed duplicate import)
         parser = create_argument_parser()
 
         # Parse arguments

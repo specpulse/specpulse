@@ -81,6 +81,11 @@ class MemoryManager:
 
         self.console = Console()
 
+        # Auto-cleanup configuration
+        self._update_counter = 0
+        self._auto_cleanup_threshold = 100  # Run cleanup every 100 updates
+        self._auto_cleanup_retention_days = 90  # Keep entries for 90 days
+
         # Ensure memory directory exists
         self.memory_dir.mkdir(exist_ok=True)
 
@@ -163,17 +168,49 @@ class MemoryManager:
 """.format(date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
 
     def _load_memory_index(self) -> Dict:
-        """Load memory index from file"""
+        """Load memory index from file with enhanced corruption recovery"""
         if self.memory_index_path.exists():
             try:
                 with open(self.memory_index_path, 'r', encoding='utf-8') as f:
                     return json.load(f)
             except json.JSONDecodeError as e:
-                # BUG-011 fix: Log corrupted JSON files
-                self.console.warning(f"Corrupted memory index file, reinitializing: {e}")
+                # Enhanced corruption handling: backup corrupted file
+                corrupted_backup = self.memory_index_path.with_suffix('.json.corrupted')
+                try:
+                    import shutil
+                    from datetime import datetime
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    final_backup = self.memory_index_path.parent / f".memory_index.corrupted.{timestamp}.json"
+                    shutil.copy2(self.memory_index_path, final_backup)
+
+                    # Prominent warning to user
+                    self.console.error("=" * 70)
+                    self.console.error("⚠️  CRITICAL: Memory index file is corrupted!")
+                    self.console.error(f"    Corrupted file backed up to: {final_backup}")
+                    self.console.error(f"    Error: {e}")
+                    self.console.error("    Attempting to restore from backup...")
+                    self.console.error("=" * 70)
+                except Exception as backup_error:
+                    self.console.error(f"Failed to backup corrupted file: {backup_error}")
+
+                # Attempt to restore from most recent backup
+                backup_pattern = ".memory_index.corrupted.*.json"
+                backups = sorted(self.memory_index_path.parent.glob(backup_pattern), reverse=True)
+
+                # Try to find a valid backup (skip the one we just created)
+                for backup_file in backups[1:] if len(backups) > 1 else []:
+                    try:
+                        with open(backup_file, 'r', encoding='utf-8') as f:
+                            recovered_data = json.load(f)
+                        self.console.success(f"✅ Successfully recovered from backup: {backup_file}")
+                        return recovered_data
+                    except (json.JSONDecodeError, IOError):
+                        continue
+
+                self.console.warning("No valid backups found. Reinitializing with empty index.")
+
             except IOError as e:
-                # Log file read errors
-                self.console.warning(f"Failed to read memory index: {e}")
+                self.console.error(f"Failed to read memory index: {e}")
 
         return {
             "version": "1.0.0",
@@ -277,6 +314,15 @@ class MemoryManager:
             self._save_memory_index()
             self.memory_stats = self._calculate_memory_stats()
             self._save_memory_stats()
+
+            # Auto-cleanup: Run cleanup periodically
+            self._update_counter += 1
+            if self._update_counter >= self._auto_cleanup_threshold:
+                self.console.info(f"Running automatic cleanup (threshold: {self._auto_cleanup_threshold} updates)...")
+                removed = self.cleanup_old_entries(days=self._auto_cleanup_retention_days)
+                if removed > 0:
+                    self.console.success(f"✅ Auto-cleanup: Removed {removed} old entries")
+                self._update_counter = 0  # Reset counter
 
             self.console.success(f"Context updated: {action}")
             return True
