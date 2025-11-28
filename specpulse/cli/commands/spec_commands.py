@@ -16,7 +16,7 @@ class SpecCommands:
         self.project_root = project_root
         # Import PathManager for centralized path management
         from ...core.path_manager import PathManager
-        self.path_manager = PathManager(project_root, use_legacy_structure=False)
+        self.path_manager = PathManager(project_root)
 
         self.specs_dir = self.path_manager.specs_dir
         self.templates_dir = self.path_manager.templates_dir

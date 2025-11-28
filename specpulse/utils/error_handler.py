@@ -300,6 +300,57 @@ class ErrorHandler:
         for severity in self.error_counts:
             self.error_counts[severity] = 0
 
+    def suggest_recovery_for_error(self, error_message: str) -> List[str]:
+        """Suggest recovery actions based on error message patterns"""
+        from .console import Console
+
+        suggestions = []
+
+        # Common error patterns and their suggestions
+        error_patterns = {
+            r'permission.*denied': [
+                "Check file and directory permissions",
+                "Try running with appropriate privileges",
+                "Ensure the script files are executable"
+            ],
+            r'no such file.*directory': [
+                "Check that the project directory exists",
+                "Ensure you're in the correct directory",
+                "Run 'specpulse init' if this is a new project"
+            ],
+            r'template.*not found': [
+                "Run 'specpulse update' to refresh templates",
+                "Check templates directory exists",
+                "Verify template files are present"
+            ],
+            r'git.*not found': [
+                "Install Git if not present",
+                "Check Git is in your PATH",
+                "Ensure Git repository is initialized"
+            ],
+            r'validation.*failed': [
+                "Run 'specpulse validate --fix' to auto-fix issues",
+                "Check project structure requirements",
+                "Review validation error details"
+            ]
+        }
+
+        import re
+        for pattern, pattern_suggestions in error_patterns.items():
+            if re.search(pattern, error_message, re.IGNORECASE):
+                suggestions.extend(pattern_suggestions)
+                break
+
+        # Add general suggestions if no specific matches
+        if not suggestions:
+            suggestions = [
+                "Try running with --verbose for more details",
+                "Check the documentation for troubleshooting",
+                "Report this issue if it persists"
+            ]
+
+        return suggestions
+
 
 # Global error handler instance
 _global_error_handler: Optional[ErrorHandler] = None

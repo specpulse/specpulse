@@ -51,7 +51,7 @@ class AIIntegration:
 
         # Import PathManager for centralized path management
         from .path_manager import PathManager
-        self.path_manager = PathManager(project_root, use_legacy_structure=False)
+        self.path_manager = PathManager(project_root)
 
         # AI integration paths
         self.ai_state_file = project_root / ".specpulse" / "ai_state.json"

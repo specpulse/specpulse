@@ -178,7 +178,6 @@ class MemoryManager:
                 corrupted_backup = self.memory_index_path.with_suffix('.json.corrupted')
                 try:
                     import shutil
-                    from datetime import datetime
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                     final_backup = self.memory_index_path.parent / f".memory_index.corrupted.{timestamp}.json"
                     shutil.copy2(self.memory_index_path, final_backup)

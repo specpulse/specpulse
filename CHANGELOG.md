@@ -5,6 +5,68 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.9] - 2025-11-28
+
+### 🐛 Critical Bug Fixes Release
+
+**Upgrade Priority:** 🔴 **CRITICAL** (fixes broken CLI tool)
+
+---
+
+### 🚑 **Emergency CLI Fixes**
+
+#### **CLI Tool Restoration** (CRITICAL)
+- **FIXED**: **Complete CLI tool failure** - `specpulse init` and all commands were broken
+- **FIXED**: **ErrorHandler missing method** - Added `suggest_recovery_for_error` method to ErrorHandler class
+- **FIXED**: **DateTime variable scoping** - Removed redundant local import causing variable shadowing in MemoryManager
+- **FIXED**: **PathManager parameter error** - Updated all PathManager constructor calls to remove deprecated `use_legacy_structure` parameter
+
+#### **Technical Details**
+- **ErrorHandler Class**: Added missing recovery suggestion method with comprehensive error pattern matching
+- **MemoryManager**: Fixed DateTime import conflict in exception handling
+- **PathManager**: Updated 6+ command files to use new constructor signature
+- **AI Integration**: Updated all AI platform command files for compatibility
+
+#### **Verification**
+- ✅ `specpulse --version` works correctly (shows v2.6.9)
+- ✅ `specpulse --help` displays complete help menu
+- ✅ `specpulse init --here` successfully initializes projects
+- ✅ `specpulse doctor` passes all health checks
+- ✅ All `/sp-*` commands are functional across 8 AI platforms
+
+---
+
+### 📋 **Summary**
+
+This is an **emergency release** that restores full CLI functionality. The v2.6.8 release introduced critical bugs that completely broke the SpecPulse CLI tool. All issues have been resolved and the tool is now fully operational.
+
+**Recommended Action**: Upgrade immediately if you experienced CLI issues with v2.6.8
+
+## [2.6.8] - 2025-11-28
+
+### 🐛 PyPI Version Conflict Release
+
+**Upgrade Priority:** 🟡 **RECOMMENDED** (fixes PyPI publishing conflict)
+
+---
+
+### 🚑 **Emergency Fixes**
+
+#### **PyPI Publishing**
+- **FIXED**: **Version conflict on PyPI** - v2.6.7 already existed, incremented to v2.6.8
+- **UPDATED**: All documentation and references to point to v2.6.8
+
+#### **Documentation Updates**
+- **UPDATED**: README.md with version bump and comprehensive feature documentation
+- **UPDATED**: CHANGELOG.md with release notes
+- **ENHANCED**: Complete workflow documentation and examples
+
+---
+
+### 📋 **Summary**
+
+This release resolved a PyPI publishing conflict where v2.6.7 was already taken, forcing a version increment to v2.6.8.
+
 ## [2.6.7] - 2025-11-28
 
 ### 🎯 Qwen Code Integration Release

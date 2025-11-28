@@ -16,7 +16,7 @@ class PlanCommands:
         self.project_root = project_root
         # Import PathManager for centralized path management
         from ...core.path_manager import PathManager
-        self.path_manager = PathManager(project_root, use_legacy_structure=False)
+        self.path_manager = PathManager(project_root)
 
         self.plans_dir = self.path_manager.plans_dir
         self.specs_dir = self.path_manager.specs_dir
@@ -159,7 +159,7 @@ class TaskCommands:
         self.project_root = project_root
         # Import PathManager for centralized path management
         from ...core.path_manager import PathManager
-        self.path_manager = PathManager(project_root, use_legacy_structure=False)
+        self.path_manager = PathManager(project_root)
 
         self.tasks_dir = self.path_manager.tasks_dir
         self.plans_dir = self.path_manager.plans_dir

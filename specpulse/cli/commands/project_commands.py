@@ -23,7 +23,7 @@ class ProjectCommands:
         self.project_root = project_root
         self.specpulse = SpecPulse()
         # Initialize PathManager for directory structure handling
-        self.path_manager = PathManager(project_root, use_legacy_structure=False)
+        self.path_manager = PathManager(project_root)
 
     def init(self, project_name: Optional[str] = None, here: bool = False,
              ai: Optional[str] = None, tool: Optional[str] = None,

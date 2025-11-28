@@ -499,7 +499,7 @@ class CommandHandler:
         specs_dir = None
         if self.project_root:
             from ...core.path_manager import PathManager
-            path_manager = PathManager(self.project_root, use_legacy_structure=False)
+            path_manager = PathManager(self.project_root)
             specs_dir = path_manager.specs_dir
 
         if specs_dir and specs_dir.exists():
