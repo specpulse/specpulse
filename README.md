@@ -1,4 +1,4 @@
-# SpecPulse v2.7.0
+# SpecPulse v2.7.1
 
 <div align="center">
 
@@ -1232,6 +1232,6 @@ cd my-project
 
 **Made with ❤️ by developers who believe in specifications-first development**
 
-**SpecPulse v2.7.0** - Building the future of software development, together.
+**SpecPulse v2.7.1** - Building the future of software development, together.
 
 </div>
