@@ -1,11 +1,11 @@
 """
-Path Manager for SpecPulse v2.6.0
+Path Manager for SpecPulse v2.6.7
 
 Centralized path management for all SpecPulse directories.
 This class provides a single source of truth for all path resolutions,
-supporting both legacy and new directory structures.
+ENFORCING the consolidated .specpulse/ directory structure.
 
-New Structure (v2.2.0+):
+Mandatory Structure (v2.2.0+):
 - .specpulse/specs/
 - .specpulse/plans/
 - .specpulse/tasks/
@@ -14,11 +14,18 @@ New Structure (v2.2.0+):
 - .specpulse/cache/
 - .specpulse/checkpoints/
 - .specpulse/docs/
-- .claude/ (root)
-- .gemini/ (root)
+- .claude/ (root - AI commands only)
+- .gemini/ (root - AI commands only)
+- .windsurf/ (root - AI commands only)
+- .cursor/ (root - AI commands only)
+- .github/ (root - AI commands only)
+- .opencode/ (root - AI commands only)
+- .crush/ (root - AI commands only)
+- .qwen/ (root - AI commands only)
 
-IMPORTANT: All SpecPulse operations MUST stay within .specpulse directory.
+CRITICAL: All SpecPulse operations MUST stay within .specpulse directory.
 No SpecPulse-generated files should be created in the root project directory.
+Custom commands MUST stay in their respective AI directories.
 """
 
 from pathlib import Path
@@ -30,40 +37,52 @@ class PathManager:
     """
     Centralized path management for SpecPulse projects.
 
-    This class handles all path resolutions for both the new .specpulse/
-    consolidated structure and legacy directory structures for backward compatibility.
+    This class ENFORCES the .specpulse/ consolidated structure.
+    Legacy structure is NOT supported - all operations MUST use .specpulse/ directory.
     """
 
-    def __init__(self, project_root: Path, use_legacy_structure: bool = False):
+    def __init__(self, project_root: Path):
         """
-        Initialize path manager.
+        Initialize path manager with enforced .specpulse/ structure.
 
         Args:
             project_root: Root directory of the project
-            use_legacy_structure: If True, use legacy paths (specs/, plans/, etc.)
-                                If False, use new .specpulse/ structure
+
+        Raises:
+            ValueError: If project_root is invalid
         """
         self.project_root = Path(project_root)
-        self.use_legacy_structure = use_legacy_structure
+        if not self.project_root.exists():
+            raise ValueError(f"Project root does not exist: {self.project_root}")
 
-        # Core .specpulse directory
+        # ENFORCED: Always use .specpulse/ structure
+        self.use_legacy_structure = False
+
+        # Core .specpulse directory (MANDATORY)
         self.specpulse_dir = self.project_root / ".specpulse"
 
-        # AI integration directories (always at root)
+        # ENFORCE: Create .specpulse directory immediately
+        self.specpulse_dir.mkdir(exist_ok=True)
+
+        # AI integration directories (always at root for custom commands)
         self.claude_dir = self.project_root / ".claude"
         self.gemini_dir = self.project_root / ".gemini"
+        self.windsurf_dir = self.project_root / ".windsurf"
+        self.cursor_dir = self.project_root / ".cursor"
+        self.github_dir = self.project_root / ".github"
+        self.opencode_dir = self.project_root / ".opencode"
+        self.crush_dir = self.project_root / ".crush"
+        self.qwen_dir = self.project_root / ".qwen"
 
-        # System directories
+        # System directories (within .specpulse)
         self.cache_dir = self.specpulse_dir / "cache"
         self.checkpoints_dir = self.specpulse_dir / "checkpoints"
 
-        if use_legacy_structure:
-            self._init_legacy_paths()
-        else:
-            self._init_new_paths()
+        # ENFORCED: Initialize ONLY new structure paths
+        self._init_enforced_paths()
 
-    def _init_new_paths(self):
-        """Initialize new consolidated .specpulse/ structure paths."""
+    def _init_enforced_paths(self):
+        """Initialize ENFORCED .specpulse/ structure paths."""
         self.specs_dir = self.specpulse_dir / "specs"
         self.plans_dir = self.specpulse_dir / "plans"
         self.tasks_dir = self.specpulse_dir / "tasks"
@@ -73,15 +92,6 @@ class PathManager:
         self.docs_dir = self.specpulse_dir / "docs"
         self.template_backups_dir = self.specpulse_dir / "template_backups"
 
-    def _init_legacy_paths(self):
-        """Initialize legacy structure paths for backward compatibility."""
-        self.specs_dir = self.project_root / "specs"
-        self.plans_dir = self.project_root / "plans"
-        self.tasks_dir = self.project_root / "tasks"
-        self.memory_dir = self.project_root / "memory"
-        self.templates_dir = self.project_root / "templates"
-        self.notes_dir = self.memory_dir / "notes"
-
     def get_all_directories(self) -> Dict[str, Path]:
         """
         Get all managed directories as a dictionary.
@@ -90,6 +100,7 @@ class PathManager:
             Dictionary mapping directory names to Path objects
         """
         return {
+            # Core SpecPulse directories (within .specpulse)
             'specs': self.specs_dir,
             'plans': self.plans_dir,
             'tasks': self.tasks_dir,
@@ -100,8 +111,18 @@ class PathManager:
             'checkpoints': self.checkpoints_dir,
             'docs': self.docs_dir,
             'template_backups': self.template_backups_dir,
+
+            # AI command directories (at root for custom commands)
             'claude': self.claude_dir,
             'gemini': self.gemini_dir,
+            'windsurf': self.windsurf_dir,
+            'cursor': self.cursor_dir,
+            'github': self.github_dir,
+            'opencode': self.opencode_dir,
+            'crush': self.crush_dir,
+            'qwen': self.qwen_dir,
+
+            # Main directories
             'specpulse': self.specpulse_dir,
         }
 
@@ -239,54 +260,28 @@ class PathManager:
 
     def detect_structure(self) -> str:
         """
-        Auto-detect which directory structure is being used.
+        ENFORCED: Always returns 'new' since only .specpulse/ structure is supported.
+        Legacy structure is NOT supported.
 
         Returns:
-            'new' if .specpulse/ structure is detected,
-            'legacy' if legacy structure is detected,
-            'mixed' if both are present,
-            'none' if no SpecPulse structure is detected
+            Always returns 'new'
         """
-        has_new_structure = self.specpulse_dir.exists() and any([
-            (self.specpulse_dir / "specs").exists(),
-            (self.specpulse_dir / "plans").exists(),
-            (self.specpulse_dir / "tasks").exists()
-        ])
-
-        has_legacy_structure = any([
-            (self.project_root / "specs").exists(),
-            (self.project_root / "plans").exists(),
-            (self.project_root / "tasks").exists()
-        ])
-
-        if has_new_structure and has_legacy_structure:
-            return "mixed"
-        elif has_new_structure:
-            return "new"
-        elif has_legacy_structure:
-            return "legacy"
-        else:
-            return "none"
+        # ENFORCED: Always new structure
+        return "new"
 
     def migrate_to_new_structure(self, backup: bool = True) -> bool:
         """
-        Migrate from legacy to new directory structure.
+        NOT APPLICABLE: Migration not needed since only .specpulse/ structure is supported.
+        This method is kept for API compatibility but always returns True.
 
         Args:
-            backup: If True, create backup before migration
+            backup: Unused - kept for API compatibility
 
         Returns:
-            True if migration was successful, False otherwise
+            Always returns True - no migration needed
         """
-        structure = self.detect_structure()
-        if structure == "new":
-            return True  # Already using new structure
-        elif structure == "none":
-            raise ValueError("No SpecPulse structure detected to migrate")
-
-        # Implementation would go here for actual migration
-        # This is a placeholder for the migration logic
-        raise NotImplementedError("Migration functionality not yet implemented")
+        # ENFORCED: No migration needed - we only support .specpulse/ structure
+        return True
 
     def validate_specpulse_path(self, file_path: Path) -> bool:
         """
@@ -310,7 +305,8 @@ class PathManager:
 
     def enforce_specpulse_rules(self) -> Dict[str, Any]:
         """
-        Enforce SpecPulse directory rules and return validation results.
+        ENFORCED: Validate that all operations respect .specpulse directory structure.
+        Legacy structure is NOT supported.
 
         Returns:
             Dictionary with validation results and warnings
@@ -319,33 +315,124 @@ class PathManager:
             'valid': True,
             'warnings': [],
             'errors': [],
-            'structure_type': 'new' if not self.use_legacy_structure else 'legacy'
+            'structure_type': 'enforced',
+            'enforced_directories': []
         }
 
-        # Check if using legacy structure
+        # ENFORCED: Always use .specpulse/ structure
         if self.use_legacy_structure:
-            results['warnings'].append(
-                "Using legacy directory structure. Consider migrating to .specpulse/ structure."
+            results['valid'] = False
+            results['errors'].append(
+                "Legacy structure is NOT supported. Only .specpulse/ structure is enforced."
             )
 
-        # Validate that all SpecPulse directories are within .specpulse
-        if not self.use_legacy_structure:
-            for dir_name, dir_path in self.get_all_directories().items():
-                if dir_name in ['claude', 'gemini']:
-                    continue  # AI dirs can be at root
+        # Validate that all SpecPulse data directories are within .specpulse
+        for dir_name, dir_path in self.get_all_directories().items():
+            # AI command directories can be at root - they are for custom commands only
+            if dir_name in ['claude', 'gemini', 'windsurf', 'cursor', 'github', 'opencode', 'crush', 'qwen']:
+                continue
 
-                if not self.validate_specpulse_path(dir_path):
-                    results['valid'] = False
-                    results['errors'].append(
-                        f"Directory '{dir_name}' is outside .specpulse: {dir_path}"
-                    )
+            # Validate that directory is within .specpulse
+            if not self.validate_specpulse_path(dir_path):
+                results['valid'] = False
+                results['errors'].append(
+                    f"Directory '{dir_name}' is outside .specpulse: {dir_path}"
+                )
+            else:
+                results['enforced_directories'].append(dir_name)
+
+        # ENFORCED: Ensure .specpulse directory exists
+        if not self.specpulse_dir.exists():
+            results['valid'] = False
+            results['errors'].append(
+                f".specpulse directory does not exist: {self.specpulse_dir}"
+            )
+
+        # Validate AI command directories isolation
+        ai_violations = self.validate_ai_command_isolation()
+        if ai_violations:
+            results['valid'] = False
+            results['errors'].extend(ai_violations)
 
         return results
+
+    def validate_ai_command_isolation(self) -> list:
+        """
+        Validate that AI command directories only contain their respective commands.
+
+        Returns:
+            List of violations found
+        """
+        violations = []
+
+        # Define expected subdirectories for each AI platform
+        ai_platforms = {
+            'claude': ['commands'],
+            'gemini': ['commands'],
+            'windsurf': ['commands'],
+            'cursor': ['commands'],
+            'github': ['prompts'],
+            'opencode': ['commands'],
+            'crush': ['commands'],
+            'qwen': ['commands']
+        }
+
+        for platform, expected_subdirs in ai_platforms.items():
+            ai_dir = getattr(self, f"{platform}_dir")
+            if ai_dir.exists():
+                # Check that only expected subdirectories exist
+                for item in ai_dir.iterdir():
+                    if item.is_dir() and item.name not in expected_subdirs:
+                        violations.append(
+                            f"Unexpected subdirectory in .{platform}/: {item.name}"
+                        )
+                    elif item.is_file() and not item.name.startswith('.'):
+                        # Only allow hidden files (like .gitkeep)
+                        violations.append(
+                            f"Unexpected file in .{platform}/ root: {item.name}"
+                        )
+
+        return violations
+
+    def lock_custom_commands_to_directories(self) -> bool:
+        """
+        ENFORCED: Ensure custom commands stay within their respective AI directories.
+
+        Returns:
+            True if all custom commands are properly isolated
+        """
+        try:
+            # Create AI command directories if they don't exist
+            ai_platforms = ['claude', 'gemini', 'windsurf', 'cursor', 'github', 'opencode', 'crush', 'qwen']
+            for platform in ai_platforms:
+                ai_dir = getattr(self, f"{platform}_dir")
+                if platform == 'github':
+                    commands_dir = ai_dir / 'prompts'
+                else:
+                    commands_dir = ai_dir / 'commands'
+
+                # Create directory structure
+                commands_dir.mkdir(parents=True, exist_ok=True)
+
+                # Add .gitkeep to maintain directory structure
+                gitkeep_file = commands_dir / '.gitkeep'
+                if not gitkeep_file.exists():
+                    gitkeep_file.write_text('# Maintains directory structure for SpecPulse\n')
+
+            # Validate isolation
+            violations = self.validate_ai_command_isolation()
+            return len(violations) == 0
+
+        except Exception as e:
+            import warnings
+            warnings.warn(f"Failed to lock custom commands to directories: {e}")
+            return False
 
     def get_safe_output_path(self, file_type: str, feature_id: str = None,
                            feature_name: str = None, filename: str = None) -> Path:
         """
         Get a safe output path that always stays within .specpulse directory.
+        ENFORCED: Only .specpulse/ structure is supported.
 
         Args:
             file_type: Type of file ('spec', 'plan', 'task', 'memory', 'cache')
@@ -355,12 +442,11 @@ class PathManager:
 
         Returns:
             Safe Path within .specpulse directory
-        """
-        if self.use_legacy_structure:
-            # Fallback to legacy paths but warn
-            import warnings
-            warnings.warn("Using legacy structure - paths may not be confined to .specpulse")
 
+        Raises:
+            ValueError: If file_type is invalid
+        """
+        # ENFORCED: Always use .specpulse/ structure
         if file_type == 'spec' and feature_id and feature_name:
             if filename:
                 return self.get_feature_dir(feature_id, feature_name, 'specs') / filename

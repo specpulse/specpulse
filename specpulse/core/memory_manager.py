@@ -69,9 +69,9 @@ class MemoryManager:
 
     def __init__(self, project_root: Path):
         self.project_root = project_root
-        # Import PathManager for centralized path management
+        # Import PathManager for centralized path management (ENFORCED: Always uses .specpulse/ structure)
         from .path_manager import PathManager
-        self.path_manager = PathManager(project_root, use_legacy_structure=False)
+        self.path_manager = PathManager(project_root)
 
         self.memory_dir = self.path_manager.memory_dir
         self.context_file = self.memory_dir / "context.md"

@@ -298,7 +298,7 @@ class SpecPulse:
         Args:
             project_name: Name of the project
             here: Initialize in current directory
-            ai_assistant: AI tool(s) to configure (claude, gemini, windsurf, cursor, github, all, or comma-separated)
+            ai_assistant: AI tool(s) to configure (claude, gemini, windsurf, cursor, github, opencode, crush, qwen, all, or comma-separated)
             template_source: Template source (local or remote)
             console: Console instance for output
 
@@ -352,8 +352,8 @@ class SpecPulse:
             # Import PathManager for centralized directory management
             from .path_manager import PathManager
 
-            # Create path manager instance
-            path_manager = PathManager(project_path, use_legacy_structure=False)
+            # Create path manager instance (ENFORCED: Always uses .specpulse/ structure)
+            path_manager = PathManager(project_path)
 
             # Create directory structure
             directories = [
@@ -362,11 +362,17 @@ class SpecPulse:
                 ".gemini",
                 ".gemini/commands",
                 ".windsurf",
-                ".windsurf/commands",
+                ".windsurf/workflows",
                 ".cursor",
                 ".cursor/commands",
                 ".github",
                 ".github/prompts",
+                ".opencode",
+                ".opencode/command",
+                ".crush",
+                ".crush/commands/sp",
+                ".qwen",
+                ".qwen/commands",
                 ".specpulse",
                 ".specpulse/cache",
                 ".specpulse/specs",
@@ -1242,31 +1248,56 @@ tags:
 
         # Handle 'all' keyword
         if 'all' in tools:
-            return ['claude', 'gemini', 'windsurf', 'cursor', 'github']
+            return ['claude', 'gemini', 'windsurf', 'cursor', 'github', 'opencode', 'crush', 'qwen']
 
         # Validate tool names
-        valid_tools = ['claude', 'gemini', 'windsurf', 'cursor', 'github']
+        valid_tools = ['claude', 'gemini', 'windsurf', 'cursor', 'github', 'opencode', 'crush', 'qwen']
         return [tool for tool in tools if tool in valid_tools]
 
     def _copy_ai_commands(self, project_path: Path, ai_assistant: Optional[str], console=None) -> None:
-        """Copy AI command files based on chosen assistant(s)"""
+        """Copy AI command files based on chosen assistant(s) with enforced directory isolation"""
         import shutil
+
+        # Import PathManager for enforced directory management
+        from .path_manager import PathManager
+
+        # Create path manager instance (ENFORCED: Always uses .specpulse/ structure)
+        path_manager = PathManager(project_path)
+
+        # Lock custom commands to their directories first
+        if not path_manager.lock_custom_commands_to_directories():
+            if console:
+                console.error("Failed to lock custom commands to their directories")
+            return
 
         commands_dir = self.resources_dir / "commands"
         selected_tools = self._parse_ai_assistant(ai_assistant)
 
         for tool in selected_tools:
-            tool_dir = commands_dir / tool
+            # Special handling for crush which has subdirectory structure
+            if tool == 'crush':
+                tool_dir = commands_dir / tool / 'sp'
+            else:
+                tool_dir = commands_dir / tool
             if tool_dir.exists():
-                # Determine destination directory and file pattern
+                # Determine destination directory using PathManager enforcement
                 if tool == 'github':
-                    dst_dir = project_path / ".github" / "prompts"
+                    dst_dir = getattr(path_manager, 'github_dir') / "prompts"
                     pattern = "*.prompt.md"
                 elif tool == 'gemini':
-                    dst_dir = project_path / ".gemini" / "commands"
+                    dst_dir = getattr(path_manager, 'gemini_dir') / "commands"
                     pattern = "*.toml"
-                else:  # claude, windsurf, cursor
-                    dst_dir = project_path / f".{tool}" / "commands"
+                elif tool == 'windsurf':
+                    dst_dir = getattr(path_manager, 'windsurf_dir') / "commands"  # ENFORCED: Use commands instead of workflows
+                    pattern = "*.md"
+                elif tool == 'opencode':
+                    dst_dir = getattr(path_manager, 'opencode_dir') / "commands"  # ENFORCED: Use commands instead of command
+                    pattern = "*.md"
+                elif tool == 'crush':
+                    dst_dir = getattr(path_manager, 'crush_dir') / "commands" / "sp"
+                    pattern = "*.md"
+                else:  # claude, cursor, qwen
+                    dst_dir = getattr(path_manager, f"{tool}_dir") / "commands"
                     pattern = "*.md"
 
                 # Create destination directory
@@ -1277,11 +1308,21 @@ tags:
                     shutil.copy2(cmd_file, dst_dir / cmd_file.name)
 
                 if console:
-                    console.success(f"Copied {tool.title()} AI commands")
+                    console.success(f"Copied {tool.title()} AI commands to enforced directory")
+
+        # Validate AI command isolation after copying
+        violations = path_manager.validate_ai_command_isolation()
+        if violations and console:
+            console.warning(f"AI command isolation violations found: {violations}")
 
         if console and selected_tools:
             tool_names = ", ".join(selected_tools).upper()
-            console.info(f"Configured for: {tool_names}")
+            console.info(f"Configured for: {tool_names} (ENFORCED directory structure)")
+
+        # Log enforcement status
+        enforcement_results = path_manager.enforce_specpulse_rules()
+        if not enforcement_results['valid'] and console:
+            console.error(f"Directory structure enforcement failed: {enforcement_results['errors']}")
 
     def _create_documentation(self, project_path: Path) -> None:
         """Create centralized documentation for AI commands and fallback procedures"""

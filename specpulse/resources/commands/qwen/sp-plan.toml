@@ -1,0 +1,48 @@
+description = "Generate or validate implementation plans using SpecPulse SDD methodology"
+
+prompt = """
+<!-- SPECPULSE:START -->
+**Guardrails**
+- CLI-first approach: Always try SpecPulse CLI commands before file operations
+- Keep changes tightly scoped to the planning outcome
+- Only edit files in specs/, plans/, tasks/, memory/ directories - NEVER modify templates/ or internal config
+
+**Critical Rules**
+- **PRIMARY**: Use `specpulse plan create <spec-id>` when available
+- **FALLBACK**: File Operations only if CLI fails
+- **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/, .github/, .opencode/, .crush/, .qwen/
+- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
+
+**Steps**
+Track these steps as TODOs and complete them one by one.
+
+1. **Parse arguments** to extract planning parameters and spec reference
+2. **Read specification requirements**:
+   - Locate and read: specs/<feature-id>/spec-*.md
+   - Extract requirements, constraints, and acceptance criteria
+3. **Try CLI first**:
+   - Run `specpulse plan create <spec-id>`
+   - If this succeeds, STOP HERE. CLI handles everything.
+4. **If CLI doesn't exist, use File Operations**:
+   - **Step 1: Create planning structure**:
+     ```bash
+     mkdir -p plans/feature-id
+     ```
+   - **Step 2: Generate comprehensive plan**:
+     - Architecture and design approach
+     - Implementation phases and milestones
+     - Resource allocation and dependencies
+     - Risk assessment and mitigation strategies
+5. **Strategic planning development**:
+   - Create detailed task breakdowns
+   - Define success metrics and KPIs
+   - Establish timeline and deliverables
+   - Plan testing and validation approach
+
+**Reference**
+- Use `specpulse plan --help` for additional CLI options
+- Reference related specifications in specs/ directory
+- Use `task` to break down plans into actionable tasks
+- Run `specpulse doctor` if you encounter system issues
+<!-- SPECPULSE:END -->
+"""

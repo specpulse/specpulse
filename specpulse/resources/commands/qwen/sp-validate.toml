@@ -1,0 +1,57 @@
+description = "Validate specifications, plans, and tasks using SpecPulse SDD methodology"
+
+prompt = """
+<!-- SPECPULSE:START -->
+**Guardrails**
+- CLI-first approach: Always try SpecPulse CLI commands before file operations
+- Keep changes tightly scoped to the validation outcome
+- Only edit files in specs/, plans/, tasks/, memory/ directories - NEVER modify templates/ or internal config
+
+**Critical Rules**
+- **PRIMARY**: Use `specpulse validate [component]` when available
+- **FALLBACK**: File Operations only if CLI fails
+- **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/, .github/, .opencode/, .crush/, .qwen/
+- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
+
+**Steps**
+Track these steps as TODOs and complete them one by one.
+
+1. **Parse arguments** to extract validation parameters and target
+2. **Determine validation scope**:
+   - Read: memory/context.md for current context
+   - Identify target: spec, plan, task, or all
+3. **Try CLI first**:
+   - Run `specpulse validate [component]`
+   - If this succeeds, display validation results
+4. **If CLI doesn't exist, use File Operations**:
+   - **Step 1: Analyze target files**:
+     - Specs: Check completeness, consistency, clarity
+     - Plans: Validate feasibility, dependencies, timelines
+     - Tasks: Verify task definitions, acceptance criteria
+5. **Comprehensive validation framework**:
+   - **Specification Validation**:
+     - Requirement completeness and clarity
+     - Technical feasibility assessment
+     - Consistency with project goals
+   - **Plan Validation**:
+     - Implementation approach review
+     - Timeline and resource validation
+     - Risk assessment accuracy
+   - **Task Validation**:
+     - Task definition completeness
+     - Acceptance criteria clarity
+     - Dependency mapping accuracy
+
+6. **Quality assurance reporting**:
+   - Generate detailed validation reports
+   - Identify issues and recommendations
+   - Create improvement action items
+   - Update quality metrics tracking
+
+**Reference**
+- Use `specpulse validate --help` for additional CLI options
+- Check related files in specs/, plans/, tasks/ directories
+- Use appropriate commands to fix validation issues
+- Run `specpulse doctor` if you encounter system issues
+<!-- SPECPULSE:END -->
+"""

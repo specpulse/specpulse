@@ -1,0 +1,52 @@
+description = "Address clarification markers in specifications using SpecPulse SDD methodology"
+
+prompt = """
+<!-- SPECPULSE:START -->
+**Guardrails**
+- CLI-first approach: Always try SpecPulse CLI commands before file operations
+- Keep changes tightly scoped to the clarification outcome
+- Only edit files in specs/, plans/, tasks/, memory/ directories - NEVER modify templates/ or internal config
+
+**Critical Rules**
+- **PRIMARY**: Use `specpulse clarify <spec-id>` when available
+- **FALLBACK**: File Operations only if CLI fails
+- **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/, .github/, .opencode/, .crush/, .qwen/
+- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
+
+**Steps**
+Track these steps as TODOs and complete them one by one.
+
+1. **Parse arguments** to extract clarification targets
+2. **Scan for clarification markers**:
+   - Search specs/ directory for TBD, TODO, CLARIFY markers
+   - Identify ambiguous requirements
+   - Locate missing specifications
+3. **Try CLI first**:
+   - Run `specpulse clarify <spec-id>`
+   - If this succeeds, follow CLI guidance
+4. **If CLI doesn't exist, use File Operations**:
+   - **Step 1: Analyze clarification needs**:
+     - Read specification files with markers
+     - Identify specific clarification points
+     - Categorize clarification types
+5. **Comprehensive clarification process**:
+   - **Requirement Clarification**:
+     - Define unclear functional requirements
+     - Specify acceptance criteria details
+     - Resolve contradictory requirements
+   - **Technical Clarification**:
+     - Define technical specifications
+     - Clarify implementation approaches
+     - Specify integration requirements
+   - **Process Clarification**:
+     - Define validation criteria
+     - Specify testing approaches
+     - Clarify deliverable formats
+
+**Reference**
+- Use `specpulse clarify --help` for additional CLI options
+- Focus on specifications with clarification markers
+- Use `validate` to verify clarification completeness
+- Run `specpulse doctor` if you encounter system issues
+<!-- SPECPULSE:END -->
+"""

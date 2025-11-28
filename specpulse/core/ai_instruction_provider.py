@@ -21,8 +21,12 @@ class AIInstructionProvider:
         self.claude_commands_dir = resources_dir / "commands" / "claude"
         self.gemini_commands_dir = resources_dir / "commands" / "gemini"
         self.windsurf_commands_dir = resources_dir / "commands" / "windsurf"
+        self.windsurf_workflows_dir = resources_dir / "commands" / "windsurf"  # For .windsurf/workflows/ deployment
         self.cursor_commands_dir = resources_dir / "commands" / "cursor"
         self.github_commands_dir = resources_dir / "commands" / "github"
+        self.opencode_commands_dir = resources_dir / "commands" / "opencode"
+        self.crush_commands_dir = resources_dir / "commands" / "crush" / "sp"
+        self.qwen_commands_dir = resources_dir / "commands" / "qwen"
 
     # Claude methods
     def get_claude_instructions(self) -> str:
@@ -218,6 +222,132 @@ Use /sp-pulse, /sp-spec, /sp-plan, /sp-task for SDD workflow."""
         """Get GitHub Copilot feature command"""
         return self._load_command_file(self.github_commands_dir / "sp-feature.prompt.md")
 
+    # OpenCode methods
+    def get_opencode_instructions(self) -> str:
+        """Get OpenCode AI instructions"""
+        return """# SpecPulse Commands for OpenCode
+Use /sp-pulse, /sp-spec, /sp-plan, /sp-task for SDD workflow."""
+
+    def get_opencode_pulse_command(self) -> str:
+        """Get OpenCode pulse command"""
+        return self._load_command_file(self.opencode_commands_dir / "sp-pulse.md")
+
+    def get_opencode_spec_command(self) -> str:
+        """Get OpenCode spec command"""
+        return self._load_command_file(self.opencode_commands_dir / "sp-spec.md")
+
+    def get_opencode_plan_command(self) -> str:
+        """Get OpenCode plan command"""
+        return self._load_command_file(self.opencode_commands_dir / "sp-plan.md")
+
+    def get_opencode_task_command(self) -> str:
+        """Get OpenCode task command"""
+        return self._load_command_file(self.opencode_commands_dir / "sp-task.md")
+
+    def get_opencode_execute_command(self) -> str:
+        """Get OpenCode execute command"""
+        return self._load_command_file(self.opencode_commands_dir / "sp-execute.md")
+
+    def get_opencode_status_command(self) -> str:
+        """Get OpenCode status command"""
+        return self._load_command_file(self.opencode_commands_dir / "sp-status.md")
+
+    def get_opencode_validate_command(self) -> str:
+        """Get OpenCode validate command"""
+        return self._load_command_file(self.opencode_commands_dir / "sp-validate.md")
+
+    def get_opencode_feature_command(self) -> str:
+        """Get OpenCode feature command"""
+        return self._load_command_file(self.opencode_commands_dir / "sp-feature.md")
+
+    # Crush methods
+    def get_crush_instructions(self) -> str:
+        """Get Crush AI instructions"""
+        return """# SpecPulse Commands for Crush
+Use SpecPulse commands with Crush workflow system."""
+
+    def get_crush_pulse_command(self) -> str:
+        """Get Crush pulse command"""
+        return self._load_command_file(self.crush_commands_dir / "sp-pulse.md")
+
+    def get_crush_spec_command(self) -> str:
+        """Get Crush spec command"""
+        return self._load_command_file(self.crush_commands_dir / "sp-spec.md")
+
+    def get_crush_plan_command(self) -> str:
+        """Get Crush plan command"""
+        return self._load_command_file(self.crush_commands_dir / "sp-plan.md")
+
+    def get_crush_task_command(self) -> str:
+        """Get Crush task command"""
+        return self._load_command_file(self.crush_commands_dir / "sp-task.md")
+
+    def get_crush_execute_command(self) -> str:
+        """Get Crush execute command"""
+        return self._load_command_file(self.crush_commands_dir / "sp-execute.md")
+
+    def get_crush_status_command(self) -> str:
+        """Get Crush status command"""
+        return self._load_command_file(self.crush_commands_dir / "sp-status.md")
+
+    def get_crush_validate_command(self) -> str:
+        """Get Crush validate command"""
+        return self._load_command_file(self.crush_commands_dir / "sp-validate.md")
+
+    def get_crush_feature_command(self) -> str:
+        """Get Crush feature command"""
+        return self._load_command_file(self.crush_commands_dir / "sp-feature.md")
+
+    # Qwen Code methods
+    def get_qwen_instructions(self) -> str:
+        """Get Qwen Code AI instructions"""
+        return """# SpecPulse Commands for Qwen Code
+Use /sp-pulse, /sp-spec, /sp-plan, /sp-task for SDD workflow."""
+
+    def get_qwen_pulse_command(self) -> str:
+        """Get Qwen Code pulse command"""
+        return self._load_command_file(self.qwen_commands_dir / "sp-pulse.toml")
+
+    def get_qwen_spec_command(self) -> str:
+        """Get Qwen Code spec command"""
+        return self._load_command_file(self.qwen_commands_dir / "sp-spec.toml")
+
+    def get_qwen_plan_command(self) -> str:
+        """Get Qwen Code plan command"""
+        return self._load_command_file(self.qwen_commands_dir / "sp-plan.toml")
+
+    def get_qwen_task_command(self) -> str:
+        """Get Qwen Code task command"""
+        return self._load_command_file(self.qwen_commands_dir / "sp-task.toml")
+
+    def get_qwen_execute_command(self) -> str:
+        """Get Qwen Code execute command"""
+        return self._load_command_file(self.qwen_commands_dir / "sp-execute.toml")
+
+    def get_qwen_status_command(self) -> str:
+        """Get Qwen Code status command"""
+        return self._load_command_file(self.qwen_commands_dir / "sp-status.toml")
+
+    def get_qwen_validate_command(self) -> str:
+        """Get Qwen Code validate command"""
+        return self._load_command_file(self.qwen_commands_dir / "sp-validate.toml")
+
+    def get_qwen_feature_command(self) -> str:
+        """Get Qwen Code feature command"""
+        return self._load_command_file(self.qwen_commands_dir / "sp-feature.toml")
+
+    def get_qwen_clarify_command(self) -> str:
+        """Get Qwen Code clarify command"""
+        return self._load_command_file(self.qwen_commands_dir / "sp-clarify.toml")
+
+    def get_qwen_continue_command(self) -> str:
+        """Get Qwen Code continue command"""
+        return self._load_command_file(self.qwen_commands_dir / "sp-continue.toml")
+
+    def get_qwen_decompose_command(self) -> str:
+        """Get Qwen Code decompose command"""
+        return self._load_command_file(self.qwen_commands_dir / "sp-decompose.toml")
+
     # Command generation
     def generate_claude_commands(self) -> List[Dict]:
         """Generate all Claude AI commands"""
@@ -284,6 +414,45 @@ Use /sp-pulse, /sp-spec, /sp-plan, /sp-task for SDD workflow."""
                 })
         return commands
 
+    def generate_opencode_commands(self) -> List[Dict]:
+        """Generate all OpenCode AI commands"""
+        commands = []
+        if self.opencode_commands_dir.exists():
+            for cmd_file in self.opencode_commands_dir.glob("*.md"):
+                content = cmd_file.read_text(encoding='utf-8')
+                commands.append({
+                    "name": cmd_file.stem,
+                    "description": "OpenCode AI command",
+                    "content": content
+                })
+        return commands
+
+    def generate_crush_commands(self) -> List[Dict]:
+        """Generate all Crush AI commands"""
+        commands = []
+        if self.crush_commands_dir.exists():
+            for cmd_file in self.crush_commands_dir.glob("*.md"):
+                content = cmd_file.read_text(encoding='utf-8')
+                commands.append({
+                    "name": cmd_file.stem,
+                    "description": "Crush AI command",
+                    "content": content
+                })
+        return commands
+
+    def generate_qwen_commands(self) -> List[Dict]:
+        """Generate all Qwen Code AI commands"""
+        commands = []
+        if self.qwen_commands_dir.exists():
+            for cmd_file in self.qwen_commands_dir.glob("*.toml"):
+                content = cmd_file.read_text(encoding='utf-8')
+                commands.append({
+                    "name": cmd_file.stem,
+                    "description": "Qwen Code AI command",
+                    "content": content
+                })
+        return commands
+
     def generate_all_commands(self) -> Dict[str, List[Dict]]:
         """Generate commands for all supported AI tools"""
         all_commands = {}
@@ -294,11 +463,17 @@ Use /sp-pulse, /sp-spec, /sp-plan, /sp-task for SDD workflow."""
             ("gemini", "*.toml", "Gemini AI command"),
             ("windsurf", "*.md", "Windsurf AI command"),
             ("cursor", "*.md", "Cursor AI command"),
-            ("github", "*.prompt.md", "GitHub Copilot AI command")
+            ("github", "*.prompt.md", "GitHub Copilot AI command"),
+            ("opencode", "*.md", "OpenCode AI command"),
+            ("crush", "*.md", "Crush AI command"),
+            ("qwen", "*.toml", "Qwen Code AI command")
         ]
 
         for tool_name, pattern, description in tools:
-            tool_dir = self.resources_dir / "commands" / tool_name
+            if tool_name == 'crush':
+                tool_dir = self.resources_dir / "commands" / "crush" / "sp"
+            else:
+                tool_dir = self.resources_dir / "commands" / tool_name
             if tool_dir.exists():
                 commands = []
                 for cmd_file in tool_dir.glob(pattern):

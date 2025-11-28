@@ -91,6 +91,9 @@ packages = [
     "specpulse.resources.commands",
     "specpulse.resources.commands.claude",
     "specpulse.resources.commands.gemini",
+    "specpulse.resources.commands.opencode",
+    "specpulse.resources.commands.crush",
+    "specpulse.resources.commands.qwen",
     "specpulse.resources.memory",
     "specpulse.monitor",
 ]
@@ -107,6 +110,9 @@ specpulse = [
     "resources/commands/claude/**/*.md",
     "resources/commands/gemini/*.toml",
     "resources/commands/gemini/**/*.toml",
+    "resources/commands/opencode/*.md",
+    "resources/commands/crush/sp/*.md",
+    "resources/commands/qwen/*.toml",
     "resources/validation_rules.yaml",
     "resources/validation_examples.yaml",
 ]

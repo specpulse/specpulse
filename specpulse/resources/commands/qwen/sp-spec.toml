@@ -1,0 +1,53 @@
+description = "Create or manage feature specifications using SpecPulse SDD methodology"
+
+prompt = """
+<!-- SPECPULSE:START -->
+**Guardrails**
+- CLI-first approach: Always try SpecPulse CLI commands before file operations
+- Keep changes tightly scoped to the specification creation outcome
+- Only edit files in specs/, plans/, tasks/, memory/ directories - NEVER modify templates/ or internal config
+
+**Critical Rules**
+- **PRIMARY**: Use `specpulse spec create <feature-id>` when available
+- **FALLBACK**: File Operations only if CLI fails
+- **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/, .github/, .opencode/, .crush/, .qwen/
+- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
+
+**Steps**
+Track these steps as TODOs and complete them one by one.
+
+1. **Parse arguments** to extract specification name and options
+2. **Determine current context**:
+   - Read: memory/context.md
+   - Extract current.feature, current.feature_id if available
+3. **Try CLI first**:
+   - Run `specpulse spec create <spec-name>`
+   - If this succeeds, STOP HERE. CLI handles everything.
+4. **If CLI doesn't exist, use File Operations**:
+   - **Step 1: Create specification structure**:
+     ```bash
+     mkdir -p specs/current.feature_id
+     ```
+   - **Step 2: Create specification template**:
+     - Copy from templates/spec-template.md if exists
+     - Generate comprehensive specification structure
+   - **Step 3: Populate specification content**:
+     - Feature overview and objectives
+     - Functional requirements
+     - Non-functional requirements
+     - Technical specifications
+     - Acceptance criteria
+     - Dependencies and constraints
+5. **Comprehensive specification development**:
+   - Define problem statement and scope
+   - Document technical architecture
+   - Create detailed requirements breakdown
+   - Specify testing and validation criteria
+
+**Reference**
+- Use `specpulse spec --help` for additional CLI options
+- Check memory/context.md for current feature context
+- Use `pulse` to initialize new features
+- Run `specpulse doctor` if you encounter system issues
+<!-- SPECPULSE:END -->
+"""

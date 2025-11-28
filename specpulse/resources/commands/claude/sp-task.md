@@ -184,6 +184,128 @@ When called with `/sp-task $ARGUMENTS`, I will:
    f. **Track execution results** and update status
    g. **Update progress tracking** automatically
 
+## Standardized Task Format
+
+All task files must follow this exact YAML frontmatter format:
+
+```yaml
+---
+id: task-[slug]
+status: todo | in-progress | blocked | done
+title: "Short but clear task title"
+description: |
+  *Answer these 4 questions with sufficient detail:*
+  - What problem does this solve?
+  - Why is this necessary?
+  - How will this be done? (step-by-step, include function/file names when possible)
+  - When is this considered complete?
+
+files_touched:
+  - path: src/...
+    reason: "What changes in this file, briefly"
+  - path: ...
+    reason: "..."
+
+goals:
+  - "Concrete goal 1 achieved when this task completes"
+  - "Concrete goal 2"
+
+success_criteria:
+  - "Test/acceptance criteria 1 (measurable or verifiable)"
+  - "Test/acceptance criteria 2"
+
+dependencies:
+  - task-[id-1]
+  - task-[id-2]
+
+next_tasks:
+  - task-[id-x]
+  - task-[id-y]
+
+risk_level: low | medium | high
+risk_notes: |
+  "Important risks, edge cases, technical debt notes for this task"
+
+# MoSCoW breakdown for this task
+moscow:
+  must:
+    - "Must-have requirements/behaviors for this task"
+    - "Without these, task is not considered complete"
+  should:
+    - "Additional improvements if time/budget allows"
+    - "Performance, UX, DX improvements, etc."
+  know:
+    - "Critical knowledge, context, or domain details developer must know"
+    - "Documentation links, rationale for specific decisions"
+  wont:
+    - "Things we WILL NOT do in this task scope - out of scope"
+    - "Topics for future tasks"
+
+priority_overall: must | should | could | wont
+priority_reason: "Why this task has this priority - short, clear explanation."
+
+---
+```
+
+### Example Task File
+```markdown
+---
+id: task-001
+status: todo
+title: "User authentication system setup"
+description: |
+  - **What problem does this solve?**: User login/logout and token-based authentication
+  - **Why is this necessary?**: Foundation for secure system access
+  - **How will this be done?**: JWT implementation, middleware, auth routes
+  - **When is this complete?**: All tests pass and documentation ready
+
+files_touched:
+  - path: src/auth/jwt.py
+    reason: "JWT token generation/validation"
+  - path: src/auth/middleware.py
+    reason: "Authentication middleware for protected routes"
+  - path: src/routes/auth.py
+    reason: "Login/logout endpoints"
+
+goals:
+  - "JWT-based authentication system"
+  - "Secure password hashing"
+  - "Authentication middleware"
+
+success_criteria:
+  - "Login/logout responds under 200ms"
+  - "JWT token passes security tests"
+  - "Rate limiting is active"
+
+dependencies: []
+next_tasks:
+  - task-002  # User management
+  - task-003  # Role system
+
+risk_level: medium
+risk_notes: "JWT secret management requires careful handling in production"
+
+moscow:
+  must:
+    - "JWT token implementation"
+    - "Password hashing (bcrypt)"
+    - "Basic auth middleware"
+  should:
+    - "Rate limiting"
+    - "Token refresh mechanism"
+    - "Authentication logs"
+  know:
+    - "JWT standards and security best practices"
+    - "OWASP authentication guidelines"
+  wont:
+    - "OAuth implementation (separate task)"
+    - "2FA (separate task)"
+
+priority_overall: must
+priority_reason: "All features depend on authentication system"
+---
+```
+
 ## Enhanced Task Format
 
 ### For Decomposed Services

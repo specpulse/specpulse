@@ -44,10 +44,65 @@ Track these steps as TODOs and complete them one by one.
      ```
      If CLI succeeds, STOP HERE.
    - **Read selected implementation plan** from selected plan file
-   - **Generate AI-optimized tasks using File Operations**:
-     - **Step 1: Read Task Template**
+   - **Generate tasks using STANDARDIZED FORMAT**:
+     - **Step 1: Use this exact YAML structure for EVERY task**:
+       ```yaml
+       ---
+       id: task-[slug]
+       status: todo | in-progress | blocked | done
+       title: "Short but clear task title"
+       description: |
+         *Answer these 4 questions with sufficient detail:*
+         - What problem does this solve?
+         - Why is this necessary?
+         - How will this be done? (step-by-step, include function/file names when possible)
+         - When is this considered complete?
+
+       files_touched:
+         - path: src/...
+           reason: "What changes in this file, briefly"
+
+       goals:
+         - "Concrete goal 1 achieved when this task completes"
+         - "Concrete goal 2"
+
+       success_criteria:
+         - "Test/acceptance criteria 1 (measurable or verifiable)"
+         - "Test/acceptance criteria 2"
+
+       dependencies:
+         - task-[id-1]
+         - task-[id-2]
+
+       next_tasks:
+         - task-[id-x]
+         - task-[id-y]
+
+       risk_level: low | medium | high
+       risk_notes: |
+         "Important risks, edge cases, technical debt notes for this task"
+
+       moscow:
+         must:
+           - "Must-have requirements/behaviors for this task"
+           - "Without these, task is not considered complete"
+         should:
+           - "Additional improvements if time/budget allows"
+           - "Performance, UX, DX improvements, etc."
+         know:
+           - "Critical knowledge, context, or domain details developer must know"
+           - "Documentation links, rationale for specific decisions"
+         wont:
+           - "Things we WILL NOT do in this task scope - out of scope"
+           - "Topics for future tasks"
+
+       priority_overall: must | should | could | wont
+       priority_reason: "Why this task has this priority - short, clear explanation."
+       ---
        ```
-       Read: templates/task.md
+     - **Step 2: Read Standard Template**
+       ```
+       Read: templates/task_standard.md
        ```
      - **Step 2: Parse Plan and Create Task Files**
        ```

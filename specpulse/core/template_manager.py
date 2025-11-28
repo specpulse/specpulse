@@ -118,9 +118,9 @@ class TemplateManager:
     def __init__(self, project_root: Path):
         self.project_root = project_root
 
-        # Use path manager to detect structure and get correct template path
+        # Use path manager to detect structure and get correct template path (ENFORCED: Always uses .specpulse/ structure)
         from .path_manager import PathManager
-        self.path_manager = PathManager(project_root, use_legacy_structure=False)
+        self.path_manager = PathManager(project_root)
 
         # Check if .specpulse structure exists, fallback to legacy if not
         if (project_root / ".specpulse" / "templates").exists():

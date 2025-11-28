@@ -1,0 +1,56 @@
+description = "Switch context and continue work on a specific feature using SpecPulse SDD methodology"
+
+prompt = """
+<!-- SPECPULSE:START -->
+**Guardrails**
+- CLI-first approach: Always try SpecPulse CLI commands before file operations
+- Keep changes tightly scoped to the context switching outcome
+- Only edit files in specs/, plans/, tasks/, memory/ directories - NEVER modify templates/ or internal config
+
+**Critical Rules**
+- **PRIMARY**: Use `specpulse continue <feature-id>` when available
+- **FALLBACK**: File Operations only if CLI fails
+- **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/, .github/, .opencode/, .crush/, .qwen/
+- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
+
+**Steps**
+Track these steps as TODOs and complete them one by one.
+
+1. **Parse arguments** to extract feature ID and continue parameters
+2. **Determine target feature context**:
+   - Read: memory/context.md for current context
+   - Locate target feature in specs/ directory
+   - Analyze feature completion status
+3. **Try CLI first**:
+   - Run `specpulse continue <feature-id>`
+   - If this succeeds, follow CLI context switching
+4. **If CLI doesn't exist, use File Operations**:
+   - **Step 1: Load feature context**:
+     - Read feature specifications
+     - Analyze implementation plans
+     - Check task progress status
+   - **Step 2: Update working context**:
+     - Update memory/context.md with new feature
+     - Switch git branch if needed
+     - Load feature-specific configurations
+5. **Seamless context transition**:
+   - **Context Loading**:
+     - Load feature specifications and requirements
+     - Restore implementation progress state
+     - Load relevant tools and configurations
+   - **Progress Assessment**:
+     - Analyze current completion status
+     - Identify next actionable items
+     - Determine continuation priorities
+   - **Environment Setup**:
+     - Prepare development environment
+     - Load relevant templates and tools
+     - Establish working directory structure
+
+**Reference**
+- Use `specpulse continue --help` for additional CLI options
+- Check memory/context.md for current working context
+- Use `status` to assess feature progress
+- Run `specpulse doctor` if you encounter system issues
+<!-- SPECPULSE:END -->
+"""
