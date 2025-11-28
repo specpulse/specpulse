@@ -1,6 +1,6 @@
 # SpecPulse Documentation
 
-Welcome to the SpecPulse documentation! This directory contains comprehensive guides for using SpecPulse v2.4.1.
+Welcome to the SpecPulse documentation! This directory contains comprehensive guides for using SpecPulse v2.7.1.
 
 ---
 
@@ -13,9 +13,9 @@ Welcome to the SpecPulse documentation! This directory contains comprehensive gu
 
 ### Core Concepts
 
-- **[AI Integration Guide](AI_INTEGRATION.md)** - How SpecPulse works with Claude Code and Gemini CLI
+- **[AI Integration Guide](AI_INTEGRATION.md)** - How SpecPulse works with 8 AI platforms (Claude, Gemini, GPT, Windsurf, Cursor, GitHub, OpenCode, Crush, Qwen)
 - **[Migration Guide](MIGRATION.md)** - Upgrading from previous versions
-- **[Migration Guide v2.2.0](MIGRATION_v2.2.0.md)** - Specific migration for v2.2.0
+- **[Migration Guide v2.7.1](MIGRATION_v2.7.1.md)** - Specific migration for v2.7.1
 
 ### Troubleshooting
 
@@ -70,8 +70,8 @@ Covers:
 **File**: `MIGRATION.md`
 
 Covers:
-- v2.1.2 → v2.4.1 migration (CLI-First Architecture)
-- v2.0.0 → v2.1.2 migration (script elimination)
+- v2.7.1 → v2.7.1 migration (CLI-First Architecture)
+- v2.7.1 → v2.7.1 migration (script elimination)
 - Breaking changes
 - Command mapping
 - Rollback procedures
@@ -90,33 +90,43 @@ Covers:
 
 ---
 
-## 🚀 What's New in v2.4.1
+## 🚀 What's New in v2.7.1
 
-### Major Changes
+### Latest Changes
 
-✅ **CLI-First Architecture (v2.1.2+)**
+✅ **OpenCode Command Directory Fix (v2.7.1)**
+- Fixed OpenCode custom commands copying to wrong directory
+- Enforced `.opencode/command/` (singular) directory structure
+- Fixed "all" selection mode for AI tool initialization
+
+✅ **Domain & Website Launch (v2.7.1)**
+- New custom domain: `https://specpulse.xyz`
+- Modern, responsive landing page
+- Professional email contacts
+- Enhanced documentation
+
+✅ **Selective AI Tool Initialization (v2.7.1)**
+- Only create directories for selected AI platforms
+- Cleaner project structure with no unnecessary directories
+- Faster initialization with selective tool loading
+- Better resource usage optimization
+
+✅ **Multi-Platform AI Integration (v2.7.1)**
+- Support for 8 AI platforms: Claude, Gemini, GPT, Windsurf, Cursor, GitHub, OpenCode, Crush, Qwen
+- 86 custom commands across all platforms
+- Consistent command structure and behavior
+
+✅ **Enhanced CLI-First Architecture (v2.7.1+)**
 - AI assistants must try CLI commands before file operations
 - Deprecated AI commands (`specpulse ai *`)
 - Enhanced performance and reliability
 
-✅ **Enhanced Validation System (v2.2.0)**
+✅ **Enhanced Validation System (v2.7.1)**
 - Auto-fix capabilities
 - Parallel processing for large projects
 - Comprehensive security improvements
 
-✅ **Performance Improvements**
-- Thread-safe feature IDs
-- 3-5x faster validation
-- TTL template caching
-- Better memory management
-
-✅ **Architecture Improvements**
-- Service-oriented design
-- Dependency injection
-- Clean code principles
-- Better testability
-
-### Historical Changes (v2.1.0)
+### Historical Changes (v2.7.1)
 
 ✅ **Scripts Eliminated**
 - No more bash/PowerShell scripts
@@ -136,10 +146,10 @@ Covers:
 # Upgrade to latest
 pip install --upgrade specpulse
 
-# For v2.0.0 → v2.1.0: Remove old scripts (optional)
+# For v2.7.1 → v2.7.1: Remove old scripts (optional)
 rm -rf scripts/
 
-# For v2.1.2 → v2.4.1: No changes needed
+# For v2.7.1 → v2.7.1: No changes needed
 # CLI-first workflow is automatic
 
 # Done! Everything works (much faster and more reliable)
@@ -170,7 +180,7 @@ User → Claude Code/Gemini → SpecPulse CLI → LLM-Friendly Files
         Complete specs, plans, tasks
 ```
 
-**CLI-First Pattern (v2.1.2+)**:
+**CLI-First Pattern (v2.7.1+)**:
 ```
 User Request: /sp-spec OAuth2 login
     ↓
@@ -195,8 +205,10 @@ Step 2: If CLI doesn't exist, use File Operations
 ### Complete Feature Development
 
 ```bash
-# 1. Initialize project
-specpulse init my-project --ai claude
+# 1. Initialize project (supports all 8 AI platforms)
+specpulse init my-project --ai all        # All platforms
+specpulse init my-project --ai claude     # Claude only
+specpulse init my-project --ai interactive # Choose interactively
 
 # 2. Start feature
 specpulse feature init oauth-login
@@ -319,24 +331,24 @@ All SpecPulse documentation follows these standards:
 - ✅ **Clear Examples**: Every concept includes code examples
 - ✅ **Step-by-Step**: Guides are sequential and complete
 - ✅ **Platform-Agnostic**: Works on Windows, macOS, Linux
-- ✅ **Version-Specific**: Clearly marked for v2.4.1
+- ✅ **Version-Specific**: Clearly marked for v2.7.1
 - ✅ **Tested**: All examples are tested and verified
 
 ---
 
 ## 🔄 Documentation Updates
 
-**Last Updated**: 2025-11-01
-**Version**: v2.4.1
+**Last Updated**: 2025-11-28
+**Version**: v2.7.1
 **Status**: Current and Complete
 
 ### Recent Changes
 
-- ✅ Updated for v2.4.1 (CLI-First Architecture)
-- ✅ Enhanced AI integration documentation
-- ✅ New validation system coverage
-- ✅ Performance improvements documentation
-- ✅ Updated migration guides for all versions
+- ✅ Updated for v2.7.1 (OpenCode Command Directory Fix)
+- ✅ Added comprehensive 8-platform AI integration documentation
+- ✅ Enhanced selective AI tool initialization coverage
+- ✅ New domain and website launch information
+- ✅ Updated migration guides for all versions including v2.7.x
 
 ---
 

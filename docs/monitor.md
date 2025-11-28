@@ -1,4 +1,4 @@
-# Task Monitor Documentation
+# SpecPulse v2.7.1 Task Monitor Documentation
 
 ## Overview
 
@@ -26,7 +26,7 @@ The SpecPulse Task Monitor provides comprehensive task progress tracking and ana
 
 ## Installation
 
-The Task Monitor is included with SpecPulse v2.6.0+. No additional installation required.
+The Task Monitor is included with SpecPulse v2.7.1+. No additional installation required.
 
 ## Quick Start
 

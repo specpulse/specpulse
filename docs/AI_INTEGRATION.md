@@ -1,4 +1,4 @@
-# SpecPulse v2.4.1 AI Integration Guide
+# SpecPulse v2.7.1 AI Integration Guide
 
 ## 📋 Table of Contents
 
@@ -10,6 +10,7 @@
 - [Multi-LLM Support](#multi-llm-support)
 - [AI Workflow Checkpoints](#ai-workflow-checkpoints)
 - [Privacy-First Design](#privacy-first-design)
+- [Multi-Platform AI Integration](#multi-platform-ai-integration)
 - [Integration with AI Assistants](#integration-with-ai-assistants)
 - [Advanced Configuration](#advanced-configuration)
 - [Troubleshooting](#troubleshooting)
@@ -19,15 +20,17 @@
 
 ## 🎯 Overview
 
-SpecPulse v2.4.1 introduces revolutionary AI integration that enhances your specification-driven development workflow while maintaining complete privacy and control. Unlike traditional AI tools that require external API calls, SpecPulse's AI integration works entirely offline, processing all logic locally on your machine.
+SpecPulse v2.7.1 introduces comprehensive multi-platform AI integration that enhances your specification-driven development workflow while maintaining complete privacy and control. Unlike traditional AI tools that require external API calls, SpecPulse's AI integration works entirely offline, processing all logic locally on your machine.
 
 ### Key Principles
 
 1. **Privacy-First**: No data leaves your system
 2. **Local Processing**: All AI logic runs locally
 3. **Context-Aware**: Understands your project structure
-4. **Multi-LLM Support**: Works with Claude, Gemini, or both
-5. **Intelligent Suggestions**: Provides context-aware recommendations
+4. **Multi-Platform Support**: Works with 8 AI platforms (Claude, Gemini, GPT, Windsurf, Cursor, GitHub, OpenCode, Crush, Qwen)
+5. **Selective Initialization**: Only create directories for selected AI platforms
+6. **Intelligent Suggestions**: Provides context-aware recommendations
+7. **Consistent Command Structure**: Uniform slash commands across all platforms
 
 ---
 
@@ -80,11 +83,11 @@ SpecPulse v2.4.1 introduces revolutionary AI integration that enhances your spec
 
 ---
 
-## 🤖 AI Integration in v2.4.1
+## 🤖 AI Integration in v2.7.1
 
-### CLI-First Architecture (v2.1.2+)
+### CLI-First Architecture (v2.7.1+)
 
-**Critical Design Change**: SpecPulse v2.4.1 follows a CLI-first architecture where AI assistants should ALWAYS try CLI commands before using file operations.
+**Critical Design Change**: SpecPulse v2.7.1 follows a CLI-first architecture where AI assistants should ALWAYS try CLI commands before using file operations.
 
 #### **Primary Workflow Hierarchy**
 
@@ -199,7 +202,7 @@ tech_stack:
 last_updated: "2025-11-01T12:00:00Z"
 ```
 
-### AI Context Detection (v2.4.1)
+### AI Context Detection (v2.7.1)
 
 While AI commands have been deprecated, context detection still works through:
 
@@ -214,7 +217,7 @@ While AI commands have been deprecated, context detection still works through:
 
 ## 💡 Workflow Guidance & Templates
 
-### Template System (v2.4.1)
+### Template System (v2.7.1)
 
 SpecPulse provides intelligent template selection and workflow guidance:
 
@@ -372,7 +375,7 @@ Both sets of commands provide identical functionality but are formatted for thei
 
 ## 📸 Memory & Checkpoint System
 
-### Memory System (v2.4.1)
+### Memory System (v2.7.1)
 
 SpecPulse provides a structured memory system for tracking project knowledge and decisions:
 
@@ -473,11 +476,174 @@ git checkout milestone-001
 
 ---
 
+## 🌐 Multi-Platform AI Integration
+
+### Supported AI Platforms (v2.7.1)
+
+SpecPulse v2.7.1 supports 8 major AI platforms with consistent command structure:
+
+| Platform | Directory | Command Format | File Type | Custom Commands |
+|----------|-----------|---------------|-----------|-----------------|
+| **Claude** | `.claude/commands/` | YAML + Markdown | `.md` | 14 commands |
+| **Gemini** | `.gemini/commands/` | TOML Configuration | `.toml` | 12 commands |
+| **GPT** | `.gpt/commands/` | YAML + Markdown | `.md` | 12 commands |
+| **Windsurf** | `.windsurf/workflows/` | Custom Front Matter | `.md` | 12 commands |
+| **Cursor** | `.cursor/commands/` | YAML + Markdown | `.md` | 8 commands |
+| **GitHub** | `.github/prompts/` | Prompt Format | `.prompt.md` | 8 commands |
+| **OpenCode** | `.opencode/command/` | YAML + Markdown | `.md` | 8 commands |
+| **Crush** | `.crush/commands/sp/` | YAML + Markdown | `.md` | 8 commands |
+| **Qwen** | `.qwen/commands/` | TOML Configuration | `.toml` | 12 commands |
+
+### Selective AI Tool Initialization
+
+SpecPulse v2.7.1 introduces selective AI tool initialization for cleaner projects:
+
+```bash
+# Initialize with all AI platforms
+specpulse init my-project --ai all
+
+# Initialize with specific platforms
+specpulse init my-project --ai claude,gemini
+
+# Initialize with single platform
+specpulse init my-project --ai claude
+
+# Interactive selection
+specpulse init my-project --ai interactive
+```
+
+#### Directory Structure Benefits
+
+**Before (All Platforms)**:
+```
+.claude/
+.gemini/
+.gpt/
+.windsurf/
+.cursor/
+.github/
+.opencode/
+.crush/
+.qwen/
+```
+
+**After (Selective)**:
+```
+# Only selected platforms
+.claude/
+.gemini/
+.cursor/
+```
+
+### Unified Command Set
+
+All platforms support these core commands:
+
+| Command | Function | Platforms |
+|---------|----------|-----------|
+| `/sp-pulse` | Initialize feature | All |
+| `/sp-spec` | Create specification | All |
+| `/sp-plan` | Generate implementation plan | All |
+| `/sp-task` | Break down into tasks | All |
+| `/sp-execute` | Execute tasks | All |
+| `/sp-status` | Show project status | All |
+| `/sp-validate` | Validate project | All |
+| `/sp-feature` | Feature management | All |
+
+#### Platform-Specific Commands
+
+**Claude Code**:
+- `/sp-clarify` - Clarify requirements
+- `/sp-continue` - Continue current work
+- `/sp-decompose` - Decompose complex features
+- `/sp-llm-enforce` - Enforce LLM compliance
+- `/sp-test` - Generate tests
+
+**Gemini CLI**:
+- `/sp-clarify` - Requirements clarification (TOML)
+- `/sp-continue` - Work continuation (TOML)
+- `/sp-decompose` - Feature decomposition (TOML)
+- `/sp-ops` - Operations commands (TOML)
+
+**Windsurf**:
+- `/sp-clarify` - Clarify with SPECPULSE blocks
+- `/sp-continue` - Continue with workflow blocks
+- `/sp-decompose` - Decompose with structured blocks
+- `/sp-ops` - Operations with workflow integration
+
+### Platform Configuration
+
+Each platform has its own configuration style:
+
+#### Claude Code (YAML Front Matter)
+```yaml
+---
+command: sp-spec
+description: Create specification
+version: 1.0
+---
+```
+
+#### Gemini CLI (TOML)
+```toml
+[command]
+name = "sp-spec"
+description = "Create specification"
+version = "1.0"
+```
+
+#### Windsurf (Custom Front Matter)
+```frontmatter
+<!-- @command: sp-spec -->
+<!-- @description: Create specification -->
+<!-- @version: 1.0 -->
+```
+
+### Cross-Platform Compatibility
+
+All commands work identically across platforms:
+
+```bash
+# These work the same on ALL platforms
+/sp-pulse user-authentication
+/sp-spec "OAuth2 authentication system"
+/sp-plan "Implementation roadmap"
+/sp-task breakdown
+/sp-execute all
+/sp-status
+/sp-validate
+```
+
+### Migration Between Platforms
+
+Switching between AI platforms is seamless:
+
+```bash
+# Current project with Claude
+ls .claude/commands/
+
+# Add Gemini support
+specpulse init . --ai gemini
+
+# Both platforms now available
+ls .claude/commands/  # Existing
+ls .gemini/commands/  # Newly added
+```
+
+### Best Practices
+
+1. **Choose Your Primary Platform**: Select 1-2 platforms for daily use
+2. **Use Selective Initialization**: Only initialize needed platforms
+3. **Maintain Consistency**: Use same commands across platforms
+4. **Leverage Platform Strengths**: Use unique features when beneficial
+
+---
+
 ## 🔒 Privacy-First Design
 
-### Privacy Principles (v2.4.1)
+### Privacy Principles (v2.7.1)
 
-SpecPulse v2.4.1 maintains privacy as a fundamental requirement while providing enhanced AI integration:
+SpecPulse v2.7.1 maintains privacy as a fundamental requirement while providing enhanced AI integration:
 
 #### **No External API Calls**
 
@@ -674,7 +840,7 @@ Complete specification ready
 
 ---
 
-## ⚙️ Configuration (v2.4.1)
+## ⚙️ Configuration (v2.7.1)
 
 ### Environment Variables
 
@@ -691,7 +857,7 @@ export SPECPULSE_EDITOR="code"
 
 ### Project Configuration
 
-SpecPulse v2.4.1 uses simplified configuration:
+SpecPulse v2.7.1 uses simplified configuration:
 
 #### **No Configuration Required**
 
@@ -829,7 +995,7 @@ When called, I will:
 
 ---
 
-## 🐛 Troubleshooting (v2.4.1)
+## 🐛 Troubleshooting (v2.7.1)
 
 ### Common Issues
 
@@ -1039,7 +1205,7 @@ specpulse validate all
 
 ---
 
-## 📋 Best Practices (v2.4.1)
+## 📋 Best Practices (v2.7.1)
 
 ### CLI-First Workflow Best Practices
 
@@ -1265,7 +1431,7 @@ export SPECPULSE_VERBOSE=1
 
 - [Installation Guide](INSTALLATION.md) - Detailed installation instructions
 - [Migration Guide](MIGRATION.md) - Upgrading from previous versions
-- [Migration Guide v2.2.0](MIGRATION_v2.2.0.md) - Specific migration for v2.2.0
+- [Migration Guide v2.7.1](MIGRATION_v2.7.1.md) - Specific migration for v2.7.1
 - [Troubleshooting Guide](TROUBLESHOOTING.md) - Common issues and solutions
 
 ### Getting Help
@@ -1362,4 +1528,4 @@ specpulse doctor
 
 ---
 
-**🎉 Congratulations! You now have a complete understanding of SpecPulse v2.4.1's AI integration capabilities. Build better software, faster, with intelligent AI assistance while maintaining complete privacy and control!**
+**🎉 Congratulations! You now have a complete understanding of SpecPulse v2.7.1's AI integration capabilities. Build better software, faster, with intelligent AI assistance while maintaining complete privacy and control!**

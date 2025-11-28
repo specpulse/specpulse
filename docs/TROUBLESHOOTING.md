@@ -1,4 +1,4 @@
-# SpecPulse v2.4.1 Troubleshooting Guide
+# SpecPulse v2.7.1 Troubleshooting Guide
 
 ## 📋 Table of Contents
 
@@ -14,6 +14,70 @@
 ---
 
 ## 🚨 Common Issues
+
+### OpenCode Command Directory Issue (v2.7.1)
+
+**Problem**: OpenCode custom commands are in the wrong directory
+
+**Symptoms**:
+- Commands in `.opencode/commands/` (plural)
+- Should be in `.opencode/command/` (singular)
+
+**Diagnosis**:
+```bash
+# Check directory structure
+ls -la .opencode/
+
+# Wrong:
+# .opencode/commands/
+
+# Correct:
+# .opencode/command/
+```
+
+**Solution**:
+```bash
+# Fix directory structure
+if [ -d ".opencode/commands" ] && [ ! -d ".opencode/command" ]; then
+    mv .opencode/commands .opencode/command
+    echo "Fixed OpenCode directory structure"
+fi
+
+# Re-initialize OpenCode commands
+specpulse init . --ai opencode
+```
+
+### Multi-Platform AI Integration Issues
+
+**Problem**: AI commands not working across platforms
+
+**Symptoms**:
+- Slash commands not recognized
+- Missing command files
+- Platform-specific errors
+
+**Diagnosis**:
+```bash
+# Check which AI platforms are initialized
+ls -la .claude/ .gemini/ .gpt/ .windsurf/ .cursor/ .github/ .opencode/ .crush/ .qwen/
+
+# Check command files exist
+ls .claude/commands/ 2>/dev/null || echo "Claude not initialized"
+ls .gemini/commands/ 2>/dev/null || echo "Gemini not initialized"
+ls .opencode/command/ 2>/dev/null || echo "OpenCode not initialized"
+```
+
+**Solution**:
+```bash
+# Re-initialize with specific platforms
+specpulse init . --ai claude,gemini
+
+# Or initialize all platforms
+specpulse init . --ai all
+
+# Or interactive selection
+specpulse init . --ai interactive
+```
 
 ### Quick Diagnosis
 
@@ -61,7 +125,7 @@ specpulse --version
 3. **Check Python Environment:**
    ```bash
    python --version
-   # Should be 3.11+ for v2.4.1
+   # Should be 3.11+ for v2.7.1
    ```
 
 4. **Virtual Environment:**
@@ -179,7 +243,7 @@ specpulse ai context
 # Error: Unknown command 'ai'
 ```
 
-**Explanation**: AI commands have been deprecated in v2.4.1 in favor of CLI-first architecture.
+**Explanation**: AI commands have been deprecated in v2.7.1 in favor of CLI-first architecture.
 
 **Solutions:**
 
@@ -638,7 +702,7 @@ specpulse ai context
 ```
 
 **Solutions:**
-- ✅ **Already Fixed**: v2.4.1 includes Unicode fixes
+- ✅ **Already Fixed**: v2.7.1 includes Unicode fixes
 - Use PowerShell instead of Command Prompt
 - Set console encoding: `chcp 65001`
 
@@ -884,4 +948,4 @@ When reporting issues, include:
 
 ---
 
-**🎉 With proper preparation and troubleshooting, your migration to SpecPulse v2.4.1 should be smooth and successful!**
+**🎉 With proper preparation and troubleshooting, your migration to SpecPulse v2.7.1 should be smooth and successful!**

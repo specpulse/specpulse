@@ -1,4 +1,4 @@
-# SpecPulse v2.4.1 Installation Guide
+# SpecPulse v2.7.1 Installation Guide
 
 ## 📋 Table of Contents
 
@@ -28,8 +28,16 @@
 
 ### Optional Dependencies
 
-- **Claude Code**: For AI-enhanced workflow (recommended)
-- **Gemini CLI**: For AI-enhanced workflow (alternative)
+- **AI Platforms**: Choose one or more for AI-enhanced workflow
+  - **Claude Code**: For AI-enhanced workflow (recommended)
+  - **Gemini CLI**: For AI-enhanced workflow (alternative)
+  - **GPT Tools**: OpenAI's ChatGPT Plus with Advanced Data Analysis
+  - **Windsurf**: AI-powered development environment
+  - **Cursor**: AI code editor with built-in commands
+  - **GitHub Copilot**: AI pair programming assistant
+  - **OpenCode**: AI development platform
+  - **Crush**: AI-powered development tools
+  - **Qwen**: Alibaba's AI language model
 - **VS Code**: For enhanced development experience
 - **Git Client**: Command-line git tools
 
@@ -40,11 +48,14 @@
 ### Method 1: Install from PyPI (Recommended)
 
 ```bash
-# Install SpecPulse
-pip install specpulse==2.4.1
+# Install SpecPulse v2.7.1
+pip install specpulse==2.7.1
+
+# Or install the latest version
+pip install specpulse
 
 # Or upgrade from previous version
-pip install --upgrade specpulse==2.4.1
+pip install --upgrade specpulse==2.7.1
 ```
 
 ### Method 2: Install from Source
@@ -458,7 +469,7 @@ git commit -m "Initial commit"
 ### Windows
 
 - **PowerShell Recommended**: Use PowerShell instead of Command Prompt for better experience
-- **Unicode Support**: SpecPulse v2.4.1 includes Unicode encoding fixes for Windows
+- **Unicode Support**: SpecPulse v2.7.1 includes Unicode encoding fixes for Windows
 - **Path Length**: Be aware of Windows path length limitations (260 characters)
 - **Antivirus**: Some antivirus software may flag Python packages - add exceptions if needed
 
@@ -478,7 +489,7 @@ git commit -m "Initial commit"
 
 ## 🔄 Upgrading from Previous Versions
 
-### From v1.x to v2.4.1
+### From v1.x to v2.7.1
 
 ```bash
 # Backup existing projects (recommended)
@@ -557,4 +568,4 @@ systeminfo  # Windows
 
 ---
 
-**🎉 Congratulations! You have successfully installed SpecPulse v2.4.1.**
+**🎉 Congratulations! You have successfully installed SpecPulse v2.7.1.**

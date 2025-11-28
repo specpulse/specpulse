@@ -1,387 +1,546 @@
-# SpecPulse Migration Guide
+# SpecPulse v2.7.1 Migration Guide
 
-## v2.1.2 → v2.4.1 (Current)
+## 📋 Table of Contents
 
-### 📋 Overview
-
-SpecPulse v2.4.1 introduces the CLI-First Architecture, a fundamental shift in how AI assistants interact with SpecPulse. This is a **backward compatible** upgrade that improves performance and maintains all existing functionality.
-
-### 🔧 Key Changes in v2.4.1
-
-**Major Architectural Change:**
-- ✅ **CLI-First Architecture**: AI assistants must try CLI commands before file operations
-- ✅ **Deprecated AI Commands**: `specpulse ai *` commands removed in favor of direct CLI usage
-- ✅ **Enhanced Validation**: Improved validation system with auto-fix capabilities
-- ✅ **Better Error Handling**: More informative error messages and recovery suggestions
-- ✅ **Performance Improvements**: Faster command execution and reduced overhead
-
-**What Stayed the Same:**
-- ✅ All existing specs, plans, tasks remain compatible
-- ✅ Templates unchanged
-- ✅ Memory system unchanged
-- ✅ AI assistant integration (Claude/Gemini) unchanged
-- ✅ Slash commands work the same way
+- [Overview](#overview)
+- [v2.7.0 → v2.7.1 Migration](#v270--v271-migration)
+- [v2.6.x → v2.7.1 Migration](#v26x--v271-migration)
+- [v2.5.x → v2.7.1 Migration](#v25x--v271-migration)
+- [v2.4.x → v2.7.1 Migration](#v24x--v271-migration)
+- [v2.2.x → v2.7.1 Migration](#v22x--v271-migration)
+- [v2.1.x → v2.7.1 Migration](#v21x--v271-migration)
+- [v2.0.x → v2.7.1 Migration](#v20x--v271-migration)
+- [Breaking Changes](#breaking-changes)
+- [Rollback Procedures](#rollback-procedures)
+- [Testing Migration](#testing-migration)
 
 ---
 
-### 🚀 Migration Steps to v2.4.1
+## 🎯 Overview
 
-#### Step 1: Upgrade SpecPulse
+This guide helps you migrate to SpecPulse v2.7.1 from any previous version. SpecPulse v2.7.1 focuses on fixing the OpenCode command directory issue and maintaining backward compatibility while introducing selective AI tool initialization.
+
+### What's New in v2.7.1
+
+- **Fixed**: OpenCode custom commands directory structure
+- **Enhanced**: Selective AI tool initialization
+- **Maintained**: Full backward compatibility
+- **Improved**: Domain and website integration
+
+---
+
+## 🔄 v2.7.0 → v2.7.1 Migration
+
+### Changes
+
+- **OpenCode Directory Fix**: Commands now go to `.opencode/command/` instead of `.opencode/commands/`
+- **No Breaking Changes**: Existing projects continue to work
+- **Enhanced Validation**: Better directory structure enforcement
+
+### Migration Steps
 
 ```bash
-# Upgrade to latest version
-pip install --upgrade specpulse
+# 1. Upgrade SpecPulse
+pip install --upgrade specpulse==2.7.1
 
-# Verify version
-specpulse --version
-# Should show: 2.4.1
+# 2. Fix existing OpenCode directory (if exists)
+if [ -d ".opencode/commands" ] && [ ! -d ".opencode/command" ]; then
+    mv .opencode/commands .opencode/command
+    echo "Fixed OpenCode directory structure"
+fi
+
+# 3. Verify installation
+specpulse --version  # Should show v2.7.1
+specpulse doctor     # Should pass all checks
 ```
 
-#### Step 2: Update Workflow (Optional)
+### Verification
 
-For **existing projects**, the workflow remains the same but AI assistants should now follow the CLI-first approach:
-
-**Old Workflow (AI commands):**
 ```bash
-# Deprecated - no longer needed
-specpulse ai context
-specpulse ai suggest
+# Check directory structure
+ls -la .opencode/
+# Should show: command/ (not commands/)
+
+# Test OpenCode commands
+ls .opencode/command/
+# Should show all OpenCode command files
 ```
 
-**New Workflow (Direct CLI):**
+---
+
+## 🔄 v2.6.x → v2.7.1 Migration
+
+### Major Changes
+
+- **Selective AI Tool Initialization**: Choose which AI platforms to initialize
+- **Enhanced Multi-Platform Support**: 8 AI platforms with consistent commands
+- **OpenCode Directory Fix**: Correct directory structure
+- **Domain Integration**: New specpulse.xyz domain
+
+### Migration Steps
+
 ```bash
-# Use CLI commands directly
-specpulse feature init my-feature
-specpulse spec create "My feature description"
-specpulse plan create "Implementation plan"
-specpulse task breakdown <plan-id>
+# 1. Backup current project
+cp -r .specpulse .specpulse.backup
+
+# 2. Upgrade SpecPulse
+pip install --upgrade specpulse==2.7.1
+
+# 3. Fix OpenCode directory (if needed)
+if [ -d ".opencode/commands" ] && [ ! -d ".opencode/command" ]; then
+    mv .opencode/commands .opencode/command
+fi
+
+# 4. (Optional) Re-initialize with selective AI tools
+specpulse init . --ai interactive
 ```
 
-#### Step 3: Test New Features
+### New Features Available
 
 ```bash
-# Test enhanced validation
+# Initialize new projects with selective AI tools
+specpulse init new-project --ai claude,gemini
+specpulse init new-project --ai all
+specpulse init new-project --ai interactive
+
+# Check available AI platforms
+specpulse --help | grep -i ai
+```
+
+---
+
+## 🔄 v2.5.x → v2.7.1 Migration
+
+### Breaking Changes
+
+- **CLI-First Architecture**: AI commands deprecated, use CLI commands
+- **Template System**: Enhanced template management
+- **Directory Structure**: Enforced .specpulse/ structure
+
+### Migration Steps
+
+```bash
+# 1. Backup everything
+cp -r .specpulse .specpulse.backup
+cp -r .claude .claude.backup  # If exists
+cp -r .gemini .gemini.backup  # If exists
+
+# 2. Upgrade SpecPulse
+pip install --upgrade specpulse==2.7.1
+
+# 3. Fix OpenCode directory
+if [ -d ".opencode/commands" ] && [ ! -d ".opencode/command" ]; then
+    mv .opencode/commands .opencode/command
+fi
+
+# 4. Update project structure
+specpulse doctor --fix
+
+# 5. Re-initialize AI integration
+specpulse init . --ai claude  # Or your preferred AI
+```
+
+### Command Changes
+
+**Old Commands (Deprecated)**:
+```bash
+specpulse ai init          # Don't use
+specpulse ai context        # Don't use
+specpulse ai status         # Don't use
+```
+
+**New Commands (Use These)**:
+```bash
+specpulse feature init      # Use this
+specpulse spec create       # Use this
+specpulse plan create       # Use this
+specpulse task breakdown    # Use this
+```
+
+---
+
+## 🔄 v2.4.x → v2.7.1 Migration
+
+### Major Changes
+
+- **Validation System**: Enhanced validation with auto-fix
+- **Performance**: 3-5x faster operations
+- **Security**: Comprehensive security improvements
+- **Multi-Platform AI**: Support for 8 AI platforms
+
+### Migration Steps
+
+```bash
+# 1. Full backup
+tar -czf specpulse-backup-$(date +%Y%m%d).tar.gz .specpulse .claude .gemini 2>/dev/null || true
+
+# 2. Upgrade SpecPulse
+pip install --upgrade specpulse==2.7.1
+
+# 3. Fix directory structure
+if [ -d ".opencode/commands" ] && [ ! -d ".opencode/command" ]; then
+    mv .opencode/commands .opencode/command
+fi
+
+# 4. Validate and fix project
 specpulse validate all --fix
 
-# Test improved error handling
+# 5. Re-initialize if needed
+specpulse init . --ai all
+```
+
+### Performance Verification
+
+```bash
+# Test new performance
+time specpulse spec create "Test performance"
+# Should be significantly faster than v2.4.x
+```
+
+---
+
+## 🔄 v2.2.x → v2.7.1 Migration
+
+### Major Changes
+
+- **Template System**: Complete overhaul
+- **Service Architecture**: Dependency injection
+- **CLI Commands**: New command structure
+- **Memory System**: Enhanced memory management
+
+### Migration Steps
+
+```bash
+# 1. Critical backup
+tar -czf v2.2-backup.tar.gz .specpulse .claude .gemini 2>/dev/null || true
+
+# 2. Upgrade in stages
+pip install --upgrade specpulse==2.7.1
+
+# 3. Fix OpenCode directory
+if [ -d ".opencode/commands" ] && [ ! -d ".opencode/command" ]; then
+    mv .opencode/commands .opencode/command
+fi
+
+# 4. Migrate templates
+specpulse init . --force --ai claude
+
+# 5. Validate everything
 specpulse doctor
-
-# Test new CLI capabilities
-specpulse feature --help
+specpulse validate all
 ```
 
-**That's it!** No data migration needed - all existing files remain compatible.
+### Template Migration
 
----
-
-### 📊 CLI-First Architecture
-
-**The New Workflow Pattern:**
-
-```
-User Request: /sp-spec OAuth2 login with JWT
-    ↓
-Step 1: Try CLI first
-    Bash: specpulse spec create "OAuth2 login with JWT"
-    ↓
-Step 2: If CLI doesn't exist, use File Operations:
-    Claude reads: .specpulse/templates/spec.md
-    Claude writes: .specpulse/specs/001-feature/spec-001.md
-    Claude edits: .specpulse/specs/001-feature/spec-001.md (expand)
-    ↓
-Complete specification ready
-```
-
-**Why CLI First?**
-- **Metadata Handling**: CLI manages timestamps, IDs, status automatically
-- **Structure Validation**: CLI validates before creating files
-- **Context Updates**: CLI updates context.md consistently
-- **Error Handling**: CLI provides recovery and validation
-- **File Operations**: Fallback for flexibility when CLI doesn't cover operation
-
----
-
-## v2.0.0 → v2.1.2
-
-### 📋 Overview
-
-SpecPulse v2.1.0 eliminated bash/PowerShell scripts and moved all functionality to pure Python CLI. This was a **backward compatible** upgrade with optional cleanup.
-
-### 🔧 Key Changes in v2.1.0
-
-**What Changed:**
-- ✅ Scripts removed (`specpulse/resources/scripts/` deleted)
-- ✅ All functionality moved to CLI commands
-- ✅ No `scripts/` folder in new projects
-- ✅ Slash commands updated to use CLI
-- ✅ ~50KB smaller projects
-- ✅ ~3x faster execution
-
-**What Stayed the Same:**
-- ✅ All existing specs, plans, tasks remain compatible
-- ✅ Templates unchanged
-- ✅ Memory system unchanged
-- ✅ AI integration unchanged
-- ✅ Slash commands work the same (just faster)
-
----
-
-### 🚀 Migration Steps
-
-#### Step 1: Upgrade SpecPulse
+Old templates are automatically migrated, but you can customize:
 
 ```bash
-# Upgrade to latest version
-pip install --upgrade specpulse
-
-# Verify version
-specpulse --version
-# Should show: 2.1.0
-```
-
-#### Step 2: Clean Up Old Scripts (Optional)
-
-For **existing v2.0.0 projects**, the `scripts/` folder is now unnecessary:
-
-```bash
-# Navigate to your project
-cd my-project
-
-# Remove old scripts (safe to delete)
-rm -rf scripts/
-
-# Verify slash commands still work
-# (they now use CLI instead of scripts)
-```
-
-#### Step 3: Test Workflow
-
-```bash
-# Test feature creation
-specpulse feature init test-migration
-
-# Test spec creation
-specpulse spec create "test spec for migration"
-
-# Verify file was created
-ls specs/001-test-migration/spec-001.md
-```
-
-**That's it!** No data migration needed.
-
----
-
-### 📊 Command Mapping
-
-Old scripts → New CLI commands:
-
-| Old (v2.0.0) | New (v2.1.0) | Notes |
-|--------------|--------------|-------|
-| `bash scripts/sp-pulse-init.sh` | `specpulse feature init` | Native CLI |
-| `bash scripts/sp-pulse-spec.sh` | `specpulse spec create` | Native CLI |
-| `bash scripts/sp-pulse-plan.sh` | `specpulse plan create` | Native CLI |
-| `bash scripts/sp-pulse-task.sh` | `specpulse task breakdown` | Native CLI |
-| `bash scripts/sp-pulse-execute.sh` | `specpulse execute start/done` | Native CLI |
-
-**Slash commands automatically updated** - no changes needed!
-
----
-
-### 🆕 New CLI Commands in v2.1.0
-
-```bash
-# Feature management
-specpulse feature init <name>        # Initialize feature
-specpulse feature continue <name>    # Switch to feature
-
-# Spec management
-specpulse spec create <description>  # Create spec
-specpulse spec update <id> <desc>    # Update spec
-specpulse spec validate              # Validate spec
-
-# Plan management
-specpulse plan create <description>  # Create plan
-specpulse plan update <id> <desc>    # Update plan
-
-# Task management
-specpulse task create <description>  # Create task
-specpulse task breakdown <plan-id>   # Generate tasks
-specpulse task update <id> <desc>    # Update task
-
-# Execution tracking
-specpulse execute start <task-id>    # Start task
-specpulse execute done <task-id>     # Complete task
+# Check new templates
+ls .specpulse/templates/
+ls .claude/commands/
+ls .gemini/commands/
 ```
 
 ---
 
-### 🔄 Project Structure Changes
+## 🔄 v2.1.x → v2.7.1 Migration
 
-**Before (v2.0.0):**
-```
-my-project/
-├── scripts/                # ❌ No longer needed
-│   ├── sp-pulse-init.sh
-│   ├── sp-pulse-spec.sh
-│   └── ...
-├── specs/
-├── plans/
-└── tasks/
+### Breaking Changes
+
+- **Scripts Eliminated**: No more bash/PowerShell scripts
+- **Pure Python CLI**: All functionality in Python CLI
+- **New Commands**: Complete command set replacement
+
+### Migration Steps
+
+```bash
+# 1. Remove old scripts (if exist)
+rm -rf scripts/ 2>/dev/null || true
+
+# 2. Backup configuration
+cp -r .specpulse .specpulse.v2.1.backup
+
+# 3. Upgrade SpecPulse
+pip install --upgrade specpulse==2.7.1
+
+# 4. Fix OpenCode directory
+if [ -d ".opencode/commands" ] && [ ! -d ".opencode/command" ]; then
+    mv .opencode/commands .opencode/command
+fi
+
+# 5. Re-initialize project
+specpulse init . --ai interactive
 ```
 
-**After (v2.1.0):**
+### Script to CLI Mapping
+
+| Old Script | New CLI Command |
+|------------|-----------------|
+| `scripts/feature.sh` | `specpulse feature init` |
+| `scripts/spec.sh` | `specpulse spec create` |
+| `scripts/plan.sh` | `specpulse plan create` |
+| `scripts/task.sh` | `specpulse task breakdown` |
+
+---
+
+## 🔄 v2.0.x → v2.7.1 Migration
+
+### Major Overhaul
+
+This is a major version upgrade requiring careful migration:
+
+### Migration Steps
+
+```bash
+# 1. Complete backup
+tar -czf v2.0-complete-backup.tar.gz .specpulse scripts/ .claude .gemini 2>/dev/null || true
+
+# 2. Clean upgrade
+pip uninstall specpulse
+pip install specpulse==2.7.1
+
+# 3. Remove old artifacts
+rm -rf scripts/ .claude/ .gemini/ .specpulse/ 2>/dev/null || true
+
+# 4. Fresh initialization
+specpulse init new-project --ai all
+
+# 5. Migrate custom content manually
+# Copy your old specs/plans/tasks to new structure
 ```
-my-project/
-├── specs/                 # Same
-├── plans/                 # Same
-└── tasks/                 # Same
-# No scripts/ folder! ✅
+
+### Manual Content Migration
+
+```bash
+# Copy old content to new structure
+# Old: specs/SPEC-001.md
+# New: .specpulse/specs/001-feature-name/spec-001.md
+
+# Example migration
+mkdir -p .specpulse/specs/001-migrated-feature
+cp old-specs/SPEC-001.md .specpulse/specs/001-migrated-feature/spec-001.md
 ```
 
 ---
 
-### ⚠️ Breaking Changes
+## ⚠️ Breaking Changes
 
-**Only one breaking change:**
-- Scripts removed from `specpulse/resources/scripts/`
-- Projects no longer get `scripts/` folder on init
+### v2.7.1 Breaking Changes
 
-**Everything else remains compatible:**
-- ✅ Existing specs, plans, tasks work unchanged
-- ✅ Templates remain the same
-- ✅ Memory files unchanged
-- ✅ AI integration unchanged
-- ✅ Slash commands work (use CLI internally)
+✅ **None** - v2.7.1 is fully backward compatible
 
----
+### Historical Breaking Changes
 
-### 🐛 Troubleshooting
+**v2.7.0**:
+- Selective AI tool initialization (opt-in)
+- Domain changes (specpulse.xyz)
 
-#### Issue: "Command not found: specpulse"
+**v2.6.9**:
+- Multi-platform AI support
+- New directory structures for AI platforms
 
-**Solution:**
-```bash
-# Reinstall SpecPulse
-pip install --upgrade --force-reinstall specpulse
+**v2.5.x**:
+- CLI-first architecture
+- Deprecated AI commands
 
-# Check installation
-which specpulse  # Unix/Mac
-where specpulse  # Windows
-```
+**v2.4.x**:
+- Enhanced validation system
+- Performance improvements
 
-#### Issue: "Scripts folder still exists"
+**v2.2.x**:
+- Template system overhaul
+- Service architecture
 
-**Solution:**
-```bash
-# Safe to delete in existing projects
-rm -rf scripts/
+**v2.1.x**:
+- Script elimination
+- Pure Python CLI
 
-# New projects won't create it
-specpulse init test-project --ai claude
-ls test-project/  # No scripts/ folder
-```
-
-#### Issue: "Slash commands not working"
-
-**Solution:**
-Slash commands should work automatically. If not:
-
-1. Check SpecPulse version: `specpulse --version`
-2. Re-initialize project: `specpulse init --here`
-3. Verify command files exist: `ls .claude/commands/`
+**v2.0.x**:
+- Complete architecture overhaul
 
 ---
 
-### 📝 Testing Migration
+## 🔄 Rollback Procedures
+
+### Rollback to Previous Version
 
 ```bash
-# 1. Create test project
-mkdir test-v2.1.0
-cd test-v2.1.0
-specpulse init --here --ai claude
-
-# 2. Verify no scripts folder
-ls scripts/  # Should fail or be empty
-
-# 3. Test feature workflow
-specpulse feature init test-feature
-
-# 4. Test spec creation
-specpulse spec create "test specification"
-
-# 5. Verify file created
-cat specs/001-test-feature/spec-001.md
-
-# 6. Success! ✅
-```
-
----
-
-### 🔄 Rollback Plan (If Needed)
-
-If you need to rollback to v2.0.0:
-
-```bash
-# 1. Uninstall v2.1.0
+# 1. Uninstall current version
 pip uninstall specpulse
 
-# 2. Install v2.0.0
-pip install specpulse==2.0.0
+# 2. Install previous version
+pip install specpulse==2.7.0
 
-# 3. Your data is safe
-# All specs, plans, tasks remain intact
+# 3. Restore from backup (if needed)
+rm -rf .specpulse
+tar -xzf specpulse-backup.tar.gz
 ```
 
-**Note**: Rolling back means scripts will be expected but not present. You'd need to copy scripts from a fresh v2.0.0 init.
-
----
-
-## v1.x → v2.0.0
-
-See [CHANGELOG.md](../CHANGELOG.md) for v2.0.0 migration details.
-
-**Summary:**
-- AI integration added
-- 3-tier template system
-- Enhanced validation
-- Memory management
-- All v1.x features remain functional
-
----
-
-## 📞 Migration Support
-
-**Having issues?**
-
-1. **Check documentation**: [docs/](.)
-2. **Run diagnostics**: `specpulse doctor`
-3. **View changelog**: [CHANGELOG.md](../CHANGELOG.md)
-4. **Get help**: `specpulse --help`
-5. **Report issues**: [GitHub Issues](https://github.com/specpulse/specpulse/issues)
-
----
-
-## ✅ Post-Migration Checklist
-
-After upgrading to v2.4.1:
-
-- [ ] `specpulse --version` shows 2.4.1
-- [ ] `specpulse feature init` works
-- [ ] `specpulse spec create` works
-- [ ] `specpulse plan create` works
-- [ ] `specpulse task breakdown` works
-- [ ] `specpulse validate all --fix` works
-- [ ] `specpulse doctor` shows no errors
-- [ ] Slash commands work in Claude Code/Gemini
-- [ ] Existing specs/plans/tasks still accessible
-- [ ] CLI-first workflow understood by team
-
----
-
-**🎉 Migration Complete!**
-
-Enjoy faster, cleaner, CLI-first SpecPulse v2.4.1!
+### Rollback Project Changes
 
 ```bash
-specpulse feature init my-new-feature
+# Restore .specpulse from backup
+rm -rf .specpulse
+cp -r .specpulse.backup .specpulse
+
+# Fix OpenCode directory for rollback
+if [ -d ".opencode/command" ] && [ ! -d ".opencode/commands" ]; then
+    mv .opencode/command .opencode/commands
+fi
 ```
+
+---
+
+## 🧪 Testing Migration
+
+### Pre-Migration Testing
+
+```bash
+# 1. Current system health
+specpulse doctor
+specpulse validate all
+
+# 2. Backup critical data
+tar -czf pre-migration-backup.tar.gz .specpulse .claude .gemini .opencode 2>/dev/null || true
+
+# 3. Document current state
+specpulse status > current-status.txt
+```
+
+### Post-Migration Testing
+
+```bash
+# 1. Verify installation
+specpulse --version  # Should show v2.7.1
+specpulse doctor     # Should pass all checks
+
+# 2. Test core functionality
+specpulse feature init test-migration
+specpulse spec create "Migration test specification"
+specpulse plan create "Migration test plan"
+specpulse task breakdown 001
+
+# 3. Test AI integration
+# Check your AI platform commands work:
+# Claude: /sp-status
+# Gemini: /sp-status
+# etc.
+
+# 4. Verify directory structure
+ls -la .specpulse/
+ls -la .claude/commands/ 2>/dev/null || echo "Claude not initialized"
+ls -la .gemini/commands/ 2>/dev/null || echo "Gemini not initialized"
+ls -la .opencode/command/ 2>/dev/null || echo "OpenCode not initialized"
+
+# 5. Validate project
+specpulse validate all
+```
+
+### Migration Success Checklist
+
+- [ ] `specpulse --version` shows v2.7.1
+- [ ] `specpulse doctor` passes all checks
+- [ ] Core CLI commands work (`feature`, `spec`, `plan`, `task`)
+- [ ] AI platform commands work (your chosen platforms)
+- [ ] Directory structure is correct
+- [ ] OpenCode uses `.opencode/command/` (not `.opencode/commands/`)
+- [ ] All existing content is accessible
+- [ ] No data loss occurred
+
+---
+
+## 🆘 Troubleshooting Migration
+
+### Common Issues
+
+#### OpenCode Directory Issue
+
+**Problem**: Commands in wrong directory
+```bash
+# Wrong
+.opencode/commands/
+
+# Correct
+.opencode/command/
+```
+
+**Solution**:
+```bash
+if [ -d ".opencode/commands" ] && [ ! -d ".opencode/command" ]; then
+    mv .opencode/commands .opencode/command
+fi
+```
+
+#### CLI Commands Not Found
+
+**Problem**: `specpulse: command not found`
+
+**Solution**:
+```bash
+# Reinstall with proper PATH
+pip install --upgrade --force-reinstall specpulse==2.7.1
+python -m specpulse --version  # Test direct module call
+```
+
+#### AI Commands Not Working
+
+**Problem**: Slash commands not recognized
+
+**Solution**:
+```bash
+# Re-initialize AI integration
+specpulse init . --ai your-platform
+
+# Check command files exist
+ls .claude/commands/
+ls .gemini/commands/
+ls .opencode/command/
+```
+
+#### Validation Failures
+
+**Problem**: `specpulse validate all` shows errors
+
+**Solution**:
+```bash
+# Auto-fix validation issues
+specpulse validate all --fix
+
+# Manual fix for specific issues
+specpulse doctor --verbose
+```
+
+---
+
+## 📞 Getting Help
+
+### Migration Support
+
+- **Documentation**: [Installation Guide](INSTALLATION.md)
+- **Troubleshooting**: [Troubleshooting Guide](TROUBLESHOOTING.md)
+- **AI Integration**: [AI Integration Guide](AI_INTEGRATION.md)
+- **Community**: [GitHub Discussions](https://github.com/specpulse/specpulse/discussions)
+- **Issues**: [GitHub Issues](https://github.com/specpulse/specpulse/issues)
+
+### Quick Help Commands
+
+```bash
+# General help
+specpulse --help
+
+# Specific command help
+specpulse feature --help
+specpulse spec --help
+specpulse plan --help
+specpulse task --help
+
+# System diagnostics
+specpulse doctor
+specpulse validate all
+```
+
+---
+
+**🎉 Congratulations! You've successfully migrated to SpecPulse v2.7.1!**
+
+Enjoy the enhanced OpenCode directory structure, selective AI tool initialization, and continued backward compatibility.
