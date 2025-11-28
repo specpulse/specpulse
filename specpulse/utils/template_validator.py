@@ -4,12 +4,45 @@ Template Content Validator - Advanced security and content validation for templa
 
 import re
 import yaml
+import time
+import signal
 from typing import Dict, List, Tuple, Set, Optional, Any
 from dataclasses import dataclass
 from pathlib import Path
 from enum import Enum
+from contextlib import contextmanager
 
 from .error_handler import TemplateError, ValidationError
+
+
+class TimeoutError(Exception):
+    """Raised when validation times out"""
+    pass
+
+
+@contextmanager
+def validation_timeout(seconds: int = 5):
+    """Context manager for timeout protection against ReDoS"""
+    def timeout_handler(signum, frame):
+        raise TimeoutError(f"Validation timed out after {seconds} seconds")
+
+    # Set timeout (Unix-like systems)
+    if hasattr(signal, 'SIGALRM'):
+        old_handler = signal.signal(signal.SIGALRM, timeout_handler)
+        signal.alarm(seconds)
+        try:
+            yield
+        finally:
+            signal.alarm(0)
+            signal.signal(signal.SIGALRM, old_handler)
+    else:
+        # Windows fallback - use time-based check
+        start_time = time.time()
+        class TimeoutChecker:
+            def check(self):
+                if time.time() - start_time > seconds:
+                    raise TimeoutError(f"Validation timed out after {seconds} seconds")
+        yield TimeoutChecker()
 
 
 class ValidationSeverity(Enum):
@@ -241,42 +274,64 @@ class TemplateValidator:
         )
 
     def _validate_security(self, content: str) -> Tuple[List[ValidationIssue], List[str]]:
-        """Validate security aspects of template"""
+        """Validate security aspects of template with ReDoS protection"""
         issues = []
         suggestions = []
 
-        for category, patterns in self.security_patterns.items():
-            for pattern in patterns:
-                matches = list(re.finditer(pattern, content, re.IGNORECASE | re.MULTILINE))
-                for match in matches:
-                    line_num = content[:match.start()].count('\n') + 1
+        try:
+            # Apply timeout protection against ReDoS attacks
+            with validation_timeout(seconds=5):
+                for category, patterns in self.security_patterns.items():
+                    for pattern in patterns:
+                        try:
+                            matches = list(re.finditer(pattern, content, re.IGNORECASE | re.MULTILINE))
+                            for match in matches:
+                                line_num = content[:match.start()].count('\n') + 1
 
-                    severity = ValidationSeverity.CRITICAL if category in ['config_access', 'environment_access', 'dangerous_functions'] else ValidationSeverity.ERROR
+                                severity = ValidationSeverity.CRITICAL if category in ['config_access', 'environment_access', 'dangerous_functions'] else ValidationSeverity.ERROR
 
+                                issues.append(ValidationIssue(
+                                    severity=severity,
+                                    category=f"security_{category}",
+                                    message=f"Potentially dangerous {category.replace('_', ' ')} detected",
+                                    line_number=line_num,
+                                    suggestion=f"Remove or replace {category.replace('_', ' ')} usage"
+                                ))
+                        except TimeoutError:
+                            # Individual pattern timeout - skip and warn
+                            issues.append(ValidationIssue(
+                                severity=ValidationSeverity.WARNING,
+                                category="security_timeout",
+                                message=f"Security check for {category} timed out (possible ReDoS)",
+                                suggestion="Simplify template content to avoid complex patterns"
+                            ))
+                            break
+
+                # Additional security checks
+                if len(content.split('\n')) > 1000:
                     issues.append(ValidationIssue(
-                        severity=severity,
-                        category=f"security_{category}",
-                        message=f"Potentially dangerous {category.replace('_', ' ')} detected",
-                        line_number=line_num,
-                        suggestion=f"Remove or replace {category.replace('_', ' ')} usage"
+                        severity=ValidationSeverity.ERROR,
+                        category="security_dos",
+                        message="Template too large (potential DoS vector)",
+                        suggestion="Break template into smaller components"
                     ))
 
-        # Additional security checks
-        if len(content.split('\n')) > 1000:
-            issues.append(ValidationIssue(
-                severity=ValidationSeverity.ERROR,
-                category="security_dos",
-                message="Template too large (potential DoS vector)",
-                suggestion="Break template into smaller components"
-            ))
+                var_count = len(re.findall(r'\{\{\s*\w+[\w\.]*\s*\}\}', content))
+                if var_count > 200:
+                    issues.append(ValidationIssue(
+                        severity=ValidationSeverity.WARNING,
+                        category="security_performance",
+                        message="Too many template variables (performance concern)",
+                        suggestion="Consider simplifying template logic"
+                    ))
 
-        var_count = len(re.findall(r'\{\{\s*\w+[\w\.]*\s*\}\}', content))
-        if var_count > 200:
+        except TimeoutError:
+            # Overall validation timeout
             issues.append(ValidationIssue(
-                severity=ValidationSeverity.WARNING,
-                category="security_performance",
-                message="Too many template variables (performance concern)",
-                suggestion="Consider simplifying template logic"
+                severity=ValidationSeverity.CRITICAL,
+                category="security_timeout",
+                message="Security validation timed out - template may contain ReDoS patterns",
+                suggestion="Drastically simplify template content or break into smaller parts"
             ))
 
         return issues, suggestions

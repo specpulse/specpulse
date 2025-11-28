@@ -1,0 +1,30 @@
+# Jekyll configuration for GitHub Pages
+
+# Site settings
+title: SpecPulse
+description: AI-Powered Software Development Framework
+url: "https://specpulse.github.io"
+baseurl: "/specpulse"
+
+# Build settings
+markdown: kramdown
+exclude:
+  - README.md
+  - node_modules
+  - package.json
+  - package-lock.json
+
+# GitHub Pages settings
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Collections
+collections: []
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default

@@ -76,10 +76,15 @@ class MemoryManager:
         self.memory_dir = self.path_manager.memory_dir
         self.context_file = self.memory_dir / "context.md"
         self.decisions_file = self.memory_dir / "decisions.md"
-        self.memory_index = self.memory_dir / ".memory_index.json"
-        self.memory_stats = self.memory_dir / ".memory_stats.json"
+        self.memory_index_path = self.memory_dir / ".memory_index.json"
+        self.memory_stats_path = self.memory_dir / ".memory_stats.json"
 
         self.console = Console()
+
+        # Auto-cleanup configuration
+        self._update_counter = 0
+        self._auto_cleanup_threshold = 100  # Run cleanup every 100 updates
+        self._auto_cleanup_retention_days = 90  # Keep entries for 90 days
 
         # Ensure memory directory exists
         self.memory_dir.mkdir(exist_ok=True)
@@ -163,13 +168,49 @@ class MemoryManager:
 """.format(date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
 
     def _load_memory_index(self) -> Dict:
-        """Load memory index from file"""
-        if self.memory_index.exists():
+        """Load memory index from file with enhanced corruption recovery"""
+        if self.memory_index_path.exists():
             try:
-                with open(self.memory_index, 'r', encoding='utf-8') as f:
+                with open(self.memory_index_path, 'r', encoding='utf-8') as f:
                     return json.load(f)
-            except (json.JSONDecodeError, IOError):
-                pass
+            except json.JSONDecodeError as e:
+                # Enhanced corruption handling: backup corrupted file
+                corrupted_backup = self.memory_index_path.with_suffix('.json.corrupted')
+                try:
+                    import shutil
+                    from datetime import datetime
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    final_backup = self.memory_index_path.parent / f".memory_index.corrupted.{timestamp}.json"
+                    shutil.copy2(self.memory_index_path, final_backup)
+
+                    # Prominent warning to user
+                    self.console.error("=" * 70)
+                    self.console.error("⚠️  CRITICAL: Memory index file is corrupted!")
+                    self.console.error(f"    Corrupted file backed up to: {final_backup}")
+                    self.console.error(f"    Error: {e}")
+                    self.console.error("    Attempting to restore from backup...")
+                    self.console.error("=" * 70)
+                except Exception as backup_error:
+                    self.console.error(f"Failed to backup corrupted file: {backup_error}")
+
+                # Attempt to restore from most recent backup
+                backup_pattern = ".memory_index.corrupted.*.json"
+                backups = sorted(self.memory_index_path.parent.glob(backup_pattern), reverse=True)
+
+                # Try to find a valid backup (skip the one we just created)
+                for backup_file in backups[1:] if len(backups) > 1 else []:
+                    try:
+                        with open(backup_file, 'r', encoding='utf-8') as f:
+                            recovered_data = json.load(f)
+                        self.console.success(f"✅ Successfully recovered from backup: {backup_file}")
+                        return recovered_data
+                    except (json.JSONDecodeError, IOError):
+                        continue
+
+                self.console.warning("No valid backups found. Reinitializing with empty index.")
+
+            except IOError as e:
+                self.console.error(f"Failed to read memory index: {e}")
 
         return {
             "version": "1.0.0",
@@ -186,20 +227,27 @@ class MemoryManager:
         """Save memory index to file"""
         self.memory_index["last_updated"] = datetime.now().isoformat()
         try:
-            with open(self.memory_index, 'w', encoding='utf-8') as f:
+            with open(self.memory_index_path, 'w', encoding='utf-8') as f:
                 json.dump(self.memory_index, f, indent=2, ensure_ascii=False)
         except IOError as e:
             raise ValidationError(f"Failed to save memory index: {e}")
 
     def _load_memory_stats(self) -> MemoryStats:
         """Load memory statistics"""
-        if self.memory_stats.exists():
+        if self.memory_stats_path.exists():
             try:
-                with open(self.memory_stats, 'r', encoding='utf-8') as f:
+                with open(self.memory_stats_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     return MemoryStats(**data)
-            except (json.JSONDecodeError, IOError, TypeError):
-                pass
+            except json.JSONDecodeError as e:
+                # BUG-011 fix: Log corrupted JSON files
+                self.console.warning(f"Corrupted memory stats file, recalculating: {e}")
+            except IOError as e:
+                # Log file read errors
+                self.console.warning(f"Failed to read memory stats: {e}")
+            except TypeError as e:
+                # Log data structure errors
+                self.console.warning(f"Invalid memory stats format, recalculating: {e}")
 
         # Calculate initial stats
         return self._calculate_memory_stats()
@@ -207,7 +255,7 @@ class MemoryManager:
     def _save_memory_stats(self):
         """Save memory statistics"""
         try:
-            with open(self.memory_stats, 'w', encoding='utf-8') as f:
+            with open(self.memory_stats_path, 'w', encoding='utf-8') as f:
                 json.dump(asdict(self.memory_stats), f, indent=2)
         except IOError as e:
             raise ValidationError(f"Failed to save memory stats: {e}")
@@ -266,6 +314,15 @@ class MemoryManager:
             self._save_memory_index()
             self.memory_stats = self._calculate_memory_stats()
             self._save_memory_stats()
+
+            # Auto-cleanup: Run cleanup periodically
+            self._update_counter += 1
+            if self._update_counter >= self._auto_cleanup_threshold:
+                self.console.info(f"Running automatic cleanup (threshold: {self._auto_cleanup_threshold} updates)...")
+                removed = self.cleanup_old_entries(days=self._auto_cleanup_retention_days)
+                if removed > 0:
+                    self.console.success(f"✅ Auto-cleanup: Removed {removed} old entries")
+                self._update_counter = 0  # Reset counter
 
             self.console.success(f"Context updated: {action}")
             return True
@@ -539,7 +596,7 @@ class MemoryManager:
         issues = []
 
         # Check required files
-        required_files = [self.context_file, self.decisions_file, self.memory_index]
+        required_files = [self.context_file, self.decisions_file, self.memory_index_path]
         for file_path in required_files:
             if not file_path.exists():
                 issues.append(f"Missing required file: {file_path}")

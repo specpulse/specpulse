@@ -7,6 +7,7 @@ Ensures data integrity with atomic writes, backup procedures, and JSON schema va
 
 import json
 import os
+import sys
 import shutil
 import tempfile
 from pathlib import Path
@@ -14,6 +15,12 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
 import threading
 from contextlib import contextmanager
+
+# Import platform-specific file locking
+if sys.platform == "win32":
+    import msvcrt
+else:
+    import fcntl
 
 from .models import TaskInfo, ProgressData, TaskHistory, MonitoringConfig
 
@@ -72,12 +79,51 @@ class StateStorage:
 
     @contextmanager
     def _file_lock(self, file_type: str):
-        """Context manager for thread-safe file operations."""
+        """Context manager for thread-safe and process-safe file operations."""
+        # Thread-level lock
         lock = self._locks[file_type]
         lock.acquire()
+
+        # Process-level lock using lock file
+        lock_file_map = {
+            'state': self.memory_path / '.state.lock',
+            'progress': self.memory_path / '.progress.lock',
+            'history': self.memory_path / '.history.lock',
+            'config': self.memory_path / '.config.lock',
+        }
+
+        lock_file_path = lock_file_map.get(file_type)
+        lock_file = None
+
         try:
+            if lock_file_path:
+                # Create lock file if it doesn't exist
+                lock_file_path.touch(exist_ok=True)
+                lock_file = open(lock_file_path, 'w')
+
+                # Acquire file-level lock (process-safe)
+                if sys.platform == "win32":
+                    # Windows file locking
+                    msvcrt.locking(lock_file.fileno(), msvcrt.LK_LOCK, 1)
+                else:
+                    # Unix file locking
+                    fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+
             yield
+
         finally:
+            # Release file-level lock
+            if lock_file:
+                try:
+                    if sys.platform == "win32":
+                        msvcrt.locking(lock_file.fileno(), msvcrt.LK_UNLCK, 1)
+                    else:
+                        fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+                    lock_file.close()
+                except Exception:
+                    pass  # Best effort to release
+
+            # Release thread-level lock
             lock.release()
 
     def _atomic_write(self, file_path: Path, data: Dict[str, Any]) -> None:

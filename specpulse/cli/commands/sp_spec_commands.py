@@ -97,7 +97,7 @@ STATUS: draft
 
             self.console.success(f"Created: {safe_spec_path.relative_to(self.project_root)}")
             self.console.info(f"\nNext steps:")
-            self.console.info(f"1. Edit the specification: {spec_path.relative_to(self.project_root)}")
+            self.console.info(f"1. Edit the specification: {safe_spec_path.relative_to(self.project_root)}")
             self.console.info(f"2. Expand with AI (Claude/Gemini): /sp-spec expand")
             self.console.info(f"3. Validate: specpulse sp-spec validate {spec_number:03d}")
 
