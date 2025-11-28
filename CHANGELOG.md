@@ -5,6 +5,67 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.1] - 2025-11-28
+
+### 🐛 Bug Fixes
+
+**Upgrade Priority:** 🟡 **RECOMMENDED** (fixes OpenCode command file copying issue)
+
+---
+
+#### **OpenCode Command Directory Fix**
+- **FIXED**: OpenCode custom commands were being copied to wrong directory (`.opencode/commands/` instead of `.opencode/command/`)
+- **FIXED**: "all" selection mode now correctly copies OpenCode files to `.opencode/command/` (singular directory)
+- **UPDATED**: PathManager validation to only expect `command` (singular) directory for OpenCode
+
+#### **Technical Details**
+- **PathManager**: Updated AI platform validation rules for OpenCode
+- **Directory Structure**: Enforced OpenCode uses only `.opencode/command/` directory
+- **File Copying**: Fixed AI command copying logic in `_copy_ai_commands` method
+
+#### **Verification**
+- ✅ Individual OpenCode selection copies files to `.opencode/command/`
+- ✅ "all" selection copies OpenCode files to `.opencode/command/`
+- ✅ No incorrect `.opencode/commands/` directory is created
+- ✅ All 8 OpenCode command files are copied correctly
+
+---
+
+### 📋 **Summary**
+
+This release fixes the OpenCode command file copying issue that occurred when using "all" tool selection during project initialization. OpenCode commands now consistently go to the correct `.opencode/command/` directory regardless of selection method.
+
+## [2.7.0] - 2025-11-28
+
+### 🎉 Major Release - Domain & Website Launch
+
+**Upgrade Priority:** 🟢 **OPTIONAL** (new domain and website features)
+
+---
+
+#### **🌐 Domain Migration**
+- **NEW**: Custom domain `https://specpulse.xyz`
+- **UPDATED**: All documentation references to use new domain
+- **ENHANCED**: Professional email contacts (`info@specpulse.xyz`, `security@specpulse.xyz`)
+
+#### **🚀 Website Launch**
+- **NEW**: Modern, responsive landing page at `https://specpulse.xyz`
+- **FEATURES**: Live demos, interactive tutorials, AI platform showcase
+- **TECH**: Built with Tailwind CSS, Alpine.js, and modern web technologies
+
+#### **⚡ Performance Improvements**
+- **OPTIMIZED**: Selective AI tool initialization - only create directories for selected platforms
+- **ENHANCED**: Cleaner project structure with no unnecessary AI directories
+- **IMPROVED**: Faster initialization with selective tool loading
+- **MAINTAINED**: All 8 AI platforms working perfectly
+
+#### **📚 Documentation Updates**
+- **UPDATED**: README.md with new domain and contact information
+- **ENHANCED**: Security policy with proper contact channels
+- **IMPROVED**: Website deployment documentation
+
+---
+
 ## [2.6.9] - 2025-11-28
 
 ### 🐛 Critical Bug Fixes Release

@@ -372,7 +372,7 @@ class PathManager:
             'windsurf': ['workflows'],  # ENFORCED: Windsurf uses workflows, not commands
             'cursor': ['commands'],
             'github': ['prompts'],
-            'opencode': ['commands', 'command'],  # ENFORCED: OpenCode supports both directories
+            'opencode': ['command'],  # ENFORCED: OpenCode uses command (singular) only
             'crush': ['commands'],
             'qwen': ['commands']
         }
@@ -431,16 +431,13 @@ class PathManager:
                     if not gitkeep_file.exists():
                         gitkeep_file.write_text('# Maintains directory structure for SpecPulse\n')
                 elif platform == 'opencode':
-                    # ENFORCED: OpenCode supports both commands and command directories
-                    # Only create if they don't exist (init should have created them)
-                    commands_dir = ai_dir / 'commands'
-                    command_dir = ai_dir / 'command'
-
-                    for dir_path in [commands_dir, command_dir]:
-                        dir_path.mkdir(parents=True, exist_ok=True)
-                        gitkeep_file = dir_path / '.gitkeep'
-                        if not gitkeep_file.exists():
-                            gitkeep_file.write_text('# Maintains directory structure for SpecPulse\n')
+                    # ENFORCED: OpenCode uses command (singular) directory for custom commands
+                    commands_dir = ai_dir / 'command'
+                    commands_dir.mkdir(parents=True, exist_ok=True)
+                    # Add .gitkeep to maintain directory structure
+                    gitkeep_file = commands_dir / '.gitkeep'
+                    if not gitkeep_file.exists():
+                        gitkeep_file.write_text('# Maintains directory structure for SpecPulse\n')
                 else:
                     # For claude, gemini, cursor, crush, qwen
                     commands_dir = ai_dir / 'commands'

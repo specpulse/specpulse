@@ -1,6 +1,6 @@
-# SpecPulse v2.7.0 Website
+# SpecPulse v2.7.1 Website
 
-🚀 **Modern, responsive landing page for SpecPulse v2.7.0 - The Ultimate AI-Powered Development Framework**
+🚀 **Modern, responsive landing page for SpecPulse v2.7.1 - The Ultimate AI-Powered Development Framework**
 
 Built with cutting-edge technologies:
 
@@ -33,7 +33,7 @@ Built with cutting-edge technologies:
 - Fast load times (< 2s on 3G)
 - SEO-friendly with structured data
 
-🎯 **v2.7.0 Highlights**
+🎯 **v2.7.1 Highlights**
 - **NEW**: Selective AI tool initialization - only create directories for selected AI platforms
 - **ENHANCED**: Cleaner project structure with no unnecessary AI directories
 - **IMPROVED**: Faster initialization with selective tool loading

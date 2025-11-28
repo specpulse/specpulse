@@ -386,7 +386,7 @@ class SpecPulse:
                 elif tool == 'github':
                     directories.extend([".github", ".github/prompts"])
                 elif tool == 'opencode':
-                    directories.extend([".opencode", ".opencode/commands"])
+                    directories.extend([".opencode", ".opencode/command"])
                 elif tool == 'crush':
                     directories.extend([".crush", ".crush/commands/sp"])
                 elif tool == 'qwen':
@@ -1298,7 +1298,7 @@ tags:
                     dst_dir = getattr(path_manager, 'windsurf_dir') / "workflows"  # ENFORCED: Windsurf uses workflows, not commands
                     pattern = "*.md"
                 elif tool == 'opencode':
-                    dst_dir = getattr(path_manager, 'opencode_dir') / "commands"  # ENFORCED: Use commands instead of command
+                    dst_dir = getattr(path_manager, 'opencode_dir') / "command"  # ENFORCED: Use command (singular) instead of commands
                     pattern = "*.md"
                 elif tool == 'crush':
                     dst_dir = getattr(path_manager, 'crush_dir') / "commands" / "sp"

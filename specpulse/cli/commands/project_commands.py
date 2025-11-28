@@ -149,15 +149,21 @@ class ProjectCommands:
                 for item in choice.replace(',', ' ').split():
                     if item.isdigit():
                         idx = int(item) - 1
-                        if 0 <= idx < len(available_tools) - 1:  # -1 to exclude "all" from digit selection
-                            selected.append(available_tools[idx][0])
-                    elif item in ['claude', 'gemini', 'windsurf', 'cursor', 'github', 'opencode', 'crush', 'qwen']:
+                        if 0 <= idx < len(available_tools):
+                            tool_name = available_tools[idx][0]
+                            selected.append(tool_name)
+                    elif item in ['claude', 'gemini', 'windsurf', 'cursor', 'github', 'opencode', 'crush', 'qwen', 'all']:
                         selected.append(item)
+                        self.console.debug(f"Selected tool by name: {item}")
 
                 if selected:
                     # Remove duplicates and validate
                     selected = list(dict.fromkeys(selected))  # Remove duplicates while preserving order
-                    valid_tools = [t[0] for t in available_tools[:-1]]  # exclude 'all'
+                    valid_tools = [t[0] for t in available_tools]  # include 'all'
+
+                    # Handle 'all' selection
+                    if 'all' in selected:
+                        return 'all'
 
                     if all(tool in valid_tools for tool in selected):
                         if len(selected) == 1:
