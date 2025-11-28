@@ -355,24 +355,11 @@ class SpecPulse:
             # Create path manager instance (ENFORCED: Always uses .specpulse/ structure)
             path_manager = PathManager(project_path)
 
-            # Create directory structure
+            # Parse selected AI tools to create selective directory structure
+            selected_tools = self._parse_ai_assistant(ai_assistant)
+
+            # Base directories always needed
             directories = [
-                ".claude",
-                ".claude/commands",
-                ".gemini",
-                ".gemini/commands",
-                ".windsurf",
-                ".windsurf/workflows",
-                ".cursor",
-                ".cursor/commands",
-                ".github",
-                ".github/prompts",
-                ".opencode",
-                ".opencode/command",
-                ".crush",
-                ".crush/commands/sp",
-                ".qwen",
-                ".qwen/commands",
                 ".specpulse",
                 ".specpulse/cache",
                 ".specpulse/specs",
@@ -385,6 +372,25 @@ class SpecPulse:
                 ".specpulse/memory/notes",
                 ".specpulse/docs"
             ]
+
+            # Add directories only for selected AI tools
+            for tool in selected_tools:
+                if tool == 'claude':
+                    directories.extend([".claude", ".claude/commands"])
+                elif tool == 'gemini':
+                    directories.extend([".gemini", ".gemini/commands"])
+                elif tool == 'windsurf':
+                    directories.extend([".windsurf", ".windsurf/workflows"])
+                elif tool == 'cursor':
+                    directories.extend([".cursor", ".cursor/commands"])
+                elif tool == 'github':
+                    directories.extend([".github", ".github/prompts"])
+                elif tool == 'opencode':
+                    directories.extend([".opencode", ".opencode/commands"])
+                elif tool == 'crush':
+                    directories.extend([".crush", ".crush/commands/sp"])
+                elif tool == 'qwen':
+                    directories.extend([".qwen", ".qwen/commands"])
 
             # Create directories
             failed_dirs = []
@@ -1264,14 +1270,15 @@ tags:
         # Create path manager instance (ENFORCED: Always uses .specpulse/ structure)
         path_manager = PathManager(project_path)
 
-        # Lock custom commands to their directories first
-        if not path_manager.lock_custom_commands_to_directories():
+        # Parse selected tools first
+        commands_dir = self.resources_dir / "commands"
+        selected_tools = self._parse_ai_assistant(ai_assistant)
+
+        # Lock custom commands to their directories first (only for selected tools)
+        if not path_manager.lock_custom_commands_to_directories(selected_tools):
             if console:
                 console.error("Failed to lock custom commands to their directories")
             return
-
-        commands_dir = self.resources_dir / "commands"
-        selected_tools = self._parse_ai_assistant(ai_assistant)
 
         for tool in selected_tools:
             # Special handling for crush which has subdirectory structure
@@ -1288,7 +1295,7 @@ tags:
                     dst_dir = getattr(path_manager, 'gemini_dir') / "commands"
                     pattern = "*.toml"
                 elif tool == 'windsurf':
-                    dst_dir = getattr(path_manager, 'windsurf_dir') / "commands"  # ENFORCED: Use commands instead of workflows
+                    dst_dir = getattr(path_manager, 'windsurf_dir') / "workflows"  # ENFORCED: Windsurf uses workflows, not commands
                     pattern = "*.md"
                 elif tool == 'opencode':
                     dst_dir = getattr(path_manager, 'opencode_dir') / "commands"  # ENFORCED: Use commands instead of command

@@ -1,4 +1,4 @@
-# SpecPulse v2.6.9
+# SpecPulse v2.7.0
 
 <div align="center">
 
@@ -1220,7 +1220,9 @@ cd my-project
 
 ### Need Help?
 
+- **Website:** [specpulse.xyz](https://specpulse.xyz) for full documentation
 - **Support:** [Create an issue](https://github.com/specpulse/specpulse/issues)
+- **Contact:** [info@specpulse.xyz](mailto:info@specpulse.xyz) for business inquiries
 
 ---
 
@@ -1230,6 +1232,6 @@ cd my-project
 
 **Made with ❤️ by developers who believe in specifications-first development**
 
-**SpecPulse v2.6.9** - Building the future of software development, together.
+**SpecPulse v2.7.0** - Building the future of software development, together.
 
 </div>

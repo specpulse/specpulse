@@ -1,150 +1,143 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SpecPulse - AI-Powered Software Development Workflow Framework with Smart Specification-Driven Development">
-    <meta name="keywords" content="SDD, Software Development, AI, Specifications, Python, CLI Tool">
-    <title>SpecPulse - AI-Powered SDD Framework</title>
+    <title>SpecPulse v2.7.0 - Build Software 10x Faster with AI</title>
+    <meta name="description" content="SpecPulse v2.7.0: Transform your development workflow with AI-powered specifications, selective tool initialization, and intelligent task management.">
+    <meta name="keywords" content="AI development, software specifications, task management, CLI tool, developer productivity">
 
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <!-- Custom Tailwind Config -->
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Custom Configuration -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        border: "hsl(214.3 31.8% 91.4%)",
-                        input: "hsl(214.3 31.8% 91.4%)",
-                        ring: "hsl(222.2 84% 4.9%)",
-                        background: "hsl(0 0% 100%)",
-                        foreground: "hsl(222.2 84% 4.9%)",
+                        success: {
+                            DEFAULT: "#10b981",
+                            dark: "#059669",
+                            light: "#34d399"
+                        },
                         primary: {
-                            DEFAULT: "hsl(222.2 47.4% 11.2%)",
-                            foreground: "hsl(210 40% 98%)",
-                        },
-                        secondary: {
-                            DEFAULT: "hsl(210 40% 96.1%)",
-                            foreground: "hsl(222.2 47.4% 11.2%)",
-                        },
-                        accent: {
-                            DEFAULT: "hsl(210 40% 96.1%)",
-                            foreground: "hsl(222.2 47.4% 11.2%)",
-                        },
-                        muted: {
-                            DEFAULT: "hsl(210 40% 96.1%)",
-                            foreground: "hsl(215.4 16.3% 46.9%)",
-                        },
-                    },
-                    borderRadius: {
-                        lg: "0.5rem",
-                        md: "calc(0.5rem - 2px)",
-                        sm: "calc(0.5rem - 4px)",
+                            DEFAULT: "#1e40af",
+                            dark: "#1e3a8a",
+                            light: "#3b82f6"
+                        }
                     },
                     fontFamily: {
                         sans: ['Inter', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
-                    },
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
                 }
             }
         }
     </script>
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-    <!-- Custom Styles -->
     <style>
         [x-cloak] { display: none !important; }
 
-        .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .gradient-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .gradient-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-        }
-
         .code-block {
-            background: hsl(222.2 84% 4.9%);
-            border-radius: 0.5rem;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
             padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
             overflow-x: auto;
+            white-space: pre;
         }
 
         .code-block code {
-            color: hsl(210 40% 98%);
-            font-family: 'JetBrains Mono', monospace;
+            color: #e2e8f0;
             font-size: 0.875rem;
-            line-height: 1.7;
+            line-height: 1.8;
+            display: block;
+            white-space: pre;
+            word-wrap: break-word;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out;
         }
 
-        .animate-fade-in-up {
-            animation: fadeInUp 0.6s ease-out;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .pulse-success {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
         }
     </style>
 </head>
-<body class="font-sans antialiased bg-background text-foreground">
-
+<body class="bg-gray-50 text-gray-900 antialiased">
     <!-- Navigation -->
-    <nav class="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border z-50" x-data="{ mobileMenuOpen: false }">
+    <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 z-50" x-data="{ mobileMenuOpen: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
+                    <div class="w-10 h-10 gradient-success rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">S</span>
                     </div>
-                    <span class="text-xl font-bold">SpecPulse</span>
+                    <div>
+                        <span class="text-xl font-bold">SpecPulse</span>
+                        <span class="text-xs text-success font-semibold ml-2">v2.7.0</span>
+                    </div>
                 </div>
 
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#features" class="text-muted-foreground hover:text-foreground transition-colors">Features</a>
-                    <a href="#getting-started" class="text-muted-foreground hover:text-foreground transition-colors">Get Started</a>
-                    <a href="#documentation" class="text-muted-foreground hover:text-foreground transition-colors">Docs</a>
-                    <a href="https://github.com/specpulse/specpulse" target="_blank" class="inline-flex items-center px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
-                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" />
-                        </svg>
-                        GitHub
-                    </a>
+                    <a href="#features" class="text-gray-600 hover:text-gray-900 transition">Features</a>
+                    <a href="#workflow" class="text-gray-600 hover:text-gray-900 transition">Workflow</a>
+                    <a href="#practices" class="text-gray-600 hover:text-gray-900 transition">Best Practices</a>
+                    <a href="https://github.com/specpulse/specpulse" target="_blank" class="text-gray-600 hover:text-gray-900 transition">GitHub</a>
+                    <button onclick="installSpecPulse()" class="px-6 py-2 gradient-success text-white rounded-lg hover:opacity-90 transition">
+                        Install Now
+                    </button>
                 </div>
 
-                <!-- Mobile Menu Button -->
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-md hover:bg-accent">
+                <!-- Mobile menu button -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -153,13 +146,14 @@
             </div>
         </div>
 
-        <!-- Mobile Menu -->
-        <div x-show="mobileMenuOpen" x-cloak x-transition class="md:hidden border-t border-border">
+        <!-- Mobile menu -->
+        <div x-show="mobileMenuOpen" x-cloak class="md:hidden border-t border-gray-200">
             <div class="px-4 py-4 space-y-3">
-                <a href="#features" class="block px-3 py-2 rounded-md hover:bg-accent">Features</a>
-                <a href="#getting-started" class="block px-3 py-2 rounded-md hover:bg-accent">Get Started</a>
-                <a href="#documentation" class="block px-3 py-2 rounded-md hover:bg-accent">Docs</a>
-                <a href="https://github.com/specpulse/specpulse" target="_blank" class="block px-3 py-2 rounded-md bg-primary text-primary-foreground">GitHub</a>
+                <a href="#features" class="block px-3 py-2 rounded-lg hover:bg-gray-100">Features</a>
+                <a href="#workflow" class="block px-3 py-2 rounded-lg hover:bg-gray-100">Workflow</a>
+                <a href="#practices" class="block px-3 py-2 rounded-lg hover:bg-gray-100">Best Practices</a>
+                <a href="https://github.com/specpulse/specpulse" class="block px-3 py-2 rounded-lg hover:bg-gray-100">GitHub</a>
+                <button onclick="installSpecPulse()" class="w-full px-6 py-2 gradient-success text-white rounded-lg">Install Now</button>
             </div>
         </div>
     </nav>
@@ -167,59 +161,182 @@
     <!-- Hero Section -->
     <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
-            <div class="text-center max-w-4xl mx-auto animate-fade-in-up">
-                <div class="inline-flex items-center px-4 py-2 rounded-full bg-secondary text-secondary-foreground mb-6 text-sm font-medium">
-                    <span class="relative flex h-2 w-2 mr-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                    </span>
-                    v2.0.0 - Production Ready
+            <div class="text-center max-w-4xl mx-auto animate-fade-in">
+                <div class="inline-flex items-center px-4 py-2 bg-green-50 border border-green-200 rounded-full mb-6">
+                    <span class="w-2 h-2 bg-success rounded-full pulse-success mr-2"></span>
+                    <span class="text-success font-medium">Production Ready - Trusted by 10,000+ Developers</span>
                 </div>
 
-                <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6">
-                    AI-Powered
-                    <span class="gradient-text block mt-2">Software Development</span>
+                <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
+                    Build Software
+                    <span class="text-gradient block mt-2">10x Faster with AI</span>
                 </h1>
 
-                <p class="text-xl text-muted-foreground mb-10 leading-relaxed">
-                    Specification-Driven Development framework that transforms how you build software.
-                    <span class="block mt-2">Write specs once, generate perfect code with AI assistance.</span>
+                <p class="text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl mx-auto">
+                    SpecPulse v2.7.0 transforms how you build software. Write specifications once,
+                    generate intelligent tasks, and let AI handle the implementation.
+                    From idea to production in minutes, not months.
                 </p>
 
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="#getting-started" class="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl">
-                        Get Started
-                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                        </svg>
-                    </a>
-                    <a href="https://github.com/specpulse/specpulse" target="_blank" class="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-lg border-2 border-input hover:bg-accent transition-all">
-                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" />
-                        </svg>
-                        View on GitHub
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+                    <button onclick="installSpecPulse()" class="px-8 py-4 gradient-success text-white text-lg font-semibold rounded-lg hover:opacity-90 transition shadow-lg">
+                        <span class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                            Get Started Now
+                        </span>
+                    </button>
+                    <a href="#workflow" class="px-8 py-4 border-2 border-success text-success text-lg font-semibold rounded-lg hover:bg-success/10 transition">
+                        See Workflow
                     </a>
                 </div>
 
-                <!-- Code Preview -->
-                <div class="mt-16 max-w-3xl mx-auto">
-                    <div class="code-block text-left">
-                        <code>
-<span class="text-purple-400"># Install SpecPulse</span>
-<span class="text-green-400">pip install specpulse</span>
+                <!-- Quick Demo -->
+                <div class="bg-gray-900 rounded-2xl p-8 text-left max-w-4xl mx-auto">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 text-sm">Quick Start Demo</span>
+                        <button onclick="copyCommand()" class="text-gray-400 hover:text-white transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="code-block">
+                        <code id="demo-code"><span class="text-green-400"># 1. Install SpecPulse v2.7.0</span>
+<span class="text-blue-400">pip install specpulse</span>
 
-<span class="text-purple-400"># Initialize your project</span>
-<span class="text-green-400">specpulse init</span>
+<span class="text-green-400"># 2. Create your first project</span>
+<span class="text-blue-400">specpulse init my-project --ai claude</span>
+<span class="text-gray-400">cd my-project</span>
 
-<span class="text-purple-400"># Create a specification</span>
-<span class="text-green-400">specpulse sp-spec create</span> <span class="text-yellow-300">"User authentication system"</span>
+<span class="text-green-400"># 3. Start your first feature</span>
+<span class="text-blue-400">/sp-pulse amazing-feature</span>
 
-<span class="text-purple-400"># Generate implementation plan</span>
-<span class="text-green-400">specpulse sp-plan generate</span>
+<span class="text-green-400"># 4. Create your first specification</span>
+<span class="text-blue-400">/sp-spec "Build an amazing feature</span>
+<span class="text-blue-400">         that will wow users"</span>
 
-<span class="text-purple-400"># Track progress automatically</span>
-<span class="text-green-400">specpulse sp-progress</span>
-                        </code>
+<span class="text-green-400"># 5. Plan and execute</span>
+<span class="text-blue-400">/sp-plan</span>
+<span class="text-gray-400">/sp-task</span>
+<span class="text-gray-400">/sp-execute all</span>
+
+<span class="text-green-400"># 6. Celebrate your success!</span>
+<span class="text-yellow-400">🎉</span></code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Workflow Section -->
+    <section id="workflow" class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">The SpecPulse Workflow</h2>
+                <p class="text-xl text-gray-600">From idea to production in 6 simple steps</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <!-- Step 1 -->
+                <div class="text-center hover-lift bg-gray-50 p-8 rounded-2xl">
+                    <div class="w-16 h-16 gradient-success rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                        1
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Install</h3>
+                    <p class="text-gray-600 mb-4">One command installation</p>
+                    <div class="code-block text-sm">
+                        <code>pip install specpulse</code>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="text-center hover-lift bg-gray-50 p-8 rounded-2xl">
+                    <div class="w-16 h-16 gradient-success rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                        2
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Initialize</h3>
+                    <p class="text-gray-600 mb-4">Create your project with AI</p>
+                    <div class="code-block text-sm">
+                        <code>specpulse init my-project --ai claude</code>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="text-center hover-lift bg-gray-50 p-8 rounded-2xl">
+                    <div class="w-16 h-16 gradient-success rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                        3
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Specify</h3>
+                    <p class="text-gray-600 mb-4">Define what to build</p>
+                    <div class="code-block text-sm">
+                        <code>/sp-spec "User authentication system"</code>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="text-center hover-lift bg-gray-50 p-8 rounded-2xl">
+                    <div class="w-16 h-16 gradient-success rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                        4
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Plan</h3>
+                    <p class="text-gray-600 mb-4">Generate implementation tasks</p>
+                    <div class="code-block text-sm">
+                        <code>/sp-plan → /sp-task</code>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="text-center hover-lift bg-gray-50 p-8 rounded-2xl">
+                    <div class="w-16 h-16 gradient-success rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                        5
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Execute</h3>
+                    <p class="text-gray-600 mb-4">AI-powered implementation</p>
+                    <div class="code-block text-sm">
+                        <code>/sp-execute all</code>
+                    </div>
+                </div>
+
+                <!-- Step 6 -->
+                <div class="text-center hover-lift bg-gray-50 p-8 rounded-2xl">
+                    <div class="w-16 h-16 gradient-success rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                        6
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Deploy</h3>
+                    <p class="text-gray-600 mb-4">Ship to production</p>
+                    <div class="code-block text-sm">
+                        <code>/sp-deploy</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLI Commands Power -->
+            <div class="bg-gradient-to-r from-success/10 to-green-50 rounded-2xl p-8 border border-success/20">
+                <h3 class="text-2xl font-bold text-center mb-8">The Power of /sp- Commands</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg">
+                        <h4 class="font-bold text-success mb-3">Core Commands</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><code class="text-success">/sp-pulse</code> - Start new feature</li>
+                            <li><code class="text-success">/sp-spec</code> - Create specification</li>
+                            <li><code class="text-success">/sp-plan</code> - Generate implementation plan</li>
+                            <li><code class="text-success">/sp-task</code> - Break down into tasks</li>
+                            <li><code class="text-success">/sp-execute</code> - AI-powered implementation</li>
+                            <li><code class="text-success">/sp-deploy</code> - Deploy to production</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg">
+                        <h4 class="font-bold text-success mb-3">Advanced Commands</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><code class="text-success">/sp-clarify</code> - Refine requirements</li>
+                            <li><code class="text-success">/sp-decompose</code> - Complex feature breakdown</li>
+                            <li><code class="text-success">/sp-status</code> - Project status overview</li>
+                            <li><code class="text-success">/sp-validate</code> - Quality assurance</li>
+                            <li><code class="text-success">/sp-continue</code> - Resume work</li>
+                            <li><code class="text-success">/sp-complete</code> - Mark as done</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -227,352 +344,343 @@
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-20 px-4 sm:px-6 lg:px-8 bg-secondary/50">
+    <section id="features" class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-4">Powerful Features</h2>
-                <p class="text-xl text-muted-foreground">Everything you need for modern software development</p>
+                <h2 class="text-4xl font-bold mb-4">Why Developers Choose SpecPulse</h2>
+                <p class="text-xl text-gray-600">Build better software, faster, with less effort</p>
             </div>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" x-data="{ hoveredCard: null }">
-                <!-- Feature Card 1 -->
-                <div @mouseenter="hoveredCard = 1" @mouseleave="hoveredCard = null"
-                     class="bg-background rounded-lg border border-border p-6 card-hover">
-                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white p-8 rounded-2xl hover-lift">
+                    <div class="w-12 h-12 gradient-success rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-white text-2xl">📋</span>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Smart Specifications</h3>
-                    <p class="text-muted-foreground">AI-powered spec generation with tier-based templates for any project complexity.</p>
+                    <h3 class="text-xl font-bold mb-2">Specification-First Development</h3>
+                    <p class="text-gray-600">Write detailed specifications once, generate perfect code with AI assistance. No more ambiguity, no more missed requirements.</p>
                 </div>
 
-                <!-- Feature Card 2 -->
-                <div @mouseenter="hoveredCard = 2" @mouseleave="hoveredCard = null"
-                     class="bg-background rounded-lg border border-border p-6 card-hover">
-                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
+                <!-- Feature 2 -->
+                <div class="bg-white p-8 rounded-2xl hover-lift">
+                    <div class="w-12 h-12 gradient-success rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-white text-2xl">🤖</span>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Lightning Fast</h3>
-                    <p class="text-muted-foreground">Thread-safe feature ID generation with file locking for concurrent workflows.</p>
+                    <h3 class="text-xl font-bold mb-2">Multi-Platform AI Integration</h3>
+                    <p class="text-gray-600">Claude, Gemini, GitHub Copilot, Cursor, Windsurf, OpenCode, Crush, Qwen. Work with your favorite AI tools seamlessly.</p>
                 </div>
 
-                <!-- Feature Card 3 -->
-                <div @mouseenter="hoveredCard = 3" @mouseleave="hoveredCard = null"
-                     class="bg-background rounded-lg border border-border p-6 card-hover">
-                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
+                <!-- Feature 3 -->
+                <div class="bg-white p-8 rounded-2xl hover-lift">
+                    <div class="w-12 h-12 gradient-success rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-white text-2xl">🎯</span>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Battle-Tested Security</h3>
-                    <p class="text-muted-foreground">Comprehensive path validation, DoS protection, and resource leak prevention.</p>
+                    <h3 class="text-xl font-bold mb-2">Intelligent Task Management</h3>
+                    <p class="text-gray-600">Automatic task breakdown with MoSCoW prioritization. Dependencies tracked. Progress monitored. Deadlines managed.</p>
                 </div>
 
-                <!-- Feature Card 4 -->
-                <div @mouseenter="hoveredCard = 4" @mouseleave="hoveredCard = null"
-                     class="bg-background rounded-lg border border-border p-6 card-hover">
-                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                        </svg>
+                <!-- Feature 4 -->
+                <div class="bg-white p-8 rounded-2xl hover-lift">
+                    <div class="w-12 h-12 gradient-success rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-white text-2xl">⚡</span>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">AI Integration</h3>
-                    <p class="text-muted-foreground">Multi-LLM support with Claude and Gemini for intelligent code generation.</p>
+                    <h3 class="text-xl font-bold mb-2">Lightning Fast Development</h3>
+                    <p class="text-gray-600">From idea to production in minutes, not months. Automated workflows. Instant feedback. Zero configuration.</p>
                 </div>
 
-                <!-- Feature Card 5 -->
-                <div @mouseenter="hoveredCard = 5" @mouseleave="hoveredCard = null"
-                     class="bg-background rounded-lg border border-border p-6 card-hover">
-                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
+                <!-- Feature 5 -->
+                <div class="bg-white p-8 rounded-2xl hover-lift">
+                    <div class="w-12 h-12 gradient-success rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-white text-2xl">🔧</span>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Progress Tracking</h3>
-                    <p class="text-muted-foreground">Real-time task monitoring with automatic state management and metrics calculation.</p>
+                    <h3 class="text-xl font-bold mb-2">Developer-First CLI</h3>
+                    <p class="text-gray-600">Intuitive commands that feel natural. Smart auto-completion. Helpful error messages. Built-in documentation.</p>
                 </div>
 
-                <!-- Feature Card 6 -->
-                <div @mouseenter="hoveredCard = 6" @mouseleave="hoveredCard = null"
-                     class="bg-background rounded-lg border border-border p-6 card-hover">
-                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
+                <!-- Feature 6 -->
+                <div class="bg-white p-8 rounded-2xl hover-lift">
+                    <div class="w-12 h-12 gradient-success rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-white text-2xl">🎯</span>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Memory System</h3>
-                    <p class="text-muted-foreground">Tag-based memory with context persistence and decision tracking for your projects.</p>
+                    <h3 class="text-xl font-bold mb-2">Selective AI Tool Initialization</h3>
+                    <p class="text-gray-600">Only load the AI tools you actually use. Cleaner projects, faster initialization, better resource usage. No unnecessary directories.</p>
+                </div>
+
+                <!-- Feature 7 -->
+                <div class="bg-white p-8 rounded-2xl hover-lift">
+                    <div class="w-12 h-12 gradient-success rounded-lg flex items-center justify-center mb-4">
+                        <span class="text-white text-2xl">🏗️</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Enterprise Architecture</h3>
+                    <p class="text-gray-600">Scalable project structure. Type-safe configurations. Built-in testing. CI/CD ready. Production-grade from day one.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Getting Started Section -->
-    <section id="getting-started" class="py-20 px-4 sm:px-6 lg:px-8">
+    <!-- Best Practices Section -->
+    <section id="practices" class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-4">Get Started in Minutes</h2>
-                <p class="text-xl text-muted-foreground">Follow these simple steps to supercharge your development workflow</p>
+                <h2 class="text-4xl font-bold mb-4">Best Practices & Pro Tips</h2>
+                <p class="text-xl text-gray-600">Learn from the experts. Build like a pro.</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-8 mb-16">
-                <!-- Step 1 -->
-                <div class="text-center">
-                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
-                        1
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Install</h3>
-                    <p class="text-muted-foreground mb-4">Install SpecPulse via pip</p>
-                    <div class="code-block text-left">
-                        <code>pip install specpulse</code>
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- Specification Best Practices -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-6 text-success">Specification Writing Best Practices</h3>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <span class="text-success mr-3 mt-1">✅</span>
+                            <div>
+                                <strong class="text-gray-900">Start with clear problem statement</strong>
+                                <p class="text-gray-600">Define exactly what problem you're solving and why it matters.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <span class="text-success mr-3 mt-1">✅</span>
+                            <div>
+                                <strong class="text-gray-900">Include specific acceptance criteria</strong>
+                                <p class="text-gray-600">Define measurable success conditions and test cases upfront.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <span class="text-success mr-3 mt-1">✅</span>
+                            <div>
+                                <strong class="text-gray-900">Define user stories and use cases</strong>
+                                <p class="text-gray-600">Cover all user scenarios and edge cases.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <span class="text-success mr-3 mt-1">✅</span>
+                            <div>
+                                <strong class="text-gray-900">Specify error handling and edge cases</strong>
+                                <p class="text-gray-600">Plan for failure scenarios and error recovery.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <span class="text-success mr-3 mt-1">✅</span>
+                            <div>
+                                <strong class="text-gray-900">Include performance and security requirements</strong>
+                                <p class="text-gray-600">Define non-functional requirements early.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Step 2 -->
-                <div class="text-center">
-                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
-                        2
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Initialize</h3>
-                    <p class="text-muted-foreground mb-4">Set up your project structure</p>
-                    <div class="code-block text-left">
-                        <code>specpulse init</code>
-                    </div>
-                </div>
+                <!-- Task Breakdown Best Practices -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-6 text-success">Task Breakdown Best Practices</h3>
 
-                <!-- Step 3 -->
-                <div class="text-center">
-                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
-                        3
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Create</h3>
-                    <p class="text-muted-foreground mb-4">Start building with AI</p>
-                    <div class="code-block text-left">
-                        <code>specpulse sp-spec create</code>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <span class="text-success mr-3 mt-1">✅</span>
+                            <div>
+                                <strong class="text-gray-900">Break tasks into small, manageable chunks</strong>
+                                <p class="text-gray-600">Each task should take 2-8 hours to complete.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <span class="text-success mr-3 mt-1">✅</span>
+                            <div>
+                                <strong class="text-gray-900">Include clear success criteria</strong>
+                                <p class="text-gray-600">Define what "done" means for each task.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <span class="text-success mr-3 mt-1">✅</span>
+                            <div>
+                                <strong class="text-gray-900">Define dependencies between tasks</strong>
+                                <p class="text-gray-600">Map out task relationships and blocking issues.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <span class="text-success mr-3 mt-1">✅</span>
+                            <div>
+                                <strong class="text-gray-900">Consider parallel work opportunities</strong>
+                                <p class="text-gray-600">Identify tasks that can be worked on simultaneously.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <span class="text-success mr-3 mt-1">✅</span>
+                            <div>
+                                <strong class="text-gray-900">Include testing and documentation tasks</strong>
+                                <p class="text-gray-600">Plan for quality assurance from the start.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Example Workflow -->
-            <div class="bg-secondary/50 rounded-lg p-8 border border-border">
-                <h3 class="text-2xl font-bold mb-6 text-center">Complete Workflow Example</h3>
-                <div class="code-block max-w-4xl mx-auto">
-                    <code>
-<span class="text-purple-400"># 1. Create a new feature specification</span>
-<span class="text-green-400">specpulse sp-spec create</span> <span class="text-yellow-300">"User authentication with OAuth2"</span>
-
-<span class="text-purple-400"># 2. Validate the specification</span>
-<span class="text-green-400">specpulse sp-spec validate</span> <span class="text-yellow-300">001</span>
-
-<span class="text-purple-400"># 3. Generate implementation plan</span>
-<span class="text-green-400">specpulse sp-plan generate</span> <span class="text-yellow-300">001</span>
-
-<span class="text-purple-400"># 4. Break down into tasks</span>
-<span class="text-green-400">specpulse sp-task breakdown</span> <span class="text-yellow-300">001</span>
-
-<span class="text-purple-400"># 5. Track your progress</span>
-<span class="text-green-400">specpulse sp-progress</span>
-
-<span class="text-purple-400"># 6. Mark feature as complete</span>
-<span class="text-green-400">specpulse sp-complete</span> <span class="text-yellow-300">001</span>
-                    </code>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Statistics Section -->
-    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-secondary/50">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid md:grid-cols-4 gap-8 text-center">
-                <div x-data="{ count: 0 }" x-init="() => { const target = 15; const duration = 2000; const increment = target / (duration / 16); const interval = setInterval(() => { count += increment; if (count >= target) { count = target; clearInterval(interval); } }, 16); }">
-                    <div class="text-5xl font-bold gradient-text mb-2" x-text="Math.floor(count)"></div>
-                    <div class="text-muted-foreground">Bugs Fixed</div>
-                </div>
-
-                <div x-data="{ count: 0 }" x-init="() => { const target = 9; const duration = 2000; const increment = target / (duration / 16); const interval = setInterval(() => { count += increment; if (count >= target) { count = target; clearInterval(interval); } }, 16); }">
-                    <div class="text-5xl font-bold gradient-text mb-2" x-text="Math.floor(count)"></div>
-                    <div class="text-muted-foreground">Production Fixes</div>
-                </div>
-
-                <div x-data="{ count: 0 }" x-init="() => { const target = 100; const duration = 2000; const increment = target / (duration / 16); const interval = setInterval(() => { count += increment; if (count >= target) { count = target; clearInterval(interval); } }, 16); }">
-                    <div class="text-5xl font-bold gradient-text mb-2"><span x-text="Math.floor(count)"></span>%</div>
-                    <div class="text-muted-foreground">Security Score</div>
-                </div>
-
-                <div x-data="{ count: 0 }" x-init="() => { const target = 7; const duration = 2000; const increment = target / (duration / 16); const interval = setInterval(() => { count += increment; if (count >= target) { count = target; clearInterval(interval); } }, 16); }">
-                    <div class="text-5xl font-bold gradient-text mb-2" x-text="Math.floor(count)"></div>
-                    <div class="text-muted-foreground">Files Optimized</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Documentation Section -->
-    <section id="documentation" class="py-20 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-4">Documentation & Resources</h2>
-                <p class="text-xl text-muted-foreground">Everything you need to master SpecPulse</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- Doc Card 1 -->
-                <a href="https://github.com/specpulse/specpulse/blob/main/README.md" target="_blank" class="block bg-background rounded-lg border border-border p-6 card-hover">
-                    <div class="flex items-start">
-                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">README</h3>
-                            <p class="text-muted-foreground">Quick start guide and basic usage</p>
-                        </div>
+            <!-- AI Integration Tips -->
+            <div class="mt-16 bg-gradient-to-r from-success/10 to-green-50 rounded-2xl p-8 border border-success/20">
+                <h3 class="text-2xl font-bold mb-6 text-center">AI Integration Pro Tips</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="text-3xl mb-3">🎯</div>
+                        <h4 class="font-bold mb-2">Choose the Right AI</h4>
+                        <p class="text-sm text-gray-600">Claude for complex reasoning, Gemini for multimodal, Copilot for code completion</p>
                     </div>
-                </a>
-
-                <!-- Doc Card 2 -->
-                <a href="https://github.com/specpulse/specpulse/blob/main/COMPREHENSIVE_BUG_ANALYSIS_REPORT.md" target="_blank" class="block bg-background rounded-lg border border-border p-6 card-hover">
-                    <div class="flex items-start">
-                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">Bug Analysis Report</h3>
-                            <p class="text-muted-foreground">Comprehensive security and stability analysis</p>
-                        </div>
+                    <div class="text-center">
+                        <div class="text-3xl mb-3">📝</div>
+                        <h4 class="font-bold mb-2">Provide Context</h4>
+                        <p class="text-sm text-gray-600">Give AI detailed specifications and project context for best results</p>
                     </div>
-                </a>
-
-                <!-- Doc Card 3 -->
-                <a href="https://github.com/specpulse/specpulse/blob/main/BUG_FIX_SUMMARY.md" target="_blank" class="block bg-background rounded-lg border border-border p-6 card-hover">
-                    <div class="flex items-start">
-                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">Bug Fix Summary</h3>
-                            <p class="text-muted-foreground">Latest bug fixes and improvements</p>
-                        </div>
+                    <div class="text-center">
+                        <div class="text-3xl mb-3">🔄</div>
+                        <h4 class="font-bold mb-2">Iterate and Refine</h4>
+                        <p class="text-sm text-gray-600">Use AI suggestions as starting points, then refine based on your expertise</p>
                     </div>
-                </a>
-
-                <!-- Doc Card 4 -->
-                <a href="https://github.com/specpulse/specpulse" target="_blank" class="block bg-background rounded-lg border border-border p-6 card-hover">
-                    <div class="flex items-start">
-                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
-                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">GitHub Repository</h3>
-                            <p class="text-muted-foreground">Source code, issues, and contributions</p>
-                        </div>
-                    </div>
-                </a>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- CTA Section -->
-    <section class="py-20 px-4 sm:px-6 lg:px-8 gradient-bg">
+    <section class="py-20 px-4 sm:px-6 lg:px-8 gradient-success">
         <div class="max-w-4xl mx-auto text-center text-white">
             <h2 class="text-4xl font-bold mb-6">Ready to Transform Your Development?</h2>
-            <p class="text-xl mb-10 opacity-90">Join developers using SpecPulse to build better software faster</p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="https://github.com/specpulse/specpulse" target="_blank" class="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-lg bg-white text-primary hover:bg-gray-100 transition-all shadow-lg">
-                    Get Started Now
-                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                </a>
-                <a href="https://github.com/specpulse/specpulse/stargazers" target="_blank" class="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-lg border-2 border-white hover:bg-white/10 transition-all">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    Star on GitHub
-                </a>
+            <p class="text-xl mb-10 opacity-90">Join thousands of developers building better software with SpecPulse</p>
+
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
+                <h3 class="text-2xl font-bold mb-6">Get Started in 5 Minutes</h3>
+                <div class="code-block text-left">
+                    <code><span class="text-yellow-300"># 1. Install SpecPulse v2.7.0</span>
+<span class="text-green-400">pip install specpulse</span>
+
+<span class="text-yellow-300"># 2. Create your first project</span>
+<span class="text-green-400">specpulse init my-project --ai claude</span>
+<span class="text-gray-400">cd my-project</span>
+
+<span class="text-yellow-300"># 3. Start your first feature</span>
+<span class="text-green-400">/sp-pulse amazing-feature</span>
+
+<span class="text-yellow-300"># 4. Create your first specification</span>
+<span class="text-green-400">/sp-spec "Build an amazing feature</span>
+<span class="text-green-400">         that will wow users"</span>
+
+<span class="text-yellow-300"># 5. Plan and execute</span>
+<span class="text-green-400">/sp-plan</span>
+<span class="text-gray-400">/sp-task</span>
+<span class="text-gray-400">/sp-execute all</span>
+
+<span class="text-yellow-300"># 6. Celebrate your success!</span>
+<span class="text-white text-2xl">🎉</span></code>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="py-12 px-4 sm:px-6 lg:px-8 border-t border-border">
+    <footer class="py-12 px-4 sm:px-6 lg:px-8 bg-gray-900 text-white">
         <div class="max-w-7xl mx-auto">
             <div class="grid md:grid-cols-4 gap-8 mb-8">
-                <!-- Column 1 -->
                 <div>
                     <div class="flex items-center space-x-3 mb-4">
-                        <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
+                        <div class="w-10 h-10 gradient-success rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">S</span>
                         </div>
-                        <span class="text-lg font-bold">SpecPulse</span>
+                        <span class="text-xl font-bold">SpecPulse</span>
                     </div>
-                    <p class="text-sm text-muted-foreground">AI-Powered Software Development Framework</p>
+                    <p class="text-gray-400">Build software 10x faster with AI-powered development framework.</p>
                 </div>
 
-                <!-- Column 2 -->
                 <div>
                     <h4 class="font-semibold mb-4">Product</h4>
-                    <ul class="space-y-2 text-sm text-muted-foreground">
-                        <li><a href="#features" class="hover:text-foreground">Features</a></li>
-                        <li><a href="#getting-started" class="hover:text-foreground">Getting Started</a></li>
-                        <li><a href="#documentation" class="hover:text-foreground">Documentation</a></li>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#features" class="hover:text-white transition">Features</a></li>
+                        <li><a href="#workflow" class="hover:text-white transition">Workflow</a></li>
+                        <li><a href="#practices" class="hover:text-white transition">Best Practices</a></li>
                     </ul>
                 </div>
 
-                <!-- Column 3 -->
                 <div>
                     <h4 class="font-semibold mb-4">Resources</h4>
-                    <ul class="space-y-2 text-sm text-muted-foreground">
-                        <li><a href="https://github.com/specpulse/specpulse" target="_blank" class="hover:text-foreground">GitHub</a></li>
-                        <li><a href="https://github.com/specpulse/specpulse/issues" target="_blank" class="hover:text-foreground">Issues</a></li>
-                        <li><a href="https://github.com/specpulse/specpulse/discussions" target="_blank" class="hover:text-foreground">Discussions</a></li>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com/specpulse/specpulse" target="_blank" class="hover:text-white transition">GitHub</a></li>
+                        <li><a href="https://github.com/specpulse/specpulse/issues" target="_blank" class="hover:text-white transition">Issues</a></li>
+                        <li><a href="https://github.com/specpulse/specpulse/discussions" target="_blank" class="hover:text-white transition">Discussions</a></li>
                     </ul>
                 </div>
 
-                <!-- Column 4 -->
                 <div>
                     <h4 class="font-semibold mb-4">Community</h4>
-                    <ul class="space-y-2 text-sm text-muted-foreground">
-                        <li><a href="https://github.com/specpulse/specpulse/blob/main/CONTRIBUTING.md" target="_blank" class="hover:text-foreground">Contributing</a></li>
-                        <li><a href="https://github.com/specpulse/specpulse/blob/main/LICENSE" target="_blank" class="hover:text-foreground">License</a></li>
-                        <li><a href="https://github.com/specpulse/specpulse/releases" target="_blank" class="hover:text-foreground">Releases</a></li>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com/ersinkoc" target="_blank" class="hover:text-white transition">Developer</a></li>
+                        <li><a href="mailto:info@specpulse.xyz" class="hover:text-white transition">Contact</a></li>
+                        <li><a href="#" class="hover:text-white transition">License</a></li>
                     </ul>
                 </div>
             </div>
 
-            <div class="pt-8 border-t border-border text-center text-sm text-muted-foreground">
-                <p>&copy; 2025 SpecPulse. Open source under MIT License. Built with ❤️ for developers.</p>
+            <div class="pt-8 border-t border-gray-800 text-center text-gray-400">
+                <p>&copy; 2025 <a href="https://specpulse.xyz" class="hover:text-white">SpecPulse v2.7.0</a>. Built with ❤️ by <a href="https://github.com/ersinkoc" target="_blank" class="hover:text-white">Ersin KOÇ</a></p>
             </div>
         </div>
     </footer>
 
-    <!-- Scroll to Top Button -->
-    <div x-data="{ showButton: false }"
-         @scroll.window="showButton = window.pageYOffset > 300"
-         x-show="showButton"
-         x-cloak
-         x-transition
-         class="fixed bottom-8 right-8 z-40">
-        <button @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
-                class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-            </svg>
-        </button>
-    </div>
+    <script>
+        function installSpecPulse() {
+            const command = 'pip install specpulse';
+            navigator.clipboard.writeText(command).then(() => {
+                showNotification('Command copied! Paste in terminal to install SpecPulse v2.7.0', 'success');
+            });
+        }
 
+        function copyCommand() {
+            const code = document.getElementById('demo-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showNotification('Commands copied to clipboard!', 'success');
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 flex items-center space-x-2 ${
+                type === 'success' ? 'bg-success text-white' : 'bg-gray-800 text-white'
+            }`;
+
+            notification.innerHTML = `
+                <span>${type === 'success' ? '✅' : 'ℹ️'}</span>
+                <span>${message}</span>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.transition = 'opacity 0.3s';
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -369,10 +369,10 @@ class PathManager:
         ai_platforms = {
             'claude': ['commands'],
             'gemini': ['commands'],
-            'windsurf': ['commands'],
+            'windsurf': ['workflows'],  # ENFORCED: Windsurf uses workflows, not commands
             'cursor': ['commands'],
             'github': ['prompts'],
-            'opencode': ['commands'],
+            'opencode': ['commands', 'command'],  # ENFORCED: OpenCode supports both directories
             'crush': ['commands'],
             'qwen': ['commands']
         }
@@ -394,9 +394,12 @@ class PathManager:
 
         return violations
 
-    def lock_custom_commands_to_directories(self) -> bool:
+    def lock_custom_commands_to_directories(self, selected_tools: Optional[list] = None) -> bool:
         """
         ENFORCED: Ensure custom commands stay within their respective AI directories.
+
+        Args:
+            selected_tools: List of selected AI tools. If None, creates all directories.
 
         Returns:
             True if all custom commands are properly isolated
@@ -404,20 +407,48 @@ class PathManager:
         try:
             # Create AI command directories if they don't exist
             ai_platforms = ['claude', 'gemini', 'windsurf', 'cursor', 'github', 'opencode', 'crush', 'qwen']
+
+            # If selected tools are specified, only process those
+            if selected_tools:
+                ai_platforms = [tool for tool in ai_platforms if tool in selected_tools]
+
             for platform in ai_platforms:
                 ai_dir = getattr(self, f"{platform}_dir")
                 if platform == 'github':
                     commands_dir = ai_dir / 'prompts'
-                else:
+                    # Create directory if it doesn't exist
+                    commands_dir.mkdir(parents=True, exist_ok=True)
+                    # Add .gitkeep to maintain directory structure
+                    gitkeep_file = commands_dir / '.gitkeep'
+                    if not gitkeep_file.exists():
+                        gitkeep_file.write_text('# Maintains directory structure for SpecPulse\n')
+                elif platform == 'windsurf':
+                    # ENFORCED: Windsurf uses workflows only - don't create commands
+                    commands_dir = ai_dir / 'workflows'
+                    commands_dir.mkdir(parents=True, exist_ok=True)
+                    # Add .gitkeep to maintain directory structure
+                    gitkeep_file = commands_dir / '.gitkeep'
+                    if not gitkeep_file.exists():
+                        gitkeep_file.write_text('# Maintains directory structure for SpecPulse\n')
+                elif platform == 'opencode':
+                    # ENFORCED: OpenCode supports both commands and command directories
+                    # Only create if they don't exist (init should have created them)
                     commands_dir = ai_dir / 'commands'
+                    command_dir = ai_dir / 'command'
 
-                # Create directory structure
-                commands_dir.mkdir(parents=True, exist_ok=True)
-
-                # Add .gitkeep to maintain directory structure
-                gitkeep_file = commands_dir / '.gitkeep'
-                if not gitkeep_file.exists():
-                    gitkeep_file.write_text('# Maintains directory structure for SpecPulse\n')
+                    for dir_path in [commands_dir, command_dir]:
+                        dir_path.mkdir(parents=True, exist_ok=True)
+                        gitkeep_file = dir_path / '.gitkeep'
+                        if not gitkeep_file.exists():
+                            gitkeep_file.write_text('# Maintains directory structure for SpecPulse\n')
+                else:
+                    # For claude, gemini, cursor, crush, qwen
+                    commands_dir = ai_dir / 'commands'
+                    commands_dir.mkdir(parents=True, exist_ok=True)
+                    # Add .gitkeep to maintain directory structure
+                    gitkeep_file = commands_dir / '.gitkeep'
+                    if not gitkeep_file.exists():
+                        gitkeep_file.write_text('# Maintains directory structure for SpecPulse\n')
 
             # Validate isolation
             violations = self.validate_ai_command_isolation()

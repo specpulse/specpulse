@@ -42,12 +42,16 @@ class ProjectCommands:
         ai_tool = tool or ai  # tool takes precedence over ai
 
         # Handle interactive selection
-        if ai_tool == 'interactive' or (not ai_tool and not project_name):
-            ai_tool = self._interactive_ai_selection()
+        try:
+            if ai_tool == 'interactive' or (not ai_tool and not project_name):
+                ai_tool = self._interactive_ai_selection()
 
-        # Default to all tools if no specific tool selected
-        if not ai_tool:
-            ai_tool = 'all'
+            # Default to all tools if no specific tool selected
+            if not ai_tool:
+                ai_tool = 'all'
+        except KeyboardInterrupt:
+            self.console.info("\nOperation cancelled by user.")
+            return {"status": "cancelled", "message": "Project initialization cancelled by user"}
         # Skip banner for now to avoid Unicode issues
         # self.console.show_banner()
         # self.console.pulse_animation("Initializing SpecPulse Framework", duration=1.0)
@@ -113,7 +117,7 @@ class ProjectCommands:
             Selected AI tool name
         """
         self.console.info("\n" + "="*60)
-        self.console.info("🤖 SELECT AI TOOLS FOR SPECPULSE PROJECT")
+        self.console.info("SELECT AI TOOLS FOR SPECPULSE PROJECT")
         self.console.info("="*60)
 
         # Get available tools
@@ -123,6 +127,9 @@ class ProjectCommands:
             ("windsurf", "Windsurf", "Custom front matter + SPECPULSE blocks"),
             ("cursor", "Cursor", "Custom front matter + TODO tracking"),
             ("github", "GitHub Copilot", "$ARGUMENTS + .prompt.md format"),
+            ("opencode", "OpenCode AI", "Markdown command format"),
+            ("crush", "Crush AI", "SP command format"),
+            ("qwen", "Qwen Code", "TOML command format"),
             ("all", "All Tools", "Install commands for all supported AI tools")
         ]
 
@@ -132,7 +139,7 @@ class ProjectCommands:
 
         while True:
             try:
-                choice = input(f"\nSelect AI tools (comma-separated, 1-6, or 'a' for all): ").strip().lower()
+                choice = input(f"\nSelect AI tools (comma-separated, 1-9, or 'a' for all): ").strip().lower()
 
                 if choice in ['a', 'all']:
                     return 'all'
@@ -144,7 +151,7 @@ class ProjectCommands:
                         idx = int(item) - 1
                         if 0 <= idx < len(available_tools) - 1:  # -1 to exclude "all" from digit selection
                             selected.append(available_tools[idx][0])
-                    elif item in ['claude', 'gemini', 'windsurf', 'cursor', 'github']:
+                    elif item in ['claude', 'gemini', 'windsurf', 'cursor', 'github', 'opencode', 'crush', 'qwen']:
                         selected.append(item)
 
                 if selected:
@@ -164,8 +171,8 @@ class ProjectCommands:
                     self.console.warning("Please select at least one AI tool")
 
             except KeyboardInterrupt:
-                self.console.info("\nOperation cancelled. Using default: all tools")
-                return 'all'
+                self.console.info("\nOperation cancelled by user.")
+                raise  # Re-raise to be handled by the outer try-catch
             except ValueError:
                 self.console.warning("Invalid input. Please try again.")
 
