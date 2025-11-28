@@ -29,8 +29,8 @@ pytestmark = pytest.mark.skip(reason="BUG-011: Missing utility modules (file_uti
 # )
 # from specpulse.utils.formatting import (
 #     format_header, format_section, format_list,
-    format_table, format_code_block
-)
+#     format_table, format_code_block
+# )
 
 
 class TestFileUtils:

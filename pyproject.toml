@@ -159,6 +159,12 @@ python_files = [
     "test_*.py",
     "*_test.py",
 ]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "security: Security tests",
+    "performance: Performance tests",
+]
 
 [tool.coverage.run]
 source = ["specpulse"]

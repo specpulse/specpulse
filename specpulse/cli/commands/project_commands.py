@@ -26,16 +26,28 @@ class ProjectCommands:
         self.path_manager = PathManager(project_root, use_legacy_structure=False)
 
     def init(self, project_name: Optional[str] = None, here: bool = False,
-             ai: Optional[str] = None, template_source: str = 'local', **kwargs):
+             ai: Optional[str] = None, tool: Optional[str] = None,
+             template_source: str = 'local', **kwargs):
         """
         Initialize a new SpecPulse project
 
         Args:
             project_name: Name of the project
             here: Initialize in current directory
-            ai: AI assistant to configure (claude or gemini)
+            ai: Legacy AI assistant to configure (claude or gemini) - deprecated
+            tool: AI tool to configure (claude, gemini, windsurf, cursor, github, or interactive)
             template_source: Template source (local or remote)
         """
+        # Handle legacy --ai argument
+        ai_tool = tool or ai  # tool takes precedence over ai
+
+        # Handle interactive selection
+        if ai_tool == 'interactive' or (not ai_tool and not project_name):
+            ai_tool = self._interactive_ai_selection()
+
+        # Default to all tools if no specific tool selected
+        if not ai_tool:
+            ai_tool = 'all'
         # Skip banner for now to avoid Unicode issues
         # self.console.show_banner()
         # self.console.pulse_animation("Initializing SpecPulse Framework", duration=1.0)
@@ -44,7 +56,7 @@ class ProjectCommands:
         result = self.specpulse.init(
             project_name=project_name,
             here=here,
-            ai_assistant=ai,
+            ai_assistant=ai_tool,
             template_source=template_source,
             console=self.console
         )
@@ -92,6 +104,70 @@ class ProjectCommands:
                     raise SpecPulseError(f"Update failed: {e}")
         else:
             self.console.success(f"Already on latest version (v{__version__})")
+
+    def _interactive_ai_selection(self) -> str:
+        """
+        Interactive AI tool selection for project initialization
+
+        Returns:
+            Selected AI tool name
+        """
+        self.console.info("\n" + "="*60)
+        self.console.info("🤖 SELECT AI TOOLS FOR SPECPULSE PROJECT")
+        self.console.info("="*60)
+
+        # Get available tools
+        available_tools = [
+            ("claude", "Claude Code", "YAML front matter + .md format"),
+            ("gemini", "Gemini CLI", "TOML configuration format"),
+            ("windsurf", "Windsurf", "Custom front matter + SPECPULSE blocks"),
+            ("cursor", "Cursor", "Custom front matter + TODO tracking"),
+            ("github", "GitHub Copilot", "$ARGUMENTS + .prompt.md format"),
+            ("all", "All Tools", "Install commands for all supported AI tools")
+        ]
+
+        self.console.info("\nAvailable AI Tools:")
+        for i, (key, name, description) in enumerate(available_tools, 1):
+            self.console.info(f"  {i}. {name:<15} - {description}")
+
+        while True:
+            try:
+                choice = input(f"\nSelect AI tools (comma-separated, 1-6, or 'a' for all): ").strip().lower()
+
+                if choice in ['a', 'all']:
+                    return 'all'
+
+                # Parse comma-separated choices
+                selected = []
+                for item in choice.replace(',', ' ').split():
+                    if item.isdigit():
+                        idx = int(item) - 1
+                        if 0 <= idx < len(available_tools) - 1:  # -1 to exclude "all" from digit selection
+                            selected.append(available_tools[idx][0])
+                    elif item in ['claude', 'gemini', 'windsurf', 'cursor', 'github']:
+                        selected.append(item)
+
+                if selected:
+                    # Remove duplicates and validate
+                    selected = list(dict.fromkeys(selected))  # Remove duplicates while preserving order
+                    valid_tools = [t[0] for t in available_tools[:-1]]  # exclude 'all'
+
+                    if all(tool in valid_tools for tool in selected):
+                        if len(selected) == 1:
+                            return selected[0]
+                        else:
+                            return ','.join(selected)
+                    else:
+                        invalid = [tool for tool in selected if tool not in valid_tools]
+                        self.console.error(f"Invalid tools: {', '.join(invalid)}")
+                else:
+                    self.console.warning("Please select at least one AI tool")
+
+            except KeyboardInterrupt:
+                self.console.info("\nOperation cancelled. Using default: all tools")
+                return 'all'
+            except ValueError:
+                self.console.warning("Invalid input. Please try again.")
 
     def doctor(self, fix: bool = False, component: str = 'all', **kwargs):
         """

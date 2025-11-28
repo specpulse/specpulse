@@ -29,9 +29,47 @@ commands/
     ├── sp-validate.toml        # Same as Claude (TOML format)
     ├── sp-clarify.toml         # Same as Claude (TOML format)
     └── utility/                # Utility commands
+└── windsurf/                     # Windsurf commands (.md format with custom structure)
+    ├── sp-pulse.md             # Feature initialization (Windsurf format)
+    ├── sp-spec.md              # Specification management (Windsurf format)
+    ├── sp-plan.md              # Implementation planning (Windsurf format)
+    ├── sp-task.md              # Task management (Windsurf format)
+    ├── sp-execute.md           # Continuous execution (Windsurf format)
+    ├── sp-status.md            # Progress tracking (Windsurf format)
+    ├── sp-continue.md          # Resume work (Windsurf format)
+    ├── sp-decompose.md         # Feature decomposition (Windsurf format)
+    ├── sp-validate.md          # Validation (Windsurf format)
+    ├── sp-clarify.md           # Clarifications (Windsurf format)
+    ├── sp-feature.md           # Feature initialization alias (Windsurf format)
+    └── utility/                # Utility commands
+└── cursor/                      # Cursor commands (.md format with custom front matter)
+    ├── sp-pulse.md             # Feature initialization (Cursor format)
+    ├── sp-spec.md              # Specification management (Cursor format)
+    ├── sp-plan.md              # Implementation planning (Cursor format)
+    ├── sp-task.md              # Task management (Cursor format)
+    ├── sp-execute.md           # Continuous execution (Cursor format)
+    ├── sp-status.md            # Progress tracking (Cursor format)
+    ├── sp-validate.md          # Validation (Cursor format)
+    ├── sp-feature.md           # Feature initialization alias (Cursor format)
+    └── utility/                # Utility commands
+└── github/                      # GitHub Copilot commands (.prompt.md format)
+    ├── sp-pulse.prompt.md       # Feature initialization (GitHub Copilot format)
+    ├── sp-spec.prompt.md        # Specification management (GitHub Copilot format)
+    ├── sp-plan.prompt.md        # Implementation planning (GitHub Copilot format)
+    ├── sp-task.prompt.md        # Task management (GitHub Copilot format)
+    ├── sp-execute.prompt.md     # Continuous execution (GitHub Copilot format)
+    ├── sp-status.prompt.md      # Progress tracking (GitHub Copilot format)
+    ├── sp-validate.prompt.md    # Validation (GitHub Copilot format)
+    ├── sp-feature.prompt.md     # Feature initialization alias (GitHub Copilot format)
+    └── utility/                 # Utility commands
 
-Note: Claude uses Markdown (.md), Gemini uses TOML (.toml)
-Both formats contain the SAME instructions and workflows!
+Note:
+- Claude uses Markdown (.md) with YAML front matter
+- Gemini uses TOML (.toml) configuration format
+- Windsurf uses Markdown (.md) with custom front matter and SPECPULSE:START/END blocks
+- Cursor uses Markdown (.md) with custom front matter (name, id, category) and SPECPULSE:START/END blocks
+- GitHub Copilot uses Markdown (.prompt.md) with $ARGUMENTS placeholder and SPECPULSE:START/END blocks
+All formats contain the SAME instructions and workflows!
 ```
 
 ## 🚀 Command Categories
@@ -123,12 +161,20 @@ cat memory/context.md
 
 ### Adding New Commands
 1. Choose appropriate category (workflow/analysis/utility)
-2. Create command file in correct directory
+2. Create command file in correct directory format:
+   - **Claude**: `.md` with YAML front matter
+   - **Gemini**: `.toml` configuration
+   - **Windsurf**: `.md` with custom front matter and SPECPULSE:START/END blocks
+   - **Cursor**: `.md` with custom front matter (name, id, category) and SPECPULSE:START/END blocks
+   - **GitHub Copilot**: `.prompt.md` with $ARGUMENTS placeholder and SPECPULSE:START/END blocks
 3. Update CLI integration if needed
-4. Test with both Claude and Gemini
+4. Test with all supported AI tools (Claude, Gemini, Windsurf, Cursor, GitHub Copilot)
 5. Update documentation
+6. Update AIInstructionProvider if adding new methods
 
-### Command Structure Template
+### Command Structure Templates
+
+#### Claude Format (.md)
 ```markdown
 ---
 name: command-name
@@ -153,6 +199,105 @@ allowed_tools:
 2. CLI integration points
 3. Memory updates
 4. Validation checks
+```
+
+#### Gemini Format (.toml)
+```toml
+description = "Brief description"
+prompt = """
+## Command: /command [args]
+
+1. Step-by-step description
+2. CLI integration points
+3. Memory updates
+4. Validation checks
+"""
+```
+
+#### Windsurf Format (.md)
+```markdown
+---
+description: Brief description
+auto_execution_mode: 3
+---
+
+<!-- SPECPULSE:START -->
+**Guardrails**
+- CLI-first approach: Always try SpecPulse CLI commands before file operations
+- Keep changes tightly scoped to the command outcome
+- Only edit specific directories as needed
+
+**Steps**
+1. Step-by-step description
+2. CLI integration points
+3. Memory updates
+4. Validation checks
+
+**Usage**
+```
+/command [args]
+```
+<!-- SPECPULSE:END -->
+```
+
+#### Cursor Format (.md)
+```markdown
+---
+name: /command-name
+id: command-name
+category: SpecPulse
+description: Brief description
+---
+<!-- SPECPULSE:START -->
+**Guardrails**
+- CLI-first approach: Always try SpecPulse CLI commands before file operations
+- Keep changes tightly scoped to the command outcome
+- Only edit specific directories as needed
+
+**Steps**
+Track these steps as TODOs and complete them one by one.
+1. Step-by-step description
+2. CLI integration points
+3. Memory updates
+4. Validation checks
+
+**Usage**
+```
+/command [args]
+```
+
+**Reference**
+- Additional help and reference information
+<!-- SPECPULSE:END -->
+```
+
+#### GitHub Copilot Format (.prompt.md)
+```markdown
+---
+description: Brief description
+---
+
+$ARGUMENTS
+<!-- SPECPULSE:START -->
+**Guardrails**
+- CLI-first approach: Always try SpecPulse CLI commands before file operations
+- Keep changes tightly scoped to the command outcome
+- Only edit specific directories as needed
+
+**Steps**
+Track these steps as TODOs and complete them one by one.
+1. Parse arguments from $ARGUMENTS
+2. Step-by-step description
+3. CLI integration points
+4. Memory updates
+5. Validation checks
+
+**Usage**
+Arguments should be provided as: `[args]`
+
+**Reference**
+- Additional help and reference information
+<!-- SPECPULSE:END -->
 ```
 
 ## 🔄 Maintenance

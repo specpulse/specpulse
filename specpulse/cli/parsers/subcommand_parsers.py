@@ -217,9 +217,12 @@ def _add_project_commands(subparsers: argparse._SubParsersAction) -> None:
         help='Initialize in current directory instead of creating a subdirectory'
     )
     init_parser.add_argument(
+        '--tool',
+        help='AI tool(s) to use for generated commands (claude, gemini, windsurf, cursor, github, all, interactive, or comma-separated list like "claude,windsurf")'
+    )
+    init_parser.add_argument(
         '--ai',
-        choices=['claude', 'gemini'],
-        help='AI assistant to use for generated commands (claude or gemini)'
+        help='Legacy alias for --tool (deprecated, use --tool instead)'
     )
     init_parser.add_argument(
         '--template-source',

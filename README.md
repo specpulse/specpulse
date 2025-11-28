@@ -1,4 +1,4 @@
-# SpecPulse v2.6.2
+# SpecPulse v2.6.3
 
 <div align="center">
 
@@ -12,9 +12,17 @@
 
 ---
 
-## ✨ What's New in v2.6.2
+## ✨ What's New in v2.6.3
 
-### 🖥️ Task Monitoring System Enhancement
+### 🚀 Multi-Platform AI Integration Revolution
+- **🎯 Universal AI Support**: **5 major AI platforms** now supported - Claude Code, Gemini CLI, Windsurf, Cursor, GitHub Copilot
+- **📋 Platform-Specific Formats**: Each AI tool uses its native command format (.md, .toml, .prompt.md)
+- **🔄 Unified Workflow**: Same underlying SpecPulse functionality across all AI platforms
+- **🎨 Format Optimization**: Tailored command structures for each AI platform's capabilities
+- **📚 Enhanced Documentation**: Complete integration guides for all supported platforms
+- **⚡ Cross-Platform Parity**: Identical features and functionality across all AI tools
+
+### 🖥️ Task Monitoring System Enhancement (from v2.6.2)
 - **🖥️ Complete Task Monitor**: Advanced task monitoring and progress tracking system
 - **📊 Real-time Progress Analytics**: Comprehensive progress visualization and metrics
 - **🔄 CLI Integration**: Seamless monitoring commands integrated into SpecPulse CLI
@@ -48,7 +56,7 @@
 - ✅ **Stabilized**: Concurrent access handling for multi-user scenarios
 - ✅ **Documented**: Complete security and stability analysis
 
-> **Upgrade Recommendation**: v2.6.2 is a **recommended** update for enhanced monitoring capabilities and stability
+> **Upgrade Recommendation**: v2.6.3 is a **recommended** update for comprehensive multi-platform AI support and enhanced monitoring capabilities
 
 ---
 
@@ -63,13 +71,17 @@ pip install specpulse
 ### Initialize Project
 
 ```bash
-# New project
-specpulse init my-project --ai claude
+# New project (choose your AI platform)
+specpulse init my-project --ai claude     # Claude Code
+specpulse init my-project --ai gemini     # Gemini CLI
+specpulse init my-project --ai windsurf   # Windsurf AI
+specpulse init my-project --ai cursor     # Cursor AI
+specpulse init my-project --ai github     # GitHub Copilot
 cd my-project
 
 # Or add to existing project
 cd existing-project
-specpulse init --here --ai claude
+specpulse init --here --ai claude        # Claude Code (default)
 ```
 
 ### Start Your First Feature
@@ -82,27 +94,31 @@ specpulse feature init user-authentication
 specpulse spec create "OAuth2 authentication with JWT tokens"
 
 # AI ESSENTIAL: Expand specification with details
-# In Claude Code or Gemini CLI:
-/sp-spec expand "OAuth2 authentication with JWT tokens"
+# In your preferred AI platform:
+# Claude Code: /sp-spec expand "OAuth2 authentication with JWT tokens"
+# Gemini CLI: /sp-spec expand "OAuth2 authentication with JWT tokens"
+# Windsurf: /sp-spec expand "OAuth2 authentication with JWT tokens"
+# Cursor: /sp-spec expand "OAuth2 authentication with JWT tokens"
+# GitHub Copilot: /sp-spec expand "OAuth2 authentication with JWT tokens"
 
 # Generate implementation plan (CLI creates template)
 specpulse plan create "Secure authentication flow"
 
 # AI ESSENTIAL: Expand plan with detailed steps
-# In Claude Code or Gemini CLI:
+# In your preferred AI platform (all platforms support the same commands):
 /sp-plan "Secure authentication flow"
 
 # Break into tasks (CLI creates template)
 specpulse task breakdown plan-001
 
 # AI ESSENTIAL: Create detailed task breakdown
-# In Claude Code or Gemini CLI:
+# In your preferred AI platform (all platforms support the same commands):
 /sp-task plan-001
 ```
 
 ### Use AI Commands
 
-In Claude Code or Gemini CLI:
+In any supported AI platform (Claude Code, Gemini CLI, Windsurf, Cursor, GitHub Copilot):
 
 ```bash
 /sp-pulse payment-system          # Initialize feature
@@ -128,12 +144,55 @@ SpecPulse helps you build software systematically:
 
 ---
 
-## 🤖 AI Integration
+## 🤖 Multi-Platform AI Integration
 
 ### Supported AI Platforms
 
-- **Claude Code** - Custom slash commands (`/sp-*`)
-- **Gemini CLI** - Custom commands (`/sp-*`)
+SpecPulse now supports **5 major AI platforms** with unified functionality:
+
+- **Claude Code** - Custom slash commands (`/sp-*`) with Markdown format
+- **Gemini CLI** - Custom commands (`/sp-*`) with TOML configuration format
+- **Windsurf** - Custom slash commands (`/sp-*`) with enhanced Markdown blocks
+- **Cursor** - Custom slash commands (`/sp-*`) with front matter Markdown format
+- **GitHub Copilot** - Custom prompts (`.prompt.md`) with GitHub-specific format
+
+### Universal Command Compatibility
+
+All platforms support the **same command set** with identical functionality:
+
+| Command | Purpose | Available on All Platforms |
+|---------|---------|----------------------------|
+| `/sp-pulse` | Initialize new feature | ✅ |
+| `/sp-spec` | Create/expand specifications | ✅ |
+| `/sp-plan` | Generate implementation plans | ✅ |
+| `/sp-task` | Break down into tasks | ✅ |
+| `/sp-execute` | Execute tasks continuously | ✅ |
+| `/sp-status` | Track project progress | ✅ |
+| `/sp-validate` | Validate specifications/plans | ✅ |
+| `/sp-feature` | Feature management (alias for /sp-pulse) | ✅ |
+| `/sp-decompose` | Decompose specifications | ✅ |
+| `/sp-clarify` | Clarify requirements | ✅ |
+
+### Platform-Specific Optimizations
+
+Each platform uses its **native format** for optimal integration:
+
+- **Claude Code**: Markdown blocks with clear structure
+- **Gemini CLI**: TOML configuration for precise settings
+- **Windsurf**: Enhanced Markdown with auto-execution modes
+- **Cursor**: Front matter metadata for context management
+- **GitHub Copilot**: Prompt format with variable substitution
+
+### Migration Between Platforms
+
+Switch between AI platforms **seamlessly**:
+```bash
+# Commands work identically across all platforms
+/sp-pulse user-authentication     # Works on any platform
+/sp-spec "OAuth2 with JWT"       # Same functionality everywhere
+/sp-plan                          # Unified planning experience
+/sp-task plan-001                 # Consistent task breakdown
+```
 
 ### How It Works
 
@@ -220,7 +279,10 @@ my-project/
 │   ├── memory/          # Project context and decisions
 │   └── templates/       # Specification templates
 ├── .claude/             # Claude Code commands
-└── .gemini/             # Gemini CLI commands
+├── .gemini/             # Gemini CLI commands
+├── .windsurf/           # Windsurf AI commands
+├── .cursor/             # Cursor AI commands
+└── .github/prompts/     # GitHub Copilot prompts
 ```
 
 ---
@@ -917,7 +979,7 @@ specpulse doctor
 
 **Made with ❤️ for developers who value specifications and quality**
 
-**SpecPulse v2.5.0** - Critical Bug Fixes • System Stability • Application Loading • Version Checking • Memory Display
+**SpecPulse v2.6.3** - Multi-Platform AI Integration • Task Monitoring • Enhanced Testing • Universal Platform Support
 
 [⭐ Star us on GitHub](https://github.com/specpulse/specpulse) | [📦 Install from PyPI](https://pypi.org/project/specpulse/)
 

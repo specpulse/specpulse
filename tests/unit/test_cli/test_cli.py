@@ -27,14 +27,14 @@ class TestSpecPulseCLI:
 
     def test_cli_initialization(self):
         """Test CLI initialization"""
-        cli = CommandHandler(no_color=True, verbose=False)
+        cli = SpecPulseCLI(no_color=True, verbose=False)
         assert cli.console is not None
         assert cli.specpulse is not None
 
     @patch('specpulse.cli.main.Console')
     def test_cli_initialization_with_console(self, mock_console_class):
         """Test CLI initialization with console parameters"""
-        cli = CommandHandler(no_color=False, verbose=True)
+        cli = SpecPulseCLI(no_color=False, verbose=True)
         mock_console_class.assert_called_once_with(no_color=False, verbose=True)
 
     def test_init_new_project(self):
