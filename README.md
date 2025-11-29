@@ -1,4 +1,4 @@
-# SpecPulse v2.7.1
+# SpecPulse v2.7.3
 
 <div align="center">
 

@@ -5,6 +5,29 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.4] - 2025-11-29
+
+### 🐛 Bug Fixes
+
+**Upgrade Priority:** 🔴 **CRITICAL** (fixes missing import in initialization)
+
+- **FIXED**: Missing `os` module import causing initialization failure
+- **FIXED**: All required imports now properly available for debug logging functionality
+
+---
+
+## [2.7.3] - 2025-11-29
+
+### 🐛 Bug Fixes
+
+**Upgrade Priority:** 🔴 **CRITICAL** (fixes initialization failure on Windows)
+
+- **FIXED**: Debug log path issue causing SpecPulse initialization to fail
+- **FIXED**: Hardcoded `/d/debug_specpulse.log` path replaced with proper temporary directory path
+- **IMPROVED**: Debug logging now uses system temp directory for cross-platform compatibility
+
+---
+
 ## [2.7.2] - 2025-11-29
 
 ### 🚀 Major Update - Unified AI Command Workflow
@@ -80,7 +103,7 @@ specpulse spec create "My feature"
 
 ### 📋 **Summary**
 
-v2.7.2 represents a major simplification of the SpecPulse workflow by standardizing all AI platforms to use `/sp-pulse` as the primary entry point. This creates a unified, consistent experience across all 8 supported AI platforms while maintaining full functionality through 11 standardized commands.
+v2.7.3 represents a major simplification of the SpecPulse workflow by standardizing all AI platforms to use `/sp-pulse` as the primary entry point. This creates a unified, consistent experience across all 8 supported AI platforms while maintaining full functionality through 11 standardized commands.
 
 ## [2.7.1] - 2025-11-28
 

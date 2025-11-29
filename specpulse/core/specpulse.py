@@ -10,6 +10,7 @@ AFTER:  ~300 lines, orchestrates services
 Architecture Pattern: Facade + Dependency Injection
 """
 
+import os
 from pathlib import Path
 from typing import Dict, List, Optional
 import logging
@@ -1315,7 +1316,9 @@ tags:
                 # Copy command files
                 found_files = list(tool_dir.glob(pattern))
                 # Write debug to file
-                with open('/d/debug_specpulse.log', 'a') as f:
+                import tempfile
+                debug_log_path = os.path.join(tempfile.gettempdir(), 'debug_specpulse.log')
+                with open(debug_log_path, 'a') as f:
                     f.write(f"DEBUG {tool}: Looking for '{pattern}' in {tool_dir}, found {len(found_files)} files\n")
                 print(f"DEBUG {tool}: Looking for '{pattern}' in {tool_dir}, found {len(found_files)} files")
                 for cmd_file in found_files:
