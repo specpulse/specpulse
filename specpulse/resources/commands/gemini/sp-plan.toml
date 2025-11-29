@@ -1,70 +1,164 @@
-description = "Generate or validate implementation plans with versioning"
-prompt = """
-## CRITICAL: v2.1.3+ Use CLI FIRST
-**PRIMARY**: specpulse sp-plan create "description"
-**FALLBACK**: File Operations if CLI fails
+[command]
+name = "sp-plan"
+description = "Generate and manage implementation plans without SpecPulse CLI"
+version = "1.0"
 
-Handle the /sp-plan command with arguments: {{args}}
+[command.usage]
+pattern = "/sp-plan [action] [feature-directory]"
+examples = [
+  "/sp-plan generate",
+  "/sp-plan validate",
+  "/sp-plan optimize"
+]
 
-First, detect current feature context:
-- Read .specpulse/memory/context.md for current feature metadata
-- Use git branch name if available (e.g., 001-user-authentication)
-- Fall back to most recently created feature directory
-- If no context found, ask user to specify feature or run /sp-pulse first
+[command.implementation]
+# When called with "/sp-plan {{args}}, I will:
 
-Parse arguments to determine action:
-- If "validate": Check plan against SDD principles
-- Otherwise: Generate new plan
+[command.implementation.argument_parsing]
+# Parse arguments to determine action:
+# - If first argument is generate, validate, or optimize → Use that action
+# - If no action specified → Default to generate
+# - For other arguments → Look for feature name or use current feature
 
-## For /sp-plan generate or /sp-plan:
-1. Show list of existing spec files in current feature directory
-2. Ask user which spec file to base plan on
-3. Read selected specification from @{.specpulse/.specpulse/specs/*/spec-XXX.md}
+[command.implementation.feature_context]
+# Detect Current Feature Context:
+# - Check .specpulse/memory/context.md for active feature
+# - Look for most recently modified spec/plan/task directory
+# - Validate feature directory exists and is properly structured
+# - Extract feature ID and name from directory structure
 
-4. Run Phase Gates checks:
-   - SDD compliance verification
-   - Architecture documentation check
-   - Quality assurance strategy defined
-   - Stakeholder alignment confirmed
-   - Incremental planning validated
+[command.implementation.plan_generation]
+# For Action: generate (default):
 
-5. Generate plan sections:
-   - Technology stack
-   - Architecture overview
-   - Implementation phases
-   - API contracts
-   - Data models
-   - Testing strategy
+[command.implementation.plan_generation.specification_analysis]
+# Specification Analysis:
+# - Read specification files from .specpulse/specs/[feature]/
+# - Analyze functional requirements and user stories
+# - Extract technical constraints and dependencies
+# - Identify complexity and risk factors
 
-6. Track architectural decisions:
-   - Document all technology choices
-   - Record trade-offs and rationale
+[command.implementation.plan_generation.decomposition_support]
+# Decomposition Support Check:
+# - Look for .specpulse/specs/[feature]/decomposition/ directory
+# - If decomposition exists, identify service directories
+# - Parse service names for task categorization
+# - Plan service-specific implementation strategies
 
-7. Check existing plan files and create next version (plan-001.md, plan-002.md, etc.)
-8. Write plan to .specpulse/plans/XXX-feature/plan-XXX.md
-9. Run validation using CLI:
-   - !{bash specpulse --no-color validate plan --verbose}
+[command.implementation.plan_generation.plan_creation]
+# Plan Structure Design:
+# Create comprehensive plan structure:
+# - Implementation Strategy: High-level approach and methodology
+# - Phase Breakdown: Structured implementation phases (Phase 0-4)
+# - Task Dependencies: Dependency mapping and critical path identification
+# - Resource Requirements: Tools, libraries, and external dependencies
+# - Timeline Estimates: Realistic timeframes for each phase
+# - Risk Mitigation: Implementation risks and mitigation strategies
 
-## For /sp-plan validate:
-1. Show list of existing plan files in current feature directory
-2. Ask user which plan file to validate
-3. Read selected plan from @{.specpulse/.specpulse/plans/*/plan-XXX.md}
-4. Run validation using CLI:
-   - !{bash specpulse --no-color validate plan --verbose}
-5. Verify Phase Gates compliance
-6. Check architecture documentation
-7. Ensure quality assurance strategy
-8. Validate framework choices
-9. Report validation results
+[command.implementation.plan_generation.service_planning]
+# Service-Specific Planning (if decomposed):
+# For each identified service:
+# - Service Implementation Plan: Service-specific approach
+# - Service Dependencies: Inter-service communication patterns
+# - Integration Strategy: How services will work together
+# - Data Flow: Information flow between services
+# - API Contracts: Service interface definitions
 
-SDD Compliance Gates must pass before implementation:
-- ✅ Specification clearly defined
-- ✅ Incremental phases planned
-- ✅ Tasks properly decomposed
-- ✅ Quality strategy appropriate
-- ✅ Architecture documented
+[command.implementation.plan_validation]
+# For Action: validate:
 
-Examples:
-- /sp-plan generate
-- /sp-plan validate
-"""
+[command.implementation.plan_validation.file_structure]
+# File Structure Validation:
+# - Verify plan files exist in .specpulse/plans/[feature]/
+# - Check file naming follows plan-[###].md pattern
+# - Validate plan file format and readability
+# - Ensure proper markdown structure
+
+[command.implementation.plan_validation.content_completeness]
+# Content Completeness Validation:
+# Check that plan contains:
+# - Implementation Strategy: Clear and comprehensive approach
+# - Phase Breakdown: Properly structured implementation phases
+# - Task Dependencies: Logical dependency mapping
+# - Resource Requirements: Complete tool and library lists
+# - Timeline Estimates: Realistic and justified timeframes
+# - Risk Mitigation: Comprehensive risk identification and mitigation
+
+[command.implementation.plan_validation.technical_feasibility]
+# Technical Feasibility Validation:
+# - Assess implementation approach complexity
+# - Validate dependency relationships are logical
+# - Check timeline estimates are achievable
+# - Verify resource requirements are realistic
+# - Identify potential implementation bottlenecks
+
+[command.implementation.plan_optimization]
+# For Action: optimize:
+
+[command.implementation.plan_optimization.analysis]
+# Plan Analysis:
+# - Read and analyze existing plan files
+# - Identify complexity issues and optimization opportunities
+# - Assess current phase breakdown effectiveness
+# - Evaluate dependency management efficiency
+
+[command.implementation.plan_optimization.strategies]
+# Optimization Strategies:
+# - Phase Consolidation: Merge related phases where possible
+# - Dependency Optimization: Reorganize dependencies for parallel execution
+# - Timeline Optimization: Adjust estimates based on complexity analysis
+# - Resource Optimization: Suggest better tool or library choices
+
+[command.implementation.plan_optimization.risk_assessment]
+# Risk Assessment Updates:
+# - Update risk mitigation strategies
+# - Identify new optimization-related risks
+# - Provide contingency planning recommendations
+
+[command.implementation.universal_id_system]
+# Universal ID System Integration:
+
+[command.implementation.universal_id_system.plan_generation]
+# Plan ID Generation Algorithm:
+# - Use Glob tool to scan .specpulse/plans/[feature]/ directory
+# - Parse existing plan files using regex plan-(\d+)\.md pattern
+# - Extract all numbers and convert to integers for comparison
+# - Find maximum value: max_num = max(extracted_numbers) or 0 if empty
+# - Generate next sequential: next_num = max_num + 1
+# - Zero-pad format: f"plan-{next_num:03d}.md" → plan-001.md, plan-002.md
+
+[command.implementation.universal_id_system.service_planning]
+# Service-Specific Plan Numbering:
+# - For decomposed services: Create separate numbering per service
+# - Service plan patterns: auth-service-plan.md, user-service-plan.md
+# - Integration plans: integration-plan.md, api-gateway-plan.md
+# - Cross-service plans: Maintain global coordination to prevent conflicts
+
+[command.implementation.universal_id_system.conflict_prevention]
+# Conflict Prevention and Validation:
+# - Atomic file existence validation before plan creation
+# - Conflict resolution loop: If filename exists, increment and retry
+# - Template validation: Ensure plan templates are valid before use
+# - Directory structure verification: Confirm proper directory hierarchy
+
+[command.features]
+# CLI-Independent Features:
+# - No CLI Dependencies: 100% independent of SpecPulse CLI installation
+# - Manual Plan Parsing: Direct file content analysis without CLI
+# - Atomic Plan Updates: Safe file operations prevent corruption
+# - Progress Tracking: Manual calculation from plan files
+# - Error Recovery: Comprehensive error handling
+
+[command.advanced_features]
+# Enhanced Plan Generation:
+# - Decomposed Services Support with service-specific planning
+# - SDD Gates Compliance with comprehensive validation
+# - Universal ID System with conflict prevention
+# - Risk Assessment with mitigation strategies
+# - Timeline optimization with dependency analysis
+
+[command.sdd_compliance]
+# SDD Gates Compliance:
+# - Specification First: Plan directly derived from specifications
+# - Task Decomposition: Plan includes detailed task breakdown
+# - Quality Assurance: Testing and validation strategies included
+# - Traceable Implementation: Clear link from requirements to implementation

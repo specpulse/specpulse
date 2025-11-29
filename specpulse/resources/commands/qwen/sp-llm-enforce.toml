@@ -1,0 +1,115 @@
+description = "Enforce strict LLM compliance rules for SpecPulse operations without SpecPulse CLI"
+
+prompt = """
+## Command: /sp-llm-enforce [action] [context]
+
+**CLI-Independent LLM Compliance Enforcement**
+
+When called with `/sp-llm-enforce {{args}}`, I will:
+
+### Step 1: Parse Arguments and Determine Enforcement Action
+
+**Parse the command arguments:**
+- `start` → Begin LLM compliance enforcement session
+- `status` → Show current compliance status and violations
+- `validate` → Validate operations against compliance rules
+- `end` → End current enforcement session
+- No argument → Default to "start" enforcement session
+
+### Step 2: Compliance Rule Initialization
+
+**Compliance framework setup:**
+- **Protected Directories**: Never modify templates/, .specpulse/, specpulse/, AI config directories
+- **Editable Only**: specs/, plans/, tasks/, memory/
+- **Rule Categories**: Directory traversal, file modification, content validation
+- **Severity Levels**: low, medium, high, critical with appropriate actions
+
+### Step 3: CLI-First Compliance Validation
+
+**CLI priority enforcement:**
+- **Step 1**: Check for SpecPulse CLI availability
+- **Step 2**: Attempt CLI operations first with fallback to file operations
+- **Step 3**: Enforce atomic operations with rollback capability
+- **Step 4**: Validate all operations against compliance rules
+
+### Step 4: Real-Time Compliance Monitoring
+
+**Active monitoring system:**
+- **File Operation Monitoring**: Track create, modify, delete, move, copy operations
+- **Validation Points**: Pre-operation, during operation, post-operation checks
+- **Violation Detection**: Directory access, protected directory modification, suspicious content
+- **Enforcement Actions**: Block operations, redirect to safe operations, provide corrections
+
+### Step 5: Protected Directory Validation
+
+**Directory protection enforcement:**
+- **NEVER modify**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/, .github/
+- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
+- **Check**: All file paths are within allowed directories
+- **Verify**: No directory traversal attempts (../, absolute paths)
+
+### Step 6: Operation Compliance Check
+
+**File operation validation:**
+- **File Operation Validation**: Verify file permissions before operations
+- **Content Validation**: Validate markdown syntax and structure
+- **Malicious Content Check**: Check for harmful patterns
+- **Naming Convention**: Verify SpecPulse naming conventions
+
+### Step 7: Error Prevention and Recovery
+
+**Comprehensive error handling:**
+- **Safe Operations**: Validate inputs before processing
+- **Atomic Operations**: Use with rollback capability
+- **Error Handling**: Provide clear error messages and corrections
+- **Data Integrity**: Maintain throughout operations
+
+### Step 8: Session Management and Configuration
+
+**Enforcement session management:**
+- **Start Session**: Initialize compliance enforcement and configuration
+- **Active Monitoring**: Real-time compliance monitoring with rule enforcement
+- **End Session**: Generate compliance summary and cleanup session data
+- **State Management**: Session persistence and configuration options
+
+### Step 9: Status Reporting and Analytics
+
+**Compliance status reporting:**
+- **Compliance Check**: Validate operations against rules
+- **Violation Report**: Categorize and report violations
+- **Metrics**: Compliance score and improvement recommendations
+- **Risk Assessment**: Identify and mitigate compliance risks
+
+### Step 10: CLI-Independent Features
+
+**Works completely without SpecPulse CLI:**
+- File-based compliance validation
+- Manual rule enforcement through file checks
+- Atomic file operations with validation
+- Comprehensive error handling and recovery
+
+**Advanced Features:**
+- Real-time violation detection
+- Automated correction suggestions
+- Compliance reporting and metrics
+- Audit trail generation
+
+## Safety and Security Features
+
+**Directory Traversal Protection:**
+- Multi-layer validation to prevent access outside allowed directories
+- Path sanitization and secure file access controls
+- Comprehensive directory structure validation
+
+**Atomic Operation Rollback:**
+- Failed operations automatically rollback to pre-operation state
+- Integrity verification after each operation
+- Complete recovery procedures for corrupted data
+
+**Comprehensive Error Handling:**
+- Input validation and sanitization for all operations
+- File operation error recovery with detailed guidance
+- Permission issue resolution with step-by-step instructions
+
+This `/sp-llm-enforce` command provides **strict LLM compliance enforcement** without requiring any SpecPulse CLI installation, using validated operations and comprehensive monitoring.
+"""

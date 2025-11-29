@@ -1,6 +1,6 @@
 ---
 name: sp-decompose
-description: Decompose large specifications into microservices, APIs, and smaller components
+description: Decompose specifications into microservices without SpecPulse CLI
 allowed_tools:
   - Read
   - Write
@@ -11,233 +11,313 @@ allowed_tools:
 
 # /sp-decompose Command
 
-Decompose large specifications into smaller, manageable components with microservice boundaries, API contracts, and interface specifications.
-
-## CRITICAL: LLM Workflow Rules
-
-**PRIMARY WORKFLOW: Use CLI when available**
-- Prefer `specpulse` CLI commands when they exist
-- Use Bash tool ONLY for CLI commands, not for file editing
-- Only use Read/Write/Edit tools when CLI doesn't cover the operation
-
-**PROTECTED DIRECTORIES (NEVER EDIT):**
-- `templates/` - Template files
-- `.specpulse/` - Internal config
-- `specpulse/` - Package code
-- `.claude/` and `.gemini/` - AI configuration
-- **ONLY EDIT**: specs/, plans/, tasks/, memory/
-- Decomposition templates are COPIED to specs/XXX-feature/decomposition/, then edited there
+Decompose specifications into microservices without SpecPulse CLI. Works completely independently through LLM-safe file operations.
 
 ## Usage
 ```
-/sp-decompose [spec-id] [options]
+/sp-decompose [spec-id]           # Decompose current or specific spec
+/sp-decompose [spec-id] --auto    # Auto-decompose with DDD patterns
 ```
-
-Options: `--microservices`, `--apis`, `--interfaces`, `--all` (defaults to `--all`)
 
 ## Implementation
 
-When called with `/sp-decompose $ARGUMENTS`, I will:
+When called with `/sp-decompose {{args}}`, I will:
 
-1. **Parse specification to decompose**:
-   - If spec-id provided (e.g., `001` or `001-authentication`), use that specification
-   - Otherwise, detect current feature from `memory/context.md` or git branch
-   - Read the target specification file from `specs/XXX-feature/spec-YYY.md`
-   - Analyze complexity and identify decomposition opportunities
+### 1. Parse Arguments and Determine Target
 
-2. **Analyze decomposition strategy**:
-   - **Domain Analysis**: Identify bounded contexts and aggregate roots
-   - **Responsibility Mapping**: Group related functionalities
-   - **Data Flow Analysis**: Understand data dependencies
-   - **Integration Points**: Identify communication needs between components
-   - **Complexity Assessment**: Measure cognitive load and cyclomatic complexity
+**I will analyze the arguments:**
+- If spec ID provided: Target that specific specification
+- If no argument: Use current feature's specification
+- Parse options like `--auto`, `--force`, `--validate`
 
-3. **Generate microservice boundaries**:
-   - Apply Domain-Driven Design (DDD) principles
-   - Create service definitions with clear responsibilities:
-     ```yaml
-     service: user-authentication
-     responsibility: Handle user identity and access control
-     bounded_context: Identity Management
-     capabilities:
-       - User registration
-       - Authentication (OAuth2, JWT)
-       - Session management
-       - Password reset
-     data_ownership:
-       - users table
-       - sessions table
-       - tokens table
-     ```
-   - Define inter-service communication patterns
-   - Specify data consistency requirements
+### 2. Detect Current Feature Context
 
-4. **Create API contracts**:
-   - Generate OpenAPI 3.0 specifications for each service
-   - Define RESTful endpoints with clear semantics:
-     ```yaml
-     /api/v1/users:
-       post:
-         summary: Create new user
-         requestBody:
-           $ref: '#/components/schemas/UserCreateRequest'
-         responses:
-           201:
-             $ref: '#/components/schemas/UserResponse'
-     ```
-   - Specify request/response schemas
-   - Include authentication and authorization requirements
-   - Define rate limiting and caching strategies
+**I will identify the current working feature:**
+- Check `.specpulse/memory/context.md` for active feature
+- Look for most recent specification files
+- Validate feature directory structure
+- Extract feature ID and name
 
-5. **Design interface specifications**:
-   - Create abstract interfaces for each component:
-     ```typescript
-     interface IAuthenticationService {
-       authenticate(credentials: Credentials): Promise<AuthToken>
-       validateToken(token: string): Promise<TokenValidation>
-       refreshToken(refreshToken: string): Promise<AuthToken>
-       revokeToken(token: string): Promise<void>
-     }
-     ```
-   - Define data transfer objects (DTOs)
-   - Specify event contracts for event-driven communication
-   - Create adapter patterns for external integrations
+### 3. Load and Analyze Specification
 
-6. **Generate decomposition artifacts using templates**:
-   - COPY templates from `templates/decomposition/` to `specs/XXX-feature/decomposition/`
-   - Use template variables for AI processing in the COPIED files
-   - **IMPORTANT**: Can EDIT files in specs/decomposition/ folder, but NEVER modify templates/, scripts/, or commands/ folders
-   - Create structured output in `specs/XXX-feature/decomposition/`:
-     - **`microservices.md`**: From template with service boundaries
-     - **`api-contracts/`**: From OpenAPI template
-     - **`interfaces/`**: From interface template
-     - **`integration-map.md`**: Service communication
-   - Update `memory/context.md` with decomposition status
+**I will read and parse the specification:**
+- Locate specification file in `.specpulse/specs/[feature]/`
+- Read specification content and structure
+- Analyze functional requirements and user stories
+- Identify domain boundaries and business concepts
+- Extract technical constraints and dependencies
 
-7. **Validate decomposition**:
-   - Check for circular dependencies
-   - Verify data consistency boundaries
-   - Ensure single responsibility principle
-   - Validate against SDD principles:
-     - Clear service boundaries
-     - Clear boundaries
-     - Testability
+### 4. Domain-Driven Design Analysis
 
-8. **Update workflow context**:
-   - Add decomposition results to `memory/context.md`
-   - Create feature-specific plan template with services
-   - Prepare for `/sp-plan generate` with service context
-   - Enable `/sp-task breakdown` per service
-   - Run validation: `specpulse --no-color validate decomposition --verbose`
+**I will perform comprehensive DDD analysis:**
 
-## Examples
+#### A. Domain Discovery
+- Identify core domain concepts and entities
+- Map business processes and workflows
+- Discover bounded contexts and subdomains
+- Analyze domain relationships and dependencies
 
-### Basic decomposition
+#### B. Bounded Context Identification
+For each potential service, I will analyze:
+- **Core Domain**: Primary business value
+- **Supporting Domains**: Essential supporting functions
+- **Generic Domains**: Common utilities and infrastructure
+- **Relationships**: Context mapping and integration patterns
+
+#### C. Service Boundary Definition
+Define microservice boundaries based on:
+- Business capability alignment
+- Data ownership and consistency
+- Team autonomy and scaling needs
+- Technical architecture considerations
+
+### 5. Microservice Design
+
+**I will design comprehensive microservice architecture:**
+
+#### A. Service Catalog Creation
+For each identified service:
+- **Service Name**: Clear, business-oriented naming
+- **Responsibility**: Primary business capabilities
+- **Domain Model**: Core entities and relationships
+- **API Contracts**: Service interfaces and data models
+- **Data Ownership**: Primary data responsibilities
+
+#### B. Service Interaction Design
+- **Communication Patterns**: Synchronous vs asynchronous
+- **Event Streams**: Domain events and pub/sub patterns
+- **Data Consistency**: Eventual consistency strategies
+- **Service Discovery**: Registration and lookup mechanisms
+
+#### C. Technology Stack Recommendations
+Based on service requirements:
+- **Database Choices**: SQL vs NoSQL per service needs
+- **Communication Protocols**: REST, gRPC, message queues
+- **Deployment Strategy**: Containerization and orchestration
+- **Monitoring**: Observability and health checks
+
+### 6. Decomposition Output Generation
+
+**I will create comprehensive decomposition documentation:**
+
+#### A. Decomposition Directory Structure
 ```
-User: /sp-decompose 001
-```
-I will analyze spec 001 and create a complete decomposition with microservices, APIs, and interfaces.
-
-### Microservices only
-```
-User: /sp-decompose 002-ecommerce --microservices
-```
-I will focus on identifying microservice boundaries for the e-commerce specification.
-
-### API contracts focus
-```
-User: /sp-decompose --apis
-```
-I will generate detailed API contracts for the current feature specification.
-
-## Decomposition Principles
-
-### Domain-Driven Design
-- Bounded contexts define service boundaries
-- Aggregates determine data ownership
-- Ubiquitous language for clear communication
-
-### SOLID Principles
-- **S**ingle Responsibility: Each service has one reason to change
-- **O**pen/Closed: Services extensible without modification
-- **L**iskov Substitution: Interfaces are substitutable
-- **I**nterface Segregation: Focused, specific interfaces
-- **D**ependency Inversion: Depend on abstractions
-
-### Communication Patterns
-- **Synchronous**: REST APIs for request-response
-- **Asynchronous**: Events for decoupled communication
-- **Hybrid**: Command Query Responsibility Segregation (CQRS)
-
-## Output Structure
-
-```
-specs/001-authentication/decomposition/
-├── microservices.md          # Service definitions
-├── api-contracts/
-│   ├── auth-service.yaml     # OpenAPI spec
-│   ├── user-service.yaml     # OpenAPI spec
-│   └── session-service.yaml  # OpenAPI spec
-├── interfaces/
-│   ├── IAuthService.ts       # TypeScript interface
-│   ├── IUserRepository.ts    # Repository pattern
-│   └── IEventBus.ts         # Event bus interface
-├── data-models/
-│   ├── user.schema.json     # JSON Schema
-│   ├── session.proto        # Protocol Buffers
-│   └── events.avsc          # Avro schema
-├── integration-map.md        # Service communication
-└── migration-plan.md         # Decomposition strategy
+.specpulse/specs/[feature]/decomposition/
+├── overview.md                    # High-level architecture overview
+├── services/                      # Individual service specifications
+│   ├── user-service.md
+│   ├── auth-service.md
+│   ├── payment-service.md
+│   └── notification-service.md
+├── integration/                   # Service integration patterns
+│   ├── api-gateway.md
+│   ├── event-bus.md
+│   └── data-synchronization.md
+└── deployment/                    # Deployment and infrastructure
+    ├── container-strategy.md
+    ├── service-discovery.md
+    └── monitoring.md
 ```
 
-## SDD Compliance
+#### B. Service Specification Files
+For each service, create detailed specification:
+- **Service Overview**: Purpose and responsibilities
+- **Domain Model**: Entities and relationships
+- **API Specification**: REST/GraphQL endpoints
+- **Database Schema**: Data model and relationships
+- **Business Events**: Domain events and handling
+- **Integration Points**: External dependencies
+- **Deployment Requirements**: Infrastructure needs
 
-**Principle 1: Specification First**
-- Each service has clear specifications
-- Service boundaries well-defined
-- Requirements traced to services
+### 7. Integration Strategy Development
 
-**Principle 3: Task Decomposition**
-- Services broken into manageable tasks
-- Clear service-specific work items
-- Integration tasks identified
+**I will design comprehensive integration patterns:**
 
-**Principle 7: Architecture Documentation**
-- Service boundaries documented
-- Technology choices recorded
-- Integration patterns defined
+#### A. API Gateway Design
+- **Routing Rules**: Request routing to services
+- **Authentication**: Centralized auth and authorization
+- **Rate Limiting**: Service protection policies
+- **Request Transformation**: Protocol translation
 
-## Integration with SpecPulse Workflow
+#### B. Event-Driven Architecture
+- **Domain Events**: Business event definitions
+- **Event Bus**: Message routing and delivery
+- **Event Sourcing**: Audit trail and state reconstruction
+- **CQRS**: Command Query Responsibility Segregation
 
-1. **After `/sp-spec create`**: 
-   - AI analyzes spec complexity
-   - Suggests decomposition if complexity warrants it
-   - User confirms with `/sp-decompose`
+#### C. Data Management
+- **Data Ownership**: Clear responsibility boundaries
+- **Eventual Consistency**: Conflict resolution strategies
+- **Data Synchronization**: Cross-service data sync
+- **Backup and Recovery**: Service-specific strategies
 
-2. **During decomposition**:
-   - AI reads spec from `specs/XXX-feature/spec-YYY.md`
-   - Applies DDD analysis using spec content
-   - Generates artifacts using templates
-   - Updates memory/context.md
+### 8. Validation and Refinement
 
-3. **Before `/sp-plan generate`**: 
-   - Plan command detects decomposition
-   - Uses service boundaries for architecture
-   - Creates service-specific phases
+**I will validate the decomposition:**
 
-4. **During `/sp-task breakdown`**: 
-   - Tasks created per service
-   - Inter-service dependencies mapped
-   - Integration tasks generated
+#### A. Architectural Validation
+- **Service Boundaries**: Validate separation of concerns
+- **Dependency Analysis**: Check for circular dependencies
+- **Scalability Assessment**: Growth and scaling considerations
+- **Performance Impact**: Latency and throughput analysis
 
-5. **With `/sp-validate`**: 
-   - Validates service boundaries
-   - Checks circular dependencies
-   - Ensures SDD compliance
+#### B. Business Validation
+- **Capability Coverage**: All business requirements addressed
+- **Process Alignment**: Business workflow support
+- **User Experience**: Impact on end-user experience
+- **Compliance**: Regulatory and security requirements
 
-## Error Handling
+#### C. Technical Validation
+- **Feasibility Assessment**: Implementation practicality
+- **Complexity Analysis**: Manageable complexity levels
+- **Team Alignment**: Organizational structure fit
+- **Tool Support**: Available tools and frameworks
 
-- Specification not found: Guide user to create spec first
-- Circular dependencies detected: Suggest refactoring
-- Too many services (>7): Recommend consolidation
-- Missing bounded contexts: Apply DDD analysis
+## Output Examples
+
+### Decomposition Overview
+```
+🏗️  Microservice Decomposition: 001-user-authentication
+================================================================
+
+📊 Specification Analysis
+   Business Requirements: 8
+   User Stories: 6
+   Acceptance Criteria: 24
+   Complexity: High (Multiple business capabilities)
+
+🔍 DDD Analysis Results
+   Core Domain: User Management & Authentication
+   Supporting Domains: Notifications, Profile Management
+   Generic Domains: Logging, Monitoring, Configuration
+
+📦 Recommended Microservices (4 services)
+
+1) **User Service** (Core Domain)
+   - User registration and profile management
+   - User preferences and settings
+   - User search and discovery
+   - Primary Data: Users, Profiles, Preferences
+
+2) **Authentication Service** (Core Domain)
+   - Login/logout functionality
+   - Password management and recovery
+   - Token generation and validation
+   - Multi-factor authentication
+   - Primary Data: Credentials, Sessions, Tokens
+
+3) **Authorization Service** (Supporting Domain)
+   - Role and permission management
+   - Access control policies
+   - Resource authorization
+   - Primary Data: Roles, Permissions, Policies
+
+4) **Notification Service** (Supporting Domain)
+   - Email notifications
+   - SMS notifications
+   - Push notifications
+   - Notification preferences
+   - Primary Data: Notifications, Templates, Preferences
+
+🔗 Integration Strategy
+   - API Gateway for external access
+   - Event Bus for service communication
+   - Shared database for cross-service queries
+   - Centralized authentication service
+
+✅ Decomposition complete with validation results
+📁 Documentation created: .specpulse/specs/001-user-authentication/decomposition/
+```
+
+### Individual Service Specification
+```
+📋 Service Specification: Authentication Service
+================================================================
+
+**Service Name**: auth-service
+**Domain**: Authentication (Core Domain)
+**Primary Responsibilities**:
+- User authentication and authorization
+- Session management and token handling
+- Password security and recovery
+- Multi-factor authentication
+
+**Domain Model**:
+```
+User (id, email, username)
+│
+├── Credentials (password_hash, salt, mfa_secret)
+├── Session (id, token, expires_at, user_agent)
+├── Token (access_token, refresh_token, type, expires_at)
+└── AuthAttempt (timestamp, ip_address, success, method)
+```
+
+**API Endpoints**:
+```
+POST /auth/login          # User authentication
+POST /auth/logout         # Session termination
+POST /auth/refresh        # Token refresh
+POST /auth/forgot-password # Password recovery
+POST /auth/reset-password # Password reset
+POST /auth/enable-mfa     # MFA setup
+POST /auth/verify-mfa     # MFA verification
+GET  /auth/profile        # User profile (auth required)
+```
+
+**Database Schema**:
+- Users table (user_id, email, username, password_hash, created_at)
+- Sessions table (session_id, user_id, token_hash, expires_at, user_agent)
+- Tokens table (token_id, user_id, token_type, token_hash, expires_at)
+- MFA_Secrets table (user_id, secret, backup_codes, enabled_at)
+
+**Business Events**:
+- UserLoggedIn (user_id, timestamp, ip_address)
+- UserLoggedOut (user_id, timestamp)
+- PasswordChanged (user_id, timestamp)
+- MFAEnabled (user_id, timestamp)
+- MFADisabled (user_id, timestamp)
+
+**Integration Points**:
+- User Service: User profile synchronization
+- Notification Service: Security alerts and notifications
+- API Gateway: Authentication middleware integration
+
+**Deployment Requirements**:
+- Container: Docker with health checks
+- Database: PostgreSQL with connection pooling
+- Cache: Redis for session storage
+- Load Balancer: SSL termination
+- Monitoring: Health endpoints and metrics
+
+**Security Considerations**:
+- Rate limiting on authentication endpoints
+- Password strength validation
+- Secure token generation (JWT)
+- SQL injection protection
+- HTTPS enforcement
+- Audit logging for security events
+```
+
+## Advanced Features
+
+### Auto-Decomposition Mode
+Using `--auto` flag enables intelligent automatic decomposition:
+- Pattern recognition for common service types
+- Automated bounded context detection
+- Template-based service specification generation
+- Best practices application for integration patterns
+
+### Validation Mode
+Comprehensive validation of decomposition results:
+- Architectural consistency checks
+- Dependency cycle detection
+- Performance impact assessment
+- Security boundary validation
+
+### Integration with Existing Workflow
+- Generate service-specific task breakdowns
+- Create implementation plans for each service
+- Provide deployment and infrastructure guidance
+- Support cross-platform service development
+
+This `/sp-decompose` command provides **comprehensive microservice decomposition** without requiring any SpecPulse CLI installation, using Domain-Driven Design principles and LLM-enhanced architectural analysis.

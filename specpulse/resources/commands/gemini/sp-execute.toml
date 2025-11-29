@@ -1,72 +1,177 @@
 [command]
 name = "sp-execute"
-description = "Execute tasks continuously without stopping - complete all pending work"
+description = "Execute tasks without SpecPulse CLI"
+version = "1.0"
 
-[command.prompt]
-text = """
-## CRITICAL: v2.1.3+ Use CLI for task tracking
-**Use**: specpulse sp-task start/done for status updates
+[command.usage]
+pattern = "/sp-execute [task-id|all|next]"
+examples = [
+  "/sp-execute",
+  "/sp-execute all",
+  "/sp-execute T001",
+  "/sp-execute AUTH-T001"
+]
 
-Execute tasks continuously from the task list without stopping between tasks.
+[command.implementation]
+# When called with "/sp-execute {{args}}, I will:
 
-Arguments: {{args}}
+[command.implementation.argument_parsing]
+# Parse Arguments and Determine Execution Mode:
+# - Parse the command arguments:
+#   - "all" → Execute ALL pending tasks non-stop
+#   - "next" or no argument → Execute next pending task and continue
+#   - "T001" or "AUTH-T001" → Execute specific task
+# - Set execution mode accordingly
+# - Determine if continuous execution is needed
 
-CRITICAL: This is NON-STOP EXECUTION mode. You must:
-1. Execute the current/next task
-2. Mark it as completed
-3. Immediately move to the next task
-4. Continue until ALL tasks are done or blocked
+[command.implementation.feature_context]
+# Detect Current Feature Context:
+# - Use Read tool to examine .specpulse/memory/context.md
+# - Look for **Directory:** field to identify current feature
+# - If no context found, use Glob tool to find first feature with task files
+# - Validate feature directory follows naming convention (XXX-feature-name)
+# - Set tasks_dir to .specpulse/tasks/[current-feature]
 
-NO STOPPING between tasks unless:
-- All tasks are completed
-- Remaining tasks are blocked
-- An error occurs requiring user intervention
-- User explicitly stops you
+[command.implementation.task_analysis]
+# Load and Analyze Task Files:
+# - Use Glob tool to find all *.md files in tasks directory
+# - Use Read tool to examine each task file
+# - Parse task status markers:
+#   - [ ] = Pending task
+#   - [>] = In progress task
+#   - [x] = Completed task
+#   - [!] = Blocked task
+# - Build task inventory with status and dependencies
+# - Validate task file structure and content
 
-## Steps:
+[command.implementation.execution_order]
+# Determine Task Execution Order:
+# - For continuous mode ("all" or "next"):
+#   - Find first pending task ([ ])
+#   - Check if dependencies are completed
+#   - If dependencies not met, skip to next available task
+#   - For specific task mode, validate the requested task exists
+# - For service tasks:
+#   - Handle AUTH-T001, USER-T001 patterns
+#   - Respect service-specific dependencies
+#   - Consider integration tasks after service tasks complete
 
-1. Check project status using CLI: specpulse --no-color doctor
+[command.implementation.task_implementation]
+# Execute Task Implementation:
+# For each selected task:
 
-2. Analyze the output to identify:
-   - Next task to execute (T001 or AUTH-T001 format)
-   - Total pending tasks
-   - Current progress percentage
+[command.implementation.task_implementation.status_management]
+# Status Management:
+# - Use Edit tool to change task status from [ ] to [>] (in progress)
+# - Read task description and requirements from the file
+# - Parse task requirements from the file content
+# - Extract specific implementation steps from task description
 
-3. For each task:
-   - Read task description from task file
-   - Implement the solution
-   - Test if applicable
-   - Mark as completed: [ ] → [x]
-   - Move to next task WITHOUT PAUSING
+[command.implementation.task_implementation.execution_logic]
+# Execute atomic file operations based on task type:
+# - For Backend/API Tasks:
+#   - Database Operations: Create schema files, migrations, models
+#   - API Endpoints: Implement controller methods with proper HTTP status codes
+#   - Authentication: Add JWT middleware, session management, password validation
+#   - Validation: Implement input validation and error handling
+# - For Frontend Tasks:
+#   - Component Creation: Build React/Vue components with proper state management
+#   - Styling: Add CSS/SCSS with responsive design and accessibility
+#   - User Interactions: Implement event handlers, form validation, user feedback
+#   - Routing: Set up navigation, route guards, page transitions
+# - For Integration Tasks:
+#   - Service Communication: Implement API calls between microservices
+#   - Data Synchronization: Create event handlers and data consistency logic
+#   - Testing: Add unit tests, integration tests, end-to-end tests
+#   - Documentation: Update API docs, README files, code comments
+# - For Infrastructure Tasks:
+#   - Configuration: Create config files, environment variables, deployment scripts
+#   - CI/CD: Set up pipelines, automated testing, deployment workflows
+#   - Monitoring: Add logging, metrics collection, health checks
+#   - Security: Implement authentication, authorization, input sanitization
 
-4. Continue executing until:
-   - All tasks completed
-   - Hit a blocker
-   - Critical error
-   - User says "stop"
+[command.implementation.task_implementation.verification]
+# Implementation Verification:
+# - Syntax Validation: Use Bash to run linters, type checkers, syntax validators
+# - Unit Testing: Create and run unit tests for implemented code
+# - Integration Testing: Test component interactions and API endpoints
+# - Manual Verification: Test functionality through actual usage scenarios
 
-## Execution Modes:
+[command.implementation.task_completion]
+# Mark Task Completion:
+# - Use Edit tool to change task status from [>] to [x] (completed)
+# - Add completion timestamp if not present
+# - Verify all requirements from task description are met
+# - Update any dependent tasks that can now be executed
 
-- No arguments or "next": Execute next pending task and continue
-- "all": Execute ALL pending tasks non-stop
-- Specific task (T001, AUTH-T001): Start from that task
+[command.implementation.continuous_execution]
+# Continue Execution (If in continuous mode):
+# - Immediately move to next pending task
+# - Repeat task execution steps without stopping for confirmation
+# - Continue until all tasks are completed or blocked
+# - Only stop when:
+#   - All tasks are completed
+#   - No more tasks can be executed due to blockers
+#   - An error occurs that requires user intervention
+#   - User explicitly stops execution
 
-## Rules:
+[command.implementation.final_report]
+# Final Status Report:
+# - Use Read tool to verify final state of all task files
+# - Count completed vs remaining tasks
+# - Calculate completion percentage
+# - List any blockers that prevented completion
+# - Provide summary of work accomplished
+# - Suggest next steps (testing, validation, etc.)
 
-- NO EXPLANATIONS between tasks
-- NO WAITING for confirmation
-- NO SUMMARIES after each task
-- Just execute and continue
+[command.implementation.atomic_operations]
+# Atomic File Operations:
+# - Task Status Updates: Use Edit tool with complete file content replacement
+# - Before Update Validation: Verify file exists and is writable
+# - After Update Verification: Confirm changes were applied correctly
+# - Rollback on Failure: Restore original content if update fails
 
-## Final Report:
+[command.implementation.safety_features]
+# Safe Directory Access:
+# - Path Validation: Ensure all paths are within .specpulse/ directory
+# - Directory Traversal Protection: Reject paths with ../ or absolute paths
+# - Permission Checks: Verify read/write access before operations
+# - Error Recovery: Provide clear guidance for permission issues
 
-Only after ALL tasks done:
-```
-Execution Complete
-Progress: 100% (25/25 tasks)
-✓ 25 tasks completed
-Ready for validation
-```
+[command.implementation.error_handling]
+# Error Handling and Recovery:
+# - Task Execution Failures: Document failure, mark task as blocked, continue
+# - Test Failures: Fix implementation errors, retry testing, mark as completed
+# - File System Errors: Provide specific error messages and resolution steps
+# - Network Issues: Retry operations, provide offline alternatives
 
-Execute efficiently and continuously!
-"""
+[command.implementation.corruption_prevention]
+# Data Corruption Prevention:
+# - Backup Creation: Create .backup files before major changes
+# - Validation Checks: Verify file integrity after operations
+# - Recovery Procedures: Provide steps to restore from backups
+# - Consistency Maintenance: Ensure task files remain valid markdown
+
+[command.features]
+# CLI-Independent Features:
+# - No CLI Dependencies: 100% independent of SpecPulse CLI installation
+# - Manual Task Parsing: Direct file content analysis without CLI
+# - Atomic Task Updates: Safe file operations prevent corruption
+# - Progress Tracking: Manual calculation from task files
+# - Error Recovery: Comprehensive error handling
+# - Continuous Execution: Non-stop task completion
+
+[command.task_status]
+# Task Status Markers:
+# - [ ] - Pending task (ready to execute)
+# - [>] - In progress (currently working on)
+# - [x] - Completed (done)
+# - [!] - Blocked (waiting for dependency)
+
+[command.advanced_features]
+# Advanced Features:
+# - Service-specific task execution with proper categorization
+# - Dependency-aware task scheduling with critical path analysis
+# - Parallel task execution for independent tasks
+# - Task rollback and recovery mechanisms
+# - Performance monitoring and optimization suggestions

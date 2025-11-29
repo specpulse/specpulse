@@ -1,120 +1,145 @@
-description = "Create or manage feature specifications using AI-optimized templates"
-prompt = """
-## CRITICAL: LLM Workflow Rules (v2.1.3+)
+[command]
+name = "sp-spec"
+description = "Create and manage specifications without SpecPulse CLI"
+version = "1.0"
 
-**PRIMARY WORKFLOW: Use CLI FIRST**
-- Use `specpulse sp-spec <action>` commands as PRIMARY method
-- CLI handles metadata, validation, and file structure automatically
-- Use File Operations ONLY if CLI fails or doesn't exist
+[command.usage]
+pattern = "/sp-spec [action] [description|feature-name]"
+examples = [
+  "/sp-spec create user authentication with JWT tokens",
+  "/sp-spec update",
+  "/sp-spec validate",
+  "/sp-spec clarify"
+]
 
-**PROTECTED DIRECTORIES (NEVER EDIT):**
-- .specpulse/templates/ - Template files
-- .specpulse/ - Internal config
-- specpulse/ - Package code
-- .claude/ and .gemini/ - AI configuration
+[command.implementation]
+# When called with "/sp-spec {{args}}, I will:
 
-**WORKFLOW (v2.1.3+):**
-1. PRIMARY: Use `specpulse sp-spec create "description"`
-2. FALLBACK: If CLI fails, use File Operations
-3. Templates are READ from .specpulse/templates/, specs are CREATED/EDITED in .specpulse/.specpulse/specs/
+[command.implementation.argument_parsing]
+# Parse arguments to determine action:
+# - If first argument is create, update, validate, or clarify → Use that action
+# - If no action specified → Default to create
+# - For create → All remaining text becomes the description
+# - For other actions → Look for feature name or use current feature
 
-## Command: /sp-spec {{args}}
+[command.implementation.feature_context]
+# Detect Current Feature Context:
+# - Check .specpulse/memory/context.md for active feature
+# - Look for most recently modified spec/plan/task directory
+# - Validate feature directory exists and is properly structured
+# - Extract feature ID and name from directory structure
 
-Create, update, or validate feature specifications using SpecPulse methodology.
+[command.implementation.spec_creation]
+# For Action: create (default):
 
-Actions: create, update, validate, clarify (defaults to create)
+[command.implementation.spec_creation.universal_id]
+# Generate Next Spec Number (Universal ID System):
+# - Use Glob tool to scan .specpulse/specs/[feature]/ directory
+# - Parse all existing spec-###.md files to extract numbers
+# - Convert to integers and find the maximum value
+# - Generate next sequential number: next_num = max_num + 1
+# - Zero-pad to 3 digits: format(next_num, '03d') → 001, 002, 003
+# - Validate no conflicts exist before using the number
+# - Handle edge cases: empty directory, corrupted files, numbering gaps
 
-### Implementation Steps:
+[command.implementation.spec_creation.template_system]
+# Read Template and Expand with AI:
+# - Load .specpulse/templates/spec.md template file
+# - If template missing, create comprehensive specification structure
+# - Based on description, generate complete specification:
+#   - Executive Summary: Clear problem statement and solution overview
+#   - Functional Requirements: Detailed feature breakdown with acceptance criteria
+#   - User Stories: Given-When-Then format with concrete scenarios
+#   - Technical Constraints: Performance, security, and scalability requirements
+#   - Non-Functional Requirements: Usability, accessibility, maintainability
+#   - Risk Assessment: Potential technical and business risks
+#   - Success Metrics: Measurable criteria for completion
 
-1. **Detect current feature context**:
-   - Read .specpulse/memory/context.md for current feature metadata
-   - Use git branch name if available (e.g., 001-user-authentication)
-   - Fall back to most recently created feature directory
-   - If no context found, ask user to specify feature or run /sp-pulse first
+[command.implementation.spec_creation.file_operations]
+# Write Specification File:
+# - Create .specpulse/specs/[feature]/spec-[###].md with generated content
+# - Use atomic file operations to prevent corruption
+# - Include proper YAML frontmatter with metadata
+# - Validate file permissions and access rights
 
-2. **Parse arguments** to determine action:
-   - If starts with 'create': Generate new specification
-   - If starts with 'update': Modify existing specification
-   - If starts with 'validate': Check specification completeness
-   - If starts with 'clarify': Address [NEEDS CLARIFICATION] markers
-   - Default to 'create' with full arguments as description
+[command.implementation.spec_update]
+# For Action: update:
+# - List all specification files in current feature
+# - Allow user to select which spec to update
+# - Parse existing content and identify sections needing updates
+# - Generate updated content based on new requirements
+# - Preserve existing structure while enhancing content
 
-3. **Run specification validation using CLI (optional)**:
-   !{bash specpulse validate spec}
+[command.implementation.spec_validation]
+# For Action: validate:
+# - Check specification file exists and is readable
+# - Validate required sections are present:
+#   - Executive Summary ✓
+#   - Functional Requirements ✓
+#   - User Stories ✓
+#   - Acceptance Criteria ✓
+#   - Technical Constraints ✓
+# - Count any [NEEDS CLARIFICATION] markers
+# - Verify Given-When-Then format in user stories
+# - Calculate completeness percentage
+# - Identify missing or incomplete sections
 
-   Note: Validation is optional - manual checks are primary
+[command.implementation.spec_clarification]
+# For Action: clarify:
+# - Scan specification for [NEEDS CLARIFICATION:...] patterns
+# - Extract each question with surrounding context
+# - Ask user for resolution on each clarification
+# - Replace markers with ✅ **CLARIFIED**: [answer] format
+# - Update specification with resolved clarifications
 
-4. **For 'create' action**:
+[command.implementation.ai_content_analysis]
+# AI-Powered Content Analysis:
+# - Project Type Detection (Web Application, API Service, Mobile App, CLI Tool, Data Pipeline, Library/SDK)
+# - Complexity Assessment (Simple 2-4 hours, Standard 8-12 hours, Complex 16-24 hours)
+# - Requirement Expansion based on project type
+# - SDD Gates Compliance (Specification First, Traceable, Testable, Complete)
 
-   **PRIMARY METHOD (v2.1.3+): Use CLI**
-   !{bash specpulse sp-spec create "description text here"}
+[command.implementation.safe_operations]
+# Safe File Operations:
+# - Validate file paths within allowed directories only
+# - Use atomic write operations to prevent corruption
+# - Create directory structure if missing
+# - Backup existing files before updates
+# - Validate file permissions and access rights
 
-   This creates the spec file with proper metadata and template.
-   Then YOU (AI) should:
-   1. Read the created spec file
-   2. Expand it with full specification details
-   3. Edit the file with expanded content
-   4. Mark uncertainties with [NEEDS CLARIFICATION: question]
+[command.implementation.context_management]
+# Context Management:
+# - Update .specpulse/memory/context.md with feature changes
+# - Track specification history and decisions
+# - Link related specifications, plans, and tasks
+# - Maintain searchable decision log
 
-   **FALLBACK: File Operations (if CLI fails)**
-   - Read template from @{.specpulse/templates/spec.md}
-   - Parse description to identify requirements, user stories
-   - Fill template with AI-generated content
-   - Mark unclear items with [NEEDS CLARIFICATION]
-   - Create numbered spec file (spec-001.md, spec-002.md)
-   - Save to .specpulse/.specpulse/specs/XXX-feature/spec-XXX.md
+[command.implementation.error_handling]
+# Error Handling and Recovery:
+# - Validation Errors (No active feature, Permission denied, Invalid feature name, Template missing)
+# - Content Issues (Vague description, Conflicting requirements, Missing dependencies)
+# - File Structure Problems (Missing directories, File permission errors, Invalid file formats)
 
-5. **Generate comprehensive specification**:
-   - Executive Summary
-   - Problem Statement
-   - Proposed Solution
-   - Functional Requirements (FR-001, FR-002, etc.)
-   - Non-Functional Requirements (performance, security, scalability)
-   - User Stories with acceptance criteria
-   - Technical Constraints
-   - Dependencies
-   - Risks and Mitigations
-   - Success Criteria
-   - Open Questions marked with [NEEDS CLARIFICATION]
+[command.features]
+# CLI-Independent Features:
+# - No CLI Dependencies: 100% independent of SpecPulse CLI installation
+# - Manual Specification Parsing: Direct file content analysis without CLI
+# - Atomic File Updates: Safe file operations prevent corruption
+# - Progress Tracking: Manual calculation from specification files
+# - Error Recovery: Comprehensive error handling
 
-6. **For 'update' action**:
-   - Show list of existing spec files
-   - Ask user which spec file to update
-   - Read selected specification
-   - Ask for clarifications or changes
-   - Update content while preserving structure
-   - Remove resolved [NEEDS CLARIFICATION] markers
+[command.advanced_features]
+# Enhanced Specification Generation:
+# - AI-Powered Content Analysis with project type detection
+# - SDD Gates Compliance with comprehensive validation
+# - Template System Integration with fallback structures
+# - Context Management with decision tracking
+# - Multi-language support for international teams
 
-7. **For 'validate' action**:
-   - Show list of existing spec files
-   - Run validation script
-   - Check all required sections are filled
-   - Count [NEEDS CLARIFICATION] markers
-   - Verify acceptance criteria are testable
-   - Report validation results
-
-8. **Update context and validate**:
-   - Update .specpulse/memory/context.md with specification status
-   - Check SDD compliance (Principle 1: Specification First)
-   - Validate all sections are filled
-   - Report any missing or incomplete sections
-
-### Example AI-Generated Content:
-For "User authentication with OAuth2":
-- FR-001: System SHALL support OAuth2 authentication with Google/GitHub
-- FR-002: System SHALL issue JWT tokens valid for 24 hours
-- NFR-001: Authentication response time < 200ms
-- User Story: As a user, I want to login with Google so that I don't need to remember another password
-
-### SDD Compliance Checklist:
-- [ ] Every requirement is testable (Principle 1)
-- [ ] User stories have clear acceptance criteria (Principle 1)
-- [ ] Dependencies are identified (Principle 4)
-- [ ] Success metrics defined (Principle 6)
-
-Examples:
-- /sp-spec user authentication with OAuth2 and email/password
-- /sp-spec update
-- /sp-spec validate
-- /sp-spec clarify
-"""
+[command.quality_assurance]
+# Quality Assurance Features:
+# - Comprehensive validation with detailed metrics
+# - Requirements traceability matrix
+# - Acceptance criteria testability verification
+# - Risk assessment with mitigation strategies
+# - Success metrics definition and tracking

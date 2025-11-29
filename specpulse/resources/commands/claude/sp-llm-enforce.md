@@ -1,228 +1,322 @@
-# SpecPulse LLM Enforcement Commands for Claude
-
-## 🔒 STRICT COMPLIANCE REQUIRED
-This is NOT a normal command. This enforces strict LLM compliance with no interpretation allowed.
-
-## MANDATORY RULES (NO EXCEPTIONS)
-
-### 1. SESSION MANAGEMENT
-- ALWAYS start with compliance enforcement
-- ALWAYS track all operations
-- NEVER operate outside enforced session
-- ALWAYS end session with validation
-
-### 2. DIRECTORY ENFORCEMENT
-- ALL files MUST stay within `.specpulse/`
-- NEVER create files outside enforced structure
-- ALWAYS validate file paths before operations
-- NEVER bypass directory restrictions
-
-### 3. STATUS TRACKING
-- ALWAYS update task status before operations
-- ALWAYS update task status after operations
-- NEVER skip status updates
-- ALWAYS provide justification for changes
-
-### 4. FILE TRACKING
-- ALWAYS track every file created
-- ALWAYS track every file modified
-- NEVER perform untracked file operations
-- ALWAYS use proper tracking methods
-
-### 5. MEMORY UPDATES
-- ALWAYS update memory files after operations
-- NEVER skip memory updates
-- ALWAYS include operation context
-- NEVER create conflicting memory entries
-
-## USAGE EXAMPLES
-
-### ✅ CORRECT: Create Specification
-```python
-from specpulse.core.llm_cli_interface import LLMCLIInterface
-from specpulse.core.llm_compliance_enforcer import enforce_llm_compliance
-from specpulse.core.llm_task_status_manager import LLMOperationType
-
-# Initialize interface
-cli = LLMCLIInterface(Path.cwd())
-
-# Create specification (automatically enforced)
-result = cli.create_specification(
-    feature_id="001",  # EXACT: 3 digits
-    feature_name="user-auth",  # EXACT: kebab-case
-    template_type="tech"
-)
-
-# Check result
-if result.success:
-    print("Specification created successfully")
-    print(f"Files affected: {result.files_affected}")
-else:
-    print(f"Error: {result.stderr}")
-    raise Exception("Specification creation failed")
-```
-
-### ✅ CORRECT: Execute Task with Status Updates
-```python
-from specpulse.core.llm_cli_interface import LLMCLIInterface
-from specpulse.core.llm_task_status_manager import TaskStatus
-
-cli = LLMCLIInterface(Path.cwd()))
-
-# Execute task with automatic compliance
-result = cli.execute_task("001-user-auth-task-001")
-
-# Task status is automatically updated
-# Memory files are automatically updated
-# File operations are automatically tracked
-
-if not result.success:
-    # Automatic error handling and status update
-    raise Exception(f"Task execution failed: {result.stderr}")
-```
-
-### ❌ WRONG: Manual File Operations
-```python
-# NEVER DO THIS - Violates compliance rules
-with open(".specpulse/specs/001-test.md", "w") as f:
-    f.write("# Manual spec")  # ❌ UNTRACKED OPERATION
-```
-
-### ❌ WRONG: Skipping Status Updates
-```python
-# NEVER DO THIS - Violates compliance rules
-cli.execute_task("001-user-auth-task-001")  # ❌ No status tracking
-# Status not updated - COMPLIANCE VIOLATION
-```
-
-## ENFORCED OPERATIONS
-
-### Specification Creation
-```python
-# ENFORCED: Validated parameters, tracked files, status updates
-cli.create_specification(
-    feature_id="001",  # Must be 3 digits
-    feature_name="user-auth",  # Must be kebab-case
-    template_type="tech",  # Valid template
-    description="Optional description"  # Optional
-)
-```
-
-### Plan Creation
-```python
-# ENFORCED: Links to specification, tracked files
-cli.create_plan(
-    feature_id="001",
-    feature_name="user-auth",
-    spec_number=1  # Optional
-)
-```
-
-### Task Execution
-```python
-# ENFORCED: Status tracking, progress monitoring
-cli.execute_task(
-    task_id="001-user-auth-task-001",  # Exact format
-    task_file="path/to/task.md"  # Optional
-)
-```
-
-### Status Monitoring
-```python
-# ENFORCED: Always know current state
-status = cli.get_status(detailed=True)
-compliance = cli.get_compliance_status()
-```
-
-## COMPLIANCE VIOLATIONS (STRICTLY FORBIDDEN)
-
-1. **No Session Management**: Operating without compliance enforcement
-2. **Directory Violations**: Creating files outside `.specpulse/`
-3. **Status Skipping**: Not updating task status properly
-4. **File Violations**: Untracked file operations
-5. **Memory Neglect**: Not updating memory files
-6. **Parameter Violation**: Invalid parameter formats
-7. **Timeout Violation**: Operations exceeding time limits
-
-## ERROR HANDLING
-
-### ✅ CORRECT: Proper Error Handling
-```python
-try:
-    result = cli.create_specification("001", "user-auth", "tech")
-    if result.success:
-        # Continue with workflow
-        pass
-    else:
-        # Handle failure properly
-        print(f"Creation failed: {result.stderr}")
-        # Status automatically updated to FAILED
-except Exception as e:
-    # Compliance automatically handles errors
-    print(f"Error: {e}")
-    # Session automatically ends with error status
-```
-
-### ❌ WRONG: Ignoring Errors
-```python
-result = cli.create_specification("001", "user-auth", "tech")
-if not result.success:
-    pass  # ❌ Ignoring failure violates compliance
-```
-
-## AUTOMATIC ENFORCEMENTS
-
-The system automatically enforces:
-
-1. **Session Validation**: All operations must be in valid sessions
-2. **Path Validation**: All file paths validated against `.specpulse/`
-3. **Status Validation**: All status transitions validated
-4. **File Tracking**: All file operations automatically tracked
-5. **Memory Updates**: Memory files automatically updated
-6. **Error Handling**: Errors automatically handled and logged
-7. **Compliance Scoring**: All operations scored for compliance
-8. **Timeout Protection**: Operations automatically timeout
-
-## REQUIRED WORKFLOW
-
-1. **Initialize**: `cli = LLMCLIInterface(Path.cwd())`
-2. **Execute**: Use enforced methods (create_specification, execute_task, etc.)
-3. **Validate**: Check result.success
-4. **Handle**: Proper error handling if needed
-5. **Continue**: Only continue if success=True
-
-## 🔒 ZERO TOLERANCE POLICY
-
-- No interpretation of rules allowed
-- No exceptions to compliance requirements
-- No bypassing of enforcement mechanisms
-- No ignoring of status updates
-- No untracked file operations
-- No manual memory management
-
-## TESTING
-
-Always test compliance:
-```python
-# Quick compliance test
-from specpulse.core.llm_cli_tester import quick_cli_test
-
-test_result = quick_cli_test()
-if test_result['success_rate'] < 0.9:
-    raise Exception("CLI compliance below 90%")
-```
-
-## EMERGENCY PROCEDURES
-
-If compliance fails:
-1. STOP all operations immediately
-2. Run `cli.run_doctor(fix_issues=True)`
-3. Check compliance status
-4. Fix violations before continuing
-
+---
+name: sp-llm-enforce
+description: Enforce strict LLM compliance rules for SpecPulse operations
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - TodoWrite
 ---
 
-**Remember**: This system enforces strict compliance with no room for interpretation.
-Follow the rules exactly or operations will fail automatically.
+# /sp-llm-enforce Command
 
-**SpecPulse LLM Enforcement System v2.6.7**
+Enforce strict LLM compliance rules for SpecPulse operations without CLI dependencies. Works completely independently through validated operations.
+
+## Usage
+```
+/sp-llm-enforce [action] [context]    # Start enforcement session or check status
+```
+
+Actions: `start`, `status`, `validate`, `end` (defaults to `start`)
+
+## Implementation
+
+When called with `/sp-llm-enforce {{args}}`, I will:
+
+### 1. Parse Arguments to Determine Enforcement Action
+
+**I will analyze the arguments:**
+- If action provided: Use specific enforcement action
+- If no argument: Start new enforcement session
+- Parse context information for targeted enforcement
+
+### 2. For Action: start (default)
+
+**I will initiate strict compliance enforcement:**
+
+#### A. Session Initialization
+- Create enforcement session with unique ID
+- Initialize operation tracking
+- Establish compliance boundaries
+- Set directory access restrictions
+
+#### B. Directory Enforcement Setup
+- Restrict all operations to `.specpulse/` directory only
+- Validate all file paths before operations
+- Create safe operation whitelist
+- Establish protected directory rules
+
+#### C. Status Tracking Initialization
+- Create session status tracking file
+- Initialize operation counters
+- Set up compliance validation rules
+- Establish audit trail requirements
+
+#### D. Memory Context Validation
+- Validate current memory structure
+- Check context file integrity
+- Initialize compliance session memory
+- Set operation context boundaries
+
+### 3. For Action: status
+
+**I will display current enforcement status:**
+
+#### A. Session Information
+- Show active enforcement session details
+- Display operation counts and types
+- Show compliance violations detected
+- List tracked file operations
+
+#### B. Compliance Metrics
+- Directory restriction compliance: 100%
+- File operation validation: Tracked/Validated
+- Status update completeness: All operations logged
+- Memory update accuracy: Context maintained
+
+#### C. Risk Assessment
+- Identify potential compliance risks
+- Show blocked operation attempts
+- Display violation patterns
+- Recommend corrective actions
+
+### 4. For Action: validate
+
+**I will perform comprehensive compliance validation:**
+
+#### A. Directory Structure Validation
+- Verify all operations stay within `.specpulse/`
+- Check for unauthorized directory access
+- Validate file path safety
+- Ensure no protected directories modified
+
+#### B. Operation Tracking Validation
+- Verify all file operations are tracked
+- Check status update completeness
+- Validate audit trail integrity
+- Ensure proper operation logging
+
+#### C. Memory Consistency Validation
+- Validate memory file updates
+- Check context file integrity
+- Verify session state consistency
+- Ensure no conflicting entries
+
+#### D. Session Compliance Validation
+- Verify all session rules followed
+- Check enforcement protocol compliance
+- Validate operation boundaries
+- Ensure proper session termination
+
+### 5. For Action: end
+
+**I will terminate enforcement session:**
+
+#### A. Session Finalization
+- Generate comprehensive compliance report
+- Validate all operations were compliant
+- Create session audit summary
+- Update final memory state
+
+#### B. Report Generation
+- Operation summary with counts
+- Compliance violations (if any)
+- Risk assessment results
+- Recommendations for future operations
+
+#### C. Memory Context Updates
+- Finalize session memory updates
+- Update context with session results
+- Store compliance metrics
+- Prepare for next session
+
+## Enforcement Rules
+
+### Strict Directory Enforcement
+**I will ensure:**
+- ✅ All file operations confined to `.specpulse/`
+- ✅ No operations on protected directories
+- ✅ Validated file paths before any operations
+- ✅ Safe operation whitelist compliance
+
+### Comprehensive Operation Tracking
+**I will maintain:**
+- ✅ Complete audit trail of all operations
+- ✅ File creation and modification tracking
+- ✅ Operation status updates before and after
+- ✅ Justification for all changes made
+
+### Memory Context Management
+**I will update:**
+- ✅ Memory files after every operation
+- ✅ Operation context information
+- ✅ Session state and compliance metrics
+- ✅ Consistent context without conflicts
+
+### Session Protocol Compliance
+**I will follow:**
+- ✅ Proper session initiation and termination
+- ✅ Enforcement protocol throughout session
+- ✅ Status reporting and validation
+- ✅ Audit trail maintenance
+
+## Output Examples
+
+### Session Start
+```
+User: /sp-llm-enforce start
+
+🔒 Enforcement Session Started
+================================================================
+
+Session ID: ENF-2025-01-11-001
+Started At: 2025-01-11 15:30:00 UTC
+Context: Full compliance enforcement mode
+
+📋 Enforcement Rules Active:
+   ✅ Directory restrictions: .specpulse/ only
+   ✅ Operation tracking: Complete audit trail
+   ✅ Status updates: Before/after every operation
+   ✅ Memory management: Real-time context updates
+   ✅ File validation: Path safety verification
+
+🎯 Session Capabilities:
+   - File operations within enforced boundaries
+   - Operation tracking and validation
+   - Compliance monitoring and reporting
+   - Risk assessment and prevention
+
+⚡ Enforcement Active - All operations will be monitored for compliance
+💡 Use /sp-llm-enforce status to check compliance metrics
+```
+
+### Status Check
+```
+User: /sp-llm-enforce status
+
+🔒 Enforcement Session Status
+================================================================
+
+Session ID: ENF-2025-01-11-001
+Duration: 45 minutes 12 seconds
+Status: Active and Compliant
+
+📊 Operations Tracked:
+   Files Created: 3
+   Files Modified: 7
+   Files Read: 15
+   Directories Created: 2
+   Status Updates: 20
+
+✅ Compliance Metrics:
+   Directory Restrictions: 100% compliant
+   Operation Tracking: 100% complete
+   Status Updates: 100% current
+   Memory Updates: 100% accurate
+
+🛡️  Risk Assessment:
+   Low Risk: All operations within boundaries
+   No violations detected
+   Session integrity maintained
+   Compliance score: 100%
+
+📋 Last Operations:
+   - Modified: .specpulse/tasks/001-auth/task-001.md (15:28:45)
+   - Created: .specpulse/memory/session-enf-001.md (15:25:30)
+   - Updated: .specpulse/memory/context.md (15:24:12)
+
+⚡ Enforcement continues - All operations being monitored
+```
+
+### Validation Report
+```
+User: /sp-llm-enforce validate
+
+🔍 Compliance Validation Results
+================================================================
+
+Session ID: ENF-2025-01-11-001
+Validation Type: Full compliance check
+Validated At: 2025-01-11 16:15:00 UTC
+
+✅ Directory Compliance: 100%
+   All operations within .specpulse/ boundaries
+   No protected directory access attempts
+   File path validation successful
+
+✅ Operation Tracking: 100%
+   All 25 operations properly tracked
+   Complete audit trail maintained
+   Status updates current for all operations
+
+✅ Memory Management: 100%
+   Memory files updated after operations
+   Context consistency maintained
+   No conflicting entries detected
+
+✅ Session Protocol: 100%
+   Proper session initiation and management
+   Enforcement rules followed throughout
+   Audit trail integrity verified
+
+📊 Overall Compliance Score: 100%
+⚠️ Issues Found: 0
+🎯 Risk Level: Low
+
+✅ Session is fully compliant with all enforcement rules
+```
+
+### Session End
+```
+User: /sp-llm-enforce end
+
+🔒 Enforcement Session Ended
+================================================================
+
+Session ID: ENF-2025-01-11-001
+Duration: 2 hours 35 minutes
+Ended At: 2025-01-11 17:05:00 UTC
+
+📊 Final Session Metrics:
+   Total Operations: 42
+   Files Created: 8
+   Files Modified: 18
+   Files Read: 28
+   Status Updates: 42
+
+✅ Final Compliance Results:
+   Directory Restrictions: 100% compliant
+   Operation Tracking: 100% complete
+   Status Updates: 100% current
+   Memory Management: 100% accurate
+
+🎯 Session Summary:
+   - Zero compliance violations
+   - Complete operation tracking
+   - Proper memory context management
+   - Full protocol compliance
+
+📋 Session Audit Report Created:
+   File: .specpulse/memory/enforcement-report-enf-001.md
+   Contains: Complete operation log, compliance metrics, risk assessment
+
+✅ Enforcement session completed successfully
+💡 New session can be started with /sp-llm-enforce start
+```
+
+## Error Handling and Recovery
+
+### Compliance Violations
+- **Directory breach detection**: Immediate operation blocking
+- **Unauthorized operations**: Automatic session termination
+- **Tracking failures**: Operation rollback and error reporting
+- **Memory inconsistency**: Context repair and validation
+
+### Session Recovery
+- **Session interruption**: Resume with status validation
+- **Operation failures**: Retry with compliance validation
+- **Memory corruption**: Context restoration from backup
+- **Enforcement override**: Emergency compliance protocols
+
+This `/sp-llm-enforce` command provides **strict compliance enforcement** without requiring any SpecPulse CLI installation, using only validated file operations and comprehensive audit tracking.

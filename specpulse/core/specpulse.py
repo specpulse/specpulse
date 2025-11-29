@@ -1261,6 +1261,7 @@ tags:
         return [tool for tool in tools if tool in valid_tools]
 
     def _copy_ai_commands(self, project_path: Path, ai_assistant: Optional[str], console=None) -> None:
+        print("DEBUG: _copy_ai_commands function called!")
         """Copy AI command files based on chosen assistant(s) with enforced directory isolation"""
         import shutil
 
@@ -1281,12 +1282,10 @@ tags:
             return
 
         for tool in selected_tools:
-            # Special handling for crush which has subdirectory structure
-            if tool == 'crush':
-                tool_dir = commands_dir / tool / 'sp'
-            else:
-                tool_dir = commands_dir / tool
-            if tool_dir.exists():
+            # Special handling for crush which has NO subdirectory structure
+            tool_dir = commands_dir / tool
+            print(f"DEBUG {tool}: tool_dir={tool_dir}, exists={tool_dir.exists()}")
+        if tool_dir.exists():
                 # Determine destination directory using PathManager enforcement
                 if tool == 'github':
                     dst_dir = getattr(path_manager, 'github_dir') / "prompts"
@@ -1303,7 +1302,10 @@ tags:
                 elif tool == 'crush':
                     dst_dir = getattr(path_manager, 'crush_dir') / "commands" / "sp"
                     pattern = "*.md"
-                else:  # claude, cursor, qwen
+                elif tool == 'qwen':
+                    dst_dir = getattr(path_manager, f"{tool}_dir") / "commands"
+                    pattern = "*.toml"
+                else:  # claude, cursor
                     dst_dir = getattr(path_manager, f"{tool}_dir") / "commands"
                     pattern = "*.md"
 
@@ -1311,7 +1313,13 @@ tags:
                 dst_dir.mkdir(parents=True, exist_ok=True)
 
                 # Copy command files
-                for cmd_file in tool_dir.glob(pattern):
+                found_files = list(tool_dir.glob(pattern))
+                # Write debug to file
+                with open('/d/debug_specpulse.log', 'a') as f:
+                    f.write(f"DEBUG {tool}: Looking for '{pattern}' in {tool_dir}, found {len(found_files)} files\n")
+                print(f"DEBUG {tool}: Looking for '{pattern}' in {tool_dir}, found {len(found_files)} files")
+                for cmd_file in found_files:
+                    print(f"DEBUG {tool}: Copying {cmd_file.name}")
                     shutil.copy2(cmd_file, dst_dir / cmd_file.name)
 
                 if console:

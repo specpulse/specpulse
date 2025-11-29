@@ -2,205 +2,149 @@
 name: /sp-task
 id: sp-task
 category: SpecPulse
-description: Generate and manage task breakdowns with versioning using AI-optimized templates.
+description: Create and manage tasks without SpecPulse CLI
 ---
+
 <!-- SPECPULSE:START -->
 **Guardrails**
 - CLI-first approach: Always try SpecPulse CLI commands before file operations
 - Keep changes tightly scoped to the task management outcome
-- Only edit files in tasks/, specs/, plans/, memory/ directories - NEVER modify templates/ or internal config
+- Only edit files in specs/, plans/, tasks/, memory/ directories - NEVER modify templates/ or internal config
 
 **Critical Rules**
-- **PRIMARY**: Use `specpulse sp-task breakdown <plan-id>` when available
-- **FALLBACK**: File Operations only if CLI fails
+- **PRIMARY**: Use file operations (CLI-independent mode)
 - **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/
-- **EDITABLE ONLY**: tasks/, specs/, plans/, memory/
+- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
 
 **Steps**
 Track these steps as TODOs and complete them one by one.
+
 1. **Detect current feature context**:
-   - Read `.specpulse/memory/context.md` for current feature metadata
-   - Use git branch name if available (e.g., 001-user-authentication)
-   - Fall back to most recently created feature directory
-   - If no context found, ask user to specify feature or run `/sp-pulse` first
-2. **Parse arguments** to determine action:
-   - If "update": Update task status
-   - If "status": Show progress
-   - Otherwise: Generate task breakdown
-3. **For /sp-task breakdown or /sp-task:**
-   - **Check for decomposition**: Look for `specs/XXX-feature/decomposition/` directory
-   - **If decomposed**:
-     - Read service definitions from decomposition
-     - Show service-specific plan files (auth-service-plan.md, user-service-plan.md, etc.)
-     - Generate tasks per service with service prefix (AUTH-T001, USER-T001)
-     - Create integration tasks (INT-T001) for cross-service work
-     - Structure: `tasks/XXX-feature/auth-service-tasks.md`, `integration-tasks.md`
-   - **If not decomposed**:
-     - Show existing plan files and ask user to select
-     - Generate single task file with standard IDs (T001, T002)
-   - **Try CLI First**:
-     ```bash
-     specpulse sp-task breakdown <plan-id>
-     ```
-     If CLI succeeds, STOP HERE.
-   - **Read selected implementation plan** from selected plan file
-   - **Generate tasks using STANDARDIZED FORMAT**:
-     - **Step 1: Use this exact YAML structure for EVERY task**:
-       ```yaml
-       ---
-       id: task-[slug]
-       status: todo | in-progress | blocked | done
-       title: "Short but clear task title"
-       description: |
-         *Answer these 4 questions with sufficient detail:*
-         - What problem does this solve?
-         - Why is this necessary?
-         - How will this be done? (step-by-step, include function/file names when possible)
-         - When is this considered complete?
+   - Check .specpulse/memory/context.md for active feature
+   - Look for most recently modified spec/plan/task directory
+   - Validate feature directory exists and is properly structured
+   - Extract feature ID and name from directory structure
 
-       files_touched:
-         - path: src/...
-           reason: "What changes in this file, briefly"
+2. **Parse arguments to determine action**:
+   - If first argument is breakdown, update, status, execute, or validate → Use that action
+   - If no action specified → Default to breakdown
+   - For other arguments → Look for feature name or use current feature
 
-       goals:
-         - "Concrete goal 1 achieved when this task completes"
-         - "Concrete goal 2"
+3. **For action: breakdown (default)**:
+   - **Step 1: Check for Service Decomposition**
+     - Look for .specpulse/specs/[feature]/decomposition/ directory
+     - If decomposition exists, identify service directories
+     - Parse service names for task categorization
+     - Plan service-specific task generation
+   - **Step 2: Generate Task Breakdown**
+     - Read implementation plan from .specpulse/plans/[feature]/ directory
+     - Analyze plan phases and identify implementation steps
+     - Create detailed tasks with proper dependencies
+     - Assign task IDs using universal numbering system
+   - **Step 3: Create Service-Specific Tasks**
+     - If decomposition exists: Auth Service Tasks (AUTH-T001), User Service Tasks (USER-T001), Integration Tasks (INT-T001)
+   - **Step 4: Generate Comprehensive Task Metadata**
+     - Task ID, Status, Title, Description, Files Touched, Goals, Success Criteria
+     - Dependencies, Next Tasks, Risk Level, Risk Notes, MOSCOW Analysis, Priority
+     - SDD Gates Compliance validation
+   - **Step 5: Universal ID System Implementation**
+     - Use Glob tool to scan .specpulse/tasks/[feature]/ directory
+     - Parse existing task files to extract current numbering (T###.md patterns)
+     - Create numbering map: {task_type: max_number_used}
+     - Generate next ID: For each task type, use max_num + 1
+     - Zero-pad format: format(next_num, '03d') ensures 001, 002, 003
+   - **Step 6: Write Task Files**
+     - Create .specpulse/tasks/[feature]/ with appropriate task files
+     - Use atomic file operations to prevent corruption
 
-       success_criteria:
-         - "Test/acceptance criteria 1 (measurable or verifiable)"
-         - "Test/acceptance criteria 2"
+4. **For action: update**:
+   - Scan .specpulse/tasks/[feature]/ directory for task files
+   - Display available task files for selection
+   - Parse current task structure and status
+   - Provide interactive update options (mark completed/in-progress/blocked)
+   - Update task descriptions or metadata, add new tasks or remove obsolete ones
+   - Recalculate progress metrics after updates
 
-       dependencies:
-         - task-[id-1]
-         - task-[id-2]
+5. **For action: status**:
+   - Scan all task files in current feature
+   - Calculate completion percentages
+   - Show progress by service (if decomposed)
+   - Display task status distribution (completed, in-progress, blocked, pending)
+   - Show SDD Gates compliance status
+   - Calculate velocity metrics (tasks/day)
+   - Identify parallel tasks and sequential chains
+   - Provide recommendations for next actions
 
-       next_tasks:
-         - task-[id-x]
-         - task-[id-y]
+6. **For action: execute**:
+   - Allow task selection from available pending tasks
+   - Validate task readiness and dependencies
+   - Display task details before execution
+   - Implement task requirements through code changes
+   - Test implementation when applicable
+   - Mark task as completed automatically
+   - Continue with next available task if requested
+   - Update progress metrics and context
 
-       risk_level: low | medium | high
-       risk_notes: |
-         "Important risks, edge cases, technical debt notes for this task"
+7. **For action: validate**:
+   - Validate task file structure and format
+   - Check required fields are present and valid
+   - Verify task dependencies exist and are valid
+   - Validate SDD Gates compliance
+   - Check for duplicate task IDs
+   - Verify success criteria are testable
+   - Assess risk levels and mitigation strategies
+   - Report validation results with fixes needed
 
-       moscow:
-         must:
-           - "Must-have requirements/behaviors for this task"
-           - "Without these, task is not considered complete"
-         should:
-           - "Additional improvements if time/budget allows"
-           - "Performance, UX, DX improvements, etc."
-         know:
-           - "Critical knowledge, context, or domain details developer must know"
-           - "Documentation links, rationale for specific decisions"
-         wont:
-           - "Things we WILL NOT do in this task scope - out of scope"
-           - "Topics for future tasks"
-
-       priority_overall: must | should | could | wont
-       priority_reason: "Why this task has this priority - short, clear explanation."
-       ---
-       ```
-     - **Step 2: Read Standard Template**
-       ```
-       Read: templates/task_standard.md
-       ```
-     - **Step 2: Parse Plan and Create Task Files**
-       ```
-       For each phase/component in plan:
-         Write: tasks/XXX-feature/task-001.md
-         Write: tasks/XXX-feature/task-002.md
-         ... (one file per task)
-
-       Content includes:
-         - Metadata (feature ID, task number, status: pending)
-         - Task description from plan
-         - Template structure for expansion
-       ```
-     - **IMPORTANT**: Can EDIT files in tasks/ folder, but NEVER modify templates/ or commands/ folders
-   - **Generate structured task categories based on architecture**:
-     - **For decomposed services**:
-       * Service-specific tasks with bounded context
-       * Inter-service integration tasks
-       * Service deployment order tasks
-       * Contract testing tasks between services
-     - **For monolithic architecture**:
-       * Layer-based tasks (data, business, API)
-       * Module-specific tasks
-     - **Common categories**:
-       * SDD Gates Compliance
-       * Critical Path identification
-       * Parallel vs Sequential grouping
-       * Progress Tracking configuration
-   - **For each task**, generate comprehensive metadata:
-     - **ID**: T[XXX] format (T001, T002)
-     - **Type**: setup, development, testing, documentation
-     - **Priority**: HIGH, MEDIUM, LOW
-     - **Estimate**: Hours or complexity points
-     - **Dependencies**: Task ID dependencies
-     - **Description**: Clear what needs to be done
-     - **Acceptance**: How to verify completion
-     - **Files**: Files to be created/modified
-     - **Assignable**: Role/skill required
-     - **Parallel**: Whether can run in parallel [P]
-   - **Generate AI execution guidelines** with workflow integration
-   - **Version management**: Check existing task files and create next version (task-001.md, task-002.md, etc.)
-   - **Write comprehensive task breakdown** to `tasks/XXX-feature/task-XXX.md`
-4. **For /sp-task update:**
-   - **Show existing task files**: List all task-XXX.md files in current feature directory
-   - **Ask user to select**: Which task file to update
-   - **Analysis** using script:
-     ```bash
-     specpulse task breakdown "$PLAN_ID"
-     ```
-   - **Parse current tasks** from selected file with comprehensive status:
-     - Total tasks, completed, pending, blocked
-     - Parallel tasks identification
-     - SDD gates status
-     - Completion percentage calculation
-   - **Interactive task updates**:
-     - Mark tasks as completed/in-progress/blocked
-     - Update dependencies and blockers
-     - Add newly discovered tasks with proper metadata
-     - Adjust estimates based on actual progress
-   - **Generate updated progress tracking** YAML
-5. **For /sp-task status:**
-   - **Show existing task files**: List all task-XXX.md files in current feature directory
-   - **Ask user to select**: Which task file to show status for
-   - **Enhanced reporting** from script output:
-     ```bash
-     TOTAL_TASKS=25
-     COMPLETED_TASKS=10
-     COMPLETION_PERCENTAGE=40%
-     SDD_GATES_PENDING=2
-     ```
-   - **Display comprehensive progress**:
-     - Overall completion percentage
-     - Phase-by-phase progress
-     - Blocker identification and resolution
-     - Velocity metrics and estimates
-     - SDD gates compliance status
+8. **Validate structure and report comprehensive status**
 
 **Usage**
 ```
 /sp-task [action] [feature-directory]
 ```
 
-Actions: `breakdown`, `update`, `status`, `execute` (defaults to `breakdown`)
+**Examples**
 
-**Task Format**
-```markdown
-- [ ] T001: [S] Set up project structure
-- [ ] T002: [M] Create database schema
-- [x] T003: [L] Implement authentication
+**Basic Usage:**
+```
+/sp-task breakdown
 ```
 
-**Examples**
-- `/sp-task breakdown`
-- `/sp-task update`
-- `/sp-task status`
+Output: Create comprehensive task breakdown with service-specific organization, universal ID system, and detailed metadata.
+
+**Task Status:**
+```
+/sp-task status
+```
+
+Output: Display comprehensive progress with completion percentages, velocity metrics, and recommendations.
+
+**Execute Task:**
+```
+/sp-task execute AUTH-T005
+```
+
+Output: Execute specific task with validation, implementation, testing, and progress updates.
+
+**Advanced Features:**
+- **Universal ID System**: Conflict-free task numbering with service-specific patterns
+- **Service-Specific Organization**: Tasks organized by microservice boundaries
+- **Progress Analytics**: Velocity calculation, completion estimates, dependency tracking
+- **SDD Gates Compliance**: Specification traced, task decomposed, quality assured, traceable implementation
+
+**Error Handling**
+- No active feature: Prompt to run /sp-pulse first
+- Missing plan file: Guide user to create plan with /sp-plan
+- Invalid task format: Identify and fix structural issues
+- Circular dependencies: Detect and resolve dependency loops
 
 **Reference**
-- Use `specpulse task breakdown --help` if you need additional CLI options
-- Check `memory/context.md` for current feature context
-- Run `specpulse doctor` if you encounter system issues
+- Check memory/context.md for current feature context
+- Run validation on created tasks
+- After task breakdown, continue with /sp-execute for implementation
+
+**CLI-Independent Benefits:**
+- Works completely without SpecPulse CLI installation
+- Uses LLM-safe file operations with atomic writes
+- Comprehensive task lifecycle management
+- Advanced analytics and progress tracking
 <!-- SPECPULSE:END -->

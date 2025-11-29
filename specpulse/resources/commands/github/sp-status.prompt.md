@@ -1,111 +1,140 @@
----
-description: Track progress across all features and specific feature details with comprehensive reporting.
----
-
 $ARGUMENTS
+
+# GitHub Copilot SpecPulse Status Tracking
+
+Track project progress without SpecPulse CLI. Works completely independently through LLM-safe file operations.
+
+## Usage
+```
+/sp-status [feature-name]    # Show overview or specific feature status
+```
+
 <!-- SPECPULSE:START -->
 **Guardrails**
 - CLI-first approach: Always try SpecPulse CLI commands before file operations
-- Keep changes tightly scoped to the progress tracking outcome
-- READ-ONLY OPERATION: This command only reads files, never modifies any files
+- Keep changes tightly scoped to the status tracking outcome
+- Only edit files in specs/, plans/, tasks/, memory/ directories - NEVER modify templates/ or internal config
 
 **Critical Rules**
-- **PRIMARY**: Use `specpulse status [feature-name]` when available
-- **FALLBACK**: File Operations only if CLI fails
-- **READ-ONLY VALIDATION**: This command only validates, never modifies files
-- **PROTECTED DIRECTORIES**: All directories are read-only during status reporting
+- **PRIMARY**: Use file operations (CLI-independent mode)
+- **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/
+- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
 
-**Steps**
-Track these steps as TODOs and complete them one by one.
-1. **Parse arguments** from $ARGUMENTS to determine scope:
+**Implementation Steps**
+
+1. **Parse Arguments to Determine Scope**
    - If feature name provided: Show detailed status for that feature
-   - Otherwise: Show overview of all features
-2. **Try CLI First**:
-   ```bash
-   specpulse status [feature-name]
-   specpulse progress [feature-id]
-   ```
-   If CLI succeeds, STOP HERE.
-3. **Read feature context** from `memory/context.md`
-4. **For all features overview**:
-   - **Scan all feature directories** (specs/*, plans/*, tasks/*)
-   - **Count features by status**: active, completed, in_progress, paused
-   - **Calculate overall project progress**
-   - **Show summary statistics**:
-     ```
-     TOTAL_FEATURES=5
-     ACTIVE_FEATURES=2
-     COMPLETED_FEATURES=1
-     IN_PROGRESS_FEATURES=1
-     PAUSED_FEATURES=1
-     OVERALL_PROGRESS=42%
-     ```
-   - **List all features** with their status and progress percentage
-   - **Highlight current active feature** from context
-5. **For specific feature status**:
-   - **Detect feature directory** (using context detection logic)
-   - **Read all task files** in the feature's tasks directory
-   - **Calculate completion percentage** based on task status
-   - **Show detailed breakdown**:
-     ```
-     FEATURE: 001-user-authentication
-     STATUS: active
-     PROGRESS: 65%
-     SPECS: 2 files
-     PLANS: 1 file
-     TASKS: 1 file (25 total tasks)
-     COMPLETED_TASKS: 16
-     IN_PROGRESS_TASKS: 5
-     BLOCKED_TASKS: 1
-     LAST_UPDATED: 2025-01-09
-     ```
-   - **Show phase-by-phase progress**
-   - **List any blockers or issues**
-   - **Provide recommendations for next steps**
-6. **Progress calculation logic**:
-   - **Scan task files** for completion status:
-     * `[x]` for completed
-     * `[ ]` for pending
-     * `[-]` for in progress
-     * `[!]` for blocked
-   - **Calculate percentages**: completed / total * 100
-   - **Track trends over time** if historical data available
+   - If no argument: Show overview of all features
+   - Parse options like --verbose, --validate, --trends
 
-**Usage**
-Arguments should be provided as: `[feature-name]`
+2. **Detect Current Feature Context**
+   - Check .specpulse/memory/context.md for active feature
+   - Look for most recently modified spec/plan/task directory
+   - Validate feature directory exists and is properly structured
+   - Extract feature ID and name from directory structure
 
-If no feature name provided, shows overview of all features.
+3. **For Overall Project Status (no arguments)**
+   - **Feature Discovery**
+     - Scan .specpulse/specs/, .specpulse/plans/, .specpulse/tasks/ directories
+     - Identify all feature directories using naming convention (XXX-feature-name)
+     - Build comprehensive feature inventory
+   - **Feature Status Assessment**
+     - For each feature, determine: Active, Completed, In Progress, Paused, Blocked
+     - Calculate project-level metrics (total features, active features, overall progress)
+   - **Display Feature Overview**
+     - Show concise summary for each feature with progress percentage, status indicator
+     - Include file counts (specs, plans, tasks) and last activity timestamp
+     - Highlight current active feature
 
-**Feature Status Indicators**
+4. **For Specific Feature Status**
+   - **Feature Detection and Validation**
+     - Locate feature directory structure
+     - Validate proper .specpulse organization
+     - Check for required subdirectories (specs/, plans/, tasks/)
+   - **File Inventory and Analysis**
+     - Count and analyze files: specification files, plan files, task files
+     - Determine completeness status and quality metrics
+   - **Progress Calculation**
+     - Calculate detailed progress metrics: overall percentage, task distribution
+     - Analyze phase breakdown and velocity metrics
+   - **Task Status Analysis**
+     - Parse task files to determine individual task status
+     - Analyze dependency relationships and chain status
+     - Identify parallel task availability and blockers
 
-- **Active**: Currently being worked on (in context.md)
-- **Completed**: All tasks marked as complete
-- **In Progress**: Has task files with some completed tasks
-- **Paused**: No recent activity, not all tasks complete
-- **Blocked**: Has blocked tasks preventing progress
+5. **Advanced Analysis Features**
+   - **Universal ID System Integration**: Track ID usage, detect conflicts, validate consistency
+   - **SDD Gates Compliance**: Verify specifications meet standards, check traceability
+   - **Trend Analysis**: Progress velocity over time, completion rate trends
+   - **Validation and Health Check**: File structure integrity, dependency cycles
 
-**Task Status Format**
-```markdown
-- [ ] T001: [S] Set up project structure      # Pending
-- [>] T002: [M] Create database schema       # In Progress
-- [x] T003: [L] Implement authentication      # Completed
-- [!] T004: [S] Fix authentication bug        # Blocked
-```
+6. **Context Management and Updates**
+   - Update .specpulse/memory/context.md with latest status
+   - Track status check history for trend analysis
+   - Link related features and dependencies
+   - Maintain searchable status history
+
+7. **Validate structure and report comprehensive status**
 
 **Examples**
 
-**All features overview:**
-Input: No arguments
-Output: Comprehensive project overview with feature breakdown.
+**Project Overview:**
+```
+/sp-status
+```
 
-**Specific feature status:**
-Input: `001-user-authentication`
-Output: Detailed feature progress with task breakdown and recommendations.
+Output: Show overview of all features with progress percentages, status indicators, and project-level metrics.
 
-**Reference**
-- Use `specpulse status --help` if you need additional CLI options
-- Check `memory/context.md` for current feature context
-- Run `specpulse doctor` if you encounter system issues
-- Use `/sp-continue` to resume work on a feature
-- This command is READ-ONLY - it never modifies files
+**Feature Status:**
+```
+/sp-status 001-user-authentication
+```
+
+Output: Detailed feature analysis with task breakdown, phase progress, blockers, and velocity metrics.
+
+**Advanced Analysis:**
+```
+/sp-status --validate --trends
+```
+
+Output: Comprehensive analysis with SDD compliance, trend analysis, and health check validation.
+
+**Status Display Features:**
+- **Project Summary**: Total features, overall progress, active features
+- **Feature Breakdown**: Individual feature status with progress indicators
+- **Task Analysis**: Completed/in-progress/blocked/pending task distribution
+- **Phase Progress**: Implementation phase completion percentages
+- **Velocity Metrics**: Tasks completed per time period, completion estimates
+- **Blocker Identification**: Current blockers and resolution paths
+- **Dependencies**: Feature relationships and blocking chains
+
+**Advanced Features:**
+- **Universal ID System**: Track ID usage, detect conflicts, validate consistency
+- **SDD Gates Compliance**: Specification standards, task traceability validation
+- **Trend Analysis**: Progress velocity trends, completion rate patterns
+- **Health Check**: File structure integrity, dependency validation
+- **Context Management**: Automatic context updates and history tracking
+
+**Error Handling**
+- No memory file: Create initial context structure
+- Invalid feature directory: Suggest valid feature names
+- Multiple active features: Prompt to select primary feature
+- Corrupted task files: Guide through file recovery process
+
+**Status Indicators**
+- `[OK]` - Completed feature
+- `[PROG]` - Active development
+- `[WAIT]` - In progress (waiting for dependencies)
+- `[PAUSED]` - No recent activity
+- `[BLOCKED]` - Blocked by issues
+
+**CLI-Independent Benefits:**
+- Works completely without SpecPulse CLI installation
+- Uses LLM-safe file operations for status calculation
+- Comprehensive progress analytics and trend analysis
+- Real-time dependency tracking and blocker identification
 <!-- SPECPULSE:END -->
+
+## Implementation Notes
+
+When called with the specified arguments, execute the status tracking workflow according to the scope. Use only file operations within the allowed directories, calculate progress metrics from file contents, and provide comprehensive analytics without requiring CLI dependencies.

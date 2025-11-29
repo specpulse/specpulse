@@ -1,0 +1,131 @@
+description = "Enforce strict LLM compliance rules for SpecPulse operations without SpecPulse CLI"
+
+prompt = """
+# /sp-llm-enforce Command
+
+Enforce strict LLM compliance rules for SpecPulse operations without CLI dependencies. Works completely independently through validated operations.
+
+## Usage
+```
+/sp-llm-enforce [action] [context]    # Start enforcement session or check status
+```
+
+Actions: `start`, `status`, `validate`, `end` (defaults to `start`)
+
+## Implementation
+
+When called with `/sp-llm-enforce {{args}}`, I will:
+
+### 1. Parse Arguments to Determine Enforcement Action
+
+**I will analyze the arguments:**
+- If action provided: Use specific enforcement action
+- If "status": Show current compliance status and violations
+- If "validate": Validate operations against rules
+- If "end": End enforcement session
+- If no argument: Default to "start"
+
+### 2. Compliance Rule Enforcement
+
+**CLI-First Approach:**
+- Always try SpecPulse CLI commands before file operations
+- Validate file operations against protected directories
+- Enforce atomic file operations with proper validation
+- Prevent directory traversal attacks
+
+**Protected Directories:**
+- **NEVER modify**: templates/, .specpulse/, specpulse/, AI config directories (.claude/, .gemini/, etc.)
+- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
+
+### 3. Operation Validation
+
+**File Operation Validation:**
+- Validate all file paths are within allowed directories
+- Check for directory traversal attempts (../, absolute paths)
+- Verify file permissions before operations
+- Ensure atomic operations with rollback capability
+
+**Content Validation:**
+- Validate markdown syntax and structure
+- Check for malicious content patterns
+- Verify SpecPulse naming conventions
+- Ensure proper file encoding
+
+### 4. Enforcement Monitoring
+
+**Real-time Monitoring:**
+- Monitor all file operations for compliance
+- Track violations and provide corrections
+- Log enforcement actions for audit trail
+- Report compliance status and recommendations
+
+### 5. Error Prevention
+
+**Safe Operations:**
+- Validate inputs before processing
+- Use atomic operations with rollback
+- Provide clear error messages and corrections
+- Maintain data integrity throughout operations
+
+### 6. CLI-Independent Features
+
+**Works completely without SpecPulse CLI:**
+- File-based compliance validation
+- Manual rule enforcement through file checks
+- Atomic file operations with validation
+- Comprehensive error handling and recovery
+
+**Advanced Features:**
+- Real-time violation detection
+- Automated correction suggestions
+- Compliance reporting and metrics
+- Audit trail generation
+
+### 7. Status Reporting
+
+**Compliance Status:**
+- Check current operations against rules
+- Report violations and recommendations
+- Validate directory structure compliance
+- Monitor file operation patterns
+
+**Validation Results:**
+- Compliance score calculation
+- Violation categorization and reporting
+- Improvement recommendations
+- Risk assessment and mitigation
+
+### 8. Session Management
+
+**Enforcement Sessions:**
+- Start/stop compliance enforcement
+- Session state management
+- Configuration persistence
+- Session history and reporting
+
+**Configuration Options:**
+- Rule severity levels
+- Monitoring sensitivity
+- Reporting frequency
+- Custom rule definitions
+
+**CLI-Independent Benefits:**
+- Complete compliance without CLI dependencies
+- Real-time violation prevention
+- Comprehensive monitoring and reporting
+- Atomic operations with guaranteed integrity
+
+**Error Handling:**
+- Input validation and sanitization
+- File operation error recovery
+- Permission issue resolution
+- Directory structure validation
+
+**Safety Features:**
+- Path validation and sanitization
+- Directory traversal protection
+- Atomic operation rollback
+- Comprehensive error handling
+
+This `/sp-llm-enforce` command provides **strict LLM compliance enforcement** without requiring any SpecPulse CLI installation, using validated operations and comprehensive monitoring.
+"""

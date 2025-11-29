@@ -75,6 +75,11 @@ def main():
             result = handler.execute_command('checkpoint', **vars(args))
             if result is not None and hasattr(result, '__str__'):
                 print(result)
+        elif hasattr(args, 'safe_command') and args.safe_command:
+            # Handle safe subcommands
+            result = handler.execute_command('safe', **vars(args))
+            if result is not None and hasattr(result, '__str__'):
+                print(result)
         else:
             # Unknown command or no command
             parser.print_help()

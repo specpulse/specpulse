@@ -1,58 +1,54 @@
-description = "Decompose large specifications into microservices, APIs, and smaller components using SpecPulse SDD methodology"
+[command]
+name = "sp-decompose"
+description = "Decompose large specifications into microservices, APIs, and smaller components"
+type = "spec-decomposition"
 
-prompt = """
-<!-- SPECPULSE:START -->
-**Guardrails**
-- CLI-first approach: Always try SpecPulse CLI commands before file operations
-- Keep changes tightly scoped to the decomposition outcome
-- Only edit files in specs/, plans/, tasks/, memory/ directories - NEVER modify templates/ or internal config
+[prompt]
+template = """
+Decompose the specification {{args}} into smaller, manageable components.
 
-**Critical Rules**
-- **PRIMARY**: Use `specpulse decompose <spec-id>` when available
-- **FALLBACK**: File Operations only if CLI fails
-- **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/, .github/, .opencode/, .crush/, .qwen/
-- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
+Analysis required:
+1. Identify microservice boundaries using DDD principles
+2. Define API contracts with OpenAPI specifications
+3. Create interface specifications for each component
+4. Map data ownership and consistency boundaries
+5. Design communication patterns between services
 
-**Steps**
-Track these steps as TODOs and complete them one by one.
+Generate:
+- Service definitions with clear responsibilities
+- API contracts in OpenAPI 3.0 format
+- Interface specifications in appropriate languages
+- Data models and schemas
+- Integration mapping diagram
+- Migration plan from monolith
 
-1. **Parse arguments** to extract specification and decomposition parameters
-2. **Analyze specification complexity**:
-   - Read target specification from specs/ directory
-   - Identify monolithic components
-   - Assess decomposition feasibility
-3. **Try CLI first**:
-   - Run `specpulse decompose <spec-id>`
-   - If this succeeds, follow CLI decomposition guidance
-4. **If CLI doesn't exist, use File Operations**:
-   - **Step 1: Specification analysis**:
-     - Identify functional boundaries
-     - Map data flows and dependencies
-     - Recognize natural service boundaries
-5. **Architectural decomposition strategy**:
-   - **Microservices Design**:
-     - Define service boundaries and responsibilities
-     - Design inter-service communication APIs
-     - Plan data isolation and consistency patterns
-   - **API Design**:
-     - Create detailed API specifications
-     - Define request/response schemas
-     - Document authentication and authorization
-   - **Component Breakdown**:
-     - Identify reusable components
-     - Define component interfaces
-     - Plan component composition patterns
+Apply these principles:
+- Domain-Driven Design for boundaries
+- SOLID principles for design
+- Single responsibility per service
+- Clear data ownership
+- Minimal coupling between services
 
-6. **Decomposition documentation**:
-   - Create decomposition specifications
-   - Document service contracts
-   - Define integration patterns
-   - Plan migration strategies
-
-**Reference**
-- Use `specpulse decompose --help` for additional CLI options
-- Focus on large, complex specifications
-- Use `plan` to create implementation strategies for components
-- Run `specpulse doctor` if you encounter system issues
-<!-- SPECPULSE:END -->
+Output structure:
+.specpulse/specs/XXX-feature/decomposition/
+├── microservices.md
+├── api-contracts/
+├── interfaces/
+├── data-models/
+├── integration-map.md
+└── migration-plan.md
 """
+
+[validation]
+required_outputs = [
+    "microservices.md",
+    "api-contracts",
+    "interfaces",
+    "integration-map.md"
+]
+
+[options]
+microservices = "Focus on service boundary identification"
+apis = "Generate detailed API contracts"
+interfaces = "Create interface specifications"
+all = "Complete decomposition analysis"

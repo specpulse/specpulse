@@ -18,6 +18,7 @@ from ..commands.sp_pulse_commands import SpPulseCommands
 from ..commands.sp_spec_commands import SpSpecCommands
 from ..commands.sp_plan_commands import SpPlanCommands
 from ..commands.sp_task_commands import SpTaskCommands
+from ..commands.safe_commands import SafeCommands
 from ..monitor import MonitorCommands
 
 from ...core.specpulse import SpecPulse
@@ -97,6 +98,9 @@ class CommandHandler:
             self.sp_plan_commands = SpPlanCommands(self.console, project_root)
             self.sp_task_commands = SpTaskCommands(self.console, project_root)
 
+            # Safe command modules (NEW)
+            self.safe_commands = SafeCommands(self.console, project_root)
+
             # Monitor commands
             self.monitor_commands = MonitorCommands(project_root, self.verbose, self.console.no_color)
         else:
@@ -110,6 +114,7 @@ class CommandHandler:
             self.sp_spec_commands = None
             self.sp_plan_commands = None
             self.sp_task_commands = None
+            self.safe_commands = None
             self.monitor_commands = None
 
     def _check_for_updates(self) -> None:
@@ -392,6 +397,65 @@ class CommandHandler:
 
                 # Call breakdown method (assuming it exists)
                 return getattr(self.sp_task_commands, 'breakdown', lambda x: False)(target, **{k: v for k, v in kwargs.items() if k not in ['target', 'verbose', 'no_color', 'command', 'template']})
+
+            elif command_name in ['safe']:
+                if not self.safe_commands:
+                    raise SpecPulseError(
+                        "This command must be run from within a SpecPulse project directory",
+                        "Run 'specpulse init' to create a new project or navigate to an existing one"
+                    )
+
+                # Handle safe commands
+                safe_command = kwargs.get('safe_command')
+                if not safe_command:
+                    raise SpecPulseError("Safe command requires a subcommand")
+
+                # Map safe commands to methods
+                safe_method_map = {
+                    'feature-init': self.safe_commands.feature_init_safe,
+                    'spec-create': self.safe_commands.spec_create_safe,
+                    'plan-create': self.safe_commands.plan_create_safe,
+                    'task-create': self.safe_commands.task_create_safe,
+                    'status': self.safe_commands.status_report_safe,
+                    'validate': self.safe_commands.validate_markdown_safe
+                }
+
+                if safe_command in safe_method_map:
+                    # Extract appropriate arguments for each command type
+                    if safe_command == 'feature-init':
+                        return safe_method_map[safe_command](kwargs.get('feature_name'))
+                    elif safe_command == 'spec-create':
+                        return safe_method_map[safe_command](
+                            kwargs.get('description'),
+                            kwargs.get('feature_name')
+                        )
+                    elif safe_command == 'plan-create':
+                        return safe_method_map[safe_command](
+                            kwargs.get('description'),
+                            kwargs.get('feature_name')
+                        )
+                    elif safe_command == 'task-create':
+                        return safe_method_map[safe_command](
+                            kwargs.get('description'),
+                            kwargs.get('service_prefix'),
+                            kwargs.get('feature_name')
+                        )
+                    elif safe_command == 'status':
+                        return safe_method_map[safe_command](
+                            kwargs.get('feature_name'),
+                            kwargs.get('verbose', False),
+                            kwargs.get('ids', False),
+                            kwargs.get('validate', False)
+                        )
+                    elif safe_command == 'validate':
+                        return safe_method_map[safe_command](
+                            kwargs.get('target', 'all'),
+                            kwargs.get('fix', False),
+                            kwargs.get('strict', False),
+                            kwargs.get('format', 'table')
+                        )
+                else:
+                    raise SpecPulseError(f"Unknown safe command: {safe_command}")
 
             # Other commands (update, validate, decompose, etc.)
             elif hasattr(self, command_name.replace('-', '_')):

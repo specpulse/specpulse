@@ -1,6 +1,6 @@
 ---
 name: sp-spec
-description: Create or manage feature specifications using AI-optimized templates
+description: Create and manage specifications without SpecPulse CLI
 allowed_tools:
   - Read
   - Write
@@ -11,37 +11,7 @@ allowed_tools:
 
 # /sp-spec Command
 
-Create, update, or validate feature specifications using SpecPulse methodology with AI-optimized templates.
-
-## CRITICAL: LLM Workflow Rules
-
-**PRIMARY WORKFLOW: CLI First with Fallback**
-- Try CLI commands first: `specpulse spec create/update/validate`
-- If CLI fails, immediately use fallback procedures from CLI_FALLBACK_GUIDE.md
-- Use Bash tool ONLY for CLI commands, not for file editing
-- Only use Read/Write/Edit tools for specs/ files when CLI doesn't exist or fails
-- **ALWAYS log fallback usage**: `[FALLBACK] CLI failed, using manual procedure`
-
-**CLI Failure Detection:**
-- Exit code != 0
-- Error messages: "command not found", "No such file", "Permission denied"
-- Timeout > 30 seconds
-- Missing dependencies
-
-**PROTECTED DIRECTORIES (NEVER EDIT):**
-- `.specpulse/templates/` - Template files
-- `.specpulse/` - Internal config
-- `specpulse/` - Package code
-- `.claude/` and `.gemini/` - AI configuration
-
-**WORKFLOW:**
-1. Try `specpulse spec create "description"` first
-2. If CLI fails (non-zero exit code, timeout, error), immediately apply fallback:
-   - Log: `[FALLBACK] CLI command failed: specpulse spec create "description"`
-   - Apply manual directory and file creation from CLI_FALLBACK_GUIDE.md
-   - Continue with file operations using Read/Write/Edit
-3. Only use File Operations when CLI doesn't exist or fails repeatedly
-4. Templates are READ from .specpulse/templates/, then specs are CREATED/EDITED in .specpulse/specs/
+Create and manage specifications without SpecPulse CLI. Works completely independently through LLM-safe file operations.
 
 ## Usage
 ```
@@ -52,190 +22,234 @@ Actions: `create`, `update`, `validate`, `clarify` (defaults to `create`)
 
 ## Implementation
 
-When called with `/sp-spec $ARGUMENTS`, I will:
+When called with `/sp-spec {{args}}`, I will:
 
-1. **Detect current feature context**:
-   - Read `.specpulse/memory/context.md` for current feature metadata
-   - Use git branch name if available (e.g., `001-user-authentication`)
-   - Fall back to most recently created feature directory
-   - If no context found, ask user to specify feature or run `/sp-pulse` first
+### 1. Parse Arguments to Determine Action
 
-2. **Parse arguments** to determine action:
-   - If starts with `create`: Generate new specification
-   - If starts with `update`: Modify existing specification
-   - If starts with `validate`: Check specification completeness
-   - If starts with `clarify`: Address [NEEDS CLARIFICATION] markers
-   - If no action specified: Default to `create` with full arguments as description
+**I will analyze the arguments:**
+- If first argument is `create`, `update`, `validate`, or `clarify` → Use that action
+- If no action specified → Default to `create`
+- For `create` → All remaining text becomes the description
+- For other actions → Look for feature name or use current feature
 
-3. **For `/sp-spec create [description]` or `/sp-spec [description]`:**
-   - **CRITICAL NUMBERING LOGIC**:
-     - Check if `.specpulse/specs/XXX-feature/spec-001.md` exists
-     - If spec-001.md does NOT exist: Create spec-001.md with full content from template
-     - If spec-001.md EXISTS: Create spec-002.md (or next number) with new content
-     - NEVER leave spec-001.md as placeholder if it's the first spec
+### 2. Detect Current Feature Context
 
-   - **Step 1: Read Template**
-     ```
-     Read: .specpulse/templates/spec.md
-     ```
+**I will identify the current working feature:**
+- Check `.specpulse/memory/context.md` for active feature
+- Look for most recently modified spec/plan/task directory
+- Validate feature directory exists and is properly structured
+- Extract feature ID and name from directory structure
 
-   - **Step 2: Create Spec File Using Write Tool**
-     ```
-     Write: .specpulse/specs/XXX-feature/spec-YYY.md
+### 3. For Action: create (default)
 
-     Content should include:
-     - Metadata section with feature ID, date, version
-     - User's description
-     - Full template content for LLM expansion
-     - [NEEDS CLARIFICATION] markers for uncertainties
-     ```
+**I will create a comprehensive specification:**
 
-   - **Step 3: Read Created File**
-     ```
-     Read: .specpulse/specs/XXX-feature/spec-YYY.md
-     ```
+#### A. Generate Next Spec Number (Universal ID System)
+- Use **Glob** tool to scan `.specpulse/specs/[feature]/` directory
+- Parse all existing `spec-###.md` files to extract numbers
+- Convert to integers and find the maximum value
+- Generate next sequential number: `next_num = max_num + 1`
+- Zero-pad to 3 digits: `format(max_num + 1, '03d')` → `001`, `002`, `003`
+- Validate no conflicts exist before using the number
+- Handle edge cases: empty directory, corrupted files, numbering gaps
 
-   - **Step 4: EXPAND Specification**
-     - Parse the description to identify:
-       * Functional requirements (Must/Should/Could/Won't have)
-       * User stories with testable acceptance criteria
-       * Technical specifications and constraints
-       * Success metrics and out-of-scope items
-     - Fill in ALL template sections with complete details
-     - Mark any uncertainties with `[NEEDS CLARIFICATION: specific question]`
+#### B. Read Template
+- Load `.specpulse/templates/spec.md` template file
+- If template missing, create comprehensive specification structure
 
-   - **Step 5: Write Expanded Content Back**
-     ```
-     Edit: .specpulse/specs/XXX-feature/spec-YYY.md
-     (Replace template placeholders with full specification)
-     ```
+#### C. Expand Specification with AI
+Based on the description, I will generate:
+- **Executive Summary**: Clear problem statement and solution overview
+- **Functional Requirements**: Detailed feature breakdown with acceptance criteria
+- **User Stories**: Given-When-Then format with concrete scenarios
+- **Technical Constraints**: Performance, security, and scalability requirements
+- **Non-Functional Requirements**: Usability, accessibility, maintainability
+- **Risk Assessment**: Potential technical and business risks
+- **Success Metrics**: Measurable criteria for completion
 
-   - **Step 6: Validate (Optional)**
-     ```
-     Bash: specpulse spec validate [spec-id]
-     ```
-     If CLI fails, use manual validation from CLI_FALLBACK_GUIDE.md
-     Note: Validation is optional - only if user requests it
+#### D. Write Specification File
+- Create `.specpulse/specs/[feature]/spec-[###].md` with generated content
+- Use atomic file operations to prevent corruption
+- Include proper YAML frontmatter with metadata
 
-4. **For `/sp-spec update`:**
-   - **Show existing spec files**: List all spec-XXX.md files in current feature directory
-   - **Ask user to select**: Which spec file to update
-   - Read selected specification file
-   - Parse update requests and identify sections to modify
-   - Update content while preserving AI-friendly template structure
-   - Remove resolved `[NEEDS CLARIFICATION]` markers
-   - Run validation to ensure completeness
+### 4. For Action: update
 
-5. **For `/sp-spec validate`:**
-   - **Step 1: Read Spec File**
-     ```
-     Read: .specpulse/specs/XXX-feature/spec-YYY.md
-     ```
+**I will update an existing specification:**
+- List all specification files in current feature
+- Allow user to select which spec to update
+- Parse existing content and identify sections needing updates
+- Generate updated content based on new requirements
+- Preserve existing structure while enhancing content
 
-   - **Step 2: Manual Validation Checks**
-     - Count `[NEEDS CLARIFICATION]` markers
-     - Verify all template sections are filled
-     - Check acceptance criteria follow Given-When-Then format
-     - Verify SDD compliance indicators present
+### 5. For Action: validate
 
-   - **Step 3: Run SpecPulse Validation (Optional)**
-     ```
-     Bash: specpulse spec validate [spec-id]
-     ```
-     If CLI fails, use manual validation from CLI_FALLBACK_GUIDE.md
-     Note: This is optional, manual checks are primary
+**I will perform comprehensive validation:**
+- Check specification file exists and is readable
+- Validate required sections are present:
+  - Executive Summary ✓
+  - Functional Requirements ✓
+  - User Stories ✓
+  - Acceptance Criteria ✓
+  - Technical Constraints ✓
+- Count any `[NEEDS CLARIFICATION]` markers
+- Verify Given-When-Then format in user stories
+- Calculate completeness percentage
+- Identify missing or incomplete sections
 
-   - **Step 4: Report Results**
-     - Show validation status (complete/incomplete)
-     - List missing sections
-     - Highlight clarifications needed
-     - Suggest next steps
+### 6. For Action: clarify
 
-6. **For `/sp-spec clarify`:**
-   - **Show existing spec files**: List all spec-XXX.md files in current feature directory
-   - **Ask user to select**: Which spec file to clarify
-   - Find all `[NEEDS CLARIFICATION]` markers
-   - Address each uncertainty with user input
-   - Update specification with resolved information
-   - Remove clarification markers
-   - Re-run validation
+**I will resolve clarification markers:**
+- Scan specification for `[NEEDS CLARIFICATION:...]` patterns
+- Extract each question with surrounding context
+- Ask user for resolution on each clarification
+- Replace markers with `✅ **CLARIFIED**: [answer]` format
+- Update specification with resolved clarifications
 
-## Examples
+## Enhanced Specification Generation
 
-### Creating a new specification
+### AI-Powered Content Analysis
+
+**For any description, I will analyze:**
+
+#### Project Type Detection
+- **Web Application**: React/Vue/Angular frontend + API backend
+- **API Service**: REST/GraphQL microservice architecture
+- **Mobile App**: React Native/Flutter native application
+- **CLI Tool**: Command-line interface tool
+- **Data Pipeline**: ETL/ELT data processing system
+- **Library/SDK**: Reusable component or SDK
+
+#### Complexity Assessment
+- **Simple** (2-4 hours): Single feature, minimal dependencies
+- **Standard** (8-12 hours): Multiple features, some integrations
+- **Complex** (16-24 hours): Multiple services, complex workflows
+
+#### Requirement Expansion
+Based on project type, I will include relevant sections:
+
+**Web Applications:**
+- UI/UX requirements
+- Browser compatibility
+- Responsive design
+- Accessibility standards (WCAG 2.1)
+
+**API Services:**
+- Endpoint specifications
+- Authentication/authorization
+- Rate limiting
+- Documentation standards
+
+**Mobile Apps:**
+- Platform requirements
+- App store guidelines
+- Offline functionality
+- Push notifications
+
+### SDD Gates Compliance
+
+**Every generated specification meets:**
+- ✅ **Specification First**: Clear requirements before implementation
+- ✅ **Traceable**: Each requirement maps to user stories and acceptance criteria
+- ✅ **Testable**: Acceptance criteria can be verified through testing
+- ✅ **Complete**: All necessary sections for implementation
+
+## File Structure and Validation
+
+### Safe File Operations
+**I ensure safe file handling:**
+- Validate file paths within allowed directories only
+- Use atomic write operations to prevent corruption
+- Create directory structure if missing
+- Backup existing files before updates
+- Validate file permissions and access rights
+
+### Context Management
+**I maintain project context:**
+- Update `.specpulse/memory/context.md` with feature changes
+- Track specification history and decisions
+- Link related specifications, plans, and tasks
+- Maintain searchable decision log
+
+## Example Outputs
+
+### Create Specification
 ```
-User: /sp-spec create user authentication system with OAuth2 and JWT tokens
-```
-I will create a comprehensive specification using AI-optimized templates with:
-- Jinja2-style variables for AI processing
-- SDD compliance sections
-- Testable acceptance criteria
-- Automated validation
+User: /sp-spec create user authentication system with JWT tokens
 
-### Updating existing specification
-```
-User: /sp-spec update add password complexity requirements
-```
-I will read the current spec, update password requirements, and validate changes.
+✅ Creating specification for: user authentication system with JWT tokens
+🔍 Current feature: 003-user-management
+📋 Generated spec number: 002
+📄 Specification file: .specpulse/specs/003-user-management/spec-002.md
 
-### Validating specification
+📊 Specification Analysis:
+   Project Type: Web Application (API + Frontend)
+   Complexity: Standard (8-12 hours)
+   Requirements Generated: 12
+   User Stories Created: 8
+   Acceptance Criteria: 24
+
+✅ Specification created successfully!
+🎯 Next steps: /sp-/sp-plan to generate implementation plan
+```
+
+### Validate Specification
 ```
 User: /sp-spec validate
+
+🔍 Validating specifications in feature: 003-user-management
+
+📄 Files found: 2
+   ✅ spec-001.md - Complete (100%)
+   ⚠️  spec-002.md - Missing sections (85%)
+
+📊 Validation Results:
+   Total Sections: 12/14
+   Clarifications Needed: 0
+   User Stories: 8/8 valid
+   Acceptance Criteria: 24/24 complete
+
+⚠️  Issues Found:
+   - Missing: Performance Requirements
+   - Missing: Deployment Strategy
+
+✅ Specification is ready for implementation planning
+🎯 Next steps: /sp-/sp-plan or fix missing sections
 ```
-I will run enhanced validation with detailed reporting:
+
+### Update Specification
 ```
-SPEC_FILE=.specpulse/specs/001-user-authentication/spec.md
-CLARIFICATIONS_NEEDED=3
-MISSING_SECTIONS=0
-STATUS=validation_complete
+User: /sp-spec update add MFA support
+
+📋 Available specifications:
+   1) spec-001.md - User Registration
+   2) spec-002.md - User Authentication
+
+Select spec to update: 2
+
+✅ Updating spec-002.md with MFA support requirements
+📝 Analyzing existing content...
+🔧 Generating new requirements for MFA...
+📄 Updated specification with additional sections:
+   - Multi-Factor Authentication Requirements
+   - TOTP Implementation Details
+   - Backup/Recovery Codes
+   - Security Considerations
+
+✅ Specification updated successfully!
+📊 Completeness: 100% (14/14 sections)
 ```
 
-### Addressing clarifications
-```
-User: /sp-spec clarify
-```
-I will systematically address all [NEEDS CLARIFICATION] markers.
+## Error Handling and Recovery
 
-## Enhanced Template Structure
+### Validation Errors
+- **No active feature**: Prompt to run `/sp-/sp-pulse` first
+- **Permission denied**: Guide user to check file permissions
+- **Invalid feature name**: Suggest valid feature names
+- **Template missing**: Create specification structure manually
 
-The AI-optimized specification template includes:
-- **Metadata**: Template variables for AI processing
-- **SDD Gates**: Pre-implementation validation
-- **Functional Requirements**: Structured Must/Should/Could/Won't
-- **User Stories**: Given-When-Then acceptance criteria
-- **Validation Checklist**: Automated completeness checks
-- **Integration Points**: AI command workflow guidance
+### Content Issues
+- **Vague description**: Ask clarifying questions
+- **Conflicting requirements**: Identify and request resolution
+- **Missing dependencies**: Highlight required prerequisite features
 
-## SDD Compliance
-
-**Principle 1: Specification First**
-- [ ] Requirements clearly documented
-- [ ] Acceptance criteria defined
-- [ ] User stories included
-
-**Principle 6: Quality Assurance**
-- [ ] Test scenarios defined
-- [ ] Acceptance criteria testable
-- [ ] Quality metrics specified
-
-**Principle 7: Architecture Documentation**
-- [ ] Technology choices documented
-- [ ] Integration points identified
-- [ ] Security considerations addressed
-
-## Enhanced Error Handling
-
-- Template existence validation
-- Feature directory auto-discovery
-- Required sections validation
-- Acceptance criteria format checking
-- Clarification marker tracking
-
-## Integration Features
-
-- **Script execution** with Bash support
-- **Template variable processing** for AI optimization
-- **Automated validation** with detailed reporting
-- **Context-aware operation** using .specpulse/memory/context.md
-- **Progress tracking** with todo list integration
-- **Cross-platform operation** with Bash
+This `/sp-spec` command provides **complete specification management** without requiring any SpecPulse CLI installation, using only validated file operations and AI-enhanced content generation.

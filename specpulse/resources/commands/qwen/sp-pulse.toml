@@ -1,48 +1,136 @@
-description = "Initialize a new feature with SpecPulse framework using SDD methodology"
+description = "Initialize new features and manage project context without SpecPulse CLI"
 
 prompt = """
-<!-- SPECPULSE:START -->
-**Guardrails**
-- CLI-first approach: Always try SpecPulse CLI commands before file operations
-- Keep changes tightly scoped to the feature initialization outcome
-- Only edit files in specs/, plans/, tasks/, memory/ directories - NEVER modify templates/ or internal config
+## Command: /sp-pulse [feature-name] [action]
 
-**Critical Rules**
-- **PRIMARY**: Use `specpulse feature init <feature-name>` when available
-- **FALLBACK**: File Operations only if CLI fails
-- **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/, .github/, .opencode/, .crush/, .qwen/
-- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
+**CLI-Independent Feature Initialization**
 
-**Steps**
-Track these steps as TODOs and complete them one by one.
+When called with `/sp-pulse {{args}}`, I will:
 
-1. **Parse arguments** to extract feature name and options
-2. **Try CLI first**:
-   - Run `specpulse feature init <feature-name>`
-   - If this succeeds, STOP HERE. CLI handles everything.
-3. **If CLI doesn't exist, use File Operations**:
-   - **Step 1: Determine Feature ID**
-     - Read specs/ directory (list subdirectories)
-     - Find highest number (e.g., 001, 002) and increment
-     - Or use 001 if no features exist
-   - **Step 2: Create Feature Structure**
-     ```bash
-     mkdir -p specs/001-feature-name
-     mkdir -p plans/001-feature-name
-     mkdir -p tasks/001-feature-name
-     ```
-   - **Step 3: Update Context and Git**
-     - Update memory/context.md with new feature
-     - Create git branch: `git checkout -b 001-feature-name`
-4. **Comprehensive feature setup**:
-   - Generate initial feature documentation
-   - Create feature specification template
-   - Set up initial planning structure
-   - Configure task tracking framework
+### Step 1: Parse Arguments and Determine Action
 
-**Reference**
-- Use `specpulse feature init --help` for additional CLI options
-- Continue with `spec` for specification creation
-- Run `specpulse doctor` if you encounter system issues
-<!-- SPECPULSE:END -->
+**Parse the command arguments:**
+- If feature name provided → Initialize new feature with that name
+- If "status" → Show current feature context
+- If "list" → Show all available features
+- If no argument → Show current feature status
+
+### Step 2: For Feature Initialization
+
+**I will create comprehensive feature structure:**
+
+#### A. Generate Universal Feature ID
+- Use Glob tool to scan existing feature directories in `.specpulse/specs/`
+- Parse directory names using `XXX-feature-name` pattern
+- Extract numeric IDs and convert to integers
+- Find maximum value: `max_num = max(extracted_numbers)` or 0 if empty
+- Generate next sequential: `next_num = max_num + 1`
+- Zero-pad format: `format(next_num, '03d')` → "001", "002", "003"
+- Create feature name from input (convert to kebab-case)
+
+#### B. Create Directory Structure (Atomic Operations)
+**I will use atomic file operations to prevent corruption:**
+
+**Atomic Directory Creation:**
+- Use Bash with `mkdir -p` for atomic directory creation
+- Create parent directories first: `.specpulse/`, `.specpulse/specs/`, etc.
+- Validate each directory creation before proceeding
+- Rollback entire operation if any step fails
+
+**Safe File Operations:**
+- Use Write tool with full file content (not partial updates)
+- Validate file paths are within `.specpulse/` directory only
+- Create backup copies before overwriting existing files
+- Verify file permissions after creation
+
+**Rollback Mechanism:**
+- Track all created files and directories
+- If any step fails, use Bash to remove partial creations
+- Restore original state from backups
+- Report specific failure points with recovery instructions
+
+#### C. Initialize Feature Specification
+- Create `spec-001.md` with comprehensive template
+- Include executive summary placeholder
+- Add functional requirements structure
+- Include user stories and acceptance criteria template
+- Add technical constraints and risk assessment sections
+
+#### D. Update Project Context
+- Update `.specpulse/memory/context.md` with new active feature
+- Set feature metadata (ID, name, created_at, status)
+- Update feature history and navigation
+- Initialize decision log for the feature
+
+### Step 3: Universal ID System Implementation
+
+**I ensure conflict-free numbering through systematic analysis:**
+- Feature ID Generation with zero-padding and conflict detection
+- File Numbering System across all file types (spec-001.md, plan-001.md, tasks-001.md)
+- Conflict Prevention with atomic file existence checks
+- Gap handling: Preserve existing numbering gaps, don't renumber
+
+### Step 4: Error Handling and Recovery
+
+**I provide comprehensive error handling:**
+- Feature Creation Failures: Guide user through directory permissions
+- Directory Exists: Handle existing feature directories gracefully
+- File System Errors: Provide recovery instructions
+- Template Missing: Use built-in fallback structure
+- Context File Corrupted: Rebuild from available feature data
+- Permission Denied: Clear resolution instructions
+
+### Step 5: CLI-Independent Features
+
+- **No CLI Dependencies**: 100% independent directory creation
+- **Atomic Operations**: Create structure with rollback on failure
+- **Template System**: Built-in templates for all file types
+- **Validation**: Verify structure integrity after creation
+- **Context Management**: File-based context tracking
+- **Feature History**: Complete navigation history
+- **Decision Logging**: Automatic decision documentation
+
+### Step 6: Advanced Features
+
+- **Feature Templates**: Web Application, API Service, CLI Tool, Library/SDK
+- **Integration Ready**: Git Integration: Automatic branch creation and management
+- **Testing Setup**: Test structure initialization
+- **CI/CD Ready**: Pipeline configuration templates
+- **Documentation**: Auto-generated README and API docs
+
+### Step 7: Complete Workflow Support
+
+- **Project Structure Creation** with guaranteed integrity
+- **Memory Context Management** with automatic updates
+- **Progress Tracking** with manual calculation from file structure
+- **Cross-platform compatibility** with identical functionality
+
+## Implementation Notes
+
+- All file operations use LLM-safe methods (Read, Write, Edit, Bash, Glob)
+- No SpecPulse CLI commands are used in this implementation
+- Atomic operations prevent data corruption and ensure consistency
+- Universal ID System prevents naming conflicts across all operations
+- Error recovery provides clear guidance for troubleshooting
+
+## Input Variables
+
+- `{{args}}`: The feature name and action parameters provided by the user
+
+## Output Format
+
+Provide comprehensive output showing:
+- Feature ID and name analysis
+- Directory structure creation progress
+- Context update status
+- Error recovery information if needed
+- Next steps for the user
+
+## Safety Constraints
+
+- Only operate within `.specpulse/` directory
+- Never modify protected directories (templates/, specpulse/, etc.)
+- Always validate paths and permissions
+- Use atomic file operations to prevent corruption
+- Provide clear error messages and recovery steps
 """

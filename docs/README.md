@@ -357,37 +357,39 @@ All SpecPulse documentation follows these standards:
 ### Essential Commands
 
 ```bash
-# Project
-specpulse init <name>                # Initialize project
-specpulse doctor                     # Health check
+# Project Installation and Setup
+pip install specpulse                 # Install SpecPulse
+specpulse init my-project --ai claude # Initialize project with AI
+specpulse doctor                      # System health check
 
-# Features
-specpulse feature init <name>        # New feature
-specpulse feature continue <name>    # Switch feature
-
-# Specifications
-specpulse spec create <desc>         # Create spec
-specpulse spec validate              # Validate spec
-
-# Plans & Tasks
-specpulse plan create <desc>         # Create plan
-specpulse task breakdown <id>        # Generate tasks
-
-# Execution
-specpulse execute start <id>         # Start task
-specpulse execute done <id>          # Complete task
+# AI Commands (use in Claude, Gemini, Windsurf, Cursor, etc.)
+/sp-pulse feature-name                # Start new feature (PRIMARY ENTRY POINT)
+/sp-spec "description"                # Create specification
+/sp-plan                              # Generate implementation plan
+/sp-task                              # Break down into tasks
+/sp-execute                           # Execute tasks
+/sp-status                            # Check progress
+/sp-validate                          # Validate work
 ```
 
 ### Essential Slash Commands
 
 ```bash
-# In Claude Code or Gemini CLI:
-/sp-pulse <feature-name>             # Initialize feature
+# In Claude Code, Gemini CLI, or ANY of the 8 supported AI platforms:
+/sp-pulse <feature-name>             # Initialize feature - PRIMARY ENTRY POINT
 /sp-spec create <description>        # Create spec
 /sp-plan generate                    # Generate plan
 /sp-task breakdown                   # Break into tasks
 /sp-execute                          # Execute tasks
+/sp-status                           # Check progress
+/sp-validate                         # Validate work
+/sp-continue <feature-id>            # Switch to existing feature
+/sp-decompose <spec-id>              # Decompose specifications
+/sp-clarify <spec-id>                # Clarify requirements
+/sp-llm-enforce [action]             # LLM compliance enforcement
 ```
+
+**🎯 IMPORTANT: Always start with `/sp-pulse` - this is your entry point to everything!**
 
 ---
 

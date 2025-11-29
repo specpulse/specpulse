@@ -1,129 +1,148 @@
-description = "Generate and manage task breakdowns with versioning"
-prompt = """
-## CRITICAL: v2.1.3+ Use CLI FIRST
-**PRIMARY**: specpulse sp-task breakdown <plan-id>
-**FALLBACK**: File Operations if CLI fails
+[command]
+name = "sp-task"
+description = "Create and manage tasks without SpecPulse CLI"
+version = "1.0"
 
-Handle the /sp-task command with arguments: {{args}}
+[command.usage]
+pattern = "/sp-task [action] [feature-directory]"
+examples = [
+  "/sp-task breakdown",
+  "/sp-task update",
+  "/sp-task status"
+]
 
-First, detect current feature context:
-- Read .specpulse/memory/context.md for current feature metadata
-- Use git branch name if available (e.g., 001-user-authentication)
-- Fall back to most recently created feature directory
-- If no context found, ask user to specify feature or run /sp-pulse first
+[command.implementation]
+# When called with "/sp-task {{args}}, I will:
 
-Parse arguments to determine action:
-- If "update": Update task status
-- If "status": Show progress
-- Otherwise: Generate task breakdown
+[command.implementation.argument_parsing]
+# Parse arguments to determine action:
+# - If first argument is breakdown, update, status, execute, or validate → Use that action
+# - If no action specified → Default to breakdown
+# - For other arguments → Look for feature name or use current feature
 
-## For /sp-task breakdown or /sp-task:
-1. Show list of existing plan files in current feature directory
-2. Ask user which plan file to base tasks on
-3. Read selected implementation plan from @{.specpulse/.specpulse/plans/*/plan-XXX.md}
+[command.implementation.feature_context]
+# Detect Current Feature Context:
+# - Check .specpulse/memory/context.md for active feature
+# - Look for most recently modified spec/plan/task directory
+# - Validate feature directory exists and is properly structured
+# - Extract feature ID and name from directory structure
 
-4. Generate tasks from plan using STANDARDIZED FORMAT:
-   - Create task categories:
-     • Critical Path (Phase 0)
-     • Phase 1: Foundation
-     • Phase 2: Core Features
-     • Phase 3: Polish
-     • Phase 4: Testing
+[command.implementation.task_breakdown]
+# For Action: breakdown (default):
 
-   - For each task, MUST use this exact YAML format:
-     ```yaml
-     ---
-     id: task-[slug]
-     status: todo | in-progress | blocked | done
-     title: "Short but clear task title"
-     description: |
-       *Answer these 4 questions with sufficient detail:*
-       - What problem does this solve?
-       - Why is this necessary?
-       - How will this be done? (step-by-step, include function/file names when possible)
-       - When is this considered complete?
+[command.implementation.task_breakdown.decomposition_check]
+# Check for Service Decomposition:
+# - Look for .specpulse/specs/[feature]/decomposition/ directory
+# - If decomposition exists, identify service directories
+# - Parse service names for task categorization
+# - Plan service-specific task generation
 
-     files_touched:
-       - path: src/...
-         reason: "What changes in this file, briefly"
+[command.implementation.task_breakdown.task_generation]
+# Generate Task Breakdown:
+# - Read implementation plan from .specpulse/plans/[feature]/ directory
+# - Analyze plan phases and identify implementation steps
+# - Create detailed tasks with proper dependencies
+# - Assign task IDs using universal numbering system
 
-     goals:
-       - "Concrete goal 1 achieved when this task completes"
-       - "Concrete goal 2"
+[command.implementation.task_breakdown.service_tasks]
+# Create Service-Specific Tasks:
+# - Auth Service Tasks: AUTH-T001, AUTH-T002, etc.
+# - User Service Tasks: USER-T001, USER-T002, etc.
+# - Integration Tasks: INT-T001, INT-T002, etc.
 
-     success_criteria:
-       - "Test/acceptance criteria 1 (measurable or verifiable)"
-       - "Test/acceptance criteria 2"
+[command.implementation.universal_id_system]
+# Universal ID System:
 
-     dependencies:
-       - task-[id-1]
-       - task-[id-2]
+[command.implementation.universal_id_system.task_generation]
+# Task ID Generation Algorithm:
+# - Use Glob tool to scan .specpulse/tasks/[feature]/ directory
+# - Parse existing task files to extract current numbering:
+#   - Global tasks: Extract numbers from T###.md patterns
+#   - Service tasks: Extract from SERVICE-T###.md patterns
+#   - Integration tasks: Extract from INT-T###.md patterns
+# - Create numbering map: {task_type: max_number_used}
+# - Generate next ID: For each task type, use max_num + 1
+# - Zero-pad format: format(next_num, '03d') ensures 001, 002, 003
 
-     next_tasks:
-       - task-[id-x]
-       - task-[id-y]
+[command.implementation.universal_id_system.service_patterns]
+# Service-Specific Task Patterns:
+# - Authentication Service: AUTH-T001.md, AUTH-T002.md, etc.
+# - User Management Service: USER-T001.md, USER-T002.md, etc.
+# - API Gateway Service: GATEWAY-T001.md, GATEWAY-T002.md, etc.
+# - Database Service: DB-T001.md, DB-T002.md, etc.
+# - Notification Service: NOTIF-T001.md, NOTIF-T002.md, etc.
 
-     risk_level: low | medium | high
-     risk_notes: |
-       "Important risks, edge cases, technical debt notes for this task"
+[command.implementation.universal_id_system.conflict_prevention]
+# Conflict Prevention Mechanisms:
+# - Atomic file existence check before creating each task file
+# - Validation loop: If conflict detected, increment and retry
+# - Cross-service dependency tracking to ensure logical numbering
+# - Fallback numbering: If directory empty, start from T001.md
+# - Gap handling: Preserve existing numbering gaps, don't renumber
 
-     moscow:
-       must:
-         - "Must-have requirements/behaviors for this task"
-         - "Without these, task is not considered complete"
-       should:
-         - "Additional improvements if time/budget allows"
-         - "Performance, UX, DX improvements, etc."
-       know:
-         - "Critical knowledge, context, or domain details developer must know"
-         - "Documentation links, rationale for specific decisions"
-       wont:
-         - "Things we WILL NOT do in this task scope - out of scope"
-         - "Topics for future tasks"
+[command.implementation.task_management]
+# Task Management Actions:
 
-     priority_overall: must | should | could | wont
-     priority_reason: "Why this task has this priority - short, clear explanation."
-     ---
-     ```
+[command.implementation.task_management.update]
+# For Action: update:
+# - Scan .specpulse/tasks/[feature]/ directory for task files
+# - Display available task files for selection
+# - Parse current task structure and status
+# - Provide interactive update options:
+#   - Mark tasks as completed/in-progress/blocked
+#   - Update task descriptions or metadata
+#   - Add new tasks or remove obsolete ones
+# - Recalculate progress metrics after updates
 
-5. Check existing task files and create next version (task-001.md, task-002.md, etc.)
-6. Write tasks to .specpulse/tasks/XXX-feature/task-XXX.md using standardized format
-7. Run validation using CLI:
-   - !{bash specpulse --no-color validate task --verbose}
+[command.implementation.task_management.status]
+# For Action: status:
+# - Scan all task files in current feature
+# - Calculate completion percentages
+# - Show progress by service (if decomposed)
+# - Display task status distribution:
+#   - Completed tasks count and percentage
+#   - In-progress tasks
+#   - Blocked tasks with blockers listed
+#   - Pending tasks available for work
+# - Show SDD Gates compliance status
+# - Calculate velocity metrics (tasks/day)
+# - Identify parallel tasks and sequential chains
+# - Provide recommendations for next actions
 
-## For /sp-task update:
-1. Show list of existing task files in current feature directory
-2. Ask user which task file to update
-3. Read selected current tasks from @{.specpulse/.specpulse/tasks/*/task-XXX.md}
-4. Ask which tasks to update
-5. Mark tasks as completed/in-progress
-6. Add newly discovered tasks
-7. Update dependencies and blockers
-8. Save updated task list
-9. Run validation using CLI:
-   - !{bash specpulse --no-color validate task --verbose}
+[command.implementation.task_management.execute]
+# For Action: execute:
+# - Allow task selection from available pending tasks
+# - Validate task readiness and dependencies
+# - Display task details before execution
+# - Implement task requirements through code changes
+# - Test implementation when applicable
+# - Mark task as completed automatically
+# - Continue with next available task if requested
+# - Update progress metrics and context
 
-## For /sp-task status:
-1. Show list of existing task files in current feature directory
-2. Ask user which task file to show status for
-3. Read selected current tasks
-4. Run analysis using CLI:
-   - !{bash specpulse --no-color validate task --verbose}
-5. Count completed vs total
-6. Show current phase progress
-7. List any blockers
-8. Estimate remaining work
-9. Display progress summary
+[command.implementation.task_management.validate]
+# For Action: validate:
+# - Validate task file structure and format
+# - Check required fields are present and valid
+# - Verify task dependencies exist and are valid
+# - Validate SDD Gates compliance
+# - Check for duplicate task IDs
+# - Verify success criteria are testable
+# - Assess risk levels and mitigation strategies
+# - Report validation results with fixes needed
 
-Task Format:
-```markdown
-- [ ] T001: [S] Set up project structure
-- [ ] T002: [M] Create database schema
-- [x] T003: [L] Implement authentication
-```
+[command.features]
+# CLI-Independent Features:
+# - No CLI Dependencies: 100% independent of SpecPulse CLI installation
+# - Manual Task Parsing: Direct file content analysis without CLI
+# - Atomic Task Updates: Safe file operations prevent corruption
+# - Progress Tracking: Manual calculation from task files
+# - Error Recovery: Comprehensive error handling
 
-Examples:
-- /sp-task breakdown
-- /sp-task update
-- /sp-task status
-"""
+[command.advanced_features]
+# Enhanced Task Generation:
+# - Service-Specific Task Organization with proper categorization
+# - SDD Gates Compliance with comprehensive validation
+# - Universal ID System with conflict prevention
+# - Dependency-aware task scheduling
+# - Progress Analytics and velocity tracking

@@ -83,6 +83,9 @@ Examples:
     # Monitor Commands (new)
     _add_monitor_commands(subparsers)
 
+    # Safe Commands (NEW - LLM-safe alternatives)
+    _add_safe_commands(subparsers)
+
     # Utility Commands (working ones only)
     _add_utility_commands_working(subparsers)
 
@@ -787,6 +790,16 @@ def _add_slash_commands(subparsers: argparse._SubParsersAction) -> None:
         '--template',
         help='Task template to use'
     )
+
+
+def _add_safe_commands(subparsers: argparse._SubParsersAction) -> None:
+    """Add LLM-safe command alternatives"""
+
+    # Import the safe commands parser function
+    from .safe_commands_parser import add_safe_commands
+
+    # Add safe commands using the imported function
+    add_safe_commands(subparsers)
 
 
 def _add_utility_commands_working(subparsers: argparse._SubParsersAction) -> None:

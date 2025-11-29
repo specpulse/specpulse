@@ -1,6 +1,6 @@
 ---
 name: sp-continue
-description: Switch context and continue work on a specific feature
+description: Switch to existing feature context without SpecPulse CLI
 allowed_tools:
   - Read
   - Write
@@ -11,193 +11,212 @@ allowed_tools:
 
 # /sp-continue Command
 
-Switch context to a specific feature and continue work from where you left off.
+Switch to existing feature context without SpecPulse CLI. Works completely independently through LLM-safe file operations.
 
 ## Usage
 ```
-/sp-continue <feature-name|feature-id>
+/sp-continue [feature-id|feature-name]    # Switch to specific feature
+/sp-continue                             # Show available features
 ```
 
 ## Implementation
 
-When called with `/sp-continue $ARGUMENTS`, I will:
+When called with `/sp-continue {{args}}`, I will:
 
-1. **Parse arguments** to extract feature name or ID
-2. **Find feature directory** using context detection:
-   - Search for matching feature directory (specs/*, plans/*, tasks/*)
-   - Support partial matching (e.g., "auth" matches "001-user-authentication")
-   - Support ID matching (e.g., "001" matches "001-user-authentication")
+### 1. Parse Arguments to Determine Action
 
-3. **Validate feature exists**:
-   - Check if feature directory has any files
-   - Verify feature structure is intact
-   - Report if feature not found
+**I will analyze the arguments:**
+- If feature ID/name provided: Switch to that feature
+- If no argument: List all available features for selection
+- Validate input format (XXX-feature-name or just feature-name)
 
-4. **Update context** in `memory/context.md`:
-   ```yaml
-   # Feature Context
-   
-   ## Current Feature
-   - **ID**: 001
-   - **Name**: user-authentication
-   - **Branch**: 001-user-authentication
-   - **Status**: active
-   - **Created**: 2025-01-09
-   - **Last Updated**: 2025-01-09
-   - **Switched To**: 2025-01-09 (via /continue)
-   ```
+### 2. For Listing Available Features
 
-5. **Switch git branch** if in git repository:
-   - Checkout feature branch if it exists
-   - Report if branch doesn't exist
-   - Handle branch switching errors gracefully
+**I will scan and display all features:**
+- Scan `.specpulse/specs/`, `.specpulse/plans/`, `.specpulse/tasks/` directories
+- Identify all feature directories using naming convention (XXX-feature-name)
+- Display each feature with:
+  - Feature ID and name
+  - Progress percentage (if tasks exist)
+  - File counts (specs, plans, tasks)
+  - Last activity timestamp
+  - Current status indicator
 
-6. **Display feature status**:
-   - Show current progress percentage
-   - List next available actions
-   - Highlight any blockers or issues
-   - Show recent activity
+### 3. For Feature Context Switching
 
-7. **Suggest next steps** based on feature state:
-   - If no spec files: `/spec <description>`
-   - If spec but no plan: `/plan`
-   - If plan but no tasks: `/task`
-   - If tasks exist: Show task completion status and suggest next task
+**I will perform comprehensive context switch:**
 
-## Feature Detection Logic
+#### A. Feature Detection and Validation
+- Parse feature identifier (extract ID from XXX-feature-name)
+- Validate feature directory exists and is properly structured
+- Check for required `.specpulse` organization
+- Verify feature has content (specs, plans, or tasks)
 
-The command supports multiple ways to identify features:
+#### B. Context Analysis
+- Analyze feature structure and content
+- Identify current progress status
+- Check for active work or incomplete tasks
+- Detect any blockers or issues
 
-### By Name
+#### C. Update Memory Context
+- Update `.specpulse/memory/context.md` with new active feature
+- Set current working directory context
+- Record feature switch history
+- Update feature status and metadata
+
+#### D. Git Integration
+- Check if feature branch exists
+- Switch to feature branch if available
+- Create feature branch if missing
+- Update git working directory context
+
+### 4. Context Switch Validation
+
+**I will verify successful context switch:**
+- Confirm feature directory is accessible
+- Validate memory context updated correctly
+- Check file permissions and structure
+- Verify git branch (if applicable)
+
+### 5. Display Feature Summary
+
+**After successful switch, I will show:**
+- Feature name and ID
+- Current progress status
+- Available files (specs, plans, tasks)
+- Last activity information
+- Recommended next steps
+- Any active work or blockers
+
+## Feature Selection Interface
+
+### When No Argument Provided
 ```
-/sp-continue user-authentication
-/sp-continue "user authentication"
-/sp-continue auth
-```
+🔄 Feature Selection - Switch Context
+================================================================
 
-### By ID
-```
-/sp-continue 001
-/sp-continue 002
-```
+Available Features:
 
-### By Partial Match
-```
-/sp-continue user  # Matches any feature with "user" in name
-/sp-continue pay   # Matches "payment-processing"
-```
+1) 🟢 001-user-authentication (65% complete)
+   Status: Active Progress
+   Files: 2 specs, 1 plan, 25 tasks
+   Last Activity: 2 hours ago
 
-## Context Switching
+2) 🟡 002-payment-processing (23% complete)
+   Status: In Progress
+   Files: 1 spec, 1 plan, 18 tasks
+   Last Activity: 1 day ago
 
-When switching features, the system:
+3) ⏸️  003-user-profile (45% complete)
+   Status: Paused
+   Files: 1 spec, 0 plans, 12 tasks
+   Last Activity: 3 days ago
 
-1. **Saves previous context**:
-   - Stores previous feature state
-   - Notes switch reason and timestamp
-   - Preserves all progress tracking data
+4) ✅ 000-project-setup (100% complete)
+   Status: Completed
+   Files: 1 spec, 1 plan, 8 tasks
+   Last Activity: 1 week ago
 
-2. **Loads new context**:
-   - Updates `memory/context.md` with new feature
-   - Loads feature metadata
-   - Calculates current progress
-
-3. **Environment setup**:
-   - Switches git branch if available
-   - Updates working directory context
-   - Prepares for continued development
-
-## Examples
-
-### Basic feature switch
-```
-User: /sp-continue user-authentication
-```
-
-I will:
-- Find feature: `001-user-authentication`
-- Update context: Switch from current feature to `001-user-authentication`
-- Switch git branch: `git checkout 001-user-authentication`
-- Display status:
-  ```
-  ## Switched to Feature: 001-user-authentication
-  
-  **Progress**: 65% complete
-  **Status**: Active
-  **Last Worked**: 2025-01-09
-  
-  ### Next Steps
-  - 16 tasks completed, 9 remaining
-  - 1 blocker: T015 (Database schema approval)
-  - Suggested action: /sp-status user-authentication for details
-  ```
-
-### Continue with ID
-```
-User: /sp-continue 002
+💡 Select feature to switch to:
+- Use number (1-4)
+- Use feature ID (001, 002, etc.)
+- Use feature name (user-auth, payment, etc.)
+- Type 'cancel' to abort
 ```
 
-I will:
-- Find feature: `002-payment-processing`
-- Switch context and display feature status
-
-### Feature not found
+### Successful Context Switch
 ```
-User: /sp-continue non-existent-feature
-```
+✅ Context Switched Successfully!
 
-I will:
-- Search for matching features
-- Show available features:
-  ```
-  Feature "non-existent-feature" not found.
-  
-  Available features:
-  - 001-user-authentication (65%)
-  - 002-payment-processing (23%)
-  - 003-user-profile (45%)
-  
-  Use /sp-status to see all features.
-  ```
+🎯 Active Feature: 002-payment-processing
+📁 Working Directory: .specpulse/specs/002-payment-processing/
+🔗 Git Branch: feature/002-payment-processing
 
-## Integration Features
+📊 Feature Status:
+   Progress: 23% (4/18 tasks completed)
+   Status: In Progress
+   Created: 2025-01-10
+   Last Updated: 2025-01-11
 
-- **Intelligent feature matching** with partial name and ID support
-- **Context preservation** when switching between features
-- **Git integration** with automatic branch switching
-- **Progress tracking** across feature switches
-- **Smart suggestions** for next actions based on feature state
-- **Error recovery** with helpful fallback options
-- **Cross-platform compatibility** for any development environment
+📋 Available Files:
+   ├── Specifications: spec-001.md (Payment API)
+   ├── Plans: plan-001.md (Implementation Strategy)
+   └── Tasks: payment-tasks.md (18 tasks)
 
-## Error Handling
+🚀 Next Steps:
+   1. Continue with T005: Implement payment gateway integration
+   2. Review specifications: /sp-spec validate
+   3. Check task status: /sp-status
+   4. Execute next task: /sp-execute
 
-- Feature not found with suggestions
-- Git branch switching errors
-- Context file permission issues
-- Directory structure validation
-- Progress calculation errors
-- Working directory validation
-
-## Multi-Feature Workflow
-
-The `/continue` command enables efficient multi-feature development:
-
-```
-# Start new feature
-/sp-pulse new-feature
-/sp-spec "feature description"
-/sp-plan
-/sp-task
-
-# Switch to existing feature
-/sp-continue user-authentication
-
-# Check status and continue work
-/sp-status user-authentication
-# ... complete some tasks ...
-
-# Switch back to new feature
-/sp-continue new-feature
+💡 Memory context updated. Ready to continue work on payment processing!
 ```
 
-This enables developers to context-switch between multiple active features while maintaining progress tracking and development context.
+## Context Memory Structure
+
+The feature context is stored in `.specpulse/memory/context.md`:
+
+```yaml
+---
+context_version: "1.0"
+last_updated: "2025-01-11T15:30:00Z"
+active_feature:
+  id: "002"
+  name: "payment-processing"
+  directory: "002-payment-processing"
+  status: "in_progress"
+  progress: 23
+  created_at: "2025-01-10T09:00:00Z"
+  last_activity: "2025-01-11T14:20:00Z"
+git_context:
+  branch: "feature/002-payment-processing"
+  remote: "origin"
+  commit_hash: "abc123def"
+working_directory: "/project/root/.specpulse/specs/002-payment-processing"
+feature_history:
+  - feature_id: "001"
+    name: "user-authentication"
+    switched_from: "2025-01-11T15:30:00Z"
+    duration: "2 days 4 hours"
+  - feature_id: "002"
+    name: "payment-processing"
+    switched_to: "2025-01-11T15:30:00Z"
+---
+```
+
+## Error Handling and Recovery
+
+### Feature Not Found
+- **Invalid feature ID**: Suggest valid feature IDs from available list
+- **Feature directory missing**: Guide through feature discovery process
+- **Empty feature**: Recommend running `/sp-pulse` to create feature
+
+### Permission Issues
+- **Directory access denied**: Provide permission fix instructions
+- **File write errors**: Guide through permission corrections
+- **Git operation failures**: Offer manual git command alternatives
+
+### Context Recovery
+- **Memory file corrupted**: Rebuild from available features
+- **Git branch issues**: Work without git integration
+- **Feature structure invalid**: Provide repair instructions
+
+## Advanced Features
+
+### Feature Search and Fuzzy Matching
+- Partial name matching (e.g., "auth" matches "user-authentication")
+- ID pattern matching (e.g., "00" matches all features starting with 00)
+- Status-based filtering (show only active, completed, or paused features)
+
+### Bulk Operations
+- List features by progress percentage
+- Show features with specific file types
+- Display features sorted by last activity
+- Filter features by completion status
+
+### Context Presets
+- Save frequently used feature combinations
+- Quick switch between related features
+- Bookmark important feature contexts
+
+This `/sp-continue` command provides **seamless feature context switching** without requiring any SpecPulse CLI installation, using only validated file operations and comprehensive context management.

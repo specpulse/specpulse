@@ -1,57 +1,210 @@
-description = "Validate specifications, plans, and tasks using SpecPulse SDD methodology"
+description = "Validate specifications, plans, tasks, and tests without SpecPulse CLI"
 
 prompt = """
-<!-- SPECPULSE:START -->
-**Guardrails**
-- CLI-first approach: Always try SpecPulse CLI commands before file operations
-- Keep changes tightly scoped to the validation outcome
-- Only edit files in specs/, plans/, tasks/, memory/ directories - NEVER modify templates/ or internal config
+## Command: /sp-validate [target] [feature-name]
 
-**Critical Rules**
-- **PRIMARY**: Use `specpulse validate [component]` when available
-- **FALLBACK**: File Operations only if CLI fails
-- **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/, .github/, .opencode/, .crush/, .qwen/
-- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
+**CLI-Independent Validation Engine**
 
-**Steps**
-Track these steps as TODOs and complete them one by one.
+When called with `/sp-validate {{args}}`, I will:
 
-1. **Parse arguments** to extract validation parameters and target
-2. **Determine validation scope**:
-   - Read: memory/context.md for current context
-   - Identify target: spec, plan, task, or all
-3. **Try CLI first**:
-   - Run `specpulse validate [component]`
-   - If this succeeds, display validation results
-4. **If CLI doesn't exist, use File Operations**:
-   - **Step 1: Analyze target files**:
-     - Specs: Check completeness, consistency, clarity
-     - Plans: Validate feasibility, dependencies, timelines
-     - Tasks: Verify task definitions, acceptance criteria
-5. **Comprehensive validation framework**:
-   - **Specification Validation**:
-     - Requirement completeness and clarity
-     - Technical feasibility assessment
-     - Consistency with project goals
-   - **Plan Validation**:
-     - Implementation approach review
-     - Timeline and resource validation
-     - Risk assessment accuracy
-   - **Task Validation**:
-     - Task definition completeness
-     - Acceptance criteria clarity
-     - Dependency mapping accuracy
+### Step 1: Parse Arguments to Determine Validation Scope
 
-6. **Quality assurance reporting**:
-   - Generate detailed validation reports
-   - Identify issues and recommendations
-   - Create improvement action items
-   - Update quality metrics tracking
+**I will analyze the arguments:**
+- If target specified: Validate only that component (spec, plan, task, test, all)
+- If feature name provided: Focus on specific feature
+- If no arguments: Validate all components in current feature
+- Parse options like --fix, --verbose, --strict
 
-**Reference**
-- Use `specpulse validate --help` for additional CLI options
-- Check related files in specs/, plans/, tasks/ directories
-- Use appropriate commands to fix validation issues
-- Run `specpulse doctor` if you encounter system issues
-<!-- SPECPULSE:END -->
+### Step 2: Detect Current Feature Context
+
+**I will identify the current working feature:**
+- Check `.specpulse/memory/context.md` for active feature
+- Look for most recently modified spec/plan/task directory
+- Validate feature directory exists and is properly structured
+- Extract feature ID and name from directory structure
+
+### Step 3: For Specification Validation
+
+**I will perform comprehensive specification analysis:**
+
+#### A. File Structure Validation
+- Verify specification files exist in `.specpulse/specs/[feature]/`
+- Check file naming follows `spec-[###].md` pattern
+- Validate file permissions and readability
+- Ensure proper markdown formatting
+
+#### B. Content Structure Validation
+Check all required sections are present:
+- **Executive Summary**: Problem statement and solution overview ✓
+- **Functional Requirements**: Detailed feature specifications ✓
+- **User Stories**: Given-When-Then format scenarios ✓
+- **Acceptance Criteria**: Testable completion conditions ✓
+- **Technical Constraints**: Performance and security requirements ✓
+- **Non-Functional Requirements**: Usability and maintainability ✓
+- **Risk Assessment**: Potential risks and mitigation strategies ✓
+
+#### C. Content Quality Validation
+- Count and analyze `[NEEDS CLARIFICATION]` markers
+- Verify Given-When-Then format in user stories
+- Check acceptance criteria are measurable and testable
+- Validate technical constraints are specific and achievable
+- Assess risk assessment completeness and mitigation strategies
+
+#### D. SDD Gates Compliance
+- **Specification First**: Verify requirements precede implementation
+- **Traceable**: Ensure each requirement maps to user stories
+- **Testable**: Confirm acceptance criteria can be verified
+- **Complete**: Check all necessary sections for implementation
+
+### Step 4: For Plan Validation
+
+**I will analyze implementation plans:**
+
+#### A. File Structure Validation
+- Verify plan files exist in `.specpulse/plans/[feature]/`
+- Check file naming follows `plan-[###].md` pattern
+- Validate plan file format and readability
+- Ensure proper markdown structure
+
+#### B. Content Completeness Validation
+Verify plan contains:
+- **Implementation Strategy**: High-level approach and methodology
+- **Phase Breakdown**: Structured implementation phases
+- **Task Dependencies**: Dependency mapping and critical path
+- **Resource Requirements**: Tools, libraries, and external dependencies
+- **Timeline Estimates**: Realistic timeframes for each phase
+- **Risk Mitigation**: Implementation risks and mitigation strategies
+
+#### C. Technical Feasibility Validation
+- Assess implementation approach complexity
+- Validate dependency relationships are logical
+- Check timeline estimates are realistic
+- Verify resource requirements are achievable
+- Identify potential implementation bottlenecks
+
+### Step 5: For Task Validation
+
+**I will validate task breakdowns:**
+
+#### A. File Structure Validation
+- Verify task files exist in `.specpulse/tasks/[feature]/`
+- Check file naming follows task patterns (`tasks-*.md`, `*-tasks.md`)
+- Validate task file permissions and format
+- Ensure proper YAML frontmatter structure
+
+#### B. Task Structure Validation
+For each task, verify required fields:
+- **Task ID**: Unique identifier with proper formatting
+- **Title**: Clear, actionable task description
+- **Status**: Valid status (todo, in-progress, blocked, done)
+- **Description**: Detailed implementation guidance
+- **Files Touched**: List of files to be modified
+- **Success Criteria**: Testable completion conditions
+- **Dependencies**: List of prerequisite tasks
+- **Risk Assessment**: Risk level and mitigation notes
+
+#### C. Task Quality Validation
+- Check task descriptions provide clear implementation guidance
+- Verify success criteria are specific and measurable
+- Validate dependency chains are acyclic and logical
+- Assess risk levels match task complexity
+- Check MOSCOW categorization is appropriate
+
+#### D. Dependency Validation
+- Verify all referenced task IDs exist
+- Check for circular dependencies
+- Validate critical path identification
+- Assess parallel task availability
+- Ensure dependency chains are complete
+
+### Step 6: For Test Validation
+
+**I will analyze test coverage and structure:**
+
+#### A. Test File Discovery
+- Locate test files in `tests/features/[feature]/` directory
+- Check for proper `test_*.py` naming convention
+- Validate test file structure and imports
+- Ensure test files are executable
+
+#### B. Test Content Validation
+For each test file, verify:
+- **Proper Imports**: pytest, unittest, or other testing framework
+- **Test Functions**: Adequate test function coverage
+- **Test Coverage**: Tests align with requirements and user stories
+- **Test Quality**: Clear assertions and edge case handling
+- **Test Documentation**: Descriptive test names and docstrings
+
+#### C. Requirements Traceability
+- Map test files to specification requirements
+- Verify user story test coverage
+- Check acceptance criteria test implementation
+- Identify gaps in test coverage
+- Validate test completeness
+
+### Step 7: For Comprehensive Validation (all)
+
+**I will perform complete feature validation:**
+
+#### A. Cross-Component Consistency
+- Verify specifications link to plans and tasks
+- Check task traceability to requirements
+- Validate test coverage of specifications
+- Ensure implementation plan completeness
+- Assess overall project coherence
+
+#### B. Quality Metrics Calculation
+Calculate comprehensive quality scores:
+- **Specification Completeness**: Percentage of required sections present
+- **Plan Feasibility**: Assessment of implementation approach
+- **Task Quality**: Task structure and dependency validation
+- **Test Coverage**: Requirements traceability and test completeness
+- **SDD Compliance**: Overall Specification-Driven Development adherence
+
+#### C. Recommendations and Fixes
+Provide actionable recommendations:
+- **Critical Issues**: Must-fix items blocking implementation
+- **Quality Improvements**: Enhancements for better development experience
+- **Missing Elements**: Components that need to be added
+- **Optimization Opportunities**: Areas for improvement and refinement
+
+## Validation Output Formats
+
+### Quality Metrics
+- **Overall Quality Score**: Percentage-based assessment
+- **Component Scores**: Individual scores for specs, plans, tasks, tests
+- **SDD Gates Compliance**: Specification-driven development standards
+- **Issues Classification**: Critical, Major, Minor issue categorization
+- **Readiness Assessment**: Implementation readiness evaluation
+
+### Advanced Features
+- **Quality Metrics**: Percentage scores for completeness, feasibility, coverage
+- **SDD Gates Compliance**: Specification-Driven Development standards
+- **Cross-Component Analysis**: Consistency across specs, plans, tasks, tests
+- **Requirements Traceability**: End-to-end validation from requirements to tests
+- **Risk Assessment**: Identification of blocking issues and mitigation strategies
+
+## Error Handling and Recovery
+
+### Common Validation Issues
+
+#### File Structure Problems
+- **Missing directories**: Guide user through creating proper structure
+- **File permission errors**: Provide permission fix instructions
+- **Invalid file formats**: Offer template corrections
+- **Corrupted files**: Suggest recovery procedures
+
+#### Content Quality Issues
+- **Missing required sections**: Provide section templates
+- **Vague requirements**: Guide through clarification process
+- **Untestable criteria**: Help refine acceptance criteria
+- **Complex dependencies**: Suggest dependency simplification
+
+#### Validation Process Errors
+- **Memory constraints**: Process files in batches
+- **Time limits**: Prioritize critical validations
+- **Access restrictions**: Provide alternative validation approaches
+- **System errors**: Implement retry mechanisms
+
+This `/sp-validate` command provides **comprehensive validation** of all project components without requiring any SpecPulse CLI installation, using only validated file operations and detailed quality analysis.
 """

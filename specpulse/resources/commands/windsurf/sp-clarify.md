@@ -1,320 +1,128 @@
 ---
-description: Address clarification markers in specifications through interactive user input and resolution
 auto_execution_mode: 3
 ---
 
 <!-- SPECPULSE:START -->
 **Guardrails**
 - CLI-first approach: Always try SpecPulse CLI commands before file operations
-- Keep changes tightly scoped to the clarification resolution outcome
-- Only edit specs/ directory - NEVER modify templates/ or internal config
+- Keep changes tightly scoped to the clarification outcome
+- Only edit files in specs/, plans/, tasks/, memory/ directories - NEVER modify templates/ or internal config
 
 **Critical Rules**
-- **PRIMARY**: Use `specpulse spec clarify <spec-id>` when available
-- **FALLBACK**: File Operations only if CLI fails
-- **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/
-- **EDITABLE ONLY**: specs/
+- **PRIMARY**: Use file operations (CLI-independent mode)
+- **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/
+- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
 
 **Steps**
 Track these steps as TODOs and complete them one by one.
 
 1. **Detect target specification**:
-   - Read `memory/context.md` for current feature
-   - If spec ID provided, use that spec file
-   - Otherwise, find most recent spec in current feature
+   - Use Read tool to detect current feature context from .specpulse/memory/context.md
+   - If arguments provided (e.g., 001), look for spec-001.md in current feature
+   - If no arguments, find the most recent specification in current feature
+   - Search across all feature directories if needed
+   - Use Glob tool to safely find specification files
 
-2. **Try CLI First**:
-   ```bash
-   specpulse spec clarify <spec-id>
-   ```
-   If CLI succeeds, STOP HERE.
+2. **Validate specification file**:
+   - Use Read tool to examine the specification content
+   - Manually check for required sections: Requirements, User Stories, Acceptance Criteria, Technical Specification
+   - Report any structural issues that need addressing
 
-3. **Find all clarification markers**:
-   - Read the spec file
-   - Search for all `[NEEDS CLARIFICATION: ...]` markers
+3. **Find clarification markers**:
+   - Use Grep tool to search for [NEEDS CLARIFICATION:...] patterns
    - Count total clarifications needed
-   - List all clarification questions with context
+   - If none found, report specification is complete
+   - Display summary of clarifications to resolve
 
-4. **For each clarification marker**:
-   - **Display the question** from the marker
-   - **Show context** (the section where it appears)
-   - **Ask user for answer**
-   - **Wait for user response**
-   - **Update spec** by removing marker and adding user's answer
-   - **Continue to next** clarification
+4. **Interactive clarification resolution**:
+   - For each clarification:
+     - Extract the question from the marker
+     - Use Read tool to get surrounding context (±200 characters)
+     - Display context with highlighted question
+     - WAIT for user input (interactive prompt)
+     - If user provides answer:
+       - Use Edit tool to replace marker with ✅ **CLARIFIED**: [answer]
+       - Report successful resolution
+     - If no answer provided, skip and continue
 
-5. **Update spec file**:
-   - Replace each `[NEEDS CLARIFICATION: question]` with actual answer
-   - Preserve all other content
-   - Maintain formatting and structure
+5. **Update specification file**:
+   - Use Edit tool to update the specification with resolved clarifications
+   - Ensure all changes are properly formatted
+   - Validate file was updated successfully
+   - Report completion status
 
-6. **Validate updated spec**:
-   ```bash
-   specpulse validate spec
-   ```
+6. **Validate updated specification**:
+   - Use Grep tool to confirm no clarification markers remain
+   - Perform manual SDD compliance checks: Requirements documented, User stories defined, Acceptance criteria valid, Technical specification present, Success metrics defined
+   - Calculate SDD compliance percentage
+   - Report overall specification quality
 
-7. **Report results**:
-   - Show how many clarifications were resolved
-   - Display updated validation status
-   - Suggest next steps
+7. **Generate next steps**:
+   - Display updated specification file path
+   - Recommend next commands: /sp-plan, /sp-task, /sp-status
+   - Provide contextual suggestions based on content (authentication → sp-decompose, api → sp-test, database → migration planning)
+
+8. **Validate structure and report comprehensive clarification results**
 
 **Usage**
 ```
-/sp-clarify                    # Clarify current spec
-/sp-clarify 001                # Clarify specific spec
+/sp-clarify [spec-id]    # Clarify current spec or specific spec
 ```
-
-**Clarification Workflow**
-
-**Marker Format:**
-```markdown
-[NEEDS CLARIFICATION: Which database should be used? (PostgreSQL, MongoDB, MySQL)]
-```
-
-**Resolution Process:**
-1. **Extract Question**: Parse the clarification question
-2. **Show Context**: Display where the question appears in the spec
-3. **Gather Input**: Ask user for specific answer
-4. **Apply Resolution**: Replace marker with user's answer
-5. **Validate**: Check if spec is now complete
 
 **Examples**
 
-**Interactive clarification session:**
+**Basic Clarification:**
 ```
 /sp-clarify
 ```
-Output:
+
+Output: Find and resolve all [NEEDS CLARIFICATION] markers in current specification interactively.
+
+**Specific Spec Clarification:**
 ```
-## Clarification Session: 001-user-authentication
-
-Found 4 clarifications that need resolution:
-
-### Clarification 1/4
-**Section**: Database Configuration
-**Question**: Which database should be used? (PostgreSQL, MongoDB, MySQL)
-
-**Context**:
-> The system should store user data in [NEEDS CLARIFICATION: Which database should be used? (PostgreSQL, MongoDB, MySQL)] with proper indexing.
-
-**Your Answer**: PostgreSQL
-
-✓ Resolved: "PostgreSQL"
-
-### Clarification 2/4
-**Section**: Authentication Strategy
-**Question**: Token type? (JWT with refresh tokens, Session-based, OAuth2)
-
-**Context**:
-> Authentication will use [NEEDS CLARIFICATION: Token type? (JWT with refresh tokens, Session-based, OAuth2)] for secure session management.
-
-**Your Answer**: JWT with refresh tokens
-
-✓ Resolved: "JWT with refresh tokens"
-
-### Clarification 3/4
-**Section**: Password Requirements
-**Question**: Minimum password complexity? (8 chars with special chars, 12 chars, Passphrase)
-
-**Context**:
-> Password security will enforce [NEEDS CLARIFICATION: Minimum password complexity? (8 chars with special chars, 12 chars, Passphrase)].
-
-**Your Answer**: 12 chars minimum with special characters
-
-✓ Resolved: "12 chars minimum with special characters"
-
-### Clarification 4/4
-**Section**: User Roles
-**Question**: Initial user roles? (Admin/User only, Admin/User/Moderator, Custom roles)
-
-**Context**:
-> The system will support [NEEDS CLARIFICATION: Initial user roles? (Admin/User only, Admin/User/Moderator, Custom roles)].
-
-**Your Answer**: Admin/User/Moderator
-
-✓ Resolved: "Admin/User/Moderator"
-
-## Clarification Complete
-
-✅ **All 4 clarifications resolved**
-✅ **Specification updated**
-✅ **Validation passed**
-
-**Next Steps**:
-1. Review updated specification
-2. Run `/sp-plan` to create implementation plan
-3. Continue with `/sp-task` for task breakdown
+/sp-clarify 001
 ```
 
-**Specific spec clarification:**
-```
-/sp-clarify 002
-```
-Output: Clarifies spec 002 with the same interactive process.
+Output: Target spec-001.md in current feature and resolve clarification markers.
 
-**Batch Clarification Mode**
+**Interactive Flow:**
+1. Find all [NEEDS CLARIFICATION] markers
+2. Ask user each question with context
+3. WAIT for user's input (interactive)
+4. Update spec with formatted answer
+5. Repeat for all clarifications
+6. Validate updated specification manually
+7. Report results and next steps
 
-**When multiple clarifications exist:**
-```
-/sp-clarify --batch
-```
-Output:
-```
-## Batch Clarification Mode
-
-Found 7 clarifications. I'll ask them all at once:
-
-**Please provide answers for all 7 questions:**
-
-1. **Database**: PostgreSQL, MongoDB, MySQL?
-2. **Auth Method**: JWT, Session, OAuth2?
-3. **Password Policy**: 8 chars, 12 chars, Passphrase?
-4. **User Roles**: Admin/User, Admin/User/Moderator, Custom?
-5. **Email Service**: SendGrid, AWS SES, Custom SMTP?
-6. **File Storage**: Local, AWS S3, CloudFront?
-7. **Logging**: Winston, Pino, Custom?
-
-**Your Answers** (one per line):
-1. PostgreSQL
-2. JWT with refresh tokens
-3. 12 chars with special characters
-4. Admin/User/Moderator
-5. AWS SES
-6. AWS S3
-7. Winston
-
-✅ **All clarifications applied**
-```
-
-**Smart Clarification Features**
-
-**Context-Aware Suggestions:**
-Based on specification content, provide intelligent suggestions:
-
-```
-### Clarification: Database Selection
-**Question**: Which database for user data?
-**Suggested**: PostgreSQL (based on user authentication requirements)
-**Options**:
-- PostgreSQL (Recommended for ACID compliance)
-- MongoDB (Recommended for flexible schema)
-- MySQL (Recommended for legacy compatibility)
-
-**Your Answer**: [PostgreSQL]
-```
-
-**Template-Based Clarifications:**
-Common question templates with predefined options:
-
-```markdown
-[NEEDS CLARIFICATION: Database choice? (PostgreSQL, MongoDB, MySQL)]
-[NEEDS CLARIFICATION: Authentication method? (JWT, Session, OAuth2)]
-[NEEDS CLARIFICATION: Frontend framework? (React, Vue, Angular)]
-[NEEDS CLARIFICATION: Deployment platform? (AWS, GCP, Azure)]
-```
-
-**Clarification Categories**
-
-**Technical Decisions:**
-- Database choice
-- Authentication method
-- API framework
-- Deployment platform
-
-**Business Requirements:**
-- User roles and permissions
-- Performance requirements
-- Compliance standards
-- Integration needs
-
-**UX/UI Decisions:**
-- Frontend framework
-- Design system
-- Accessibility requirements
-- Mobile support
-
-**CLI Integration**
-
-**Try CLI First:**
-```bash
-specpulse spec clarify <spec-id>
-specpulse sp-spec clarify <spec-id>
-```
-
-**Fallback to Manual Clarification if CLI Fails:**
-1. Read specification file manually
-2. Parse [NEEDS CLARIFICATION] markers
-3. Ask questions interactively
-4. Update specification with answers
-5. Validate completion
-
-**Advanced Features**
-
-**Clarification History:**
-- Track all resolved clarifications
-- Store decision rationale
-- Maintain change history
-
-**Smart Completion:**
-- Auto-suggest answers based on context
-- Detect similar specifications for reference
-- Provide best practice recommendations
-
-**Validation Integration:**
-- Automatic validation after clarification
-- Check for completeness
-- Identify remaining ambiguities
+**Clarification Process:**
+- **Context-Aware Questions**: Analyze surrounding content for better context
+- **Validation Enhancement**: SDD compliance scoring and completeness calculation
+- **Integration Suggestions**: Recommend related commands based on content
 
 **Error Handling**
+- No spec found: Guide user to create specification with /sp-spec
+- No clarifications: Report specification is already complete
+- File permission errors: Provide troubleshooting steps
+- Empty answers: Allow user to skip or retry
+- Partial completion: Save progress, can resume with same command
 
-**Invalid Responses:**
-- Ask for clarification if answer is unclear
-- Provide options for multiple choice questions
-- Suggest default values for technical decisions
-
-**Specification Updates:**
-- Preserve formatting when applying answers
-- Maintain section structure
-- Update related sections automatically
-
-**Best Practices**
-
-**Effective Clarification Questions:**
-- Be specific and concrete
-- Provide clear options
-- Include business context
-- Suggest best practices
-
-**Answer Management:**
-- Store decisions for future reference
-- Document rationale
-- Update dependent sections
-- Validate consistency
-
-**Integration Scenarios**
-
-**Team Collaboration:**
-```
-/sp-clarify --team
-```
-Output: Gathers input from multiple team members for decisions.
-
-**Stakeholder Review:**
-```
-/sp-clarify --stakeholder
-```
-Output: Highlights business decisions that need stakeholder approval.
-
-**Technical Architecture:**
-```
-/sp-clarify --architect
-```
-Output: Focuses on technical architecture decisions.
+**Success Indicators**
+- Complete Clarification: All markers resolved
+- Valid Specification: Meets SDD standards
+- Next Steps Ready: Clear implementation path
+- User Engagement: Interactive and guided process
+- Quality Assurance: Comprehensive validation
 
 **Reference**
-- Use `specpulse spec clarify --help` if you need additional CLI options
-- Check `memory/context.md` for current specification context
-- Run `specpulse doctor` if you encounter system issues
-- After clarification, use `/sp-validate` to confirm completeness
-- Then proceed with `/sp-plan` for implementation planning
+- Check memory/context.md for current feature context
+- Use /sp-spec to create specifications before clarification
+- Follow up with /sp-plan for implementation planning
+- Use /sp-validate for comprehensive specification validation
+
+**CLI-Independent Benefits:**
+- Works completely without SpecPulse CLI installation
+- Interactive clarification resolution with context awareness
+- SDD compliance validation and quality scoring
+- Context-aware suggestions and next steps
+- Manual validation logic with enhanced analysis
 <!-- SPECPULSE:END -->

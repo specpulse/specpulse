@@ -5,6 +5,83 @@ All notable changes to SpecPulse will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.2] - 2025-11-29
+
+### 🚀 Major Update - Unified AI Command Workflow
+
+**Upgrade Priority:** 🟡 **RECOMMENDED** (standardizes AI command workflow across all platforms)
+
+---
+
+#### **🎯 Unified AI Command Structure**
+- **NEW**: Standardized 11 AI commands that work identically across all 8 platforms
+- **UPDATED**: All AI platforms now use `/sp-pulse` as the PRIMARY ENTRY POINT for everything
+- **REMOVED**: Deprecated AI-specific commands and CLI command references in documentation
+- **ENHANCED**: All command files now have proper content matching their functionality
+
+#### **📋 Complete Command List (All Platforms)**
+| Command | Function | Status |
+|---------|----------|--------|
+| `/sp-pulse` | Initialize feature (PRIMARY ENTRY POINT) | ✅ Standardized |
+| `/sp-spec` | Create specification | ✅ Standardized |
+| `/sp-plan` | Generate implementation plan | ✅ Standardized |
+| `/sp-task` | Break down into tasks | ✅ Standardized |
+| `/sp-execute` | Execute tasks | ✅ Standardized |
+| `/sp-status` | Check progress | ✅ Standardized |
+| `/sp-validate` | Validate work | ✅ Standardized |
+| `/sp-continue` | Switch to existing feature | ✅ Standardized |
+| `/sp-decompose` | Decompose specifications | ✅ Standardized |
+| `/sp-clarify` | Clarify requirements | ✅ Standardized |
+| `/sp-llm-enforce` | LLM compliance enforcement | ✅ Standardized |
+
+#### **🔧 Platform-Specific Fixes**
+- **Gemini Platform**: Fixed `sp-llm-enforce.toml` with correct LLM enforcement content
+- **Windsurf Platform**: Fixed `sp-llm-enforce.md` with proper `auto_execution_mode` format
+- **Cursor Platform**: Fixed `sp-llm-enforce.md` with proper category front matter format
+- **GitHub Platform**: Fixed `sp-llm-enforce.prompt.md` with proper `$ARGUMENTS` format
+- **OpenCode Platform**: Fixed `sp-llm-enforce.md` with proper workflow format
+- **Crush Platform**: Fixed `llm-enforce.md` with proper LLM enforcement content
+- **Qwen Platform**: Fixed `sp-llm-enforce.toml` with proper LLM enforcement content
+
+#### **📚 Documentation Overhaul**
+- **COMPLETELY REVISED**: All documentation now emphasizes `/sp-pulse` as the entry point
+- **REMOVED**: All CLI command references (`specpulse feature init`, `specpulse spec create`, etc.)
+- **UPDATED**: README.md, CLAUDE.md, docs/README.md, docs/AI_INTEGRATION.md, and website
+- **STANDARDIZED**: Consistent messaging across all documentation about workflow starting with `/sp-pulse`
+
+#### **🌐 Website Updates**
+- **UPDATED**: All command examples to use `/sp-pulse` workflow
+- **ENHANCED**: Clear messaging about PRIMARY ENTRY POINT
+- **MODERNIZED**: Replaced `/sp-deploy` with `/sp-llm-enforce` in advanced commands
+
+#### **🎯 Key Benefits**
+- **Simplified Learning**: Only need to learn one way to start - `/sp-pulse`
+- **Platform Independence**: Same 11 commands work on Claude, Gemini, Windsurf, Cursor, GitHub, OpenCode, Crush, Qwen
+- **Better UX**: Clear entry point reduces confusion for new users
+- **Consistent Experience**: Identical functionality across all AI platforms
+
+#### **⚠️ Breaking Changes**
+- **Documentation**: All CLI command examples removed from user-facing docs
+- **Workflow**: Users should now start all work with `/sp-pulse` instead of CLI commands
+- **Commands**: `/sp-deploy` replaced with `/sp-llm-enforce`
+
+#### **🔄 Migration Guide**
+```bash
+# Old workflow (CLI commands)
+specpulse feature init my-feature
+specpulse spec create "My feature"
+
+# New workflow (AI commands) - RECOMMENDED
+/sp-pulse my-feature
+/sp-spec "My feature"
+```
+
+---
+
+### 📋 **Summary**
+
+v2.7.2 represents a major simplification of the SpecPulse workflow by standardizing all AI platforms to use `/sp-pulse` as the primary entry point. This creates a unified, consistent experience across all 8 supported AI platforms while maintaining full functionality through 11 standardized commands.
+
 ## [2.7.1] - 2025-11-28
 
 ### 🐛 Bug Fixes

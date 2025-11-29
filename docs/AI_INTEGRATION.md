@@ -91,13 +91,13 @@ SpecPulse v2.7.1 introduces comprehensive multi-platform AI integration that enh
 
 #### **Primary Workflow Hierarchy**
 
-1. **FIRST: Try CLI Command** (if exists)
+1. **FIRST: Start with AI Command** (recommended)
    ```bash
-   specpulse feature init <name>
-   specpulse spec create "<description>"
-   specpulse plan create "<description>"
-   specpulse task breakdown <plan-id>
-   specpulse validate <type>
+   /sp-pulse <feature-name>        # Start new feature
+   /sp-spec "<description>"         # Create specification
+   /sp-plan                       # Generate implementation plan
+   /sp-task                       # Break down into tasks
+   /sp-validate                   # Validate work
    ```
 
 2. **SECOND: File Operations** (if CLI doesn't exist or doesn't cover operation)
@@ -263,38 +263,39 @@ specpulse spec expand 001-feature --to-tier complete
 #### **Standard Development Workflow**
 
 ```bash
-# 1. Initialize feature
-specpulse feature init user-authentication
+# 1. Initialize feature (PRIMARY ENTRY POINT)
+/sp-pulse user-authentication
 
 # 2. Create specification
-specpulse spec create "User authentication with OAuth2 and JWT tokens"
+/sp-spec "User authentication with OAuth2 and JWT tokens"
 
 # 3. Generate implementation plan
-specpulse plan create "Implement OAuth2 authentication flow with secure token management"
+/sp-plan
 
 # 4. Break down into tasks
-specpulse task breakdown <plan-id>
+/sp-task
 
-# 5. Track progress
-specpulse task status
+# 5. Execute tasks
+/sp-execute
 
-# 6. Validate work
-specpulse validate spec
-specpulse validate plan
-specpulse validate task
+# 6. Track progress
+/sp-status
+
+# 7. Validate work
+/sp-validate
 ```
 
 #### **Context Switching**
 
 ```bash
 # Switch to existing feature
-specpulse feature continue 001-user-authentication
+/sp-continue 001-user-authentication
 
-# Get feature summary
-specpulse feature status 001-user-authentication
+# Check current status
+/sp-status
 
-# List all features
-specpulse feature list
+# Decompose specifications if needed
+/sp-decompose spec-001
 ```
 
 ---
@@ -541,14 +542,19 @@ All platforms support these core commands:
 
 | Command | Function | Platforms |
 |---------|----------|-----------|
-| `/sp-pulse` | Initialize feature | All |
+| `/sp-pulse` | Initialize feature - PRIMARY ENTRY POINT | All |
 | `/sp-spec` | Create specification | All |
 | `/sp-plan` | Generate implementation plan | All |
 | `/sp-task` | Break down into tasks | All |
 | `/sp-execute` | Execute tasks | All |
 | `/sp-status` | Show project status | All |
 | `/sp-validate` | Validate project | All |
-| `/sp-feature` | Feature management | All |
+| `/sp-continue` | Switch to existing feature | All |
+| `/sp-decompose` | Decompose specifications | All |
+| `/sp-clarify` | Clarify requirements | All |
+| `/sp-llm-enforce` | LLM compliance enforcement | All |
+
+**🎯 IMPORTANT: Always start with `/sp-pulse` - this is your entry point to everything!**
 
 #### Platform-Specific Commands
 
@@ -605,14 +611,20 @@ All commands work identically across platforms:
 
 ```bash
 # These work the same on ALL platforms
-/sp-pulse user-authentication
+/sp-pulse user-authentication    # PRIMARY ENTRY POINT
 /sp-spec "OAuth2 authentication system"
 /sp-plan "Implementation roadmap"
 /sp-task breakdown
 /sp-execute all
 /sp-status
 /sp-validate
+/sp-continue 001-auth
+/sp-decompose spec-001
+/sp-clarify spec-001
+/sp-llm-enforce
 ```
+
+**🎯 IMPORTANT: Always start with `/sp-pulse` - this is your entry point to everything!**
 
 ### Migration Between Platforms
 
@@ -1455,41 +1467,26 @@ specpulse validate all
 
 ### Command Reference
 
-#### **Feature Commands**
+#### **Setup Commands**
 ```bash
-specpulse feature init <name>           # Initialize new feature
-specpulse feature continue <feature_id> # Switch to existing feature
-specpulse feature list                  # List all features
-specpulse feature status <feature_id>   # Get feature status
+pip install specpulse                 # Install SpecPulse
+specpulse init my-project --ai claude # Initialize with AI
+specpulse doctor                      # System health check
 ```
 
-#### **Specification Commands**
+#### **AI Commands (Use in AI Assistants)**
 ```bash
-specpulse spec create "<description>"   # Create specification
-specpulse spec list                    # List specifications
-specpulse spec validate <spec_id>      # Validate specification
-```
-
-#### **Plan Commands**
-```bash
-specpulse plan create "<description>"   # Create implementation plan
-specpulse plan list                    # List plans
-specpulse plan validate <plan_id>      # Validate plan
-```
-
-#### **Task Commands**
-```bash
-specpulse task breakdown <plan_id>     # Break plan into tasks
-specpulse task list                    # List tasks
-specpulse task status <task_id>        # Get task status
-```
-
-#### **Validation Commands**
-```bash
-specpulse validate spec                # Validate specifications
-specpulse validate plan                # Validate plans
-specpulse validate task                # Validate tasks
-specpulse validate all                 # Validate everything
+/sp-pulse <feature-name>             # Start new feature (PRIMARY ENTRY POINT)
+/sp-spec "<description>"             # Create specification
+/sp-plan                             # Generate implementation plan
+/sp-task                             # Break down into tasks
+/sp-execute                          # Execute tasks
+/sp-status                           # Check progress
+/sp-validate                         # Validate work
+/sp-continue <feature-id>            # Switch to existing feature
+/sp-decompose <spec-id>              # Decompose specifications
+/sp-clarify <spec-id>                # Clarify requirements
+/sp-llm-enforce [action]             # LLM compliance enforcement
 ```
 
 ### Community Resources

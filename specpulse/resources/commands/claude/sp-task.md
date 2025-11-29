@@ -1,6 +1,6 @@
 ---
 name: sp-task
-description: Generate and manage task breakdowns using AI-optimized templates
+description: Create and manage tasks without SpecPulse CLI
 allowed_tools:
   - Read
   - Write
@@ -11,436 +11,326 @@ allowed_tools:
 
 # /sp-task Command
 
-Generate task breakdowns from implementation plans using SpecPulse methodology with AI-optimized templates and enhanced validation.
-
-## CRITICAL: LLM Workflow Rules
-
-**PRIMARY WORKFLOW: Use CLI when available**
-- Prefer `specpulse` CLI commands when they exist
-- Use Bash tool ONLY for CLI commands, not for file editing
-- Only use Read/Write/Edit tools when CLI doesn't cover the operation
-
-**PROTECTED DIRECTORIES (NEVER EDIT):**
-- `templates/` - Template files
-- `.specpulse/` - Internal config
-- `specpulse/` - Package code
-- `.claude/` and `.gemini/` - AI configuration
-- **ONLY EDIT**: specs/, plans/, tasks/, memory/
-- Templates are COPIED to tasks/ folder, then edited there
+Create and manage tasks without SpecPulse CLI. Works completely independently through LLM-safe file operations.
 
 ## Usage
 ```
 /sp-task [action] [feature-directory]
 ```
 
-Actions: `breakdown`, `update`, `status`, `execute` (defaults to `breakdown`)
+Actions: `breakdown`, `update`, `status`, `execute`, `validate` (defaults to `breakdown`)
 
 ## Implementation
 
-When called with `/sp-task $ARGUMENTS`, I will:
+When called with `/sp-task {{args}}`, I will:
 
-1. **Detect current feature context**:
-   - Read `memory/context.md` for current feature metadata
-   - Use git branch name if available (e.g., `001-user-authentication`)
-   - Fall back to most recently created feature directory
-   - If no context found, ask user to specify feature or run `/sp-pulse` first
+### 1. Detect Current Feature Context
 
-2. **Parse arguments** to determine action:
-   - If `update`: Update task status and dependencies
-   - If `status`: Show comprehensive progress with metrics
-   - If `execute`: Execute task with script integration
-   - Otherwise: Generate task breakdown
+**I will identify the current working feature:**
+- Check `.specpulse/memory/context.md` for active feature
+- Look for most recently modified spec/plan/task directory
+- Validate feature directory exists and is properly structured
+- Extract feature ID and name from directory structure
 
-3. **For `/sp-task breakdown` or `/sp-task`:**
-   
-   a. **Check for decomposition**: Look for `specs/XXX-feature/decomposition/` directory
-   b. **If decomposed**:
-      - Read service definitions from decomposition
-      - Show service-specific plan files (auth-service-plan.md, user-service-plan.md, etc.)
-      - Generate tasks per service with service prefix (AUTH-T001, USER-T001)
-      - Create integration tasks (INT-T001) for cross-service work
-      - Structure: `tasks/XXX-feature/auth-service-tasks.md`, `integration-tasks.md`
-   c. **If not decomposed**:
-      - Show existing plan files and ask user to select
-      - Generate single task file with standard IDs (T001, T002)
-   c. **Validation** using CLI:
-      ```bash
-      specpulse --no-color validate task --verbose
-      ```
-   
-   d. **Read implementation plan** from selected plan file:
-      ```
-      Read: plans/XXX-feature/plan-YYY.md
-      ```
+### 2. Parse Arguments to Determine Action
 
-   e. **Generate AI-optimized tasks using File Operations**:
-      - **Step 1: Read Task Template**
-        ```
-        Read: templates/task.md
-        ```
+**I will analyze the arguments:**
+- If first argument is `breakdown`, `update`, `status`, `execute`, or `validate` → Use that action
+- If no action specified → Default to `breakdown`
+- For other arguments → Look for feature name or use current feature
 
-      - **Step 2: Parse Plan and Create Task Files**
-        ```
-        For each phase/component in plan:
-          Write: tasks/XXX-feature/task-001.md
-          Write: tasks/XXX-feature/task-002.md
-          ... (one file per task)
+### 3. For Action: breakdown (default)
 
-        Content includes:
-          - Metadata (feature ID, task number, status: pending)
-          - Task description from plan
-          - Template structure for expansion
-        ```
+**I will create comprehensive task breakdowns:**
 
-      - **IMPORTANT**: Can EDIT files in tasks/ folder, but NEVER modify templates/ or commands/ folders
+#### A. Check for Service Decomposition
+- Look for `.specpulse/specs/[feature]/decomposition/` directory
+- If decomposition exists, identify service directories
+- Parse service names for task categorization
+- Plan service-specific task generation
 
-   f. **Generate structured task categories based on architecture**:
-      - **For decomposed services**:
-        * Service-specific tasks with bounded context
-        * Inter-service integration tasks
-        * Service deployment order tasks
-        * Contract testing tasks between services
-      - **For monolithic architecture**:
-        * Layer-based tasks (data, business, API)
-        * Module-specific tasks
-      - **Common categories**:
-        * SDD Gates Compliance
-        * Critical Path identification
-        * Parallel vs Sequential grouping
-        * Progress Tracking configuration
+#### B. Generate Task Breakdown
+- Read implementation plan from `.specpulse/plans/[feature]/` directory
+- Analyze plan phases and identify implementation steps
+- Create detailed tasks with proper dependencies
+- Assign task IDs using universal numbering system
 
-   g. **For each task**, generate comprehensive metadata:
-      - **ID**: T[XXX] format (T001, T002)
-      - **Type**: setup, development, testing, documentation
-      - **Priority**: HIGH, MEDIUM, LOW
-      - **Estimate**: Hours or complexity points
-      - **Dependencies**: Task ID dependencies
-      - **Description**: Clear what needs to be done
-      - **Acceptance**: How to verify completion
-      - **Files**: Files to be created/modified
-      - **Assignable**: Role/skill required
-      - **Parallel**: Whether can run in parallel [P]
+#### C. Create Service-Specific Tasks
+If decomposition exists:
+- **Auth Service Tasks**: AUTH-T001, AUTH-T002, etc.
+- **User Service Tasks**: USER-T001, USER-T002, etc.
+- **Integration Tasks**: INT-T001, INT-T002, etc.
 
-   h. **Generate AI execution guidelines** with workflow integration:
-      ```markdown
-      ## AI Execution Strategy
-      ### Parallel Tasks (can be worked on simultaneously):
-      - T001, T002, T003: Independent tasks, no dependencies
-      ### Sequential Tasks (must be completed in order):
-      - T004 → T005 → T006: Dependency chain
-      ```
+#### D. Generate Comprehensive Task Metadata
+For each task, I will include:
+- **Task ID**: Unique identifier with sequential numbering
+- **Status**: Initially set to "todo"
+- **Title**: Clear, actionable task description
+- **Description**: Detailed "what, why, how, when" explanation
+- **Files Touched**: List of files that will be modified
+- **Goals**: Specific objectives this task achieves
+- **Success Criteria**: Testable completion conditions
+- **Dependencies**: Tasks that must be completed first
+- **Next Tasks**: Tasks that can start after this one
+- **Risk Level**: Assessment of potential issues (low/medium/high)
+- **Risk Notes**: Specific concerns and mitigation strategies
+- **MOSCOW Analysis**: Must/Should/Know/Won't categorization
+- **Priority**: Overall priority ranking with reasoning
+- **SDD Gates Compliance**: Specification-driven validation
 
-   i. **Version management**: Check existing task files and create next version (task-001.md, task-002.md, etc.)
-   j. **Write comprehensive task breakdown** to `tasks/XXX-feature/task-XXX.md`
+### 4. For Action: update
 
-4. **For `/sp-task update`:**
-   a. **Show existing task files**: List all task-XXX.md files in current feature directory
-   b. **Ask user to select**: Which task file to update
-   c. **Analysis** using script:
-     ```bash
-     specpulse task breakdown "$PLAN_ID"
-     ```
-   d. **Parse current tasks** from selected file with comprehensive status:
-     - Total tasks, completed, pending, blocked
-     - Parallel tasks identification
-     - SDD gates status
-     - Completion percentage calculation
-   e. **Interactive task updates**:
-     - Mark tasks as completed/in-progress/blocked
-     - Update dependencies and blockers
-     - Add newly discovered tasks with proper metadata
-     - Adjust estimates based on actual progress
-   f. **Generate updated progress tracking** YAML
+**I will update existing task files:**
+- Scan `.specpulse/tasks/[feature]/` directory for task files
+- Display available task files for selection
+- Parse current task structure and status
+- Provide interactive update options:
+  - Mark tasks as completed/in-progress/blocked
+  - Update task descriptions or metadata
+  - Add new tasks or remove obsolete ones
+- Recalculate progress metrics after updates
 
-5. **For `/sp-task status`:**
-   a. **Show existing task files**: List all task-XXX.md files in current feature directory
-   b. **Ask user to select**: Which task file to show status for
-   c. **Enhanced reporting** from script output:
-     ```bash
-     TOTAL_TASKS=25
-     COMPLETED_TASKS=10
-     COMPLETION_PERCENTAGE=40%
-     SDD_GATES_PENDING=2
-     ```
-   d. **Display comprehensive progress**:
-     - Overall completion percentage
-     - Phase-by-phase progress
-     - Blocker identification and resolution
-     - Velocity metrics and estimates
-     - SDD gates compliance status
+### 5. For Action: status
 
-6. **For `/sp-task execute`:**
-   a. **Show existing task files**: List all task-XXX.md files in current feature directory
-   b. **Ask user to select**: Which task file to execute from
-   c. **Ask user to specify**: Which specific task ID to execute
-   d. **Validate task readiness** using SDD gates
-   e. **Execute task** using AI assistant capabilities:
-     ```markdown
-     ## Task Execution: {{ TASK_ID }}
-     **AI Assistant**: Claude/Gemini
-     **Method**: Direct implementation within AI session
-     **Status**: [ ] Pending → [-] In Progress → [x] Completed
-     ```
-   f. **Track execution results** and update status
-   g. **Update progress tracking** automatically
+**I will display comprehensive progress:**
+- Scan all task files in current feature
+- Calculate completion percentages
+- Show progress by service (if decomposed)
+- Display task status distribution:
+  - Completed tasks count and percentage
+  - In-progress tasks
+  - Blocked tasks with blockers listed
+  - Pending tasks available for work
+- Show SDD Gates compliance status
+- Calculate velocity metrics (tasks/day)
+- Identify parallel tasks and sequential chains
+- Provide recommendations for next actions
 
-## Standardized Task Format
+### 6. For Action: execute
 
-All task files must follow this exact YAML frontmatter format:
+**I will execute specific tasks:**
+- Allow task selection from available pending tasks
+- Validate task readiness and dependencies
+- Display task details before execution
+- Implement task requirements through code changes
+- Test implementation when applicable
+- Mark task as completed automatically
+- Continue with next available task if requested
+- Update progress metrics and context
 
-```yaml
----
-id: task-[slug]
-status: todo | in-progress | blocked | done
-title: "Short but clear task title"
-description: |
-  *Answer these 4 questions with sufficient detail:*
-  - What problem does this solve?
-  - Why is this necessary?
-  - How will this be done? (step-by-step, include function/file names when possible)
-  - When is this considered complete?
+### 7. For Action: validate
 
-files_touched:
-  - path: src/...
-    reason: "What changes in this file, briefly"
-  - path: ...
-    reason: "..."
+**I will perform comprehensive task validation:**
+- Validate task file structure and format
+- Check required fields are present and valid
+- Verify task dependencies exist and are valid
+- Validate SDD Gates compliance
+- Check for duplicate task IDs
+- Verify success criteria are testable
+- Assess risk levels and mitigation strategies
+- Report validation results with fixes needed
 
-goals:
-  - "Concrete goal 1 achieved when this task completes"
-  - "Concrete goal 2"
+## Enhanced Task Generation
 
-success_criteria:
-  - "Test/acceptance criteria 1 (measurable or verifiable)"
-  - "Test/acceptance criteria 2"
+### Universal ID System
 
-dependencies:
-  - task-[id-1]
-  - task-[id-2]
+**I ensure conflict-free numbering through systematic analysis:**
 
-next_tasks:
-  - task-[id-x]
-  - task-[id-y]
+#### A. Task ID Generation Algorithm
+- **Use Glob tool** to scan `.specpulse/tasks/[feature]/` directory
+- **Parse existing task files** to extract current numbering:
+  - Global tasks: Extract numbers from `T###.md` patterns
+  - Service tasks: Extract from `SERVICE-T###.md` patterns
+  - Integration tasks: Extract from `INT-T###.md` patterns
+- **Create numbering map**: `{task_type: max_number_used}`
+- **Generate next ID**: For each task type, use `max_num + 1`
+- **Zero-pad format**: `format(next_num, '03d')` ensures `001`, `002`, `003`
 
-risk_level: low | medium | high
-risk_notes: |
-  "Important risks, edge cases, technical debt notes for this task"
+#### B. Service-Specific Task Patterns
+- **Authentication Service**: `AUTH-T001.md`, `AUTH-T002.md`, etc.
+- **User Management Service**: `USER-T001.md`, `USER-T002.md`, etc.
+- **API Gateway Service**: `GATEWAY-T001.md`, `GATEWAY-T002.md`, etc.
+- **Database Service**: `DB-T001.md`, `DB-T002.md`, etc.
+- **Notification Service**: `NOTIF-T001.md`, `NOTIF-T002.md`, etc.
 
-# MoSCoW breakdown for this task
-moscow:
-  must:
-    - "Must-have requirements/behaviors for this task"
-    - "Without these, task is not considered complete"
-  should:
-    - "Additional improvements if time/budget allows"
-    - "Performance, UX, DX improvements, etc."
-  know:
-    - "Critical knowledge, context, or domain details developer must know"
-    - "Documentation links, rationale for specific decisions"
-  wont:
-    - "Things we WILL NOT do in this task scope - out of scope"
-    - "Topics for future tasks"
+#### C. Conflict Prevention Mechanisms
+- **Atomic file existence check** before creating each task file
+- **Validation loop**: If conflict detected, increment and retry
+- **Cross-service dependency tracking** to ensure logical numbering
+- **Fallback numbering**: If directory empty, start from `T001.md`
+- **Gap handling**: Preserve existing numbering gaps, don't renumber
 
-priority_overall: must | should | could | wont
-priority_reason: "Why this task has this priority - short, clear explanation."
+### Service-Specific Task Organization
 
----
-```
+**For decomposed features:**
+- **Authentication Service**: JWT, OAuth, password policies, session management
+- **User Management Service**: Profiles, preferences, permissions, roles
+- **API Gateway Service**: Rate limiting, authentication, routing, logging
+- **Database Service**: Schema management, migrations, backups, optimization
+- **Notification Service**: Email, SMS, push notifications, templates
+- **Integration Tasks**: Service communication, data synchronization, API contracts
 
-### Example Task File
-```markdown
----
-id: task-001
-status: todo
-title: "User authentication system setup"
-description: |
-  - **What problem does this solve?**: User login/logout and token-based authentication
-  - **Why is this necessary?**: Foundation for secure system access
-  - **How will this be done?**: JWT implementation, middleware, auth routes
-  - **When is this complete?**: All tests pass and documentation ready
+### SDD Gates Compliance
 
-files_touched:
-  - path: src/auth/jwt.py
-    reason: "JWT token generation/validation"
-  - path: src/auth/middleware.py
-    reason: "Authentication middleware for protected routes"
-  - path: src/routes/auth.py
-    reason: "Login/logout endpoints"
+**Every generated task meets:**
+- ✅ **Specification Traced**: Links to specific requirements
+- ✅ **Task Decomposed**: Complex work broken into manageable pieces
+- ✅ **Quality Assurance**: Success criteria are testable
+- ✅ **Traceable Implementation**: Clear link between tasks and code
 
-goals:
-  - "JWT-based authentication system"
-  - "Secure password hashing"
-  - "Authentication middleware"
+## Progress Tracking and Analytics
 
-success_criteria:
-  - "Login/logout responds under 200ms"
-  - "JWT token passes security tests"
-  - "Rate limiting is active"
+### Comprehensive Metrics
 
-dependencies: []
-next_tasks:
-  - task-002  # User management
-  - task-003  # Role system
+**I track detailed progress:**
+- Total tasks and completion percentage
+- Task status distribution (todo/in-progress/blocked/done)
+- Velocity calculations (tasks per day)
+- Estimated completion dates based on velocity
+- Parallel task availability
+- Sequential dependency chains
+- SDD Gates compliance percentage
 
-risk_level: medium
-risk_notes: "JWT secret management requires careful handling in production"
+### Risk Assessment
 
-moscow:
-  must:
-    - "JWT token implementation"
-    - "Password hashing (bcrypt)"
-    - "Basic auth middleware"
-  should:
-    - "Rate limiting"
-    - "Token refresh mechanism"
-    - "Authentication logs"
-  know:
-    - "JWT standards and security best practices"
-    - "OWASP authentication guidelines"
-  wont:
-    - "OAuth implementation (separate task)"
-    - "2FA (separate task)"
+**I identify and track risks:**
+- High-risk tasks with mitigation strategies
+- Dependency chain vulnerabilities
+- Resource allocation issues
+- Timeline bottlenecks
+- Technical debt accumulation
 
-priority_overall: must
-priority_reason: "All features depend on authentication system"
----
-```
+## Example Outputs
 
-## Enhanced Task Format
-
-### For Decomposed Services
-```markdown
-### Auth Service Tasks
-#### AUTH-T001: Initialize auth service structure
-- **Service**: Authentication
-- **Type**: setup
-- **Priority**: HIGH
-- **Dependencies**: None
-
-### User Service Tasks  
-#### USER-T001: Initialize user service structure
-- **Service**: User Management
-- **Type**: setup
-- **Priority**: HIGH
-- **Dependencies**: None
-
-### Integration Tasks
-#### INT-T001: Set up service communication
-- **Services**: Auth ↔ User
-- **Type**: integration
-- **Priority**: HIGH
-- **Dependencies**: AUTH-T001, USER-T001
-```
-
-### For Monolithic Architecture
-```markdown
-### Parallel Group A
-#### T001: Initialize project structure
-- **Type**: setup
-- **Priority**: HIGH
-- **Estimate**: 2 hours
-- **Dependencies**: None
-- **Description**: Set up project directory structure and configuration
-- **Acceptance**: All directories exist and config files are valid
-- **Files**: package.json, README.md, .gitignore
-- **Assignable**: developer
-- **Parallel**: [P]
-
-## Progress Tracking
-```yaml
-status:
-  total: 25
-  completed: 10
-  in_progress: 3
-  blocked: 0
-  
-metrics:
-  velocity: 2-3 tasks/day
-  estimated_completion: 2025-09-15
-  completion_percentage: 40%
-```
-
-## SDD Gates Integration
-
-Each task breakdown includes SDD compliance validation:
-- **Specification First**: Tasks trace to specifications
-- **Task Decomposition**: Concrete, actionable tasks
-- **Quality Assurance**: Appropriate testing tasks included
-- **Traceable Implementation**: Clear linkage to requirements
-
-## Examples
-
-### Generate tasks for decomposed spec
+### Task Breakdown Generation
 ```
 User: /sp-task breakdown
-```
-Detecting decomposition in `specs/001-authentication/decomposition/`...
-I will create:
-- `tasks/001-authentication/auth-service-tasks.md`
-- `tasks/001-authentication/user-service-tasks.md`
-- `tasks/001-authentication/integration-tasks.md`
 
-### Generate tasks for monolithic spec
-```
-User: /sp-task breakdown
-```
-No decomposition found. Creating single task file:
-- `tasks/001-authentication/task-001.md`
+🔍 Current feature: 002-auth-microservice
+📋 Found decomposition: 3 services (auth, user, api-gateway)
+🎯 Generating service-specific tasks...
 
-### Execute service-specific task
-```
-User: /sp-task execute AUTH-T001
-```
-I will:
-- Run: Cross-platform detection and execution
-  ```bash
-  specpulse task breakdown "$PLAN_ID"
-  ```
-- Create: AI-optimized task structure with template variables
-- Output: `TOTAL_TASKS=25, PARALLEL_TASKS=8, STATUS=generated`
+✅ Created task files:
+   📁 auth-service-tasks.md (8 tasks)
+      AUTH-T001: Initialize auth service structure
+      AUTH-T002: Implement JWT token handling
+      AUTH-T003: Create password validation
+      AUTH-T004: Design session management
+      AUTH-T005: Implement OAuth2 integration
+      AUTH-T006: Create token refresh mechanism
+      AUTH-T007: Add multi-factor authentication
+      AUTH-T008: Design auth API endpoints
 
-### Update task status
-```
-User: /sp-task update mark T001-T005 as completed
-```
-I will update task status and recalculate progress metrics.
+   📁 user-service-tasks.md (6 tasks)
+      USER-T001: Initialize user service structure
+      USER-T002: Design user profile schema
+      USER-T003: Implement user preferences
+      USER-T004: Create role-based permissions
+      USER-T005: Design user API endpoints
+      USER-T006: Add user search functionality
 
-### Show comprehensive status
+   📁 integration-tasks.md (4 tasks)
+      INT-T001: Connect auth and user services
+      INT-T002: Design service communication protocol
+      INT-T003: Implement user authentication flow
+      INT-T004: Create cross-service data consistency
+
+📊 Total: 18 tasks across 3 services
+⚡ Parallel tasks available: 12
+🔗 Sequential chains: 3
+✅ SDD Gates compliant: 100%
+```
+
+### Task Status Display
 ```
 User: /sp-task status
+
+📊 Feature: 002-auth-microservice
+============================================================
+Overall Progress: 35% (6/17 tasks completed)
+
+🔧 Service Tasks:
+   Auth Service: 4/8 completed (50%)
+      ✅ AUTH-T001: Initialize auth service structure
+      ✅ AUTH-T002: Implement JWT token handling
+      ✅ AUTH-T003: Create password validation
+      ✅ AUTH-T004: Design session management
+      🔄 AUTH-T005: Implement OAuth2 integration (in progress)
+      ⏳ AUTH-T006: Create token refresh mechanism (pending)
+      ⏳ AUTH-T007: Add multi-factor authentication (pending)
+      ⏳ AUTH-T008: Design auth API endpoints (pending)
+
+   User Service: 1/6 completed (17%)
+      ✅ USER-T001: Initialize user service structure
+      🔄 USER-T002: Design user profile schema (in progress)
+      ⏳ 4 more tasks pending
+
+   Integration: 1/4 completed (25%)
+      ✅ INT-T001: Connect auth and user services
+      ⏳ 3 more tasks pending
+
+📋 SDD Gates Compliance:
+   ✅ 15/17 tasks compliant
+   ⚠️  2 tasks need specification traceability
+
+🚀 Parallel Tasks Available: 8
+⛓️  Sequential Dependencies: 2 active chains
+
+⚡ Velocity: 2.0 tasks/day
+📅 Est. Completion: 2025-01-22
+
+🎯 Recommended Next Steps:
+   1. Complete AUTH-T005 (OAuth2 integration) - in progress
+   2. Start USER-T003 (user preferences) - can run in parallel
+   3. Begin INT-T002 (service communication) - unblocked
 ```
-I will display detailed progress with SDD gates compliance.
 
-### Execute specific task
+### Task Execution
 ```
-User: /sp-task execute T001
+User: /sp-task execute AUTH-T005
+
+🚀 Executing Task: AUTH-T005
+📋 Title: Implement OAuth2 integration
+📝 Description: Add OAuth2 authentication support for external providers...
+
+🔍 Validation:
+   ✅ Dependencies completed: AUTH-T001, AUTH-T002, AUTH-T003, AUTH-T004
+   ✅ Specification traced: ✅ Linked to spec-002.md section 4.3
+   ✅ Success criteria testable: ✅ 5 acceptance criteria defined
+   ✅ Risk assessment: ✅ Medium risk with mitigation plan
+
+🎯 Implementation Started:
+   - Creating OAuth2 provider configurations...
+   - Implementing authorization code flow...
+   - Adding provider client management...
+   - Creating token exchange mechanisms...
+   - Adding provider-specific user mapping...
+
+✅ Testing Completed:
+   - Google OAuth integration: ✅ Working
+   - GitHub OAuth integration: ✅ Working
+   - Token exchange: ✅ Working
+   - Error handling: ✅ Working
+   - Security validation: ✅ Working
+
+📊 Task AUTH-T005 completed successfully!
+📈 Progress updated: 30% → 35%
+⚡ Velocity: 2.5 tasks/day
 ```
-I will:
-- Validate: SDD gates compliance and task readiness
-- Execute: Cross-platform task execution
-  ```bash
-  specpulse task breakdown "$PLAN_ID" "execute:$TASK_ID"
-  ```
-- Track: Results and update progress automatically
 
-## Enhanced Features
+## Error Handling and Recovery
 
-- **Script execution** with Bash
-- **AI-optimized templates** with Jinja2-style variables
-- **Script integration** for validation and execution
-- **SDD gates compliance** tracking
-- **Parallel task identification** and execution
-- **Comprehensive progress tracking** with YAML configuration
-- **Automatic percentage calculation** and velocity metrics
-- **Task dependency management** with conflict detection
-- **Execution command generation** with script integration
-- **Cross-platform operation** with Bash
+### Validation Errors
+- **No active feature**: Prompt to run `/sp-/sp-pulse` first
+- **Missing plan file**: Guide user to create plan with `/sp-/sp-plan`
+- **Invalid task format**: Identify and fix structural issues
+- **Circular dependencies**: Detect and resolve dependency loops
+- **Missing specifications**: Link tasks back to requirements
 
-## Error Handling
+### Execution Issues
+- **Task blockers**: Identify dependencies and provide resolution paths
+- **Failed implementations**: Rollback changes and retry with different approach
+- **Test failures**: Debug and fix implementation issues
+- **Resource conflicts**: Reschedule tasks to avoid conflicts
 
-- Plan existence validation before task generation
-- SDD gates compliance checking
-- Template structure validation
-- Dependency conflict detection
-- Task execution error handling with rollback
-- Progress tracking validation and correction
+This `/sp-task` command provides **complete task lifecycle management** without requiring any SpecPulse CLI installation, using only validated file operations and comprehensive project analytics.

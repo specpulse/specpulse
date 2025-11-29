@@ -57,21 +57,24 @@ SpecPulse introduces **AI-Enhanced Specification-Driven Development**:
 
 ### 🔄 Identical Experience Across All Platforms
 
-**The same 10 commands work everywhere** with identical functionality:
+**The same 11 commands work everywhere** with identical functionality:
 
 ```bash
 # These commands work identically on ALL 8 platforms:
-/sp-pulse payment-system          # Initialize new feature
+/sp-pulse payment-system          # Initialize new feature - START HERE
 /sp-spec "User authentication"    # Create specification
 /sp-plan                          # Generate implementation plan
 /sp-task                          # Break down into tasks
 /sp-execute                       # Execute tasks continuously
 /sp-status                        # Check progress
 /sp-validate                      # Validate work
-/sp-feature                       # Feature management
-/sp-decompose                     # Decompose specifications
-/sp-clarify                       # Clarify requirements
+/sp-continue feature-id           # Switch to existing feature
+/sp-decompose spec-id             # Decompose specifications
+/sp-clarify spec-id               # Clarify requirements
+/sp-llm-enforce [action]          # LLM compliance enforcement
 ```
+
+**🎯 IMPORTANT: Always start with `/sp-pulse` - this is your entry point to everything!**
 
 ---
 
@@ -135,11 +138,8 @@ my-awesome-project/
 ### Step 2: Initialize Your First Feature
 
 ```bash
-# Option A: CLI Approach (Traditional)
-specpulse feature init user-authentication
-
-# Option B: AI-Powered Approach (Recommended)
-# In your AI assistant (Claude, Gemini, etc.):
+# THE WAY TO START - AI-Powered Approach
+# In your AI assistant (Claude, Gemini, Windsurf, Cursor, etc.):
 /sp-pulse user-authentication
 ```
 
@@ -148,15 +148,12 @@ specpulse feature init user-authentication
 - ✅ Sets up project context and metadata
 - ✅ Updates current working feature tracking
 - ✅ Prepares structured environment for development
+- ✅ Deploys AI platform-specific commands automatically
 
 ### Step 3: Create Detailed Specification
 
 ```bash
-# Option A: CLI creates template (boring)
-specpulse spec create "OAuth2 authentication with JWT tokens"
-
-# Option B: AI creates complete specification (magical)
-# In your AI assistant:
+# In your AI assistant (Claude, Gemini, Windsurf, Cursor, etc.):
 /sp-spec "OAuth2 authentication with JWT tokens"
 ```
 
@@ -512,14 +509,44 @@ next_tasks: ["task-002", "task-003"]
 - Conflicting specifications
 - Implementation questions
 
-#### `/sp-feature <feature-name>`
-**Alias for `/sp-pulse` - initialize new feature**
+#### `/sp-continue <feature-id>`
+**Switch to existing feature and continue work**
 
 ```bash
-# Identical to /sp-pulse
-/sp-feature user-management
-/sp-feature api-gateway
+# Examples
+/sp-continue 001-auth
+/sp-continue payment-system
+/sp-continue 003-notifications
 ```
+
+**Use this to:**
+- Switch between different features
+- Resume work on existing features
+- Change context in multi-feature projects
+
+#### `/sp-llm-enforce [action]`
+**LLM compliance enforcement and monitoring**
+
+```bash
+# Start enforcement session (default)
+/sp-llm-enforce
+
+# Check compliance status
+/sp-llm-enforce status
+
+# Validate operations against rules
+/sp-llm-enforce validate
+
+# End enforcement session
+/sp-llm-enforce end
+```
+
+**Ensures:**
+- Directory traversal protection
+- File operation security
+- Content validation and sanitization
+- Compliance with SpecPulse rules
+- Audit trail generation
 
 ---
 
@@ -583,91 +610,22 @@ your-project/
 
 ---
 
-## 💻 CLI Commands: Foundation for AI
+## 💻 Installation and Setup
 
-### Project Management
+### Project Initialization
 
 ```bash
-# Initialize new project
+# Install SpecPulse
+pip install specpulse
+
+# Create new project with AI integration
 specpulse init my-project --ai claude
 
-# Add to existing project
+# Add AI support to existing project
 specpulse init --here --ai gemini
 
-# Project health check
+# Check system health
 specpulse doctor
-
-# Fix common issues
-specpulse doctor --fix
-```
-
-### Feature Development
-
-```bash
-# Start new feature
-specpulse feature init user-authentication
-
-# Switch to existing feature
-specpulse feature continue 001-user-auth
-
-# List all features
-specpulse feature list
-
-# Show current feature context
-specpulse feature current
-```
-
-### Specification Management
-
-```bash
-# Create empty specification template
-specpulse spec create "User authentication system"
-
-# Validate specification
-specpulse spec validate spec-001
-
-# List all specifications
-specpulse spec list
-
-# Export specification
-specpulse spec export spec-001 --format pdf
-```
-
-### Planning and Task Management
-
-```bash
-# Create implementation plan template
-specpulse plan create "Authentication flow implementation"
-
-# Validate plan
-specpulse plan validate plan-001
-
-# Create task breakdown template
-specpulse task breakdown plan-001
-
-# List all tasks
-specpulse task list
-
-# Task monitoring (NEW)
-specpulse monitor status
-specpulse monitor progress
-specpulse monitor history
-```
-
-### Template Management
-
-```bash
-# List available templates
-specpulse template list
-
-# Create custom template
-specpulse template create my-spec --type spec
-
-# Validate template
-specpulse template validate my-spec
-
-# Export template
-specpulse template export my-spec --format json
 ```
 
 ---
@@ -1198,7 +1156,7 @@ pip install specpulse
 specpulse init my-project --ai claude
 cd my-project
 
-# 3. Start your first feature
+# 3. Start your first feature (THE ENTRY POINT)
 /sp-pulse amazing-feature
 
 # 4. Create your first specification

@@ -1,191 +1,286 @@
 ---
 name: sp-pulse
-description: Initialize a new feature with SpecPulse framework
+description: Initialize new features and manage project context without SpecPulse CLI
 allowed_tools:
-  - Bash
   - Read
   - Write
   - Edit
+  - Bash
   - TodoWrite
+  - Glob
 ---
 
 # /sp-pulse Command
 
-Initialize a new feature following SpecPulse methodology with SDD compliance.
-
-## CRITICAL: LLM Workflow Rules
-
-**PRIMARY WORKFLOW: Use CLI when available**
-- Always prefer `specpulse` CLI commands over direct file operations
-- Use Bash tool ONLY for CLI commands, not for file editing
-- Only use Read/Write/Edit tools when CLI doesn't provide functionality
-
-**PROTECTED DIRECTORIES (NEVER EDIT):**
-- `templates/` - Template files
-- `.specpulse/` - Internal config
-- `specpulse/` - Package code
-- `.claude/` and `.gemini/` - AI configuration
-
-**ALLOWED DIRECT EDITS (When NO CLI exists):**
-- `specs/` - Feature specifications (create/edit spec files)
-- `plans/` - Implementation plans (create/edit plan files)
-- `tasks/` - Task breakdowns (create/edit task files)
-- `memory/` - Project context (update context.md, decisions.md)
+Initialize new features and manage project context without SpecPulse CLI. Works completely independently through LLM-safe file operations.
 
 ## Usage
 ```
-/sp-pulse <feature-name> [feature-id]
+/sp-pulse [feature-name]           # Initialize new feature
+/sp-pulse status                   # Show current feature status
+/sp-pulse list                     # List all features
 ```
 
 ## Implementation
 
-When called with `/sp-pulse $ARGUMENTS`, I will:
+When called with `/sp-pulse {{args}}`, I will:
 
-1. **Validate arguments** and extract feature name + optional ID
-2. **Try CLI first (if feature init exists)**:
-   ```bash
-   specpulse feature init feature-name
-   ```
-   If this succeeds, STOP HERE. CLI handles everything.
+### 1. Parse Arguments to Determine Action
 
-3. **If CLI doesn't exist, use File Operations**:
+**I will analyze the arguments:**
+- If feature name provided → Initialize new feature with that name
+- If `status` → Show current feature context
+- If `list` → Show all available features
+- If no argument → Show current feature status
 
-   - **Step 1: Determine Feature ID**
-     ```
-     Read: specs/ directory (list subdirectories)
-     Find highest number (e.g., 001, 002) and increment
-     Or use 001 if no features exist
-     ```
+### 2. For Feature Initialization
 
-   - **Step 2: Create Feature Directories Using Bash**
-     ```bash
-     mkdir -p specs/001-feature-name
-     mkdir -p plans/001-feature-name
-     mkdir -p tasks/001-feature-name
-     ```
+**I will create comprehensive feature structure:**
 
-   - **Step 3: Update Context File**
-     ```
-     Read: memory/context.md
-     Edit: memory/context.md
-     (Add new feature entry with ID, name, timestamp)
-     ```
+#### A. Generate Universal Feature ID
+- Scan existing feature directories in `.specpulse/specs/`
+- Find highest used number (001, 002, 003, etc.)
+- Generate next sequential ID with zero-padding
+- Create feature name from input (kebab-case)
 
-   - **Step 4: Create Git Branch (Optional)**
-     ```bash
-     git checkout -b 001-feature-name
-     ```
+#### B. Create Directory Structure (Atomic Operations)
+**I will use atomic file operations to prevent corruption:**
 
-4. **Intelligent specification suggestions**:
-   - Analyze feature name to infer project type and complexity
-   - Generate 3 context-aware specification suggestions:
-     1. **Core specification** (essential functionality only)
-     2. **Standard specification** (comprehensive with detailed requirements)
-     3. **Complete specification** (full-featured with all aspects)
-   - Show estimated development time for each option
-   - Guide user to `/sp-spec [chosen-option]` after selection
+**Atomic Directory Creation:**
+- Use **Bash** with `mkdir -p` for atomic directory creation
+- Create parent directories first: `.specpulse/`, `.specpulse/specs/`, etc.
+- Validate each directory creation before proceeding
+- Rollback entire operation if any step fails
 
-5. **Validate structure** and report comprehensive status
+**Safe File Operations:**
+- Use **Write** tool with full file content (not partial updates)
+- Validate file paths are within `.specpulse/` directory only
+- Create backup copies before overwriting existing files
+- Verify file permissions after creation
 
-## SDD Compliance
+**Rollback Mechanism:**
+- Track all created files and directories
+- If any step fails, use **Bash** to remove partial creations
+- Restore original state from backups
+- Report specific failure points with recovery instructions
 
-**Principle 1: Specification First**
-- [ ] Feature name is clear and specific
-- [ ] Ready for requirements documentation
-- [ ] Structure supports specifications
+#### C. Initialize Feature Specification
+- Create `spec-001.md` with comprehensive template
+- Include executive summary placeholder
+- Add functional requirements structure
+- Include user stories and acceptance criteria template
+- Add technical constraints and risk assessment sections
 
-**Principle 2: Incremental Planning**
-- [ ] Initial structure supports phased development
-- [ ] Templates ready for iterative work
-- [ ] Supports any project type
+#### D. Update Project Context
+- Update `.specpulse/memory/context.md` with new active feature
+- Set feature metadata (ID, name, created_at, status)
+- Update feature history and navigation
+- Initialize decision log for the feature
 
-## Example
-```
-User: /sp-pulse user-authentication-oauth2
-```
+#### E. Create Initial Memory Structure
+- Create feature-specific memory file
+- Add project context metadata
+- Initialize tracking variables
+- Set up decision documentation structure
 
-I will:
-- Create feature structure using CLI calls
-- Set context: `specpulse context set current.feature "user-authentication-oauth2"`
-- Update context: `specpulse context set current.feature_id "001"`
-- Create: `specs/001-user-authentication-oauth2/` (empty, ready for spec)
-- Create: `plans/001-user-authentication-oauth2/` (empty, ready for plan)
-- Create: `tasks/001-user-authentication-oauth2/` (empty, ready for tasks)
-- Branch: `001-user-authentication-oauth2`
-- **Context-aware specification suggestions** based on feature analysis:
-  - **Core Specification** (2-4 hours development time): Essential functionality with basic requirements
-  - **Standard Specification** (8-12 hours development time): Comprehensive features with detailed requirements and technical specifications
-  - **Complete Specification** (16-24 hours development time): Full-featured solution with advanced requirements, security considerations, and scalability planning
-- **Project type detection**: Web app, API, mobile app, database system, etc.
-- **Complexity assessment**: Simple, moderate, or complex based on feature name
-- Ask: "Which specification approach would you like? (core/standard/complete or custom description)"
-- Guide: "After choosing, use `/sp-spec [your-option]` to create the specification"
-- Status: `STATUS=ready_for_spec, BRANCH_NAME=001-user-authentication-oauth2, PROJECT_TYPE=detected`
+### 3. For Status Display
 
-## Error Handling
+**I will show current feature information:**
+- Read current feature from `.specpulse/memory/context.md`
+- Display feature ID, name, and progress
+- Show file counts (specs, plans, tasks)
+- Calculate and display completion percentage
+- Show last activity timestamp
 
-Enhanced validation includes:
-- Feature name sanitization (alphanumeric, hyphens only)
-- Directory creation validation
-- Template existence verification
-- Git repository validation
-- Context file management
+### 4. For Feature Listing
 
-## Manual Workflow
+**I will scan and display all features:**
+- Use Glob tool to find all feature directories
+- Extract feature IDs and names from directory structure
+- Read context information for each feature
+- Display progress status and file counts
+- Show last activity for each feature
 
-The `/sp-pulse` command creates the feature structure and then guides you through manual steps:
+## Universal ID System Implementation
 
-1. **Phase -1**: **MANUAL** - Use `/sp-spec` to create specification with AI assistance
-2. **Phase 0**: **MANUAL** - Use `/sp-plan` to generate implementation plan  
-3. **Phase 1**: **MANUAL** - Use `/sp-task` to create task breakdown
-4. **Implementation**: Begin development following SDD principles
+### Feature ID Generation
+**I ensure conflict-free numbering:**
+- Scan `.specpulse/specs/` for existing directories
+- Parse directory names: `XXX-feature-name` pattern
+- Extract numeric ID and find highest used number
+- Generate next sequential number: `XXX` where XXX = next_number
+- Zero-pad to 3 digits: `001`, `002`, `003`, etc.
 
-## Context Detection
+### File Numbering System
+**I maintain consistent numbering across all file types:**
+- Specifications: `spec-001.md`, `spec-002.md`, etc.
+- Plans: `plan-001.md`, `plan-002.md`, etc.
+- Tasks: `tasks-001.md`, `tasks-002.md`, etc.
+- Service tasks: `AUTH-T001.md`, `USER-T001.md`, etc.
 
-The system automatically detects which feature you're working on:
-- Checks `memory/context.md` for current feature
-- Uses git branch name if available
-- Falls back to most recently created feature directory
-- You can also specify feature directory explicitly in commands
+### Conflict Prevention
+**I prevent naming conflicts through:**
+- Atomic file existence checks before creation
+- Sequential numbering with proper scanning
+- Fallback patterns for edge cases
+- Validation of directory structure integrity
 
-## Integration Features
+## CLI-Independent Features
 
-- **Automatic context tracking** in `memory/context.md`
-- **Enhanced error reporting** with specific failure reasons
-- **Git integration** with branch management
-- **Template validation** before copying
-- **Todo list creation** for progress tracking
-- **Cross-platform script execution** with Bash
-- **Platform-agnostic operation** for any development environment
-
-## Feature Progress Tracking
-
-The system tracks progress across all features:
-
-### Active Features Overview
-```
-FEATURE_COUNT=3
-ACTIVE_FEATURE=001-user-authentication
-COMPLETED_FEATURES=1
-IN_PROGRESS_FEATURES=2
-```
+### Project Structure Creation
+- **No CLI Dependencies**: 100% independent directory creation
+- **Atomic Operations**: Create structure with rollback on failure
+- **Template System**: Built-in templates for all file types
+- **Validation**: Verify structure integrity after creation
 
 ### Context Management
-- `memory/context.md` tracks current active feature
-- Progress percentages calculated from task completion
-- Feature status: active, completed, paused, blocked
-- Automatic context switching when working on different features
+- **Memory System**: File-based context tracking
+- **Feature History**: Complete navigation history
+- **Decision Logging**: Automatic decision documentation
+- **Progress Tracking**: Manual calculation from file structure
 
-### Multi-Feature Workflow
+### Error Handling and Recovery
+- **Directory Creation Failures**: Provide permission guidance
+- **File System Errors**: Graceful degradation and recovery
+- **Template Missing**: Built-in fallback templates
+- **Permission Issues**: Clear resolution instructions
+
+## Output Examples
+
+### Feature Initialization
 ```
-/sp-pulse feature-a → /sp-spec → /sp-plan → /sp-task → [work]
-/sp-pulse feature-b → /sp-spec → /sp-plan → /sp-task → [work]
-/sp-status feature-a → Check progress → /sp-continue feature-a
+User: /sp-pulse user-authentication
+
+🚀 Initializing New Feature: user-authentication
+================================================================
+
+📊 Feature Analysis
+   Project Type: User Management System
+   Complexity: Standard (authentication flows)
+   ID Generation: 001 (next available)
+   Directory: 001-user-authentication
+
+📁 Creating Feature Structure
+   ✅ Directory: .specpulse/specs/001-user-authentication/
+   ✅ Directory: .specpulse/plans/001-user-authentication/
+   ✅ Directory: .specpulse/tasks/001-user-authentication/
+   ✅ Context: .specpulse/memory/context.md
+   ✅ Memory: .specpulse/memory/decisions.md
+
+📄 Creating Initial Files
+   ✅ Specification: spec-001.md (Executive summary template)
+   ✅ Context: Feature context and metadata
+   ✅ Memory: Decision tracking initialized
+
+🔗 Feature Context Updated
+   Active Feature: 001-user-authentication
+   Status: Initialized
+   Created: 2025-01-11 16:30:00 UTC
+   Progress: 5% (structure created)
+
+✅ Feature initialization complete!
+🎯 Next steps: /sp-spec "detailed requirements" to create specification
 ```
 
-### Feature Switching
-When you have multiple features, the system helps you:
-- List all existing features with their status
-- Switch context between features
-- Continue work from where you left off
-- Track overall project progress across all features
+### Feature Status
+```
+User: /sp-pulse status
+
+📊 Current Feature Status
+================================================================
+
+🎯 Active Feature: 001-user-authentication
+📁 Working Directory: .specpulse/specs/001-user-authentication/
+🔗 Git Branch: feature/001-user-authentication (if git initialized)
+
+📊 Feature Progress
+   Status: In Progress
+   Completion: 35% (7/20 tasks completed)
+   Created: 2025-01-10 09:00:00 UTC
+   Last Activity: 2025-01-11 15:45:00 UTC
+
+📋 Available Files
+   ├── Specifications: 2 files (spec-001.md, spec-002.md)
+   ├── Plans: 1 file (plan-001.md)
+   └── Tasks: 1 file (tasks-001.md)
+
+🚀 Next Steps
+   1. Create specification: /sp-spec "additional requirements"
+   2. Generate plan: /sp-plan
+   3. Break down tasks: /sp-task
+   4. Execute tasks: /sp-execute
+
+💡 Feature context ready for development
+```
+
+### Feature Listing
+```
+User: /sp-pulse list
+
+📊 All Features in Project
+================================================================
+
+1) 🟢 001-user-authentication (35% complete)
+   Status: In Progress
+   Files: 2 specs, 1 plan, 1 task file (25 tasks)
+   Last Activity: 2 hours ago
+   Directory: .specpulse/specs/001-user-authentication/
+
+2) 🟡 002-payment-processing (12% complete)
+   Status: Early Development
+   Files: 1 spec, 0 plans, 1 task file (12 tasks)
+   Last Activity: 1 day ago
+   Directory: .specpulse/specs/002-payment-processing/
+
+3) ⏸️ 003-user-profile (0% complete)
+   Status: Planned
+   Files: 1 spec, 0 plans, 0 task files
+   Last Activity: 3 days ago
+   Directory: .specpulse/specs/003-user-profile/
+
+📊 Project Summary
+   Total Features: 3
+   Active Features: 2
+   Completed Features: 0
+   Overall Progress: 23%
+
+💡 Select feature to switch: /sp-continue [feature-id]
+```
+
+## Error Handling and Recovery
+
+### Common Issues and Solutions
+
+#### Feature Creation Failures
+- **Permission Denied**: Guide user through directory permissions
+- **Directory Exists**: Handle existing feature directories gracefully
+- **File System Errors**: Provide recovery instructions
+- **Template Missing**: Use built-in fallback structure
+
+#### Context Management Issues
+- **Memory File Corrupted**: Rebuild from available feature data
+- **Feature Not Found**: Provide list of available features
+- **Invalid Feature ID**: Validate and suggest correct IDs
+- **Navigation Errors**: Automatic context recovery
+
+#### ID System Conflicts
+- **Number Collision**: Intelligent conflict detection and resolution
+- **Invalid Format**: Automatic format correction and validation
+- **Missing Features**: Handle gaps in feature numbering
+- **Duplicate Names**: Suggest alternative feature names
+
+## Advanced Features
+
+### Feature Templates
+- **Web Application**: Pre-configured for frontend/backend features
+- **API Service**: Optimized for microservice architecture
+- **CLI Tool**: Specialized for command-line applications
+- **Library/SDK**: Configured for reusable components
+
+### Integration Ready
+- **Git Integration**: Automatic branch creation and management
+- **Testing Setup**: Test structure initialization
+- **CI/CD Ready**: Pipeline configuration templates
+- **Documentation**: Auto-generated README and API docs
+
+This `/sp-pulse` command provides **complete feature lifecycle management** without requiring any SpecPulse CLI installation, using only validated file operations and comprehensive project structure creation.

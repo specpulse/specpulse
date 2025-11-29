@@ -62,6 +62,18 @@ commands/
     ├── sp-validate.prompt.md    # Validation (GitHub Copilot format)
     ├── sp-feature.prompt.md     # Feature initialization alias (GitHub Copilot format)
     └── utility/                 # Utility commands
+└── crush/                       # Crush AI commands (.md format with category)
+    ├── pulse.md                 # Feature initialization (Crush format)
+    ├── spec.md                  # Specification management (Crush format)
+    ├── plan.md                  # Implementation planning (Crush format)
+    ├── task.md                  # Task management (Crush format)
+    ├── execute.md               # Continuous execution (Crush format)
+    ├── status.md                # Progress tracking (Crush format)
+    ├── validate.md              # Validation (Crush format)
+    ├── continue.md              # Resume work (Crush format)
+    ├── decompose.md             # Feature decomposition (Crush format)
+    ├── clarify.md               # Clarifications (Crush format)
+    └── utility/                 # Utility commands
 
 Note:
 - Claude uses Markdown (.md) with YAML front matter
@@ -69,6 +81,8 @@ Note:
 - Windsurf uses Markdown (.md) with custom front matter and SPECPULSE:START/END blocks
 - Cursor uses Markdown (.md) with custom front matter (name, id, category) and SPECPULSE:START/END blocks
 - GitHub Copilot uses Markdown (.prompt.md) with $ARGUMENTS placeholder and SPECPULSE:START/END blocks
+- Crush uses Markdown (.md) with category front matter and SPECPULSE:START/END blocks (no sp- prefix in filenames)
+- OpenCode uses Workflow format with agent and workflow_type fields
 All formats contain the SAME instructions and workflows!
 ```
 

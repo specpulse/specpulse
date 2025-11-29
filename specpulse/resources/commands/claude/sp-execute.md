@@ -1,105 +1,187 @@
 ---
 name: sp-execute
-description: Execute tasks continuously without stopping - complete all pending work
+description: Execute tasks without SpecPulse CLI
 allowed_tools:
   - Bash
   - Read
   - Write
   - Edit
-  - MultiEdit
   - TodoWrite
   - Grep
-  - WebSearch
 ---
 
 # /sp-execute Command
 
-Execute tasks continuously from the task list without stopping between tasks. Perfect for completing multiple tasks in sequence.
+Execute tasks without SpecPulse CLI. Works completely independently through LLM-safe file operations.
 
 ## Usage
 ```
-/sp-execute                    # Execute next pending task and continue
-/sp-execute next               # Same as above
-/sp-execute all                # Execute ALL pending tasks non-stop
-/sp-execute T001               # Execute specific task
-/sp-execute AUTH-T001          # Execute specific service task
+/sp-execute [task-id|all|next]    # Execute specific task, all tasks, or next pending task
 ```
-
-## CRITICAL: Continuous Execution Mode
-
-**This command enables NON-STOP task execution. I will:**
-1. Execute the current/next task
-2. Mark it as completed
-3. Immediately move to the next task
-4. Continue until ALL tasks are done or blocked
-
-**NO STOPPING** between tasks unless:
-- All tasks are completed
-- Remaining tasks are blocked
-- An error occurs that requires user intervention
-- User explicitly stops me
 
 ## Implementation
 
-When called with `/sp-execute $ARGUMENTS`, I will:
+When called with `/sp-execute {{args}}`, I will:
 
-1. **Check project status using CLI**:
-   ```bash
-   specpulse --no-color doctor
-   specpulse --no-color spec-progress [feature-id]
-   ```
-   If CLI fails, use manual status checking from CLI_FALLBACK_GUIDE.md
+### 1. Parse Arguments and Determine Execution Mode
 
-2. **Read Task File**:
-   ```
-   Read: tasks/XXX-feature/task-YYY.md
-   ```
+**I will:**
+- Parse the command arguments:
+  - `all` → Execute ALL pending tasks non-stop
+  - `next` or no argument → Execute next pending task and continue
+  - `T001` or `AUTH-T001` → Execute specific task
+- Set execution mode accordingly
+- Determine if continuous execution is needed
 
-3. **Mark Task as Started**:
-   ```
-   Edit: tasks/XXX-feature/task-YYY.md
-   (Update metadata: STATUS: in_progress, add timestamp)
-   ```
+### 2. Detect Current Feature Context
 
-4. **Execute Task Implementation**:
-   - Implement the solution based on task description
-   - Test if applicable
-   - Document any decisions or changes
+**I will:**
+- Use **Read** tool to examine `.specpulse/memory/context.md`
+- Look for `**Directory**:` field to identify current feature
+- If no context found, use **Glob** tool to find first feature with task files
+- Validate feature directory follows naming convention (XXX-feature-name)
+- Set `tasks_dir` to `.specpulse/tasks/[current-feature]`
 
-5. **Mark Task as Completed**:
-   ```
-   Edit: tasks/XXX-feature/task-YYY.md
-   (Update metadata: STATUS: completed, add completion timestamp)
-   ```
+### 3. Load and Analyze Task Files
 
-4. **Continue immediately**:
-   - NO PAUSE for confirmation
-   - NO STOPPING to explain what was done
-   - Move directly to next task
+**I will:**
+- Use **Glob** tool to find all `*.md` files in tasks directory
+- Use **Read** tool to examine each task file
+- Parse task status markers:
+  - `[ ]` = Pending task
+  - `[>]` = In progress task
+  - `[x]` = Completed task
+  - `[!]` = Blocked task
+- Build task inventory with status and dependencies
+- Validate task file structure and content
 
-5. **Repeat until done**:
-   - Continue executing tasks in sequence
-   - Only stop when all tasks are completed or blocked
+### 4. Determine Task Execution Order
 
-## Task Execution Flow
+**For continuous mode (`all` or `next`):**
+- Find first pending task (`[ ]`)
+- Check if dependencies are completed
+- If dependencies not met, skip to next available task
+- For specific task mode, validate the requested task exists
 
-### Single Task Mode (`/sp-execute` or `/sp-execute next`)
+**For service tasks:**
+- Handle `AUTH-T001`, `USER-T001` patterns
+- Respect service-specific dependencies
+- Consider integration tasks after service tasks complete
+
+### 5. Execute Task Implementation
+
+**For each selected task:**
+
+**I will:**
+- Use **Edit** tool to change task status from `[ ]` to `[>]` (in progress)
+- Parse task requirements from the file content
+- Extract specific implementation steps from task description
+- Execute **atomic file operations** based on task type:
+
+#### A. For Backend/API Tasks:
+- **Database Operations**: Create schema files, migrations, models
+- **API Endpoints**: Implement controller methods with proper HTTP status codes
+- **Authentication**: Add JWT middleware, session management, password validation
+- **Validation**: Implement input validation and error handling
+
+#### B. For Frontend Tasks:
+- **Component Creation**: Build React/Vue components with proper state management
+- **Styling**: Add CSS/SCSS with responsive design and accessibility
+- **User Interactions**: Implement event handlers, form validation, user feedback
+- **Routing**: Set up navigation, route guards, page transitions
+
+#### C. For Integration Tasks:
+- **Service Communication**: Implement API calls between microservices
+- **Data Synchronization**: Create event handlers and data consistency logic
+- **Testing**: Add unit tests, integration tests, end-to-end tests
+- **Documentation**: Update API docs, README files, code comments
+
+#### D. For Infrastructure Tasks:
+- **Configuration**: Create config files, environment variables, deployment scripts
+- **CI/CD**: Set up pipelines, automated testing, deployment workflows
+- **Monitoring**: Add logging, metrics collection, health checks
+- **Security**: Implement authentication, authorization, input sanitization
+
+#### E. Implementation Verification:
+- **Syntax Validation**: Use **Bash** to run linters, type checkers, syntax validators
+- **Unit Testing**: Create and run unit tests for implemented code
+- **Integration Testing**: Test component interactions and API endpoints
+- **Manual Verification**: Test functionality through actual usage scenarios
+
+### 6. Mark Task Completion
+
+**I will:**
+- Use **Edit** tool to change task status from `[>]` to `[x]` (completed)
+- Add completion timestamp if not present
+- Verify all requirements from task description are met
+- Update any dependent tasks that can now be executed
+
+### 7. Continue Execution (If in continuous mode)
+
+**I will:**
+- Immediately move to next pending task
+- Repeat steps 4-6 without stopping for confirmation
+- Continue until all tasks are completed or blocked
+- Only stop when:
+  - All tasks are completed
+  - No more tasks can be executed due to blockers
+  - An error occurs that requires user intervention
+  - User explicitly stops execution
+
+### 8. Final Status Report
+
+**I will:**
+- Use **Read** tool to verify final state of all task files
+- Count completed vs remaining tasks
+- Calculate completion percentage
+- List any blockers that prevented completion
+- Provide summary of work accomplished
+- Suggest next steps (testing, validation, etc.)
+
+## Task Execution Examples
+
+### Execute next pending task:
+```bash
+/sp-/sp-execute
 ```
-1. Find next pending task (T001 or AUTH-T001)
-2. Mark as in-progress: [ ] → [>]
-3. Implement the task
-4. Mark as completed: [>] → [x]
-5. Automatically continue to next task
-6. Repeat until all done
+
+**I will:**
+- Find current feature from context
+- Locate next `[ ]` task
+- Change to `[>]` (in progress)
+- Implement the task requirements
+- Change to `[x]` (completed)
+- Continue to next task
+
+### Execute all tasks:
+```bash
+/sp-/sp-execute all
 ```
 
-### Batch Mode (`/sp-execute all`)
+**I will:**
+- Find ALL pending tasks
+- Execute each in sequence without stopping
+- Update status as completed
+- Report final progress
+
+### Execute specific task:
+```bash
+/sp-/sp-execute T001
 ```
-1. Get list of ALL pending tasks
-2. Execute each task in sequence
-3. No stopping between tasks
-4. Continue until completion or blockage
-```
+
+**I will:**
+- Find task in T001.md file
+- Execute all pending tasks in that file
+- Update progress accordingly
+
+## CLI-Independent Features
+
+- **No CLI Dependencies**: 100% independent of SpecPulse CLI installation
+- **Manual Task Parsing**: Direct file content analysis without CLI
+- **Atomic Task Updates**: Safe file operations prevent corruption
+- **Progress Tracking**: Manual calculation from task files
+- **Error Recovery**: Comprehensive error handling
+- **Continuous Execution**: Non-stop task completion
 
 ## Task Status Markers
 
@@ -108,110 +190,81 @@ When called with `/sp-execute $ARGUMENTS`, I will:
 - `[x]` - Completed (done)
 - `[!]` - Blocked (waiting for dependency)
 
-## Example Execution
+## CLI-Independent Examples
 
-### Continuous execution
-```
-User: /sp-execute
-```
-
-I will:
-1. Check current tasks: "Found 15 pending tasks"
-2. Start with T001: "Implementing user model..."
-3. Complete T001: ✓ User model created
-4. Move to T002: "Creating authentication service..."
-5. Complete T002: ✓ Authentication service implemented
-6. Continue with T003, T004, T005... WITHOUT STOPPING
-7. Only report: "All 15 tasks completed successfully!"
-
-### Batch execution
-```
-User: /sp-execute all
+### Execute next pending task
+```bash
+User: /sp-/sp-execute
 ```
 
 I will:
-- Process ALL pending tasks in one go
-- No interruptions or pauses
-- Complete the entire task list
-- Report final status only
+- Detect current feature from memory context
+- Find next pending task using file scanning
+- Mark as in-progress and execute
+- Complete and move to next task automatically
 
-### Specific task
-```
-User: /sp-execute AUTH-T003
+### Execute all pending tasks
+```bash
+User: /sp-/sp-execute all
 ```
 
 I will:
-- Execute only AUTH-T003
-- Then continue with AUTH-T004, AUTH-T005...
-- Keep going until all AUTH tasks are done
+- Find ALL pending tasks across all task files
+- Execute each task in sequence without stopping
+- Complete entire task list non-stop
+- Report final progress and status
 
-## Workflow Integration
-
-### Starting fresh
-```
-/sp-pulse new-feature
-/sp-spec "Create user authentication with OAuth2"
-/sp-plan
-/sp-task
-/sp-execute all    # Complete everything!
+### Execute specific task
+```bash
+User: /sp-/sp-execute T001
 ```
 
-### Resuming work
-```
-/sp-continue 001-user-auth
-/sp-execute        # Continue from where we left off
-```
+I will:
+- Find task file T001.md
+- Execute all pending tasks in that file
+- Continue with subsequent tasks if needed
 
-## Non-Stop Execution Rules
+## CLI-Independent Safety Features
 
-1. **NO EXPLANATIONS** between tasks - just execute
-2. **NO WAITING** for confirmation - keep going
-3. **NO SUMMARIES** after each task - save for the end
-4. **ONLY STOP** when:
-   - All tasks completed
-   - Hit a blocker
-   - Critical error occurs
-   - User explicitly says "stop"
+### Atomic File Operations
+- **Task Status Updates**: Use **Edit** tool with complete file content replacement
+- **Before Update Validation**: Verify file exists and is writable
+- **After Update Verification**: Confirm changes were applied correctly
+- **Rollback on Failure**: Restore original content if update fails
 
-## Error Handling
+### Safe Directory Access
+- **Path Validation**: Ensure all paths are within `.specpulse/` directory
+- **Directory Traversal Protection**: Reject paths with `../` or absolute paths
+- **Permission Checks**: Verify read/write access before operations
+- **Error Recovery**: Provide clear guidance for permission issues
 
-If an error occurs during task execution:
-1. Mark task as blocked: `[!]`
-2. Note the error in task file
-3. Check if CLI failure caused the error
-4. If CLI failed, apply fallback procedures
-5. Skip to next available task
-6. Continue execution
-7. Report all blockers and fallback usage at the end
+### Error Handling and Recovery
 
-## Progress Tracking
+#### Task Execution Failures
+- **Implementation Errors**: Document failure, mark task as blocked, continue
+- **Test Failures**: Fix implementation errors, retry testing, mark as completed
+- **File System Errors**: Provide specific error messages and resolution steps
+- **Network Issues**: Retry operations, provide offline alternatives
 
-During execution, I maintain:
-- Task completion counter
-- Progress percentage
-- List of completed tasks
-- List of any blockers encountered
+#### Data Corruption Prevention
+- **Backup Creation**: Create `.backup` files before major changes
+- **Validation Checks**: Verify file integrity after operations
+- **Recovery Procedures**: Provide steps to restore from backups
+- **Consistency Maintenance**: Ensure task files remain valid markdown
 
-Final report shows:
-```
-## Execution Complete
+#### Memory Context Management
+- **Automatic Feature Detection**: Fallback methods if context file missing
+- **Context Recovery**: Rebuild context from available feature data
+- **State Synchronization**: Keep task status and context aligned
+- **Progress Tracking**: Manual calculation with error tolerance
 
-**Progress**: 100% (25/25 tasks)
-**Duration**: Continuous execution
-**Status**: All tasks completed
+**Key Benefits vs Regular Commands**
+| Regular /sp-execute | CLI-Independent /sp-/sp-execute |
+|-------------------|---------------------------------|
+| Requires CLI installation | Works completely independently |
+| Uses CLI task commands | Manual file parsing and updates |
+| CLI progress tracking | Manual progress calculation |
+| Limited error handling | Comprehensive error recovery |
+| CLI dependency issues | Self-contained operation |
 
-### Summary
-✓ 25 tasks completed
-✗ 0 tasks blocked
-→ 0 tasks remaining
-
-Ready for validation: /sp-validate
-```
-
-## Benefits
-
-- **Maximum efficiency** - No time wasted between tasks
-- **Flow state** - Continuous productive work
-- **Rapid delivery** - Complete features faster
-- **Reduced context switching** - Stay focused on implementation
-- **Automated workflow** - Let AI handle the execution
+**Status**: `CLI-Independent task execution complete, no SpecPulse CLI required` ✅

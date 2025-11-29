@@ -2,163 +2,141 @@
 name: /sp-plan
 id: sp-plan
 category: SpecPulse
-description: Generate or validate implementation plans using AI-optimized templates and SDD methodology.
+description: Generate and manage implementation plans without SpecPulse CLI
 ---
+
 <!-- SPECPULSE:START -->
 **Guardrails**
 - CLI-first approach: Always try SpecPulse CLI commands before file operations
-- Keep changes tightly scoped to the implementation planning outcome
-- Only edit files in plans/ directory - NEVER modify templates/ or internal config
+- Keep changes tightly scoped to the plan creation outcome
+- Only edit files in specs/, plans/, tasks/, memory/ directories - NEVER modify templates/ or internal config
 
 **Critical Rules**
-- **PRIMARY**: Use `specpulse plan generate/validate/optimize` when available
-- **FALLBACK**: File Operations only if CLI fails
+- **PRIMARY**: Use file operations (CLI-independent mode)
 - **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/
-- **EDITABLE ONLY**: plans/
+- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/
 
 **Steps**
 Track these steps as TODOs and complete them one by one.
-1. **Detect current feature context**:
-   - Read `.specpulse/memory/context.md` for current feature metadata
-   - Use git branch name if available (e.g., `001-user-authentication`)
-   - Fall back to most recently created feature directory
-   - If no context found, ask user to specify feature or run `/sp-pulse` first
-2. **Parse arguments** and determine action:
-   - If `validate`: Check plan against SDD gates
-   - If `optimize`: Improve existing plan complexity
-   - Otherwise: Generate new plan
-3. **For /sp-plan:**
-   - **Check for decomposition**: Look for `.specpulse/specs/XXX-feature/decomposition/` directory
-   - **If decomposed**:
-     - Read decomposition artifacts (microservices.md, api-contracts/, interfaces/)
-     - Generate separate plans for each service
-     - Create integration plan for service coordination
-     - Structure: `.specpulse/plans/XXX-feature/service-A-plan.md`, `integration-plan.md`
-   - **If not decomposed**:
-     - Show existing spec files and ask user to select
-     - Generate single monolithic plan
-   - **Find and validate specification** from selected spec file
-   - **Try CLI First**:
-     ```bash
-     specpulse plan generate <spec-id>
-     ```
-     If CLI succeeds, STOP HERE.
-   - **Run SDD Compliance Gates**:
-     - Specification First: Requirements clear and traced
-     - Incremental Planning: Phased approach defined
-     - Task Decomposition: Clear breakdown planned
-     - Quality Assurance: Testing strategy defined
-     - Architecture Documentation: Decisions recorded
-   - **Generate AI-optimized plan** by COPYING template from .specpulse/templates/plan.md to .specpulse/plans/XXX-feature/:
-     ```markdown
-     # Implementation Plan: {{ feature_name }}
-     ## Specification Reference
-     - **Spec ID**: SPEC-{{ feature_id }}
-     - **Spec Version**: {{ spec_version }}
-     - **Plan Version**: {{ plan_version }}
-     - **Generated**: {{ date }}
-     ```
-   - **Generate comprehensive sections based on architecture**:
-     - **For decomposed specs**:
-       * Service-specific plans with bounded contexts
-       * Inter-service communication plans
-       * Data consistency strategies
-       * Service deployment order
-       * Integration testing approach
-     - **For monolithic specs**:
-       * Traditional layered architecture
-       * Module boundaries
-       * Single deployment strategy
-     - **Common sections**:
-       * Technology stack with performance implications
-       * Testing strategy with coverage targets
-       * Security considerations
-       * Deployment strategy with rollback plans
-   - **Architecture documentation**:
-     - Document all architectural decisions with rationale
-     - Create improvement strategies for technical debt
-     - Track future enhancement opportunities
-   - **CRITICAL NUMBERING LOGIC**:
-     - Check if `.specpulse/plans/XXX-feature/plan-001.md` exists
-     - If plan-001.md does NOT exist: Create plan-001.md with full content from template
-     - If plan-001.md EXISTS: Create plan-002.md (or next number) with new content
-     - NEVER leave plan-001.md as placeholder if it's the first plan
-   - **Write FULL plan content** to `.specpulse/plans/XXX-feature/plan-XXX.md`
-   - **IMPORTANT**: Can EDIT files in .specpulse/plans/ folder, but NEVER modify .specpulse/templates/, scripts/, or commands/ folders
-4. **For /sp-plan validate:**
-   - **Show existing plan files**: List all plan-XXX.md files in current feature directory
-   - **Ask user to select**: Which plan file to validate
-   - **Validation** using script:
-     ```bash
-     specpulse plan validate <plan-id>
-     ```
-     If CLI fails, use manual validation.
-   - **Verify all SDD gates are addressed**:
-     * Specification First: Requirements clear and traced
-     * Incremental Planning: Phased approach defined
-     * Task Decomposition: Clear breakdown planned
-     * Quality Assurance: Testing strategy defined
-     * Architecture Documentation: Decisions recorded
-   - **Check architectural decisions** have proper documentation
-   - **Validate test-first approach** is documented
-   - **Ensure integration strategy** uses real services
-   - **Report detailed validation results**
-5. **For /sp-plan optimize:**
-   - **Show existing plan files**: List all plan-XXX.md files in current feature directory
-   - **Ask user to select**: Which plan file to optimize
-   - **Read existing plan** from detected context and analyze complexity
-   - **Identify optimization opportunities**:
-     - Module consolidation opportunities
-     - Abstraction layer removal candidates
-     - Simplification strategies
-   - **Generate optimization recommendations**
-   - **Create new version**: Write optimized plan as next version (plan-XXX.md)
+
+1. **Parse arguments to determine action**:
+   - If first argument is generate, validate, or optimize → Use that action
+   - If no action specified → Default to generate
+   - For other arguments → Look for feature name or use current feature
+
+2. **Detect current feature context**:
+   - Check .specpulse/memory/context.md for active feature
+   - Look for most recently modified spec/plan/task directory
+   - Validate feature directory exists and is properly structured
+   - Extract feature ID and name from directory structure
+
+3. **For action: generate (default)**:
+   - **Step 1: Specification Analysis**
+     - Read specification files from .specpulse/specs/[feature]/
+     - Analyze functional requirements and user stories
+     - Extract technical constraints and dependencies
+     - Identify complexity and risk factors
+   - **Step 2: Decomposition Support Check**
+     - Look for .specpulse/specs/[feature]/decomposition/ directory
+     - If decomposition exists, identify service directories
+     - Plan service-specific implementation strategies
+     - Generate service-dependent task breakdowns
+   - **Step 3: Plan Structure Design**
+     - Create Implementation Strategy, Phase Breakdown, Task Dependencies
+     - Include Resource Requirements, Timeline Estimates, Risk Mitigation
+   - **Step 4: Service-Specific Planning (if decomposed)**
+     - Generate Service Implementation Plan, Service Dependencies
+     - Create Integration Strategy, Data Flow, API Contracts
+   - **Step 5: Generate Next Plan Number (Universal ID System)**
+     - Use Glob tool to scan .specpulse/plans/[feature]/ directory
+     - Parse existing plan files using regex plan-(\d+)\.md pattern
+     - Extract all numbers and convert to integers for comparison
+     - Find maximum value: max_num = max(extracted_numbers) or 0 if empty
+     - Generate next sequential: next_num = max_num + 1
+     - Zero-pad format: f"plan-{next_num:03d}.md" → plan-001.md, plan-002.md
+   - **Step 6: Write Plan File**
+     - Create .specpulse/plans/[feature]/plan-[###].md with generated content
+     - Use atomic file operations to prevent corruption
+
+4. **For action: validate**:
+   - **File Structure Validation**
+     - Verify plan files exist in .specpulse/plans/[feature]/
+     - Check file naming follows plan-[###].md pattern
+     - Validate plan file format and readability
+     - Ensure proper markdown structure
+   - **Content Completeness Validation**
+     - Check Implementation Strategy, Phase Breakdown, Task Dependencies
+     - Validate Resource Requirements, Timeline Estimates, Risk Mitigation
+   - **Technical Feasibility Validation**
+     - Assess implementation approach complexity
+     - Validate dependency relationships are logical
+     - Check timeline estimates are achievable
+     - Verify resource requirements are realistic
+
+5. **For action: optimize**:
+   - **Plan Analysis**
+     - Read and analyze existing plan files
+     - Identify complexity issues and optimization opportunities
+     - Assess current phase breakdown effectiveness
+     - Evaluate dependency management efficiency
+   - **Optimization Strategies**
+     - Apply Phase Consolidation, Dependency Optimization
+     - Implement Timeline Optimization, Resource Optimization
+   - **Risk Assessment Updates**
+     - Update risk mitigation strategies
+     - Identify new optimization-related risks
+     - Provide contingency planning recommendations
+
+6. **Validate structure and report comprehensive status**
 
 **Usage**
 ```
 /sp-plan [action] [feature-directory]
 ```
 
-Actions: `generate`, `validate`, `optimize` (defaults to `generate`)
-
-**SDD Compliance Gates Tracking**
-
-**Principle 1: Specification First**
-- [ ] Clear requirements documented
-- [ ] User stories with acceptance criteria
-- [ ] [NEEDS CLARIFICATION] markers used
-- [ ] Functional and non-functional requirements
-
-**Principle 2: Incremental Planning**
-- [ ] Work broken into valuable phases
-- [ ] Each phase delivers working software
-- [ ] Milestones and checkpoints defined
-- [ ] Features prioritized by business value
-
-**Principle 3: Task Decomposition**
-- [ ] Tasks are specific and actionable
-- [ ] Effort estimates provided
-- [ ] Definition of Done clear
-- [ ] Dependencies identified
-
 **Examples**
 
-**Generate plan for decomposed spec:**
+**Basic Usage:**
 ```
-/sp-plan
+/sp-plan generate
 ```
-Output: Detecting decomposition in `specs/001-authentication/decomposition/`...
-Creates service-specific plans.
 
-**Validate existing plan:**
+Output: Create comprehensive implementation plan with specification analysis, phase breakdown, and service-specific planning.
+
+**Validate Plan:**
 ```
 /sp-plan validate
 ```
-Output: Comprehensive validation with detailed reporting.
+
+Output: Perform comprehensive validation, check file structure, content completeness, and technical feasibility.
+
+**Optimize Plan:**
+```
+/sp-plan optimize
+```
+
+Output: Improve existing plans with optimization strategies, risk assessment updates, and timeline adjustments.
+
+**Advanced Features:**
+- **Decomposed Services Support**: Service-specific planning for microservices architecture
+- **SDD Gates Compliance**: Specification First, Task Decomposition, Quality Assurance, Traceable Implementation
+- **Universal ID System**: Conflict-free plan numbering with validation
+- **Cross-Plan Dependency Management**: Track dependencies between multiple features
+
+**Error Handling**
+- No active feature: Prompt to run /sp-pulse first
+- Invalid feature directory: Suggest valid feature names
+- Missing specifications: Guide user to create specifications first
+- Template missing: Create comprehensive plan structure manually
 
 **Reference**
-- Use `specpulse plan --help` if you need additional CLI options
-- Check `memory/context.md` for current feature context
-- Run `specpulse doctor` if you encounter system issues
-- After plan creation, continue with `/sp-task` for task breakdown
+- Check memory/context.md for current feature context
+- Run validation on created plan
+- After plan creation, continue with /sp-task for task breakdown
+
+**CLI-Independent Benefits:**
+- Works completely without SpecPulse CLI installation
+- Uses LLM-safe file operations with atomic writes
+- Intelligent planning algorithms and optimization
+- Comprehensive error recovery and validation
 <!-- SPECPULSE:END -->

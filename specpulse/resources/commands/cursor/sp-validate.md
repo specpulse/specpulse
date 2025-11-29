@@ -2,109 +2,165 @@
 name: /sp-validate
 id: sp-validate
 category: SpecPulse
-description: Validate current specifications, plans, or tasks for completeness and SDD compliance.
+description: Validate specifications, plans, tasks, and tests without SpecPulse CLI
 ---
+
 <!-- SPECPULSE:START -->
 **Guardrails**
 - CLI-first approach: Always try SpecPulse CLI commands before file operations
 - Keep changes tightly scoped to the validation outcome
-- READ-ONLY OPERATION: This command only validates, never modifies any files
+- Only read files in specs/, plans/, tasks/, memory/ directories - NEVER modify templates/ or internal config
 
 **Critical Rules**
-- **PRIMARY**: Use `specpulse validate <target>` when available
-- **FALLBACK**: File Operations only if CLI fails
-- **READ-ONLY VALIDATION**: This command never modifies any files
-- **PROTECTED DIRECTORIES**: All directories are read-only during validation
+- **PRIMARY**: Use file operations (CLI-independent mode)
+- **PROTECTED DIRECTORIES**: templates/, .specpulse/, specpulse/, .claude/, .gemini/, .windsurf/, .cursor/
+- **EDITABLE ONLY**: specs/, plans/, tasks/, memory/ (read-only validation)
 
 **Steps**
 Track these steps as TODOs and complete them one by one.
-1. **Parse validation target**:
-   - If `spec`: Validate specifications
-   - If `plan`: Validate plans
-   - If `task`: Validate tasks
-   - If `all`: Validate everything
-   - If no argument: Default to current spec
-2. **Try CLI First**:
-   ```bash
-   specpulse validate spec --verbose
-   specpulse validate plan
-   specpulse validate task
-   specpulse validate all
-   ```
-   If CLI succeeds, STOP HERE.
-3. **For spec validation** (if CLI fails):
-   - **Read current spec file**: Detect from context or list available specs
-   - **Check required sections present**:
-     * Executive Summary
-     * Problem Statement
-     * Functional Requirements
-     * User Stories
-     * Acceptance Criteria
-     * Technical Constraints
-   - **Count `[NEEDS CLARIFICATION]` markers**
-   - **Verify Given-When-Then format** in acceptance criteria
-   - **Check SDD compliance indicators**
-4. **For plan validation** (if CLI fails):
-   - **Read plan file**: Detect from context or list available plans
-   - **Check phases defined** and logical flow
-   - **Verify task breakdown exists** with proper structure
-   - **Validate architecture decisions** with rationale
-   - **Verify testing strategy** is comprehensive
-5. **For task validation** (if CLI fails):
-   - **Read task files**: Detect from context or list available tasks
-   - **Check status fields present** and consistent
-   - **Verify dependencies listed** accurately
-   - **Check acceptance criteria** are testable
-   - **Validate task priority** and estimates
-   - **Check SDD gates compliance**
-6. **For all validation**:
-   - Run complete validation across all components
-   - Check cross-component consistency
-   - Validate workflow progression
-   - Verify integration points
-7. **Generate comprehensive validation report**:
-   - Show validation status (✓ or ✗)
-   - List missing sections
-   - Count clarifications needed
-   - Highlight blockers and issues
-   - Suggest fixes
-   - Recommend next steps
+
+1. **Parse arguments to determine validation scope**:
+   - If target specified: Validate only that component (spec, plan, task, test, all)
+   - If feature name provided: Focus on specific feature
+   - If no arguments: Validate all components in current feature
+   - Parse options like --fix, --verbose, --strict
+
+2. **Detect current feature context**:
+   - Check .specpulse/memory/context.md for active feature
+   - Look for most recently modified spec/plan/task directory
+   - Validate feature directory exists and is properly structured
+   - Extract feature ID and name from directory structure
+
+3. **For specification validation**:
+   - **File Structure Validation**
+     - Verify specification files exist in .specpulse/specs/[feature]/
+     - Check file naming follows spec-[###].md pattern
+     - Validate file permissions and readability
+     - Ensure proper markdown formatting
+   - **Content Structure Validation**
+     - Check required sections: Executive Summary, Functional Requirements, User Stories, Acceptance Criteria, Technical Constraints, Non-Functional Requirements, Risk Assessment
+   - **Content Quality Validation**
+     - Count [NEEDS CLARIFICATION] markers, verify Given-When-Then format
+     - Check acceptance criteria are measurable and testable
+     - Validate technical constraints are specific and achievable
+   - **SDD Gates Compliance**
+     - Specification First, Traceable, Testable, Complete validation
+
+4. **For plan validation**:
+   - **File Structure Validation**
+     - Verify plan files exist in .specpulse/plans/[feature]/
+     - Check file naming follows plan-[###].md pattern
+     - Validate plan file format and readability
+   - **Content Completeness Validation**
+     - Verify Implementation Strategy, Phase Breakdown, Task Dependencies, Resource Requirements, Timeline Estimates, Risk Mitigation
+   - **Technical Feasibility Validation**
+     - Assess implementation approach complexity, validate dependency relationships
+     - Check timeline estimates are realistic, verify resource requirements are achievable
+
+5. **For task validation**:
+   - **File Structure Validation**
+     - Verify task files exist in .specpulse/tasks/[feature]/
+     - Check file naming follows task patterns (tasks-*.md, *-tasks.md)
+     - Validate task file permissions and format
+   - **Task Structure Validation**
+     - Verify required fields: Task ID, Title, Status, Description, Files Touched, Success Criteria, Dependencies, Risk Assessment
+   - **Task Quality Validation**
+     - Check task descriptions provide clear implementation guidance
+     - Verify success criteria are specific and measurable
+     - Validate dependency chains are acyclic and logical
+   - **Dependency Validation**
+     - Verify all referenced task IDs exist, check for circular dependencies
+     - Validate critical path identification, assess parallel task availability
+
+6. **For test validation**:
+   - **Test File Discovery**
+     - Locate test files in tests/features/[feature]/ directory
+     - Check for proper test_*.py naming convention
+     - Validate test file structure and imports
+   - **Test Content Validation**
+     - Verify proper imports, test functions, test coverage, test quality, test documentation
+   - **Requirements Traceability**
+     - Map test files to specification requirements
+     - Verify user story test coverage, check acceptance criteria test implementation
+
+7. **For comprehensive validation (all)**:
+   - **Cross-Component Consistency**
+     - Verify specifications link to plans and tasks
+     - Check task traceability to requirements
+     - Validate test coverage of specifications
+   - **Quality Metrics Calculation**
+     - Calculate Specification Completeness, Plan Feasibility, Task Quality, Test Coverage, SDD Compliance
+   - **Recommendations and Fixes**
+     - Provide actionable recommendations for critical issues, quality improvements, missing elements
+
+8. **Validate structure and report comprehensive validation results**
 
 **Usage**
 ```
-/sp-validate                  # Validate current spec
-/sp-validate spec             # Validate specifications
-/sp-validate plan             # Validate plans
-/sp-validate task             # Validate tasks
-/sp-validate all              # Validate everything
+/sp-validate [target] [feature-name]
 ```
-
-**Validation Scoring**
-
-**Status Indicators:**
-- ✓ **Complete**: All requirements met, ready for next phase
-- ⚠ **Partial**: Mostly complete, minor issues to address
-- ✗ **Incomplete**: Significant issues, needs work before proceeding
-- 🚫 **Blocked**: Critical blockers prevent progress
 
 **Examples**
 
-**Validate current spec (success):**
+**Validate All Components:**
 ```
 /sp-validate
 ```
-Output: Specification validation results showing completion status.
 
-**Validate with issues:**
+Output: Comprehensive validation of specs, plans, tasks, and tests with quality metrics and recommendations.
+
+**Validate Specifications Only:**
 ```
 /sp-validate spec
 ```
-Output: Validation report with missing sections and required actions.
+
+Output: Detailed specification validation with SDD Gates compliance assessment.
+
+**Validate Specific Feature:**
+```
+/sp-validate all 001-user-authentication
+```
+
+Output: Complete feature validation with cross-component consistency analysis.
+
+**Validation Scopes:**
+- **spec**: Specification structure, content quality, SDD compliance
+- **plan**: Implementation plan feasibility and completeness
+- **task**: Task structure, dependencies, quality validation
+- **test**: Test coverage, requirements traceability, quality
+- **all**: Comprehensive validation across all components
+
+**Advanced Features:**
+- **Quality Metrics**: Percentage scores for completeness, feasibility, coverage
+- **SDD Gates Compliance**: Specification-Driven Development standards
+- **Cross-Component Analysis**: Consistency across specs, plans, tasks, tests
+- **Requirements Traceability**: End-to-end validation from requirements to tests
+- **Risk Assessment**: Identification of blocking issues and mitigation strategies
+
+**Validation Output:**
+- File structure validation results
+- Content completeness assessment
+- Quality metrics and scoring
+- Issues classification (Critical, Major, Minor)
+- Actionable recommendations and fixes
+- Readiness assessment for implementation
+
+**Error Handling**
+- Missing directories: Guide user through creating proper structure
+- File permission errors: Provide permission fix instructions
+- Invalid file formats: Offer template corrections
+- Content quality issues: Provide section templates and clarification guidance
 
 **Reference**
-- Use `specpulse validate --help` if you need additional CLI options
-- Check `memory/context.md` for current component context
-- Run `specpulse doctor` if you encounter system issues
-- Use `/sp-status` for overall project health
-- This command is READ-ONLY - it never modifies files
+- Check memory/context.md for current feature context
+- Run validation before implementation to ensure quality
+- Use --verbose option for detailed analysis and --strict for production standards
+- Follow recommended actions to improve validation scores
+
+**CLI-Independent Benefits:**
+- Works completely without SpecPulse CLI installation
+- Uses LLM-safe file operations for comprehensive validation
+- Quality metrics and scoring for objective assessment
+- SDD Gates compliance validation for specification-driven development
+- Cross-component consistency analysis and requirements traceability
 <!-- SPECPULSE:END -->
