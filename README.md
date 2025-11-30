@@ -1,12 +1,8 @@
-# SpecPulse v2.7.3
+# SpecPulse v2.7.5
 
 <div align="center">
 
-[![PyPI](https://img.shields.io/pypi/v/specpulse.svg)](https://pypi.org/project/specpulse/)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![AI Platforms](https://img.shields.io/badge/AI%20Platforms-8-blue.svg)](https://github.com/specpulse/specpulse)
-[![Commands](https://img.shields.io/badge/Commands-86-green.svg)](https://github.com/specpulse/specpulse)
+[![PyPI](https://img.shields.io/pypi/v/specpulse.svg)](https://pypi.org/project/specpulse/) [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![AI Platforms](https://img.shields.io/badge/AI%20Platforms-8-blue.svg)](https://github.com/specpulse/specpulse) [![Commands](https://img.shields.io/badge/Commands-88-green.svg)](https://github.com/specpulse/specpulse)
 
 **The Complete AI-Enhanced Development Framework**
 
@@ -331,17 +327,25 @@ next_tasks: ["task-002", "task-003"]
 
 ### Specification Commands
 
-#### `/sp-spec create "<description>"`
+#### `/sp-spec "<description>"`
+
 **Create and expand detailed specification**
 
 ```bash
 # Examples
-/sp-spec create "User authentication with OAuth2 and JWT"
-/sp-spec create "REST API for product catalog with filtering"
-/sp-spec create "Real-time chat with WebSocket and rooms"
+/sp-spec "User authentication with OAuth2 and JWT"
+/sp-spec "REST API for product catalog with filtering"
+/sp-spec "Real-time chat with WebSocket and rooms"
+
+# With explicit action
+/sp-spec create "Payment processing system"
+/sp-spec update "Add error handling requirements"
+/sp-spec validate
+/sp-spec clarify
 ```
 
 **AI generates complete specification with:**
+
 - Business problem and solution overview
 - Functional and non-functional requirements
 - API contracts and data models
@@ -349,64 +353,76 @@ next_tasks: ["task-002", "task-003"]
 - User experience and interface design
 - Acceptance criteria and success metrics
 
-#### `/sp-spec validate <spec-id>`
+#### `/sp-spec validate`
+
 **Validate specification completeness**
 
 ```bash
-# Examples
-/sp-spec validate spec-001
-/sp-spec validate auth-spec
+# Validate current feature's specifications
+/sp-spec validate
 ```
 
-#### `/sp-spec expand <spec-id>`
-**Expand existing specification with more details**
+#### `/sp-spec clarify`
+
+**Clarify and expand specification details**
 
 ```bash
-# Examples
-/sp-spec expand spec-001
-/sp-spec expand authentication-spec
+# Clarify current feature's specifications
+/sp-spec clarify
 ```
 
 ### Planning Commands
 
 #### `/sp-plan`
+
 **Generate and expand implementation plan**
 
 ```bash
-# Usage
+# Generate plan (default)
 /sp-plan
 
-# AI creates:
-# - Architecture decisions and technology choices
-# - File structure and organization
-# - Implementation steps in logical order
-# - Dependencies and integration points
-# - Time estimates and milestones
-# - Risk assessment and mitigation strategies
+# With explicit action
+/sp-plan generate
+/sp-plan validate
+/sp-plan optimize
 ```
 
-#### `/sp-plan validate <plan-id>`
+**AI creates:**
+
+- Architecture decisions and technology choices
+- File structure and organization
+- Implementation steps in logical order
+- Dependencies and integration points
+- Risk assessment and mitigation strategies
+
+#### `/sp-plan validate`
+
 **Validate implementation plan**
 
 ```bash
-# Examples
-/sp-plan validate plan-001
-/sp-plan validate auth-plan
+# Validate current feature's plan
+/sp-plan validate
 ```
 
 ### Task Management Commands
 
-#### `/sp-task [plan-id]`
+#### `/sp-task`
+
 **Break plan into detailed, actionable tasks**
 
 ```bash
-# Examples
-/sp-task                    # Uses current plan
-/sp-task plan-001          # Uses specific plan
-/sp-task auth-plan         # Uses named plan
+# Break down into tasks (default)
+/sp-task
+
+# With explicit action
+/sp-task breakdown
+/sp-task update
+/sp-task status
+/sp-task validate
 ```
 
 **Each task includes:**
+
 - Clear problem statement and necessity
 - Step-by-step implementation approach
 - Files to be created/modified with reasons
@@ -414,15 +430,14 @@ next_tasks: ["task-002", "task-003"]
 - Dependencies and task relationships
 - Risk assessment and mitigation
 - MoSCoW priority breakdown (Must, Should, Could, Won't)
-- Time and complexity estimates
 
-#### `/sp-task validate <task-id>`
+#### `/sp-task validate`
+
 **Validate task completeness and correctness**
 
 ```bash
-# Examples
-/sp-task validate task-001
-/sp-task validate auth-middleware
+# Validate current feature's tasks
+/sp-task validate
 ```
 
 ### Execution Commands
@@ -1190,6 +1205,6 @@ cd my-project
 
 **Made with ❤️ by developers who believe in specifications-first development**
 
-**SpecPulse v2.7.1** - Building the future of software development, together.
+**SpecPulse v2.7.5** - Building the future of software development, together.
 
 </div>

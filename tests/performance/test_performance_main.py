@@ -48,7 +48,7 @@ class TestPerformance:
         cli = CommandHandler(no_color=True, verbose=False)
 
         start_time = time.time()
-        success = cli.init("perf-test", here=True)
+        success = cli.project_commands.init("perf-test", here=True)
         end_time = time.time()
 
         init_time = end_time - start_time
@@ -61,7 +61,7 @@ class TestPerformance:
         """Test template validation performance with many templates"""
         # Initialize project
         cli = CommandHandler(no_color=True)
-        cli.init("perf-templates", here=True)
+        cli.project_commands.init("perf-templates", here=True)
 
         template_manager = TemplateManager(self.project_path)
 
@@ -101,7 +101,7 @@ class TestPerformance:
         """Test memory system performance with many entries"""
         # Initialize project
         cli = CommandHandler(no_color=True)
-        cli.init("perf-memory", here=True)
+        cli.project_commands.init("perf-memory", here=True)
 
         memory_manager = MemoryManager(self.project_path)
         num_entries = 100
@@ -139,7 +139,7 @@ class TestPerformance:
         """Test validation system performance"""
         # Initialize project with many files
         cli = CommandHandler(no_color=True)
-        cli.init("perf-validation", here=True)
+        cli.project_commands.init("perf-validation", here=True)
 
         validator = Validator(self.project_path)
 
@@ -242,7 +242,7 @@ Implementation plan for feature {i+1}
         """Test performance with simulated large project"""
         # Initialize project
         cli = CommandHandler(no_color=True)
-        cli.init("perf-large", here=True)
+        cli.project_commands.init("perf-large", here=True)
 
         template_manager = TemplateManager(self.project_path)
         memory_manager = MemoryManager(self.project_path)
@@ -312,7 +312,7 @@ Implementation plan for feature {i+1}
         """Test memory cleanup performance with many entries"""
         # Initialize project
         cli = CommandHandler(no_color=True)
-        cli.init("perf-cleanup", here=True)
+        cli.project_commands.init("perf-cleanup", here=True)
 
         memory_manager = MemoryManager(self.project_path)
 
@@ -354,7 +354,7 @@ Implementation plan for feature {i+1}
         """Test performance with concurrent operations"""
         # Initialize project
         cli = CommandHandler(no_color=True)
-        cli.init("perf-concurrent", here=True)
+        cli.project_commands.init("perf-concurrent", here=True)
 
         template_manager = TemplateManager(self.project_path)
         memory_manager = MemoryManager(self.project_path)
@@ -415,7 +415,7 @@ Implementation plan for feature {i+1}
         """Test memory export performance with large dataset"""
         # Initialize project
         cli = CommandHandler(no_color=True)
-        cli.init("perf-export", here=True)
+        cli.project_commands.init("perf-export", here=True)
 
         memory_manager = MemoryManager(self.project_path)
 

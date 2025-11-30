@@ -148,7 +148,7 @@ class UniversalIDGenerator:
                 os.close(self._lock_handle)
                 if self.lock_file.exists():
                     self.lock_file.unlink()
-        except:
+        except (OSError, IOError):
             pass  # Lock file might have been cleaned up
 
     def get_next_id(self, id_type: IDType, service_prefix: Optional[str] = None) -> str:

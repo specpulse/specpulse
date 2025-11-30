@@ -386,8 +386,8 @@ class LLMComplianceEnforcer:
             # Try to end session with error
             try:
                 self.status_manager.end_llm_session(False, str(e))
-            except:
-                pass
+            except Exception:
+                pass  # Cleanup should not raise
 
             self.enforcement_active = False
             session_id = self.current_context.get("session_id")
@@ -502,8 +502,8 @@ def enforce_llm_compliance(operation_type: LLMOperationType,
                 # End session with error
                 try:
                     enforcer.validate_and_end_session(False, str(e))
-                except:
-                    pass
+                except Exception:
+                    pass  # Cleanup should not raise
 
                 raise
 

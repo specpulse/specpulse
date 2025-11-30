@@ -54,7 +54,7 @@ class TestSpecPulseCLI:
             os.chdir(tmpdir)
 
             try:
-                result = cli.init("test-project")
+                result = cli.project_commands.init("test-project")
                 assert result is True
                 assert project_path.exists()
                 assert (project_path / ".specpulse").exists()
@@ -72,7 +72,7 @@ class TestSpecPulseCLI:
         mock_exists.return_value = True
 
         cli = CommandHandler(no_color=True)
-        result = cli.init("existing-project")
+        result = cli.project_commands.init("existing-project")
 
         # Should return True for successful initialization (even for existing project)
         assert result is True
@@ -93,7 +93,7 @@ class TestSpecPulseCLI:
         cli._create_ai_commands = MagicMock()
         cli._create_manifest = MagicMock()
 
-        result = cli.init(here=True)
+        result = cli.project_commands.init(here=True)
 
         # Should return error code for failed initialization
         assert result != 0

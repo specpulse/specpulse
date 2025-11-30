@@ -42,7 +42,7 @@ class TestIntegration:
         """Test complete workflow from initialization to validation"""
         # 1. Initialize project
         cli = CommandHandler(no_color=True, verbose=False)
-        success = cli.init("test-project", here=True)
+        success = cli.project_commands.init("test-project", here=True)
         assert success
 
         # Verify project structure created
@@ -76,7 +76,7 @@ class TestIntegration:
         """Test specification to plan to task workflow"""
         # Initialize project
         cli = CommandHandler(no_color=True)
-        cli.init("test-workflow", here=True)
+        cli.project_commands.init("test-workflow", here=True)
 
         # Create spec directory and file
         feature_dir = "001-test-feature"
@@ -205,7 +205,7 @@ graph TD
         """Test integration between template and memory systems"""
         # Initialize project
         cli = CommandHandler(no_color=True)
-        cli.init("integration-test", here=True)
+        cli.project_commands.init("integration-test", here=True)
 
         template_manager = TemplateManager(self.project_path)
         memory_manager = MemoryManager(self.project_path)
@@ -268,7 +268,7 @@ graph TD
         """Test CLI memory commands integration"""
         # Initialize project
         cli = CommandHandler(no_color=True)
-        cli.init("memory-test", here=True)
+        cli.project_commands.init("memory-test", here=True)
 
         # Memory manager should be initialized since we're in a project
         assert hasattr(cli, "memory_manager")
@@ -306,7 +306,7 @@ graph TD
         """Test CLI template commands integration"""
         # Initialize project
         cli = CommandHandler(no_color=True)
-        cli.init("template-test", here=True)
+        cli.project_commands.init("template-test", here=True)
 
         # Template manager should be initialized
         assert hasattr(cli, "template_manager")
@@ -355,7 +355,7 @@ This is a test template for {{ feature_name }}.
 
         # Test initialization in non-existent directory
         non_existent = Path("/tmp/non_existent_path_12345")
-        success = cli.init("test", here=False, project_name=str(non_existent))
+        success = cli.project_commands.init("test", here=False, project_name=str(non_existent))
         # Should handle gracefully - either succeed by creating dir or fail gracefully
 
         # Test template operations on non-SpecPulse project
@@ -371,7 +371,7 @@ This is a test template for {{ feature_name }}.
         """Test validation system with intentional errors"""
         # Initialize project
         cli = CommandHandler(no_color=True, verbose=True)
-        cli.init("validation-test", here=True)
+        cli.project_commands.init("validation-test", here=True)
 
         # Create invalid specification file
         spec_dir = self.project_path / "specs" / "001-invalid"
@@ -429,7 +429,7 @@ class TestAICommandIntegration:
         """Test AI command directory structure creation"""
         # Initialize project
         cli = CommandHandler(no_color=True)
-        cli.init("ai-commands-test", here=True)
+        cli.project_commands.init("ai-commands-test", here=True)
 
         # Check AI command directories are created
         claude_dir = self.project_path / ".claude"
@@ -453,7 +453,7 @@ class TestAICommandIntegration:
         """Test script system integration"""
         # Initialize project
         cli = CommandHandler(no_color=True)
-        cli.init("script-test", here=True)
+        cli.project_commands.init("script-test", here=True)
 
         # Check script files are created
         scripts_dir = self.project_path / "scripts"
@@ -474,7 +474,7 @@ class TestAICommandIntegration:
         """Test memory system AI tracking capabilities"""
         # Initialize project
         cli = CommandHandler(no_color=True)
-        cli.init("ai-memory-test", here=True)
+        cli.project_commands.init("ai-memory-test", here=True)
 
         memory_manager = MemoryManager(self.project_path)
 
@@ -514,7 +514,7 @@ class TestAICommandIntegration:
         """Test full workflow: minimal → standard → complete."""
         # 1. Initialize project
         cli = CommandHandler(no_color=True, verbose=False)
-        cli.init("test-project", here=True)
+        cli.project_commands.init("test-project", here=True)
 
         # 2. Create minimal spec manually
         spec_dir = self.project_path / "specs" / "001-test-feature"
@@ -592,7 +592,7 @@ Users need to pay for premium features to access exclusive content
         """Test tiered templates via CLI."""
         # 1. Initialize project
         cli = CommandHandler(no_color=True, verbose=False)
-        cli.init("test-project", here=True)
+        cli.project_commands.init("test-project", here=True)
 
         # 2. Create minimal spec
         spec_dir = self.project_path / "specs" / "002-auth-feature"

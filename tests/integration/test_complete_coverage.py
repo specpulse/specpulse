@@ -290,10 +290,10 @@ class TestCompleteCLI:
         if Path(self.temp_dir).exists():
             shutil.rmtree(self.temp_dir)
 
-    @patch('specpulse.cli.main.should_check_version')
-    @patch('specpulse.cli.main.check_pypi_version')
-    @patch('specpulse.cli.main.compare_versions')
-    @patch('specpulse.cli.main.get_update_message')
+    @patch('specpulse.cli.handlers.command_handler.should_check_version')
+    @patch('specpulse.cli.handlers.command_handler.check_pypi_version')
+    @patch('specpulse.cli.handlers.command_handler.compare_versions')
+    @patch('specpulse.cli.handlers.command_handler.get_update_message')
     def test_cli_check_for_updates(self, mock_msg, mock_compare, mock_check, mock_should):
         """Test CLI update checking"""
         mock_should.return_value = True
@@ -304,7 +304,7 @@ class TestCompleteCLI:
         cli = CommandHandler(no_color=True, verbose=False)
         assert cli is not None
 
-    @patch('specpulse.cli.main.should_check_version')
+    @patch('specpulse.cli.handlers.command_handler.should_check_version')
     def test_cli_private_methods(self, mock_should):
         """Test CLI private methods"""
         mock_should.return_value = False

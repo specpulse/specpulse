@@ -577,7 +577,7 @@ class SafeCommands:
                         feature_dir = line.split(':')[1].strip()
                         if self.file_ops.validate_feature_dir_name(feature_dir):
                             return feature_dir
-            except:
+            except (OSError, IOError, ValueError):
                 pass
 
         # Fallback to scanning specs directory
@@ -592,7 +592,7 @@ class SafeCommands:
                 if feature_dirs:
                     feature_dirs.sort(key=lambda x: x.stat().st_mtime, reverse=True)
                     return feature_dirs[0].name
-            except:
+            except (OSError, IOError):
                 pass
 
         return None
@@ -732,7 +732,7 @@ class SafeCommands:
                     feature_info = self._get_feature_info_safe(item.name, verbose)
                     if feature_info:
                         features.append(feature_info)
-        except:
+        except (OSError, IOError):
             pass
 
         return sorted(features, key=lambda x: x["feature_id"])
